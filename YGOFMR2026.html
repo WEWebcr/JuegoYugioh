@@ -8707,12 +8707,12 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 }
 .ps1-character-wrapper {
     position: fixed;
-    bottom: 155px; /* Justo encima de la caja de dialogo */
+    bottom: 155px;
     left: 50%;
     margin-left: -350px;
     width: 700px;
     height: 600px;
-    z-index: 999999; /* Asegurar que este encima del #campaign3000 */
+    z-index: 999999;
     pointer-events: none;
 }
 .ps1-character-cutout {
@@ -8736,6 +8736,85 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     pointer-events: none;
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* PS1 KEYBOARD STYLES */
+#keyboard-container {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    row-gap: 15px;
+    column-gap: 5px;
+    margin: 20px auto;
+    max-width: 550px;
+    padding: 30px;
+    background: url('ImagenesPersonajes/PortadaSecundaria.jpeg') center/cover;
+    border: 6px solid #4a3622;
+    border-style: ridge;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+#keyboard-container::before {
+    content: ""; position: absolute; inset:0; background: rgba(20,10,0,0.85); z-index:0;
+}
+.ps1-key {
+    position: relative; z-index: 1;
+    background: transparent; border: none; color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 24px; font-weight: bold;
+    text-shadow: 2px 2px 0 #000; cursor: pointer;
+    transition: 0.1s; padding: 0; margin: 0;
+}
+.ps1-key:hover { color: #00ff00; transform: scale(1.3); }
+
+#ps1-name-display {
+    width: 250px;
+    height: 45px;
+    margin: 20px auto;
+    background: #111;
+    border: 3px solid #333;
+    border-style: ridge;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    letter-spacing: 10px;
+    box-shadow: inset 0 0 15px #000;
+}
+
+/* PS1 MAP STYLES */
+.ps1-map-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s;
+    z-index: 20;
+}
+.ps1-map-node:hover {
+    transform: translate(-50%, -55%) scale(1.1);
+}
+.ps1-map-label {
+    background: rgba(0,0,0,0.8);
+    border: 2px solid #a67c00;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    text-shadow: 1px 1px 0 #000;
+}
+.ps1-map-arrow {
+    color: #ffff00;
+    font-size: 40px;
+    text-shadow: 0 5px 10px #000;
+    animation: ps1bounce 1s infinite alternate;
+}
+@keyframes ps1bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(10px); }
+}
+
 </style>
 
 <div id="start-overlay">HAZ CLIC EN CUALQUIER LUGAR</div>
@@ -8798,7 +8877,7 @@ document.addEventListener('touchstart', unlockAudio, {capture: true});
 document.addEventListener('keydown', unlockAudio, {capture: true});
 
 document.addEventListener('click', (e) => {
-    if(e.target.closest('.campBtn3000') || e.target.closest('.duelistNode3000')) {
+    if(e.target.closest('.campBtn3000') || e.target.closest('.ps1-map-node')) {
         window.playChic();
     }
 });
@@ -8821,71 +8900,82 @@ const observer = new MutationObserver((mutations) => {
         musicType = 'duel';
     } else if (document.getElementById('keyboard-container') || document.getElementById('name3000')) {
         musicType = 'nameEntry';
-    } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000') || document.querySelector('.map-ps1-chat')) {
+    } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000')) {
         musicType = 'dialog';
     }
     if (window.audioUnlocked && window.currentTrack !== musicType) {
         window.playBGM(musicType);
     }
     
-    // Inyectar el personaje guia (Ishizu) en el MAPA DE CAMPAÑA
-    if (document.querySelector('.worldMap3000') && !document.getElementById('map-dialog-injected')) {
-        let mapContainer = document.querySelector('.worldMap3000').parentElement;
+    // VISUAL MAP CREATION
+    if (document.querySelector('.worldMap3000') && !document.getElementById('ps1-visual-map')) {
         let mapDiv = document.querySelector('.worldMap3000');
+        mapDiv.style.display = 'none'; 
+        
+        let mapContainer = mapDiv.parentElement;
+        let panels = mapContainer.querySelectorAll('.campPanel3000');
+        panels.forEach(p => p.style.display = 'none');
+        
+        let visualMap = document.createElement('div');
+        visualMap.id = 'ps1-visual-map';
+        visualMap.style.position = 'absolute';
+        visualMap.style.top = '0'; visualMap.style.left = '0'; 
+        visualMap.style.width = '100%'; visualMap.style.height = '100%';
+        visualMap.style.background = "url('ImagenesPersonajes/PortadaSecundaria.jpeg') center/cover";
+        visualMap.style.zIndex = '10';
+        
+        // Coodinates for nodes to spread them out on the background
+        let coords = [
+            {x: 20, y: 30}, {x: 70, y: 35}, {x: 80, y: 70}, {x: 30, y: 65}, 
+            {x: 50, y: 50}, {x: 10, y: 50}, {x: 90, y: 45}, {x: 50, y: 85}
+        ];
         
         let buttons = mapDiv.querySelectorAll('.duelistNode3000');
-        let latestUnlockedName = '';
-        buttons.forEach(b => {
+        buttons.forEach((b, i) => {
             if (!b.classList.contains('locked')) {
-                let nameEl = b.querySelector('strong');
-                if(nameEl) latestUnlockedName = nameEl.textContent.replace(/[0-9.]/g, '').trim();
+                let name = "";
+                let str = b.querySelector('strong');
+                if(str) name = str.textContent.replace(/[0-9.]/g, '').trim();
+                
+                let btn = document.createElement('div');
+                btn.className = 'ps1-map-node';
+                let c = coords[i % coords.length];
+                btn.style.left = c.x + '%';
+                btn.style.top = c.y + '%';
+                btn.innerHTML = `
+                    <div class="ps1-map-label">${name}</div>
+                    <div class="ps1-map-arrow">?</div>
+                `;
+                btn.onclick = () => {
+                    window.playChic();
+                    b.click();
+                };
+                visualMap.appendChild(btn);
             }
         });
         
-        let mapDialogText = "Faraón, este mapa muestra los pasajes que has descubierto. Selecciona tu próximo destino para continuar tu viaje.";
-        if (latestUnlockedName.includes("Weevil")) {
-            mapDialogText = "Has desbloqueado el bosque antiguo. Weevil aguarda entre los árboles con sus tácticas traicioneras.";
-        } else if (latestUnlockedName.includes("Mai")) {
-            mapDialogText = "El pasaje a las montañas está abierto. Mai Valentine domina los vientos. Cuidado con sus Signos Guardianes.";
-        } else if (latestUnlockedName.includes("Joey")) {
-            mapDialogText = "Tu memoria se fortalece. Joey Wheeler custodia el siguiente pasaje con su feroz dragón.";
-        } else if (latestUnlockedName.includes("Tristan")) {
-            mapDialogText = "Tu primer desafío te espera en este pasaje. Demuestra que recuerdas las bases del duelo antes de avanzar.";
+        mapContainer.style.position = 'relative';
+        mapContainer.style.height = '100vh';
+        mapContainer.style.overflow = 'hidden';
+        mapContainer.appendChild(visualMap);
+        
+        // Ensure "back" menu button is above map
+        let titleRow = mapContainer.querySelector('.campTitleRow3000');
+        if(titleRow) {
+            titleRow.style.position = 'relative';
+            titleRow.style.zIndex = '20';
+            titleRow.style.background = 'rgba(0,0,0,0.8)';
+            titleRow.style.padding = '10px';
         }
-        
-        let dBox = document.createElement('div');
-        dBox.id = 'map-dialog-injected';
-        dBox.className = 'map-ps1-chat';
-        dBox.style.zIndex = '999998';
-        dBox.innerHTML = `
-            <div class="storySpeech301">
-                <div class="storySpeaker301" style="color: #ffcc00;">ISHIZU</div>
-                <div class="storyLine301">${mapDialogText}</div>
-            </div>
-        `;
-        document.body.appendChild(dBox);
-        
-        let wrapper = document.createElement('div');
-        wrapper.id = 'map-ps1-character';
-        wrapper.className = 'ps1-character-wrapper';
-        wrapper.innerHTML = `<div class="ps1-character-cutout" style="background-image:url('ImagenesPersonajes/Ishuzu.jpeg')"></div>`;
-        document.body.appendChild(wrapper);
-        
-        // Hide stats panel to make it look like a PS1 map screen
-        let panels = mapContainer.querySelectorAll('.campPanel3000');
-        if(panels.length > 0) panels[0].style.display = 'none';
-        
-        mapContainer.style.paddingBottom = '350px'; // Make room for character
     }
     
-    // Limpiar guia del mapa si salimos del mapa
+    // CLEAN MAP
     if (!document.querySelector('.worldMap3000')) {
-        let md = document.getElementById('map-dialog-injected');
-        if(md) md.remove();
-        let mc = document.getElementById('map-ps1-character');
-        if(mc) mc.remove();
+        let vm = document.getElementById('ps1-visual-map');
+        if(vm) vm.remove();
     }
     
+    // PS1 KEYBOARD CREATION
     if (document.getElementById('name3000') && !document.getElementById('custom-keyboard-injected')) {
         let panel = document.getElementById('name3000').closest('.campPanel3000');
         if (panel) {
@@ -8895,45 +8985,51 @@ const observer = new MutationObserver((mutations) => {
             nameInput.style.display = 'none';
             startBtn.style.display = 'none';
             
-            panel.style.background = '#1a1a1a';
-            panel.style.border = '4px solid #6b6b6b';
-            panel.style.borderStyle = 'ridge';
+            panel.style.background = '#000';
+            panel.style.border = 'none';
             let h2 = panel.querySelector('h2');
-            if (h2) {
-                h2.style.color = '#ffcc00';
-                h2.style.fontFamily = "'Press Start 2P', monospace";
-            }
+            if (h2) h2.style.display = 'none';
             
             let customUI = document.createElement('div');
             customUI.innerHTML = `
-                <div style="background:#000; padding:10px; border:2px solid #555; margin:20px 0; font-size:20px; font-family:'Press Start 2P', monospace; color:#00ff00; letter-spacing: 5px; height: 30px; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 10px rgba(0,255,0,0.2);">
-                    <span id="name-display"></span><span style="animation: blink 1s infinite;">_</span>
+                <div id="keyboard-container"></div>
+                <div id="ps1-name-display">
+                    <span style="color:#f00">[</span>
+                    <span id="name-display" style="margin: 0 10px;"></span>
+                    <span style="color:#f00; animation: blink 1s infinite;">_</span>
+                    <span style="color:#f00">]</span>
                 </div>
-                <div id="keyboard-container" style="display:grid; grid-template-columns:repeat(10, 1fr); gap:5px; margin-bottom: 20px;">
+                <div style="text-align:center; margin-top:20px;">
+                    <button class="campBtn3000" id="custom-start-btn" style="width:200px !important;">ACEPTAR</button>
                 </div>
-                <button class="campBtn3000" id="custom-start-btn" style="width:100% !important; padding:10px !important; font-size:12px !important;">ACEPTAR</button>
             `;
             panel.appendChild(customUI);
             
             let currentName = nameInput.value || "";
-            const maxLen = 10;
+            const maxLen = 8;
             const display = document.getElementById('name-display');
             display.textContent = currentName;
             
             const keyboard = document.getElementById('keyboard-container');
-            const keys = "ABCDEFGHIJ KLMNOPQRST UVWXYZ.-_  ".split('');
+            const keysArray = [
+                ..."A B C D E F G H I J K".split(' '),
+                ..."L M N O P Q R S T U V".split(' '),
+                ..."W X Y Z".split(' '), "","","","","","","",
+                ..."a b c d e f g h i j k".split(' '),
+                ..."l m n o p q r s t u v".split(' '),
+                ..."w x y z".split(' '), "","","","","","","",
+                ..."0 1 2 3 4 5 6 7 8 9".split(' '), "",
+                ..."$ % ( ) * + - ! ? . :".split(' ')
+            ];
             
-            keys.forEach(k => {
+            keysArray.forEach((k, idx) => {
                 const btn = document.createElement('button');
-                btn.textContent = k.trim() === '' ? ' ' : k;
-                btn.style.padding = '10px 0'; btn.style.background = '#333'; btn.style.color = '#fff';
-                btn.style.border = '2px solid #666'; btn.style.fontFamily = "'Press Start 2P', monospace";
-                btn.style.fontSize = '12px'; btn.style.cursor = 'pointer';
-                if(k.trim() === '') {
+                btn.className = 'ps1-key';
+                btn.textContent = k;
+                
+                if (k === '') {
                     btn.style.visibility = 'hidden';
                 } else {
-                    btn.onmouseover = () => { btn.style.background = '#555'; btn.style.borderColor = '#00ff00'; };
-                    btn.onmouseout = () => { btn.style.background = '#333'; btn.style.borderColor = '#666'; };
                     btn.onclick = () => {
                         window.playChic();
                         if(currentName.length < maxLen) { currentName += k; display.textContent = currentName; }
@@ -8942,31 +9038,29 @@ const observer = new MutationObserver((mutations) => {
                 keyboard.appendChild(btn);
             });
             
-            const delBtn = document.createElement('button');
-            delBtn.textContent = 'DEL'; delBtn.style.gridColumn = 'span 5';
-            delBtn.style.background = '#800000'; delBtn.style.color = '#fff';
-            delBtn.style.border = '2px solid #f00'; delBtn.style.fontFamily = "'Press Start 2P', monospace";
-            delBtn.style.padding = '10px'; delBtn.style.cursor = 'pointer';
-            delBtn.onmouseover = () => { delBtn.style.background = '#a00000'; };
-            delBtn.onmouseout = () => { delBtn.style.background = '#800000'; };
-            delBtn.onclick = () => {
-                window.playChic();
-                if(currentName.length > 0) { currentName = currentName.slice(0, -1); display.textContent = currentName; }
-            };
-            keyboard.appendChild(delBtn);
-
-            const spcBtn = document.createElement('button');
-            spcBtn.textContent = 'ESPACIO'; spcBtn.style.gridColumn = 'span 5';
-            spcBtn.style.background = '#333'; spcBtn.style.color = '#fff';
-            spcBtn.style.border = '2px solid #666'; spcBtn.style.fontFamily = "'Press Start 2P', monospace";
-            spcBtn.style.padding = '10px'; spcBtn.style.cursor = 'pointer';
-            spcBtn.onmouseover = () => { spcBtn.style.background = '#555'; spcBtn.style.borderColor = '#00ff00'; };
-            spcBtn.onmouseout = () => { spcBtn.style.background = '#333'; spcBtn.style.borderColor = '#666'; };
-            spcBtn.onclick = () => {
-                window.playChic();
-                if(currentName.length < maxLen) { currentName += ' '; display.textContent = currentName; }
-            };
-            keyboard.appendChild(spcBtn);
+            // Reemplazar un boton vacio por END
+            let keysDOM = keyboard.children;
+            if(keysDOM.length > 76) {
+                let endBtn = keysDOM[76];
+                endBtn.style.visibility = 'visible';
+                endBtn.textContent = 'END';
+                endBtn.style.color = '#0088ff'; // blue end
+                endBtn.onclick = () => {
+                    window.playChic();
+                    document.getElementById('custom-start-btn').click();
+                };
+            }
+            // Reemplazar vacio por DEL (flecha)
+            if(keysDOM.length > 54) {
+                let delBtn = keysDOM[54];
+                delBtn.style.visibility = 'visible';
+                delBtn.textContent = '?';
+                delBtn.style.color = '#0088ff';
+                delBtn.onclick = () => {
+                    window.playChic();
+                    if(currentName.length > 0) { currentName = currentName.slice(0, -1); display.textContent = currentName; }
+                };
+            }
             
             document.getElementById('custom-start-btn').onclick = () => {
                 window.playChic();
@@ -8976,6 +9070,7 @@ const observer = new MutationObserver((mutations) => {
         }
     }
     
+    // PS1 DIALOG LOGIC
     document.querySelectorAll('.storyLine301:not(.typed), .dialogText3000:not(.typed)').forEach(el => {
         el.classList.add('typed');
         const text = el.textContent; el.innerHTML = '';
