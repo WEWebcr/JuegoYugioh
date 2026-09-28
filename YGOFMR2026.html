@@ -8715,6 +8715,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 <script>
 
 
+
 if (!window.location.hash.includes("campContent3000")) { window.location.hash = "campContent3000"; window.location.reload(); }
 
 
@@ -8838,8 +8839,7 @@ const observer = new MutationObserver((mutations) => {
         btn.onclick = () => {
             if (confirm("¿Seguro que quieres rendirte? Esto resultará en una DERROTA automática.")) {
                 window.playChic();
-                window.game.plp = 0;
-                if (typeof window.render === 'function') window.render();
+                if (typeof window.finishDeckOut67 === 'function') window.finishDeckOut67('player');
             }
         };
         actionBtns.appendChild(btn);
@@ -8879,7 +8879,7 @@ const observer = new MutationObserver((mutations) => {
             } else {
                 title.textContent = 'GAME OVER';
                 title.style.color = '#ff0000';
-                document.getElementById('deckOutText67').innerHTML = 'Has sido derrotado por falta de cartas en la historia.<br>Tu alma ha sido enviada al Reino de las Sombras.';
+                document.getElementById('deckOutText67').innerHTML = 'Has sido derrotado en la historia.<br>Tu alma ha sido enviada al Reino de las Sombras.';
                 let btn = deckOut.querySelector('button');
                 btn.textContent = 'VOLVER AL MENÚ';
                 btn.style.borderColor = '#ff0000';
@@ -8989,6 +8989,7 @@ visualMap.appendChild(shopBtn);
     }
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
 
 
 
