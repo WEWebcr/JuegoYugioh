@@ -8713,6 +8713,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 </style>
 <div id="start-overlay">HAZ CLIC EN CUALQUIER LUGAR</div>
 <script>
+
 if (!window.location.hash.includes("campContent3000")) { window.location.hash = "campContent3000"; window.location.reload(); }
 
 
@@ -8725,7 +8726,7 @@ if (!window.location.hash.includes("campContent3000")) { window.location.hash = 
 
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
-window.activeAccount = null;
+window.activeAccount = localStorage.getItem('FMR_ACTIVE_ACCOUNT') || null;
 localStorage.getItem = function(key) {
     if (key === 'FMR_REBORN_STORY_V3000') {
         if (!window.activeAccount) return null;
@@ -8775,7 +8776,7 @@ function showLoadGameMenu() {
         if(!accs[email]) return alert("No se encontr� ninguna partida con ese correo.");
         if(accs[email].password !== pass) return alert("Contrase�a incorrecta.");
         if(!accs[email].data) return alert("Esta cuenta se cre� pero no inici� ninguna partida. Ve a Nueva Partida y usa este mismo correo.");
-        window.activeAccount = email; overlay.remove();
+        window.activeAccount = email; origSet.call(localStorage, 'FMR_ACTIVE_ACCOUNT', email); overlay.remove();
         let newg = document.getElementById('new3000');
         if(newg) { newg.click(); setTimeout(() => { document.getElementById('back3000').click(); setTimeout(() => { let c = document.getElementById('continue3000'); if (c && !c.disabled) c.click(); else alert("Hubo un error cargando la partida."); }, 100); }, 100); }
     };
@@ -8793,7 +8794,7 @@ function showRegisterMenu(name) {
         if(!email || !pass) return alert("Llena todos los campos.");
         let accs = JSON.parse(origGet.call(localStorage, 'FMR_ACCOUNTS') || '{}');
         if(accs[email] && accs[email].data !== null) return alert("Este correo ya tiene una partida. Usa otro o ve a Cargar.");
-        window.activeAccount = email; accs[email] = { password: pass, data: null }; origSet.call(localStorage, 'FMR_ACCOUNTS', JSON.stringify(accs));
+        window.activeAccount = email; origSet.call(localStorage, 'FMR_ACTIVE_ACCOUNT', email); accs[email] = { password: pass, data: null }; origSet.call(localStorage, 'FMR_ACCOUNTS', JSON.stringify(accs));
         let hiddenStart = document.getElementById('hidden-start-btn');
         if(hiddenStart) { let n = document.getElementById('name3000'); if(n) n.value = name; hiddenStart.click(); }
     };
@@ -8882,8 +8883,11 @@ const observer = new MutationObserver((mutations) => {
     if (document.getElementById('new3000') && !document.getElementById('custom-new-game')) {
         let parent = document.querySelector('.campBtns3000'); Array.from(parent.children).forEach(c => c.style.display = 'none');
         let cm = document.createElement('div'); cm.id = 'custom-main-menu'; cm.style.display = 'flex'; cm.style.flexDirection = 'column'; cm.style.gap = '15px'; cm.style.alignItems = 'center'; cm.style.width = '100%';
-        cm.innerHTML = `<button class="campBtn3000 primary" id="custom-new-game">NUEVA PARTIDA</button><button class="campBtn3000" id="custom-load-game">CARGAR</button><button class="campBtn3000" id="custom-trade">TRADE</button><button class="campBtn3000" id="custom-options">OPCIONES</button>`; parent.appendChild(cm);
+        let hasSave = document.getElementById('continue3000') && !document.getElementById('continue3000').hasAttribute('disabled');
+        let btnHtml = (hasSave ? `<button class="campBtn3000 primary" id="custom-continue-game" style="border-color:#00ff00; color:#00ff00; font-size: 20px!important; padding: 15px 40px!important;">CONTINUAR</button>` : "") + `<button class="campBtn3000 primary" id="custom-new-game">NUEVA PARTIDA</button><button class="campBtn3000" id="custom-load-game">CARGAR</button><button class="campBtn3000" id="custom-trade">TRADE</button><button class="campBtn3000" id="custom-options">OPCIONES</button>`;
+        cm.innerHTML = btnHtml; parent.appendChild(cm);
         let p = parent.nextElementSibling; if(p && p.classList.contains('campPanel3000')) p.style.display = 'none';
+        if (hasSave) document.getElementById('custom-continue-game').onclick = () => { window.playChic(); document.getElementById('continue3000').click(); };
         document.getElementById('custom-new-game').onclick = () => { window.playChic(); document.getElementById('new3000').click(); };
         document.getElementById('custom-load-game').onclick = () => { window.playChic(); showLoadGameMenu(); };
         document.getElementById('custom-trade').onclick = () => { window.playChic(); alert("El modo TRADE estar� disponible pronto."); };
@@ -8964,5 +8968,6 @@ visualMap.appendChild(shopBtn);
     }
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
 
 </script>
