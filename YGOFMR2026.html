@@ -8714,6 +8714,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 <div id="start-overlay">HAZ CLIC EN CUALQUIER LUGAR</div>
 <script>
 
+
 if (!window.location.hash.includes("campContent3000")) { window.location.hash = "campContent3000"; window.location.reload(); }
 
 
@@ -8823,6 +8824,26 @@ const observer = new MutationObserver((mutations) => {
     let musicType = 'menu'; const camp = document.getElementById('campaign3000');
     if (!camp || camp.classList.contains('hidden')) { musicType = 'duel'; } else if (document.getElementById('keyboard-container') || document.getElementById('name3000') || document.getElementById('login-overlay')) { musicType = 'nameEntry'; } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000')) { musicType = 'dialog'; }
     if (window.audioUnlocked && window.currentTrack !== musicType) { window.playBGM(musicType); }
+    
+    let actionBtns = document.querySelector('.actionBtns');
+    if (actionBtns && !document.getElementById('btn-surrender')) {
+        let btn = document.createElement('button');
+        btn.id = 'btn-surrender';
+        btn.className = 'btn';
+        btn.textContent = 'Rendirse';
+        btn.style.backgroundColor = '#600';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#900';
+        btn.style.marginLeft = '10px';
+        btn.onclick = () => {
+            if (confirm("¿Seguro que quieres rendirte? Esto resultará en una DERROTA automática.")) {
+                window.playChic();
+                window.game.plp = 0;
+                if (typeof window.render === 'function') window.render();
+            }
+        };
+        actionBtns.appendChild(btn);
+    }
     
     let defeat = document.querySelector('.rewardHero3000 h2');
     if (defeat && defeat.textContent === 'DERROTA' && !defeat.dataset.tracked) { 
@@ -8968,6 +8989,7 @@ visualMap.appendChild(shopBtn);
     }
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
 
 
 </script>
