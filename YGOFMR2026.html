@@ -8710,12 +8710,13 @@ function playTick() {
         if(window.audioCtx.state === 'suspended') window.audioCtx.resume();
         const osc = window.audioCtx.createOscillator();
         const gain = window.audioCtx.createGain();
-        osc.type = 'square'; osc.frequency.setValueAtTime(600, window.audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, window.audioCtx.currentTime + 0.05);
-        gain.gain.setValueAtTime(0.1, window.audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, window.audioCtx.currentTime + 0.05);
+        osc.type = 'sine'; 
+        osc.frequency.setValueAtTime(440, window.audioCtx.currentTime);
+        gain.gain.setValueAtTime(0, window.audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.08, window.audioCtx.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, window.audioCtx.currentTime + 0.06);
         osc.connect(gain); gain.connect(window.audioCtx.destination);
-        osc.start(); osc.stop(window.audioCtx.currentTime + 0.05);
+        osc.start(); osc.stop(window.audioCtx.currentTime + 0.07);
     } catch(e) {}
 }
 
