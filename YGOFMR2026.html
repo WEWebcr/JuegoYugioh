@@ -8713,6 +8713,8 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 </style>
 <div id="start-overlay">HAZ CLIC EN CUALQUIER LUGAR</div>
 <script>
+if (!window.location.hash.includes("campContent3000")) { window.location.hash = "campContent3000"; window.location.reload(); }
+
 
 
 
@@ -8759,7 +8761,7 @@ window.playChic = function() { if(!window.audioUnlocked) return; try { let ctx =
 function unlockAudio(e) { if(!window.audioUnlocked) { window.audioUnlocked = true; const ov = document.getElementById('start-overlay'); if(ov) ov.style.display = 'none'; let m = 'menu'; const camp = document.getElementById('campaign3000'); if (!camp || camp.classList.contains('hidden')) m = 'duel'; if (document.getElementById('keyboard-container')) m = 'nameEntry'; window.playBGM(m); } }
 document.addEventListener('click', unlockAudio, {capture: true}); document.addEventListener('touchstart', unlockAudio, {capture: true}); document.addEventListener('keydown', unlockAudio, {capture: true});
 document.addEventListener('click', (e) => { if(e.target.closest('.campBtn3000') || e.target.closest('.ps1-map-node')) { window.playChic(); } });
-const portraitMap = { 'ATEM': 'Ateam.jpeg', 'ABUELO': 'abueloYugi.jpg', 'TRISTAN': 'Tristan.jpg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'SetoKaiba.jpeg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg', 'MAI': 'Mai.jpeg', 'WEEVIL': 'Weevil.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg', 'BAKURA': 'Bakura.jpeg', 'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg' };
+const portraitMap = { 'ATEM': 'Ateam.jpeg', 'ABUELO': 'abueloYugi.jpg', 'ATEM': 'Ateam.jpeg', 'ABUELO': 'abueloYugi.jpg', 'TRISTAN': 'Tristan.jpg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'SetoKaiba.jpeg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg', 'MAI': 'Mai.jpeg', 'WEEVIL': 'Weevil.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg', 'BAKURA': 'Bakura.jpeg', 'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg' };
 function getPortrait(name) { name = (name || '').toUpperCase(); for (let key in portraitMap) if (name.includes(key)) return 'ImagenesPersonajes/' + portraitMap[key]; return null; }
 function showLoadGameMenu() {
     let panel = document.querySelector('.campBtns3000').parentElement; let overlay = document.createElement('div'); overlay.id = 'login-overlay'; overlay.style.position = 'absolute'; overlay.style.inset = '0'; overlay.style.background = 'rgba(0,0,0,0.95)'; overlay.style.zIndex = '200'; overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center';
@@ -8835,11 +8837,36 @@ const observer = new MutationObserver((mutations) => {
             rewardHero.innerHTML = `
                 <h2 style="color:#ff0000; font-size:40px; margin-bottom:20px; text-shadow:0 0 20px #ff0000;">GAME OVER</h2>
                 <p style="color:#fff; margin-bottom:40px; font-family:monospace; font-size:16px;">Has sido derrotado en la historia.<br>Tu alma ha sido enviada al Reino de las Sombras.</p>
-                <button class="campBtn3000" id="btn-game-over" style="border-color:#ff0000; color:#ff0000;">VOLVER AL MEN�</button>
+                <button class="campBtn3000" id="btn-game-over" style="border-color:#ff0000; color:#ff0000;">VOLVER AL MENÚ</button>
             `;
             document.getElementById('btn-game-over').onclick = () => { window.playChic(); window.location.reload(); };
         }
     }
+
+    let deckOut = document.getElementById('deckOut67');
+    if (deckOut && deckOut.classList.contains('show') && !deckOut.dataset.tracked) {
+        deckOut.dataset.tracked = '1';
+        let title = document.getElementById('deckOutTitle67');
+        if (title && title.textContent === 'DERROTA') {
+            if (window.currentFreeDuelId) {
+                let stats = JSON.parse(localStorage.getItem('FMR_FREE_DUEL_STATS') || '{}'); 
+                if(!stats[window.currentFreeDuelId]) stats[window.currentFreeDuelId] = {w:0, l:0}; 
+                stats[window.currentFreeDuelId].l += 1; 
+                localStorage.setItem('FMR_FREE_DUEL_STATS', JSON.stringify(stats)); 
+                window.currentFreeDuelId = null; 
+            } else {
+                title.textContent = 'GAME OVER';
+                title.style.color = '#ff0000';
+                document.getElementById('deckOutText67').innerHTML = 'Has sido derrotado por falta de cartas en la historia.<br>Tu alma ha sido enviada al Reino de las Sombras.';
+                let btn = deckOut.querySelector('button');
+                btn.textContent = 'VOLVER AL MENÚ';
+                btn.style.borderColor = '#ff0000';
+                btn.style.color = '#ff0000';
+                btn.onclick = (e) => { e.preventDefault(); window.playChic(); window.location.reload(); };
+            }
+        }
+    }
+
     let victory = document.querySelector('.rewardHero3000');
     if (victory && victory.textContent.includes('VICTORIA') && !victory.dataset.tracked) { 
         victory.dataset.tracked = '1'; 
@@ -8919,6 +8946,7 @@ visualMap.appendChild(shopBtn);
     let titleRowH2 = document.querySelector(".campTitleRow3000 h2");
     if (titleRowH2) {
         let titleText = titleRowH2.textContent;
+        if (titleText === "MUNDO 1") { window.currentFreeDuelId = null; }
         if (titleText === "TIENDA DE MEMORIAS" || titleText === "COLECCI�N" || titleText === "EDITAR DECK") {
             let backBtn = document.getElementById("back3000");
             if (backBtn && !backBtn.dataset.hijacked) {
@@ -8936,4 +8964,5 @@ visualMap.appendChild(shopBtn);
     }
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
 </script>
