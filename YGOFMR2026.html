@@ -8662,6 +8662,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 
 
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8840,18 +8841,23 @@ const observer = new MutationObserver((mutations) => {
         let idx = 0; let t = null; let isTyping = true; function type() { if(idx < text.length) { el.innerHTML += text.charAt(idx); idx++; t = setTimeout(type, 30); } else { isTyping = false; el.innerHTML += '<span style="animation: blink 1s infinite; color: #ffcc00;"> &#9660;</span>'; } } type();
         if (mainBox) { mainBox.style.cursor = 'pointer'; mainBox.onclick = (e) => { if(e.target.tagName.toLowerCase() === 'button') return; window.playChic(); if(isTyping) { clearTimeout(t); el.innerHTML = text + '<span style="animation: blink 1s infinite; color: #ffcc00;"> &#9660;</span>'; isTyping = false; } else if(btn) { btn.click(); let cleanupWrapper = document.getElementById('ps1-active-character'); if (cleanupWrapper) cleanupWrapper.remove(); } } }
     });
+    let titleRowH2 = document.querySelector(".campTitleRow3000 h2");
+    if (titleRowH2) {
+        let titleText = titleRowH2.textContent;
+        if (titleText === "TIENDA DE MEMORIAS" || titleText === "COLECCI�N" || titleText === "EDITAR DECK") {
+            let backBtn = document.getElementById("back3000");
+            if (backBtn && !backBtn.dataset.hijacked) {
+                backBtn.dataset.hijacked = "1";
+                backBtn.textContent = "VOLVER AL MAPA";
+                let oldOnclick = backBtn.onclick;
+                backBtn.onclick = () => {
+                    window.playChic();
+                    if (oldOnclick) oldOnclick();
+                    let continueBtn = document.getElementById("continue3000");
+                    if (continueBtn) continueBtn.click();
+                };
+            }
+        }
+    }
 });
-observer.observe(document.body, { childList: true, subtree: true });
-
-
-
-
-
-
-
-
-
-
-
-
-</script>
+observer.observe(document.body, { childList: true, subtree: true });</script>
