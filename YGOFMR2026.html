@@ -8653,12 +8653,12 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 }
 
 /* Ocultamos las barras de progreso, iconos y avatares pequeños del juego base durante la conversacion */
-.storyNpcRow301, .storyPlayerRow301, .speaker3000, .storySpeaker301, .storyProgress301, .storyTip301 {
+.storyStage301, .storyProgress301, .storyTip301 {
     display: none !important;
 }
 
 /* CAJA DE DIALOGO ESTILO PS1 */
-.dialog3000, .storyConversation301 {
+.dialog3000, .storyChat301 {
     position: fixed !important;
     bottom: 20px !important;
     left: 5% !important;
@@ -8690,6 +8690,14 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     line-height: 2 !important;
     text-shadow: 2px 2px 0px #000 !important;
     margin: 0 !important;
+}
+.storySpeaker301, .speaker3000 {
+    font-family: 'Press Start 2P', monospace, sans-serif !important;
+    color: #ffcc00 !important;
+    font-size: 14px !important;
+    text-shadow: 2px 2px 0px #000 !important;
+    margin-bottom: 10px !important;
+    text-transform: uppercase !important;
 }
 
 /* PERSONAJE GIGANTE ANIMADO AL FONDO */
@@ -8790,7 +8798,7 @@ const observer = new MutationObserver((mutations) => {
         musicType = 'duel';
     } else if (document.getElementById('keyboard-container') || document.getElementById('name3000')) {
         musicType = 'nameEntry';
-    } else if (document.querySelector('.storyConversation301') || document.querySelector('.dialog3000.campPanel3000')) {
+    } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000')) {
         musicType = 'dialog';
     }
     if (window.audioUnlocked && window.currentTrack !== musicType) {
@@ -8887,7 +8895,9 @@ const observer = new MutationObserver((mutations) => {
         el.classList.add('typed');
         const text = el.textContent; el.innerHTML = '';
         let container = el.closest('.storySpeech301') || el.closest('.dialog3000');
-        let mainBox = el.closest('.storyConversation301') || el.closest('.dialog3000');
+        let mainBox = el.closest('.storyChat301') || el.closest('.dialog3000');
+        
+        if (!mainBox) return; // Proteccion contra errores nulos
         
         let btn = mainBox.querySelector('button');
         if (btn) btn.style.display = 'none';
@@ -8896,15 +8906,16 @@ const observer = new MutationObserver((mutations) => {
         let speakerEl = mainBox.querySelector('.storySpeaker301') || mainBox.querySelector('.speaker3000');
         if (speakerEl) speakerName = speakerEl.textContent;
         
-        let oldWrapper = mainBox.querySelector('.ps1-character-wrapper');
+        let oldWrapper = document.getElementById('ps1-active-character');
         if (oldWrapper) oldWrapper.remove();
         
         let img = getPortrait(speakerName);
         if (img) {
             let wrapper = document.createElement('div');
+            wrapper.id = 'ps1-active-character';
             wrapper.className = 'ps1-character-wrapper';
             wrapper.innerHTML = `<div class="ps1-character-cutout" style="background-image:url('${img}')"></div>`;
-            mainBox.appendChild(wrapper);
+            document.body.appendChild(wrapper);
         }
         
         let idx = 0; let t = null; let isTyping = true;
@@ -8929,6 +8940,8 @@ const observer = new MutationObserver((mutations) => {
                     isTyping = false;
                 } else if(btn) {
                     btn.click();
+                    let cleanupWrapper = document.getElementById('ps1-active-character');
+                    if (cleanupWrapper) cleanupWrapper.remove();
                 }
             }
         }
