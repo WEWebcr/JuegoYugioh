@@ -8660,6 +8660,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 
 
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8724,7 +8725,7 @@ function showRegisterMenu(name) {
     if (hiddenStart) { hiddenStart.style.display="none"; document.body.appendChild(hiddenStart); }
     if (hiddenName) { hiddenName.style.display="none"; document.body.appendChild(hiddenName); }
     panel.innerHTML = `<div style="background:#000; border:4px solid #6b6b6b; padding:30px; color:#fff; font-family:'Press Start 2P', monospace; width:100%; box-sizing:border-box;"><h2 style="color:#ffcc00; margin-bottom:20px; font-size:16px; text-align:center;">VINCULAR CUENTA</h2><p style="font-size:10px; color:#ccc; margin-bottom:20px; text-align:center;">Guarda tu partida para: <span style="color:#0f0">${name}</span></p><div style="margin-bottom:15px;"><label style="font-size:12px;">CORREO:</label><br><input type="text" id="acc-email" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;" placeholder="tu@correo.com"></div><div style="margin-bottom:20px;"><label style="font-size:12px;">CONTRASE&Ntilde;A:</label><br><input type="password" id="acc-pass" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;"></div><button class="campBtn3000" id="acc-submit" style="width:100% !important; margin-bottom:15px;">CREAR Y EMPEZAR</button><button class="campBtn3000" id="acc-cancel" style="width:100% !important;">CANCELAR</button></div>`;
-    document.getElementById('acc-cancel').onclick = () => { window.playChic(); document.getElementById('back3000').click(); };
+    document.getElementById('acc-cancel').onclick = () => { window.playChic(); window.location.reload(); };
     document.getElementById('acc-submit').onclick = () => {
         window.playChic(); let email = document.getElementById('acc-email').value.trim(); let pass = document.getElementById('acc-pass').value.trim();
         if(!email || !pass) return alert("Llena todos los campos.");
@@ -8757,7 +8758,7 @@ function showCustomShopMenu() {
 }
 const observer = new MutationObserver((mutations) => {
     let musicType = 'menu'; const camp = document.getElementById('campaign3000');
-    if (!camp || camp.classList.contains('hidden')) { musicType = 'duel'; } else if (document.getElementById('keyboard-container') || document.getElementById('name3000')) { musicType = 'nameEntry'; } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000')) { musicType = 'dialog'; }
+    if (!camp || camp.classList.contains('hidden')) { musicType = 'duel'; } else if (document.getElementById('keyboard-container') || document.getElementById('name3000') || document.getElementById('login-overlay')) { musicType = 'nameEntry'; } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000')) { musicType = 'dialog'; }
     if (window.audioUnlocked && window.currentTrack !== musicType) { window.playBGM(musicType); }
     
     let defeat = document.querySelector('.rewardHero3000 h2');
@@ -8840,6 +8841,8 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+
 
 
 
