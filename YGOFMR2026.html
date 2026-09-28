@@ -8654,6 +8654,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 
 
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8696,7 +8697,7 @@ const portraitMap = { 'TRISTAN': 'Tristan.jpg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'S
 function getPortrait(name) { name = (name || '').toUpperCase(); for (let key in portraitMap) if (name.includes(key)) return 'ImagenesPersonajes/' + portraitMap[key]; return null; }
 function showLoadGameMenu() {
     let panel = document.querySelector('.campBtns3000').parentElement; let overlay = document.createElement('div'); overlay.id = 'login-overlay'; overlay.style.position = 'absolute'; overlay.style.inset = '0'; overlay.style.background = 'rgba(0,0,0,0.95)'; overlay.style.zIndex = '200'; overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center';
-    overlay.innerHTML = `<div style="background:#000; border:4px solid #6b6b6b; padding:30px; color:#fff; font-family:'Press Start 2P', monospace; width:400px; max-width:90%;"><h2 style="color:#ffcc00; margin-bottom:20px; font-size:16px;">CARGAR PARTIDA</h2><div style="margin-bottom:15px;"><label style="font-size:12px;">CORREO:</label><br><input type="text" id="acc-email" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;" placeholder="tu@correo.com"></div><div style="margin-bottom:20px;"><label style="font-size:12px;">CONTRASEÑA:</label><br><input type="password" id="acc-pass" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;"></div><button class="campBtn3000" id="acc-submit" style="width:100% !important; margin-bottom:15px;">ENTRAR</button><button class="campBtn3000" id="acc-cancel" style="width:100% !important;">CANCELAR</button></div>`;
+    overlay.innerHTML = `<div style="background:#000; border:4px solid #6b6b6b; padding:30px; color:#fff; font-family:'Press Start 2P', monospace; width:400px; max-width:90%;"><h2 style="color:#ffcc00; margin-bottom:20px; font-size:16px; text-align:center;">CARGAR PARTIDA</h2><div style="margin-bottom:15px;"><label style="font-size:12px;">CORREO:</label><br><input type="text" id="acc-email" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;" placeholder="tu@correo.com"></div><div style="margin-bottom:20px;"><label style="font-size:12px;">CONTRASE&Ntilde;A:</label><br><input type="password" id="acc-pass" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;"></div><button class="campBtn3000" id="acc-submit" style="width:100% !important; margin-bottom:15px;">ENTRAR</button><button class="campBtn3000" id="acc-cancel" style="width:100% !important;">CANCELAR</button></div>`;
     panel.style.position = 'relative'; panel.appendChild(overlay);
     document.getElementById('acc-cancel').onclick = () => { window.playChic(); overlay.remove(); };
     document.getElementById('acc-submit').onclick = () => {
@@ -8717,7 +8718,7 @@ function showRegisterMenu(name) {
     let hiddenName = document.getElementById('name3000');
     if (hiddenStart) { hiddenStart.style.display="none"; document.body.appendChild(hiddenStart); }
     if (hiddenName) { hiddenName.style.display="none"; document.body.appendChild(hiddenName); }
-    panel.innerHTML = `<div style="background:#000; border:4px solid #6b6b6b; padding:30px; color:#fff; font-family:'Press Start 2P', monospace; width:100%; box-sizing:border-box;"><h2 style="color:#ffcc00; margin-bottom:20px; font-size:16px;">VINCULAR CUENTA</h2><p style="font-size:10px; color:#ccc; margin-bottom:20px;">Guarda tu partida para: <span style="color:#0f0">${name}</span></p><div style="margin-bottom:15px;"><label style="font-size:12px;">CORREO:</label><br><input type="text" id="acc-email" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;" placeholder="tu@correo.com"></div><div style="margin-bottom:20px;"><label style="font-size:12px;">CONTRASEÑA:</label><br><input type="password" id="acc-pass" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;"></div><button class="campBtn3000" id="acc-submit" style="width:100% !important; margin-bottom:15px;">CREAR Y EMPEZAR</button><button class="campBtn3000" id="acc-cancel" style="width:100% !important;">CANCELAR</button></div>`;
+    panel.innerHTML = `<div style="background:#000; border:4px solid #6b6b6b; padding:30px; color:#fff; font-family:'Press Start 2P', monospace; width:100%; box-sizing:border-box;"><h2 style="color:#ffcc00; margin-bottom:20px; font-size:16px; text-align:center;">VINCULAR CUENTA</h2><p style="font-size:10px; color:#ccc; margin-bottom:20px; text-align:center;">Guarda tu partida para: <span style="color:#0f0">${name}</span></p><div style="margin-bottom:15px;"><label style="font-size:12px;">CORREO:</label><br><input type="text" id="acc-email" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;" placeholder="tu@correo.com"></div><div style="margin-bottom:20px;"><label style="font-size:12px;">CONTRASE&Ntilde;A:</label><br><input type="password" id="acc-pass" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;"></div><button class="campBtn3000" id="acc-submit" style="width:100% !important; margin-bottom:15px;">CREAR Y EMPEZAR</button><button class="campBtn3000" id="acc-cancel" style="width:100% !important;">CANCELAR</button></div>`;
     document.getElementById('acc-cancel').onclick = () => { window.playChic(); document.getElementById('back3000').click(); };
     document.getElementById('acc-submit').onclick = () => {
         window.playChic(); let email = document.getElementById('acc-email').value.trim(); let pass = document.getElementById('acc-pass').value.trim();
@@ -8834,6 +8835,8 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+
 
 
 
