@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yu-Gi-Oh! Diálogos</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000; /* Fondo negro por ahora */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Press Start 2P', monospace; /* Fuente retro */
+            overflow: hidden;
+        }
+
+        /* Contenedor principal del juego (simulando pantalla de PS1) */
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: url('ImagenesPersonajes/PortadaPrincipal.jpeg') no-repeat center center;
+            background-size: cover;
+            border: 4px solid #333;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        /* Capa oscura para resaltar al personaje */
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Personaje */
+        #character {
+            position: absolute;
+            bottom: 120px; /* Justo encima de la caja de diálogo */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 400px;
+            background: url('ImagenesPersonajes/SetoKaiba.jpeg') no-repeat center bottom;
+            background-size: contain;
+            transition: background-image 0.3s ease-in-out;
+        }
+
+        /* Caja de diálogo al estilo piedra/retro */
+        #dialog-box {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 120px;
+            background-color: #1a1a1a;
+            border: 8px solid #6b6b6b;
+            border-style: ridge; /* Da un efecto 3D similar a piedra */
+            border-radius: 5px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.8);
+            padding: 20px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        /* Texto del diálogo */
+        #dialog-text {
+            color: #ffffff;
+            font-size: 14px;
+            line-height: 1.8;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        /* Indicador de siguiente texto (parpadeante) */
+        #next-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            color: #ffcc00;
+            font-size: 18px;
+            animation: blink 1s infinite;
+            display: none; /* Oculto hasta que termine de escribir */
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="overlay"></div>
+        <div id="character"></div>
+        
+        <div id="dialog-box" onclick="avanzarDialogo()">
+            <div id="dialog-text"></div>
+            <div id="next-indicator">▼</div>
+        </div>
+    </div>
+
+    <script>
+        // Array con los diálogos y qué personaje habla
+        const dialogos = [
+            {
+                personaje: 'SetoKaiba.jpeg',
+                texto: "Es hora de que dejes de lado ese pasatiempo ridículo..."
+            },
+            {
+                personaje: 'SetoKaiba.jpeg',
+                texto: "¡Y te concentres en prepararte para el torneo!"
+            },
+            {
+                personaje: 'YugiMoTo.jpeg',
+                texto: "¡Kaiba! El Duelo de Monstruos no es solo un pasatiempo."
+            },
+            {
+                personaje: 'Pegasus.jpeg',
+                texto: "Oh, Yugi boy... Tienes mucho que aprender sobre el Reino de los Duelos."
+            }
+        ];
+
+        let indiceDialogoActual = 0;
+        let indiceLetraActual = 0;
+        let escribiendo = false;
+        let timeoutEscritura;
+
+        const elementoTexto = document.getElementById('dialog-text');
+        const elementoPersonaje = document.getElementById('character');
+        const indicadorSiguiente = document.getElementById('next-indicator');
+
+        // Velocidad de la máquina de escribir (milisegundos por letra)
+        const velocidadEscritura = 40;
+
+        function iniciarDialogo() {
+            if (indiceDialogoActual >= dialogos.length) {
+                elementoTexto.innerHTML = "<em>(Fin de la conversación)</em>";
+                indicadorSiguiente.style.display = "none";
+                return;
+            }
+
+            // Cambiar imagen del personaje
+            const dialogo = dialogos[indiceDialogoActual];
+            elementoPersonaje.style.backgroundImage = `url('ImagenesPersonajes/${dialogo.personaje}')`;
+            
+            // Reiniciar estado
+            elementoTexto.innerHTML = '';
+            indiceLetraActual = 0;
+            escribiendo = true;
+            indicadorSiguiente.style.display = 'none';
+
+            // Comenzar efecto de escritura
+            escribirLetra();
+        }
+
+        function escribirLetra() {
+            const dialogo = dialogos[indiceDialogoActual];
+            
+            if (indiceLetraActual < dialogo.texto.length) {
+                elementoTexto.innerHTML += dialogo.texto.charAt(indiceLetraActual);
+                indiceLetraActual++;
+                timeoutEscritura = setTimeout(escribirLetra, velocidadEscritura);
+            } else {
+                // Terminó de escribir
+                escribiendo = false;
+                indicadorSiguiente.style.display = 'block';
+            }
+        }
+
+        function avanzarDialogo() {
+            if (escribiendo) {
+                // Si el usuario hace clic mientras escribe, mostrar todo el texto de golpe
+                clearTimeout(timeoutEscritura);
+                elementoTexto.innerHTML = dialogos[indiceDialogoActual].texto;
+                escribiendo = false;
+                indicadorSiguiente.style.display = 'block';
+            } else {
+                // Si ya terminó, avanzar al siguiente diálogo
+                indiceDialogoActual++;
+                iniciarDialogo();
+            }
+        }
+
+        // Iniciar el primer diálogo al cargar la página
+        window.onload = iniciarDialogo;
+
+    </script>
+</body>
+</html>
