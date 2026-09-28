@@ -8652,22 +8652,72 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     transform: scale(1.05);
 }
 
-.dialog3000, .storyConversation301 {
-    background-color: #1a1a1a !important; border: 8px solid #6b6b6b !important;
-    border-style: ridge !important; border-radius: 5px !important;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.8) !important;
-    font-family: 'Press Start 2P', monospace, sans-serif !important;
-    color: #ffffff !important; text-shadow: 2px 2px 0px #000 !important;
+/* Ocultamos las barras de progreso, iconos y avatares pequeños del juego base durante la conversacion */
+.storyNpcRow301, .storyPlayerRow301, .speaker3000, .storySpeaker301, .storyProgress301, .storyTip301 {
+    display: none !important;
 }
-.storySpeech301 { background: transparent !important; border: none !important; box-shadow: none !important; }
+
+/* CAJA DE DIALOGO ESTILO PS1 */
+.dialog3000, .storyConversation301 {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 5% !important;
+    width: 90% !important;
+    height: 140px !important;
+    background: rgba(15, 25, 30, 0.95) !important;
+    border: 8px solid #5b6262 !important;
+    border-style: ridge !important;
+    border-radius: 0 !important;
+    box-shadow: inset 0 0 25px rgba(0,0,0,1), 0 5px 25px rgba(0,0,0,0.8) !important;
+    z-index: 1000 !important;
+    padding: 25px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+}
+.storySpeech301 {
+    width: 100% !important;
+    background: transparent !important; border: none !important; box-shadow: none !important;
+    padding: 0 !important; margin: 0 !important;
+}
 .storyLine301, .dialogText3000 {
     font-family: 'Press Start 2P', monospace, sans-serif !important;
-    text-shadow: 2px 2px 0px #000 !important; font-size: 11px !important; line-height: 1.8 !important;
+    color: #f0f0f0 !important;
+    font-size: 14px !important;
+    line-height: 2 !important;
+    text-shadow: 2px 2px 0px #000 !important;
+    margin: 0 !important;
 }
-.speaker3000, .storySpeaker301 { color: #ffcc00 !important; font-size: 13px !important; text-transform: uppercase; }
+
+/* PERSONAJE GIGANTE ANIMADO AL FONDO */
+@keyframes ps1breathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.03) translateY(-10px); }
+}
+.ps1-character-wrapper {
+    position: fixed;
+    bottom: 155px; /* Justo encima de la caja de dialogo */
+    left: 50%;
+    margin-left: -350px;
+    width: 700px;
+    height: 600px;
+    z-index: 999;
+    pointer-events: none;
+}
+.ps1-character-cutout {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    animation: ps1breathe 4s ease-in-out infinite;
+}
+
 #campaign3000 { background: url('ImagenesPersonajes/PortadaPrincipal.jpeg') no-repeat center center fixed !important; background-size: cover !important; }
 #campaign3000::before { content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); z-index: -1; }
-.real-portrait { width: 140px; height: 140px; background-size: cover; background-position: center top; border-radius: 8px; border: 3px solid #80643c; }
 
 #start-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -8704,28 +8754,11 @@ window.playBGM = function(track) {
   }
 };
 
-function playTick() {
-    try {
-        if(!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if(window.audioCtx.state === 'suspended') window.audioCtx.resume();
-        const osc = window.audioCtx.createOscillator();
-        const gain = window.audioCtx.createGain();
-        osc.type = 'sine'; 
-        osc.frequency.setValueAtTime(440, window.audioCtx.currentTime);
-        gain.gain.setValueAtTime(0, window.audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.08, window.audioCtx.currentTime + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.001, window.audioCtx.currentTime + 0.06);
-        osc.connect(gain); gain.connect(window.audioCtx.destination);
-        osc.start(); osc.stop(window.audioCtx.currentTime + 0.07);
-    } catch(e) {}
-}
-
 function unlockAudio(e) {
     if(!window.audioUnlocked) {
         window.audioUnlocked = true;
         const ov = document.getElementById('start-overlay');
         if(ov) ov.style.display = 'none';
-        playTick();
         
         let m = 'menu';
         const camp = document.getElementById('campaign3000');
@@ -8764,7 +8797,6 @@ const observer = new MutationObserver((mutations) => {
         window.playBGM(musicType);
     }
     
-    // Inyectar teclado sobre la pantalla original de registro de nombre
     if (document.getElementById('name3000') && !document.getElementById('custom-keyboard-injected')) {
         let panel = document.getElementById('name3000').closest('.campPanel3000');
         if (panel) {
@@ -8814,7 +8846,6 @@ const observer = new MutationObserver((mutations) => {
                     btn.onmouseover = () => { btn.style.background = '#555'; btn.style.borderColor = '#00ff00'; };
                     btn.onmouseout = () => { btn.style.background = '#333'; btn.style.borderColor = '#666'; };
                     btn.onclick = () => {
-                        playTick();
                         if(currentName.length < maxLen) { currentName += k; display.textContent = currentName; }
                     };
                 }
@@ -8829,7 +8860,6 @@ const observer = new MutationObserver((mutations) => {
             delBtn.onmouseover = () => { delBtn.style.background = '#a00000'; };
             delBtn.onmouseout = () => { delBtn.style.background = '#800000'; };
             delBtn.onclick = () => {
-                playTick();
                 if(currentName.length > 0) { currentName = currentName.slice(0, -1); display.textContent = currentName; }
             };
             keyboard.appendChild(delBtn);
@@ -8842,13 +8872,11 @@ const observer = new MutationObserver((mutations) => {
             spcBtn.onmouseover = () => { spcBtn.style.background = '#555'; spcBtn.style.borderColor = '#00ff00'; };
             spcBtn.onmouseout = () => { spcBtn.style.background = '#333'; spcBtn.style.borderColor = '#666'; };
             spcBtn.onclick = () => {
-                playTick();
                 if(currentName.length < maxLen) { currentName += ' '; display.textContent = currentName; }
             };
             keyboard.appendChild(spcBtn);
             
             document.getElementById('custom-start-btn').onclick = () => {
-                playTick();
                 nameInput.value = currentName.trim() || 'DUELISTA';
                 startBtn.onclick(); 
             };
@@ -8859,40 +8887,48 @@ const observer = new MutationObserver((mutations) => {
         el.classList.add('typed');
         const text = el.textContent; el.innerHTML = '';
         let container = el.closest('.storySpeech301') || el.closest('.dialog3000');
-        let btn = container.querySelector('button');
+        let mainBox = el.closest('.storyConversation301') || el.closest('.dialog3000');
+        
+        let btn = mainBox.querySelector('button');
         if (btn) btn.style.display = 'none';
         
-        let conversationBlock = el.closest('.storyConversation301');
-        if (conversationBlock) {
-            let activeRow = conversationBlock.querySelector('.storyNpcRow301.active, .storyPlayerRow301.active');
-            if (activeRow) {
-                let speakerEl = activeRow.querySelector('.storySpeaker301');
-                if (speakerEl) {
-                    let img = getPortrait(speakerEl.textContent);
-                    if (img) {
-                        let portraitContainer = activeRow.querySelector('.storyPortrait301, .storyPlayerPortrait301');
-                        if (portraitContainer) portraitContainer.innerHTML = `<div class="real-portrait" style="background-image:url('${img}')"></div>`;
-                    }
-                }
-            }
+        let speakerName = '';
+        let speakerEl = mainBox.querySelector('.storySpeaker301') || mainBox.querySelector('.speaker3000');
+        if (speakerEl) speakerName = speakerEl.textContent;
+        
+        let oldWrapper = mainBox.querySelector('.ps1-character-wrapper');
+        if (oldWrapper) oldWrapper.remove();
+        
+        let img = getPortrait(speakerName);
+        if (img) {
+            let wrapper = document.createElement('div');
+            wrapper.className = 'ps1-character-wrapper';
+            wrapper.innerHTML = `<div class="ps1-character-cutout" style="background-image:url('${img}')"></div>`;
+            mainBox.appendChild(wrapper);
         }
         
         let idx = 0; let t = null; let isTyping = true;
         function type() {
             if(idx < text.length) {
-                el.innerHTML += text.charAt(idx); idx++; playTick(); t = setTimeout(type, 30);
+                el.innerHTML += text.charAt(idx); idx++; t = setTimeout(type, 30);
             } else {
-                isTyping = false; if(btn) btn.style.display = 'inline-block';
+                isTyping = false;
+                el.innerHTML += '<span style="animation: blink 1s infinite; color: #ffcc00;"> &#9660;</span>';
             }
         }
         type();
         
-        if (container) {
-            container.style.cursor = 'pointer';
-            container.onclick = (e) => {
+        if (mainBox) {
+            mainBox.style.cursor = 'pointer';
+            mainBox.onclick = (e) => {
+                if(e.target.tagName.toLowerCase() === 'button') return;
+                
                 if(isTyping) {
-                    clearTimeout(t); el.innerHTML = text; isTyping = false;
-                    if(btn) btn.style.display = 'inline-block';
+                    clearTimeout(t); 
+                    el.innerHTML = text + '<span style="animation: blink 1s infinite; color: #ffcc00;"> &#9660;</span>'; 
+                    isTyping = false;
+                } else if(btn) {
+                    btn.click();
                 }
             }
         }
