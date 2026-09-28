@@ -8059,10 +8059,10 @@ const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,joey:JOE
 const STORY_UNLOCK_NEXT={tristan:'weevil',weevil:'mai',mai:'joey',joey:'bakura'};
 
 const PROLOGUE=[
- {speaker:'MEMORIA DESCONOCIDA',text:'Los recuerdos de antiguos duelistas han comenzado a despertar. Cada carta conserva una parte de un mundo que ya deberÃ­a haber terminado.'},
- {speaker:'MEMORIA DESCONOCIDA',text:'Diez Signos Guardianes mantienen unidos esos recuerdos. Si el ciclo se rompe, las eras del duelo comenzarÃ¡n a mezclarse.'},
- {speaker:'MEMORIA DESCONOCIDA',text:'Recupera los Fragmentos de Memoria. Vence a quienes los custodian y descubre por quÃ© tus monstruos recuerdan batallas que todavÃ­a no han ocurrido.'},
- {speaker:'SISTEMA',text:'MUNDO 1 â€” LAS MEMORIAS DEL FARAÃ“N. Tu primer rival te espera.'}
+ {speaker:"TRISTAN",text:"ýHey, {PLAYER}! ýEscuchaste las noticias? ýSe esta organizando un torneo clandestino enorme!"},
+ {speaker:"TRISTAN",text:"Dicen que los mejores duelistas de la ciudad estan participando. Yo ya me inscribi para demostrar de que estoy hecho."},
+ {speaker:"TRISTAN",text:"Como tu apenas estas empezando, yo sere tu primer oponente. Te enseýare las reglas basicas del Duelo de Monstruos."},
+ {speaker:"TRISTAN",text:"Deberemos ir recorriendo el camino y venciendo a cada duelista para avanzar en el torneo. ýPreparate para tu primer duelo!"}
 ];
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -8658,7 +8658,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 }
 
 /* CAJA DE DIALOGO ESTILO PS1 */
-.dialog3000, .storyChat301, .map-ps1-chat {
+.dialog3000, .storyChat301 {
     position: fixed !important;
     bottom: 20px !important;
     left: 5% !important;
@@ -8782,7 +8782,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     box-shadow: inset 0 0 15px #000;
 }
 
-/* PS1 MAP STYLES */
+/* PS1 VISUAL MAP STYLES */
 .ps1-map-node {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -8803,16 +8803,25 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     padding: 8px 12px;
     margin-bottom: 5px;
     text-shadow: 1px 1px 0 #000;
+    white-space: nowrap;
 }
-.ps1-map-arrow {
-    color: #ffff00;
-    font-size: 40px;
-    text-shadow: 0 5px 10px #000;
-    animation: ps1bounce 1s infinite alternate;
+.ps1-map-dot {
+    width: 20px; height: 20px;
+    background: #ffff00;
+    border: 3px solid #000;
+    border-radius: 50%;
+    margin: 0 auto;
+    box-shadow: 0 0 10px #000;
 }
-@keyframes ps1bounce {
-    from { transform: translateY(0); }
-    to { transform: translateY(10px); }
+.ps1-player-token {
+    width: 45px; height: 45px;
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #00ff00;
+    border-radius: 5px;
+    margin: 0 auto;
+    animation: ps1bounce 0.6s infinite alternate;
+    box-shadow: 0 5px 15px #000;
 }
 
 </style>
@@ -8907,7 +8916,7 @@ const observer = new MutationObserver((mutations) => {
         window.playBGM(musicType);
     }
     
-    // VISUAL MAP CREATION
+    // VISUAL MAP CREATION WITH PATH AND YUGI TOKEN
     if (document.querySelector('.worldMap3000') && !document.getElementById('ps1-visual-map')) {
         let mapDiv = document.querySelector('.worldMap3000');
         mapDiv.style.display = 'none'; 
@@ -8921,37 +8930,66 @@ const observer = new MutationObserver((mutations) => {
         visualMap.style.position = 'absolute';
         visualMap.style.top = '0'; visualMap.style.left = '0'; 
         visualMap.style.width = '100%'; visualMap.style.height = '100%';
-        visualMap.style.background = "url('ImagenesPersonajes/PortadaSecundaria.jpeg') center/cover";
+        visualMap.style.background = "url('ImagenesPersonajes/PortadaPrincipal.jpeg') center/cover";
         visualMap.style.zIndex = '10';
         
-        // Coodinates for nodes to spread them out on the background
+        // Coordenadas para crear el caminito en zig-zag (de abajo hacia arriba)
         let coords = [
-            {x: 20, y: 30}, {x: 70, y: 35}, {x: 80, y: 70}, {x: 30, y: 65}, 
-            {x: 50, y: 50}, {x: 10, y: 50}, {x: 90, y: 45}, {x: 50, y: 85}
+            {x: 20, y: 75}, {x: 45, y: 65}, {x: 75, y: 70}, {x: 85, y: 45}, 
+            {x: 55, y: 35}, {x: 25, y: 40}, {x: 20, y: 15}, {x: 50, y: 10}, {x: 85, y: 20}, {x: 50, y: 85}
         ];
         
-        let buttons = mapDiv.querySelectorAll('.duelistNode3000');
-        buttons.forEach((b, i) => {
-            if (!b.classList.contains('locked')) {
-                let name = "";
-                let str = b.querySelector('strong');
-                if(str) name = str.textContent.replace(/[0-9.]/g, '').trim();
-                
-                let btn = document.createElement('div');
-                btn.className = 'ps1-map-node';
-                let c = coords[i % coords.length];
-                btn.style.left = c.x + '%';
-                btn.style.top = c.y + '%';
-                btn.innerHTML = `
-                    <div class="ps1-map-label">${name}</div>
-                    <div class="ps1-map-arrow">?</div>
-                `;
-                btn.onclick = () => {
-                    window.playChic();
-                    b.click();
-                };
-                visualMap.appendChild(btn);
-            }
+        let buttons = Array.from(mapDiv.querySelectorAll('.duelistNode3000'));
+        let unlockedBtns = buttons.filter(b => !b.classList.contains('locked'));
+        let latestIndex = unlockedBtns.length - 1;
+        
+        // Dibujar SVG de las lineas punteadas conectando los nodos desbloqueados
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.style.position = 'absolute';
+        svg.style.top = '0'; svg.style.left = '0';
+        svg.style.width = '100%'; svg.style.height = '100%';
+        svg.style.pointerEvents = 'none';
+        
+        for(let i = 0; i < unlockedBtns.length - 1; i++) {
+            let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            let c1 = coords[i % coords.length];
+            let c2 = coords[(i+1) % coords.length];
+            line.setAttribute('x1', c1.x + '%');
+            line.setAttribute('y1', c1.y + '%');
+            line.setAttribute('x2', c2.x + '%');
+            line.setAttribute('y2', c2.y + '%');
+            line.setAttribute('stroke', '#ffcc00');
+            line.setAttribute('stroke-width', '4');
+            line.setAttribute('stroke-dasharray', '8, 8');
+            svg.appendChild(line);
+        }
+        visualMap.appendChild(svg);
+        
+        unlockedBtns.forEach((b, i) => {
+            let name = "";
+            let str = b.querySelector('strong');
+            if(str) name = str.textContent.replace(/[0-9.]/g, '').trim();
+            
+            let btn = document.createElement('div');
+            btn.className = 'ps1-map-node';
+            let c = coords[i % coords.length];
+            btn.style.left = c.x + '%';
+            btn.style.top = c.y + '%';
+            
+            let isCurrent = (i === latestIndex);
+            
+            btn.innerHTML = `
+                <div class="ps1-map-label" style="${isCurrent ? 'border-color:#00ff00;' : ''}">${name}</div>
+                ${isCurrent ? 
+                  `<div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/YugiMoTo.jpeg');"></div>` : 
+                  `<div class="ps1-map-dot"></div>`
+                }
+            `;
+            btn.onclick = () => {
+                window.playChic();
+                b.click();
+            };
+            visualMap.appendChild(btn);
         });
         
         mapContainer.style.position = 'relative';
@@ -9038,19 +9076,17 @@ const observer = new MutationObserver((mutations) => {
                 keyboard.appendChild(btn);
             });
             
-            // Reemplazar un boton vacio por END
             let keysDOM = keyboard.children;
             if(keysDOM.length > 76) {
                 let endBtn = keysDOM[76];
                 endBtn.style.visibility = 'visible';
                 endBtn.textContent = 'END';
-                endBtn.style.color = '#0088ff'; // blue end
+                endBtn.style.color = '#0088ff';
                 endBtn.onclick = () => {
                     window.playChic();
                     document.getElementById('custom-start-btn').click();
                 };
             }
-            // Reemplazar vacio por DEL (flecha)
             if(keysDOM.length > 54) {
                 let delBtn = keysDOM[54];
                 delBtn.style.visibility = 'visible';
