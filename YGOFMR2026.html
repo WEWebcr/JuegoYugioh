@@ -8652,6 +8652,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 <div id="start-overlay">HAZ CLIC EN CUALQUIER LUGAR</div>
 <script>
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8703,6 +8704,7 @@ function showLoadGameMenu() {
         let accs = JSON.parse(origGet.call(localStorage, 'FMR_ACCOUNTS') || '{}');
         if(!accs[email]) return alert("No se encontró ninguna partida con ese correo.");
         if(accs[email].password !== pass) return alert("Contraseña incorrecta.");
+        if(!accs[email].data) return alert("Esta cuenta se creó pero no inició ninguna partida. Ve a Nueva Partida y usa este mismo correo.");
         window.activeAccount = email; overlay.remove();
         let newg = document.getElementById('new3000');
         if(newg) { newg.click(); setTimeout(() => { document.getElementById('back3000').click(); setTimeout(() => { let c = document.getElementById('continue3000'); if (c && !c.disabled) c.click(); else alert("Hubo un error cargando la partida."); }, 100); }, 100); }
@@ -8710,13 +8712,17 @@ function showLoadGameMenu() {
 }
 function showRegisterMenu(name) {
     let panel = document.getElementById('custom-keyboard-injected');
+    let hiddenStart = document.getElementById('hidden-start-btn');
+    let hiddenName = document.getElementById('name3000');
+    if (hiddenStart) { hiddenStart.style.display="none"; document.body.appendChild(hiddenStart); }
+    if (hiddenName) { hiddenName.style.display="none"; document.body.appendChild(hiddenName); }
     panel.innerHTML = `<div style="background:#000; border:4px solid #6b6b6b; padding:30px; color:#fff; font-family:'Press Start 2P', monospace; width:100%; box-sizing:border-box;"><h2 style="color:#ffcc00; margin-bottom:20px; font-size:16px;">VINCULAR CUENTA</h2><p style="font-size:10px; color:#ccc; margin-bottom:20px;">Guarda tu partida para: <span style="color:#0f0">${name}</span></p><div style="margin-bottom:15px;"><label style="font-size:12px;">CORREO:</label><br><input type="text" id="acc-email" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;" placeholder="tu@correo.com"></div><div style="margin-bottom:20px;"><label style="font-size:12px;">CONTRASEÑA:</label><br><input type="password" id="acc-pass" style="width:100%; padding:10px; background:#222; color:#0f0; font-family:monospace; margin-top:5px; box-sizing:border-box;"></div><button class="campBtn3000" id="acc-submit" style="width:100% !important; margin-bottom:15px;">CREAR Y EMPEZAR</button><button class="campBtn3000" id="acc-cancel" style="width:100% !important;">CANCELAR</button></div>`;
     document.getElementById('acc-cancel').onclick = () => { window.playChic(); document.getElementById('back3000').click(); };
     document.getElementById('acc-submit').onclick = () => {
         window.playChic(); let email = document.getElementById('acc-email').value.trim(); let pass = document.getElementById('acc-pass').value.trim();
         if(!email || !pass) return alert("Llena todos los campos.");
         let accs = JSON.parse(origGet.call(localStorage, 'FMR_ACCOUNTS') || '{}');
-        if(accs[email]) return alert("Este correo ya tiene una partida. Usa otro o ve a Cargar.");
+        if(accs[email] && accs[email].data !== null) return alert("Este correo ya tiene una partida. Usa otro o ve a Cargar.");
         window.activeAccount = email; accs[email] = { password: pass, data: null }; origSet.call(localStorage, 'FMR_ACCOUNTS', JSON.stringify(accs));
         let hiddenStart = document.getElementById('hidden-start-btn');
         if(hiddenStart) { let n = document.getElementById('name3000'); if(n) n.value = name; hiddenStart.click(); }
@@ -8827,6 +8833,8 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+
 
 
 </script>
