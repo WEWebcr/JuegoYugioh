@@ -8653,6 +8653,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 <script>
 
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8691,7 +8692,7 @@ window.playChic = function() { if(!window.audioUnlocked) return; try { let ctx =
 function unlockAudio(e) { if(!window.audioUnlocked) { window.audioUnlocked = true; const ov = document.getElementById('start-overlay'); if(ov) ov.style.display = 'none'; let m = 'menu'; const camp = document.getElementById('campaign3000'); if (!camp || camp.classList.contains('hidden')) m = 'duel'; if (document.getElementById('keyboard-container')) m = 'nameEntry'; window.playBGM(m); } }
 document.addEventListener('click', unlockAudio, {capture: true}); document.addEventListener('touchstart', unlockAudio, {capture: true}); document.addEventListener('keydown', unlockAudio, {capture: true});
 document.addEventListener('click', (e) => { if(e.target.closest('.campBtn3000') || e.target.closest('.ps1-map-node')) { window.playChic(); } });
-const portraitMap = { 'TRISTAN': 'Joey.jpeg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'SetoKaiba.jpeg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg', 'MAI': 'Mai.jpeg', 'WEEVIL': 'Weevil.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg', 'BAKURA': 'Bakura.jpeg', 'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg' };
+const portraitMap = { 'TRISTAN': 'Tristan.jpg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'SetoKaiba.jpeg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg', 'MAI': 'Mai.jpeg', 'WEEVIL': 'Weevil.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg', 'BAKURA': 'Bakura.jpeg', 'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg' };
 function getPortrait(name) { name = (name || '').toUpperCase(); for (let key in portraitMap) if (name.includes(key)) return 'ImagenesPersonajes/' + portraitMap[key]; return null; }
 function showLoadGameMenu() {
     let panel = document.querySelector('.campBtns3000').parentElement; let overlay = document.createElement('div'); overlay.id = 'login-overlay'; overlay.style.position = 'absolute'; overlay.style.inset = '0'; overlay.style.background = 'rgba(0,0,0,0.95)'; overlay.style.zIndex = '200'; overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center';
@@ -8798,10 +8799,10 @@ const observer = new MutationObserver((mutations) => {
         let mapDiv = document.querySelector('.worldMap3000'); mapDiv.style.display = 'none'; 
         let mapContainer = mapDiv.parentElement; mapContainer.querySelectorAll('.campPanel3000').forEach(p => p.style.display = 'none');
         let visualMap = document.createElement('div'); visualMap.id = 'ps1-visual-map'; visualMap.style.position = 'absolute'; visualMap.style.top = '0'; visualMap.style.left = '0'; visualMap.style.width = '100%'; visualMap.style.height = '100%'; visualMap.style.background = "url('ImagenesPersonajes/PortadaPrincipal.jpeg') center/cover"; visualMap.style.zIndex = '10';
-        let coords = [ {x: 20, y: 75}, {x: 45, y: 65}, {x: 75, y: 70}, {x: 85, y: 45}, {x: 55, y: 35}, {x: 25, y: 40}, {x: 20, y: 15}, {x: 50, y: 10}, {x: 85, y: 20}, {x: 50, y: 85} ];
+        let coords = [ {x: 10, y: 85}, {x: 35, y: 75}, {x: 65, y: 80}, {x: 85, y: 65}, {x: 65, y: 55}, {x: 40, y: 60}, {x: 15, y: 50}, {x: 25, y: 30}, {x: 55, y: 40}, {x: 85, y: 35}, {x: 70, y: 15}, {x: 45, y: 20}, {x: 20, y: 10}, {x: 80, y: 5} ];
         let buttons = Array.from(mapDiv.querySelectorAll('.duelistNode3000')); let unlockedBtns = buttons.filter(b => !b.classList.contains('locked')); let latestIndex = unlockedBtns.length - 1;
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.style.position = 'absolute'; svg.style.top = '0'; svg.style.left = '0'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
-        for(let i = 0; i < unlockedBtns.length - 1; i++) { let line = document.createElementNS("http://www.w3.org/2000/svg", "line"); let c1 = coords[i % coords.length], c2 = coords[(i+1) % coords.length]; line.setAttribute('x1', c1.x + '%'); line.setAttribute('y1', c1.y + '%'); line.setAttribute('x2', c2.x + '%'); line.setAttribute('y2', c2.y + '%'); line.setAttribute('stroke', '#ffcc00'); line.setAttribute('stroke-width', '4'); line.setAttribute('stroke-dasharray', '8, 8'); svg.appendChild(line); } visualMap.appendChild(svg);
+        for(let i = 0; i < coords.length - 1; i++) { let line = document.createElementNS("http://www.w3.org/2000/svg", "line"); let c1 = coords[i], c2 = coords[i+1]; line.setAttribute('x1', c1.x + '%'); line.setAttribute('y1', c1.y + '%'); line.setAttribute('x2', c2.x + '%'); line.setAttribute('y2', c2.y + '%'); let isVisited = i < unlockedBtns.length - 1; line.setAttribute('stroke', isVisited ? '#ffcc00' : '#444444'); line.setAttribute('stroke-width', '4'); line.setAttribute('stroke-dasharray', '8, 8'); svg.appendChild(line); } visualMap.appendChild(svg);
         unlockedBtns.forEach((b, i) => { let name = ""; let str = b.querySelector('strong'); if(str) name = str.textContent.replace(/[0-9.]/g, '').trim(); let btn = document.createElement('div'); btn.className = 'ps1-map-node'; let c = coords[i % coords.length]; btn.style.left = c.x + '%'; btn.style.top = c.y + '%'; let isCurrent = (i === latestIndex); btn.innerHTML = `<div class="ps1-map-label" style="${isCurrent ? 'border-color:#00ff00;' : ''}">${name}</div>${isCurrent ? `<div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/YugiMoTo.jpeg');"></div>` : `<div class="ps1-map-dot"></div>`}`; btn.onclick = () => { window.playChic(); b.click(); }; visualMap.appendChild(btn); });
         let shopBtn = document.createElement('div'); shopBtn.className = 'ps1-map-node'; shopBtn.style.left = '85%'; shopBtn.style.top = '85%'; shopBtn.innerHTML = `<div class="ps1-map-label" style="border-color:#ff00ff; color:#ff00ff;">TIENDA Y MENÚ</div><div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/Pegasus.jpeg'); border-color:#ff00ff; border-radius:50%;"></div>`; shopBtn.onclick = () => { window.playChic(); showCustomShopMenu(); }; visualMap.appendChild(shopBtn);
         mapContainer.style.position = 'relative'; mapContainer.style.height = '100vh'; mapContainer.style.overflow = 'hidden'; mapContainer.appendChild(visualMap);
@@ -8833,6 +8834,8 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+
 
 
 
