@@ -8218,19 +8218,63 @@ const STORY_DIALOGS303={
 };
 const STORY_POST303={
  weevil:[
-  {role:'weevil',speaker:'WEEVIL',text:'No puede ser... mis trampas funcionaron y aun así encontraste la forma de atravesarlas.'},
-  {role:'player',speaker:'{PLAYER}',text:'No todo se resuelve atacando a la primera.'},
-  {role:'weevil',speaker:'WEEVIL',text:'Hmph. Si quieres entender esos Signos, busca a Mai. Ella lleva un rato observándolos.'}
+  {role:"weevil",speaker:"WEEVIL",text:"�Maldici�n! Mis insectos perfectos fueron aplastados."},
+  {role:"player",speaker:"{PLAYER}",text:"Tu estrategia era buena, pero mis cartas fueron m�s fuertes."},
+  {role:"weevil",speaker:"WEEVIL",text:"Hmph. Mai es la siguiente, buena suerte intentando descifrar su estrategia de viento."}
  ],
  mai:[
-  {role:'mai',speaker:'MAI',text:'Bien jugado. Ya entendiste que un Signo no es decoración; es una decisión de combate.'},
-  {role:'player',speaker:'{PLAYER}',text:'Pero todavía no sé por qué existen.'},
-  {role:'mai',speaker:'MAI',text:'Joey está investigando otra anomalía: monstruos que parecen recordar fusiones que nadie les enseñó. Tal vez ahí encuentres otra pista.'}
+  {role:"mai",speaker:"MAI",text:"Bien jugado. Tienes un instinto excelente para el duelo."},
+  {role:"player",speaker:"{PLAYER}",text:"Gracias, fue un gran combate."},
+  {role:"mai",speaker:"MAI",text:"Joey est� muy emocionado por enfrentarte. Ve y demu�strale lo que has aprendido."}
  ],
  joey:[
-  {role:'joey',speaker:'JOEY',text:'¡Eso sí fue un duelo! Tus monstruos ya están empezando a encontrar combinaciones por su cuenta.'},
-  {role:'player',speaker:'{PLAYER}',text:'Cada Fusión parece desbloquear otro recuerdo.'},
-  {role:'joey',speaker:'JOEY',text:'Entonces tu siguiente parada debería ser Bakura. Pero te aviso: él no juega con recuerdos agradables.'}
+  {role:"joey",speaker:"JOEY",text:"�Guau! Me diste una buena paliza. Tus fusiones son incre�bles."},
+  {role:"player",speaker:"{PLAYER}",text:"Fue un duelo dif�cil, Joey."},
+  {role:"joey",speaker:"JOEY",text:"�Oye! Casi lo olvido. Toma esto, es la Llave del Milenio. �Te servir� para abrir la puerta del Nuevo Mundo cuando re�nas los dem�s art�culos!"}
+ ],
+ bakura:[
+  {role:"bakura",speaker:"BAKURA",text:"Ja, ja, ja... As� que pudiste soportar la oscuridad del cementerio."},
+  {role:"player",speaker:"{PLAYER}",text:"Tu magia oscura no me detendr�."},
+  {role:"bakura",speaker:"BAKURA",text:"Eres interesante. Ll�vate la Sortija del Milenio. Te ser� �til para abrir el Nuevo Mundo."}
+ ],
+ odion:[
+  {role:"odion",speaker:"ODION",text:"Has demostrado ser digno al atravesar mi defensa de trampas."},
+  {role:"player",speaker:"{PLAYER}",text:"La paciencia es clave en el duelo de monstruos."},
+  {role:"odion",speaker:"ODION",text:"Sigue adelante. El Amo Marik y la Se�orita Ishizu te est�n esperando."}
+ ],
+ ishizu:[
+  {role:"ishizu",speaker:"ISHIZU",text:"Mi visi�n del futuro fue alterada por tu determinaci�n... Es asombroso."},
+  {role:"player",speaker:"{PLAYER}",text:"El futuro no est� escrito, Ishizu. Nosotros lo creamos."},
+  {role:"ishizu",speaker:"ISHIZU",text:"Tienes toda la raz�n. Te entrego el Collar del Milenio. Las puertas del Nuevo Mundo te esperan cuando llegue el momento."}
+ ],
+ pegasus:[
+  {role:"pegasus",speaker:"PEGASUS",text:"�Oh, boy! Mi magia no fue suficiente contra tu asombroso Deck."},
+  {role:"player",speaker:"{PLAYER}",text:"Tus ilusiones no pudieron enga�arme, Pegasus."},
+  {role:"pegasus",speaker:"PEGASUS",text:"�Maravilloso! Toma mi Ojo del Milenio como premio. Sin duda lo vas a necesitar en el Nuevo Mundo."}
+ ],
+ noah:[
+  {role:"noah",speaker:"NOAH",text:"Imposible... Mis c�lculos virtuales fallaron contra ti."},
+  {role:"player",speaker:"{PLAYER}",text:"Los duelos tienen coraz�n, algo que tu mundo virtual no comprende."},
+  {role:"noah",speaker:"NOAH",text:"Quiz�s tengas raz�n... Avanza y enfr�ntate a Kaiba."}
+ ],
+ gozaburo:[
+  {role:"gozaburo",speaker:"GOZABURO",text:"Eres solo una molestia. Mi venganza contra Seto tendr� que esperar."},
+  {role:"player",speaker:"{PLAYER}",text:"La venganza no te llevar� a ning�n lado."}
+ ],
+ kaiba:[
+  {role:"kaiba",speaker:"KAIBA",text:"Hmph. Has mejorado desde la �ltima vez, lo admito."},
+  {role:"player",speaker:"{PLAYER}",text:"Tu Drag�n Blanco es poderoso, pero conf�o en mis monstruos."},
+  {role:"kaiba",speaker:"KAIBA",text:"No te emociones demasiado. Aqu� tienes la Balanza del Milenio. No dejes que nadie se interponga en tu camino al Nuevo Mundo."}
+ ],
+ marik:[
+  {role:"marik",speaker:"MARIK",text:"La oscuridad de Ra no pudo incinerarte... Eres fuerte."},
+  {role:"player",speaker:"{PLAYER}",text:"He sobrevivido a las Sombras gracias a mis cartas."},
+  {role:"marik",speaker:"MARIK",text:"Reconozco mi derrota. Llevate el B�culo del Milenio. El Nuevo Mundo est� casi a tu alcance."}
+ ],
+ yugi:[
+  {role:"yugi",speaker:"YUGI",text:"�Ese fue un duelo excelente, {PLAYER}! Me ense�aste mucho."},
+  {role:"player",speaker:"{PLAYER}",text:"Jugar contra ti siempre es un honor, Yugi."},
+  {role:"yugi",speaker:"YUGI",text:"Eres digno de llevar esto. Te entrego el Rompecabezas del Milenio. �Ahora tienes los artefactos necesarios para abrir el Nuevo Mundo!"}
  ]
 };
 const STORY_AVATAR303={
@@ -8251,8 +8295,18 @@ function renderStoryConversation301(lines,i,onDone,buttonText){
 function showPreDuel(id,i){
  const d=DUELISTS.find(x=>x.id===id),s=loadGame();if(!d||!s)return;if(s.deck.length!==40){toast('Tu Deck debe tener exactamente 40 cartas.');return showDeckEditor();}
  storyDialogOpponent303=id;
- if(id==='tristan'){const arr=Number(s.wins&&s.wins.tristan||0)>0?TRISTAN_DIALOG_REMATCH301:TRISTAN_DIALOG_FIRST301;return renderStoryConversation301(arr,Math.min(i||0,arr.length-1),()=>beginStoryDuel(id),'INICIAR DUELO');}
- const pack=STORY_DIALOGS303[id];if(pack){const arr=Number(s.wins&&s.wins[id]||0)>0?pack.rematch:pack.first;return renderStoryConversation301(arr,Math.min(i||0,arr.length-1),()=>beginStoryDuel(id),'INICIAR DUELO');}
+ if(id==="tristan"){
+  const lines=first?[
+   {role:"tristan",speaker:"TRISTAN",text:"Nada mal, {PLAYER}. Admito que pens� que ibas a durar menos."},
+   {role:"player",speaker:"{PLAYER}",text:"Dijiste que ten�a que demostrar que sab�a usar mi Deck. Creo que ya qued� claro."},
+   {role:"tristan",speaker:"TRISTAN",text:"S�... y ese Fragmento reaccion� justo cuando termin� el duelo. Eso definitivamente no es normal."},
+   {role:"player",speaker:"{PLAYER}",text:"�Sabes qui�n m�s podr�a tener uno?"},
+   {role:"tristan",speaker:"TRISTAN",text:"Escuch� a Weevil hablando de algo parecido. Si quieres respuestas, yo empezar�a por buscarlo."}
+  ]:[
+   {role:"tristan",speaker:"TRISTAN",text:"Otra victoria. Est�s aprendiendo r�pido, {PLAYER}."},
+   {role:"player",speaker:"{PLAYER}",text:"Necesito estar listo para los duelistas que vienen despu�s."},
+   {role:"tristan",speaker:"TRISTAN",text:"Entonces sigue afinando ese Deck. Los siguientes no van a pon�rtelo f�cil."}
+  ];if(pack){const arr=Number(s.wins&&s.wins[id]||0)>0?pack.rematch:pack.first;return renderStoryConversation301(arr,Math.min(i||0,arr.length-1),()=>beginStoryDuel(id),'INICIAR DUELO');}
  const arr=[{role:'system',speaker:d.name.toUpperCase(),text:'Prepárate para el duelo.'}];return renderStoryConversation301(arr,0,()=>beginStoryDuel(id),'INICIAR DUELO');
 }
 
