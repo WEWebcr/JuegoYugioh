@@ -8621,6 +8621,56 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* Ocultar imágenes de arriba y diálogo de abajo en el menú */
+.bandaiShow307, .campHero3000 .bandaiCharacters3000, .campBtns3000 + .campPanel3000 {
+    display: none !important;
+}
+
+/* Rediseño de botones del menú estilo PS1 */
+.campBtns3000 {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
+    margin-top: 40px !important;
+}
+
+.campBtn3000 {
+    background: url('ImagenesPersonajes/PortadaPrincipal.jpeg') no-repeat center center !important;
+    background-size: cover !important;
+    position: relative;
+    border: 3px solid #6b6b6b !important;
+    border-style: ridge !important;
+    color: #ffffff !important;
+    font-family: 'Times New Roman', serif !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    padding: 12px 30px !important;
+    width: 320px !important;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    text-shadow: 2px 2px 4px #000 !important;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.5) !important;
+    z-index: 1;
+}
+/* Oscurecer el fondo del boton para que sea legible */
+.campBtn3000::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: -1;
+}
+
+/* Efecto hover estilo neon PS1 */
+.campBtn3000:hover {
+    color: #00ff00 !important;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 2px 2px 2px #000 !important;
+    border-color: #ff0000 !important;
+    box-shadow: 0 0 15px #0000ff, inset 0 0 15px #0000ff, 0 5px 10px rgba(0,0,0,0.5) !important;
+    transform: scale(1.05);
+}
+
 /* Rediseño de las cajas de diálogo */
 .dialog3000, .storyConversation301 {
     background-color: #1a1a1a !important;
@@ -8632,52 +8682,41 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     color: #ffffff !important;
     text-shadow: 2px 2px 0px #000 !important;
 }
-
-.storySpeech301 {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
+.storySpeech301 { background: transparent !important; border: none !important; box-shadow: none !important; }
 .storyLine301, .dialogText3000 {
     font-family: 'Press Start 2P', monospace, sans-serif !important;
     text-shadow: 2px 2px 0px #000 !important;
-    font-size: 11px !important;
-    line-height: 1.8 !important;
+    font-size: 11px !important; line-height: 1.8 !important;
 }
-
 .speaker3000, .storySpeaker301 {
-    color: #ffcc00 !important;
-    font-size: 13px !important;
-    text-transform: uppercase;
+    color: #ffcc00 !important; font-size: 13px !important; text-transform: uppercase;
 }
-
-/* Modificar el fondo del mapa para inmersión */
 #campaign3000 {
     background: url('ImagenesPersonajes/PortadaPrincipal.jpeg') no-repeat center center fixed !important;
     background-size: cover !important;
 }
 #campaign3000::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: -1;
+    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7); z-index: -1;
 }
-
-/* Retratos dinámicos */
 .real-portrait {
-    width: 140px;
-    height: 140px;
-    background-size: cover;
-    background-position: center top;
-    border-radius: 8px;
-    border: 3px solid #80643c;
+    width: 140px; height: 140px; background-size: cover; background-position: center top;
+    border-radius: 8px; border: 3px solid #80643c;
 }
+#start-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95); z-index: 999999; display: flex;
+    justify-content: center; align-items: center; color: #fff;
+    font-family: 'Press Start 2P', monospace, sans-serif; font-size: 20px;
+    cursor: pointer; text-shadow: 0 0 10px #fff;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 </style>
 
+<div id="start-overlay">HAZ CLIC PARA ENTRAR AL JUEGO</div>
+
 <script>
-// 1. Audio global
 window.gameMusic = {
   menu: new Audio('musica/menu principal.mp3.mpeg'),
   dialog: new Audio('musica/dialogos.mp3.mpeg'),
@@ -8685,20 +8724,29 @@ window.gameMusic = {
 };
 Object.values(window.gameMusic).forEach(a => a.loop = true);
 window.currentTrack = null;
+window.audioUnlocked = false;
 
 window.playBGM = function(track) {
+  if (!window.audioUnlocked) return;
   if (window.currentTrack === track) return;
   Object.values(window.gameMusic).forEach(a => a.pause());
   window.currentTrack = track;
   if (track && window.gameMusic[track]) {
     var p = window.gameMusic[track].play();
-    if(p !== undefined) {
-       p.catch(e => console.log('Autoplay bloqueado. Requiere interaccion previa.'));
-    }
+    if(p !== undefined) p.catch(e => console.log('Autoplay bloqueado.'));
   }
 };
 
-// 2. Mapeo de personajes
+document.getElementById('start-overlay').addEventListener('click', function() {
+    window.audioUnlocked = true;
+    this.style.display = 'none';
+    
+    let m = 'menu';
+    const camp = document.getElementById('campaign3000');
+    if (!camp || camp.classList.contains('hidden')) m = 'duel';
+    window.playBGM(m);
+});
+
 const portraitMap = {
     'TRISTAN': 'Joey.jpeg',
     'JOEY': 'Joey.jpeg',
@@ -8714,20 +8762,15 @@ const portraitMap = {
     'ODION': 'Odion.jpeg',
     'NOAH': 'NoahKaiba.jpeg'
 };
-
 function getPortrait(name) {
     name = (name || '').toUpperCase();
     for (let key in portraitMap) {
-        if (name.includes(key)) {
-            return 'ImagenesPersonajes/' + portraitMap[key];
-        }
+        if (name.includes(key)) return 'ImagenesPersonajes/' + portraitMap[key];
     }
     return null;
 }
 
-// 3. MutationObserver para inyectar Typewriter, Imágenes y Música
 const observer = new MutationObserver((mutations) => {
-    // A. Detectar música correcta
     let musicType = 'menu';
     const camp = document.getElementById('campaign3000');
     if (!camp || camp.classList.contains('hidden')) {
@@ -8735,12 +8778,10 @@ const observer = new MutationObserver((mutations) => {
     } else if (document.querySelector('.storyConversation301') || document.querySelector('.dialog3000.campPanel3000')) {
         musicType = 'dialog';
     }
-    
-    if (window.currentTrack !== musicType) {
+    if (window.audioUnlocked && window.currentTrack !== musicType) {
         window.playBGM(musicType);
     }
     
-    // B. Typewriter y retratos
     document.querySelectorAll('.storyLine301:not(.typed), .dialogText3000:not(.typed)').forEach(el => {
         el.classList.add('typed');
         const text = el.textContent;
@@ -8750,7 +8791,6 @@ const observer = new MutationObserver((mutations) => {
         let btn = container.querySelector('button');
         if (btn) btn.style.display = 'none';
         
-        // Inyectar retrato si existe en la conversación
         let conversationBlock = el.closest('.storyConversation301');
         if (conversationBlock) {
             let activeRow = conversationBlock.querySelector('.storyNpcRow301.active, .storyPlayerRow301.active');
@@ -8760,26 +8800,18 @@ const observer = new MutationObserver((mutations) => {
                     let img = getPortrait(speakerEl.textContent);
                     if (img) {
                         let portraitContainer = activeRow.querySelector('.storyPortrait301, .storyPlayerPortrait301');
-                        if (portraitContainer) {
-                            portraitContainer.innerHTML = '<div class="real-portrait" style="background-image:url(' + img + ')"></div>';
-                        }
+                        if (portraitContainer) portraitContainer.innerHTML = '<div class="real-portrait" style="background-image:url(' + img + ')"></div>';
                     }
                 }
             }
         }
         
-        let idx = 0;
-        let t = null;
-        let isTyping = true;
-        
+        let idx = 0; let t = null; let isTyping = true;
         function type() {
             if(idx < text.length) {
-                el.innerHTML += text.charAt(idx);
-                idx++;
-                t = setTimeout(type, 30);
+                el.innerHTML += text.charAt(idx); idx++; t = setTimeout(type, 30);
             } else {
-                isTyping = false;
-                if(btn) btn.style.display = 'inline-block';
+                isTyping = false; if(btn) btn.style.display = 'inline-block';
             }
         }
         type();
@@ -8788,9 +8820,7 @@ const observer = new MutationObserver((mutations) => {
             container.style.cursor = 'pointer';
             container.onclick = (e) => {
                 if(isTyping) {
-                    clearTimeout(t);
-                    el.innerHTML = text;
-                    isTyping = false;
+                    clearTimeout(t); el.innerHTML = text; isTyping = false;
                     if(btn) btn.style.display = 'inline-block';
                 }
             }
@@ -8798,19 +8828,4 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
-
-// Al primer click habilitar audio
-document.addEventListener('click', function() {
-   if(!window.currentTrack) {
-       let m = 'menu';
-       const camp = document.getElementById('campaign3000');
-       if (!camp || camp.classList.contains('hidden')) m = 'duel';
-       window.playBGM(m);
-   } else {
-       // Re-play si estaba bloqueado
-       if (window.gameMusic[window.currentTrack].paused) {
-           window.gameMusic[window.currentTrack].play().catch(e=>{});
-       }
-   }
-});
 </script>
