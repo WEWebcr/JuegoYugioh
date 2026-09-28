@@ -8059,10 +8059,10 @@ const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,joey:JOE
 const STORY_UNLOCK_NEXT={tristan:'weevil',weevil:'mai',mai:'joey',joey:'bakura'};
 
 const PROLOGUE=[
- {speaker:"TRISTAN",text:"ýHey, {PLAYER}! ýEscuchaste las noticias? ýSe esta organizando un torneo clandestino enorme!"},
- {speaker:"TRISTAN",text:"Dicen que los mejores duelistas de la ciudad estan participando. Yo ya me inscribi para demostrar de que estoy hecho."},
- {speaker:"TRISTAN",text:"Como tu apenas estas empezando, yo sere tu primer oponente. Te enseýare las reglas basicas del Duelo de Monstruos."},
- {speaker:"TRISTAN",text:"Deberemos ir recorriendo el camino y venciendo a cada duelista para avanzar en el torneo. ýPreparate para tu primer duelo!"}
+ {speaker:"TRISTAN",text:"ï¿½Hey, {PLAYER}! ï¿½Escuchaste las noticias? ï¿½Se estï¿½ organizando un torneo clandestino enorme!"},
+ {speaker:"TRISTAN",text:"Dicen que los mejores duelistas de la ciudad estï¿½n participando. Yo ya me inscribï¿½ para demostrar de quï¿½ estoy hecho."},
+ {speaker:"TRISTAN",text:"Como tï¿½ apenas estï¿½s empezando, yo serï¿½ tu primer oponente. Te enseï¿½arï¿½ las reglas bï¿½sicas del Duelo de Monstruos."},
+ {speaker:"TRISTAN",text:"Deberemos ir recorriendo el camino y venciendo a cada duelista para avanzar en el torneo. ï¿½Prepï¿½rate para tu primer duelo!"}
 ];
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -8661,6 +8661,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 
 
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8710,9 +8711,9 @@ function showLoadGameMenu() {
         window.playChic(); let email = document.getElementById('acc-email').value.trim(); let pass = document.getElementById('acc-pass').value.trim();
         if(!email || !pass) return alert("Llena todos los campos.");
         let accs = JSON.parse(origGet.call(localStorage, 'FMR_ACCOUNTS') || '{}');
-        if(!accs[email]) return alert("No se encontró ninguna partida con ese correo.");
-        if(accs[email].password !== pass) return alert("Contraseña incorrecta.");
-        if(!accs[email].data) return alert("Esta cuenta se creó pero no inició ninguna partida. Ve a Nueva Partida y usa este mismo correo.");
+        if(!accs[email]) return alert("No se encontrï¿½ ninguna partida con ese correo.");
+        if(accs[email].password !== pass) return alert("Contraseï¿½a incorrecta.");
+        if(!accs[email].data) return alert("Esta cuenta se creï¿½ pero no iniciï¿½ ninguna partida. Ve a Nueva Partida y usa este mismo correo.");
         window.activeAccount = email; overlay.remove();
         let newg = document.getElementById('new3000');
         if(newg) { newg.click(); setTimeout(() => { document.getElementById('back3000').click(); setTimeout(() => { let c = document.getElementById('continue3000'); if (c && !c.disabled) c.click(); else alert("Hubo un error cargando la partida."); }, 100); }, 100); }
@@ -8748,7 +8749,7 @@ function showFreeDuelMenu() {
 function showCustomShopMenu() {
     let old = document.getElementById('custom-shop-menu'); if(old) old.remove();
     let mapContainer = document.querySelector('.worldMap3000').parentElement; let menu = document.createElement('div'); menu.id = 'custom-shop-menu'; menu.style.position = 'absolute'; menu.style.inset = '0'; menu.style.background = 'rgba(0,0,0,0.95)'; menu.style.zIndex = '100'; menu.style.display = 'flex'; menu.style.flexDirection = 'column'; menu.style.alignItems = 'center'; menu.style.justifyContent = 'center';
-    menu.innerHTML = `<h2 style="color:#ff00ff; font-family:'Press Start 2P', monospace; margin-bottom: 30px; text-align:center;">TIENDA DE CARTAS</h2><div class="campBtns3000" style="margin-top:0;"><button class="campBtn3000 primary" id="btn-free-duel">FREE DUEL</button><button class="campBtn3000" id="btn-col">COLECCIÓN</button><button class="campBtn3000" id="btn-deck">EDITAR DECK</button><button class="campBtn3000" id="btn-shop">TIENDA DE MEMORIAS</button><button class="campBtn3000" id="btn-save" style="color:#00ff00; border-color:#00ff00;">GUARDAR PARTIDA</button><button class="campBtn3000" id="btn-shop-back" style="margin-top:20px;">VOLVER AL MAPA</button></div>`; mapContainer.appendChild(menu);
+    menu.innerHTML = `<h2 style="color:#ff00ff; font-family:'Press Start 2P', monospace; margin-bottom: 30px; text-align:center;">TIENDA DE CARTAS</h2><div class="campBtns3000" style="margin-top:0;"><button class="campBtn3000 primary" id="btn-free-duel">FREE DUEL</button><button class="campBtn3000" id="btn-col">COLECCIï¿½N</button><button class="campBtn3000" id="btn-deck">EDITAR DECK</button><button class="campBtn3000" id="btn-shop">TIENDA DE MEMORIAS</button><button class="campBtn3000" id="btn-save" style="color:#00ff00; border-color:#00ff00;">GUARDAR PARTIDA</button><button class="campBtn3000" id="btn-shop-back" style="margin-top:20px;">VOLVER AL MAPA</button></div>`; mapContainer.appendChild(menu);
     document.getElementById('btn-shop-back').onclick = () => { window.playChic(); menu.remove(); };
     document.getElementById('btn-save').onclick = () => { window.playChic(); alert("Partida guardada correctamente en el archivo de la cuenta:\n" + window.activeAccount); };
     document.getElementById('btn-col').onclick = () => { window.playChic(); document.getElementById('back3000').click(); setTimeout(() => document.getElementById('collection3000').click(), 50); };
@@ -8775,7 +8776,7 @@ const observer = new MutationObserver((mutations) => {
             rewardHero.innerHTML = `
                 <h2 style="color:#ff0000; font-size:40px; margin-bottom:20px; text-shadow:0 0 20px #ff0000;">GAME OVER</h2>
                 <p style="color:#fff; margin-bottom:40px; font-family:monospace; font-size:16px;">Has sido derrotado en la historia.<br>Tu alma ha sido enviada al Reino de las Sombras.</p>
-                <button class="campBtn3000" id="btn-game-over" style="border-color:#ff0000; color:#ff0000;">VOLVER AL MENÚ</button>
+                <button class="campBtn3000" id="btn-game-over" style="border-color:#ff0000; color:#ff0000;">VOLVER AL MENï¿½</button>
             `;
             document.getElementById('btn-game-over').onclick = () => { window.playChic(); window.location.reload(); };
         }
@@ -8799,8 +8800,8 @@ const observer = new MutationObserver((mutations) => {
         let p = parent.nextElementSibling; if(p && p.classList.contains('campPanel3000')) p.style.display = 'none';
         document.getElementById('custom-new-game').onclick = () => { window.playChic(); document.getElementById('new3000').click(); };
         document.getElementById('custom-load-game').onclick = () => { window.playChic(); showLoadGameMenu(); };
-        document.getElementById('custom-trade').onclick = () => { window.playChic(); alert("El modo TRADE estará disponible pronto."); };
-        document.getElementById('custom-options').onclick = () => { window.playChic(); let mode = window.audioMono ? 'MONO' : 'ESTEREO'; if (confirm(`Modo actual: ${mode}\n¿Cambiarlo?`)) { window.audioMono = !window.audioMono; alert(`Cambiado a ${window.audioMono ? 'MONO' : 'ESTEREO'}.`); } };
+        document.getElementById('custom-trade').onclick = () => { window.playChic(); alert("El modo TRADE estarï¿½ disponible pronto."); };
+        document.getElementById('custom-options').onclick = () => { window.playChic(); let mode = window.audioMono ? 'MONO' : 'ESTEREO'; if (confirm(`Modo actual: ${mode}\nï¿½Cambiarlo?`)) { window.audioMono = !window.audioMono; alert(`Cambiado a ${window.audioMono ? 'MONO' : 'ESTEREO'}.`); } };
     }
     if (document.querySelector('.worldMap3000') && !document.getElementById('ps1-visual-map')) {
         let mapDiv = document.querySelector('.worldMap3000'); mapDiv.style.display = 'none'; 
@@ -8811,7 +8812,7 @@ const observer = new MutationObserver((mutations) => {
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.style.position = 'absolute'; svg.style.top = '0'; svg.style.left = '0'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
         for(let i = 0; i < coords.length - 1; i++) { let line = document.createElementNS("http://www.w3.org/2000/svg", "line"); let c1 = coords[i], c2 = coords[i+1]; line.setAttribute('x1', c1.x + '%'); line.setAttribute('y1', c1.y + '%'); line.setAttribute('x2', c2.x + '%'); line.setAttribute('y2', c2.y + '%'); let isVisited = i < unlockedBtns.length - 1; line.setAttribute('stroke', isVisited ? '#ffcc00' : '#444444'); line.setAttribute('stroke-width', '4'); line.setAttribute('stroke-dasharray', '8, 8'); svg.appendChild(line); } visualMap.appendChild(svg);
         unlockedBtns.forEach((b, i) => { let name = ""; let str = b.querySelector('strong'); if(str) name = str.textContent.replace(/[0-9.]/g, '').trim(); let btn = document.createElement('div'); btn.className = 'ps1-map-node'; let c = coords[i % coords.length]; btn.style.left = c.x + '%'; btn.style.top = c.y + '%'; let isCurrent = (i === latestIndex); btn.innerHTML = `<div class="ps1-map-label" style="${isCurrent ? 'border-color:#00ff00;' : ''}">${name}</div>${isCurrent ? `<div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/YugiMoTo.jpeg');"></div>` : `<div class="ps1-map-dot"></div>`}`; btn.onclick = () => { window.playChic(); b.click(); }; visualMap.appendChild(btn); });
-        let shopBtn = document.createElement('div'); shopBtn.className = 'ps1-map-node'; shopBtn.style.left = '85%'; shopBtn.style.top = '85%'; shopBtn.innerHTML = `<div class="ps1-map-label" style="border-color:#ff00ff; color:#ff00ff;">TIENDA Y MENÚ</div><div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/Pegasus.jpeg'); border-color:#ff00ff; border-radius:50%;"></div>`; shopBtn.onclick = () => { window.playChic(); showCustomShopMenu(); }; visualMap.appendChild(shopBtn);
+        let shopBtn = document.createElement('div'); shopBtn.className = 'ps1-map-node'; shopBtn.style.left = '85%'; shopBtn.style.top = '85%'; shopBtn.innerHTML = `<div class="ps1-map-label" style="border-color:#ff00ff; color:#ff00ff;">TIENDA Y MENï¿½</div><div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/Pegasus.jpeg'); border-color:#ff00ff; border-radius:50%;"></div>`; shopBtn.onclick = () => { window.playChic(); showCustomShopMenu(); }; visualMap.appendChild(shopBtn);
         mapContainer.style.position = 'relative'; mapContainer.style.height = '100vh'; mapContainer.style.overflow = 'hidden'; mapContainer.appendChild(visualMap);
         let titleRow = mapContainer.querySelector('.campTitleRow3000'); if(titleRow) { titleRow.style.position = 'relative'; titleRow.style.zIndex = '20'; titleRow.style.background = 'rgba(0,0,0,0.8)'; titleRow.style.padding = '10px'; }
     }
@@ -8831,7 +8832,7 @@ const observer = new MutationObserver((mutations) => {
         }
     }
     document.querySelectorAll('.storyLine301:not(.typed), .dialogText3000:not(.typed)').forEach(el => {
-        el.classList.add('typed'); const text = el.textContent; el.innerHTML = ''; let mainBox = el.closest('.storyChat301') || el.closest('.dialog3000'); if (!mainBox) return;
+        el.classList.add('typed'); let pName = 'Duelista'; try { let raw = localStorage.getItem('FMR_REBORN_STORY_V3000'); if(raw) { let s = JSON.parse(raw); if(s && s.name) pName = s.name; } } catch(e){} const text = el.textContent.replace(/\{PLAYER\}/g, pName); el.innerHTML = ''; let mainBox = el.closest('.storyChat301') || el.closest('.dialog3000'); if (!mainBox) return;
         let btn = mainBox.querySelector('button'); if (btn) btn.style.display = 'none';
         let speakerName = ''; let npcEl = mainBox.querySelector('.storyChar301:not(.player) .storyCharName301'); if (npcEl) speakerName = npcEl.textContent; else { let speakerEl = mainBox.querySelector('.storySpeaker301') || mainBox.querySelector('.speaker3000'); if (speakerEl) speakerName = speakerEl.textContent; }
         let oldWrapper = document.getElementById('ps1-active-character'); if (oldWrapper) oldWrapper.remove();
@@ -8841,6 +8842,8 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
+
+
 
 
 
