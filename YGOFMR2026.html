@@ -8712,7 +8712,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     margin-left: -350px;
     width: 700px;
     height: 600px;
-    z-index: 999;
+    z-index: 999999; /* Asegurar que este encima del #campaign3000 */
     pointer-events: none;
 }
 .ps1-character-cutout {
@@ -8897,14 +8897,20 @@ const observer = new MutationObserver((mutations) => {
         let container = el.closest('.storySpeech301') || el.closest('.dialog3000');
         let mainBox = el.closest('.storyChat301') || el.closest('.dialog3000');
         
-        if (!mainBox) return; // Proteccion contra errores nulos
+        if (!mainBox) return;
         
         let btn = mainBox.querySelector('button');
         if (btn) btn.style.display = 'none';
         
+        // Determinar personaje a mostrar: buscar el nombre del NPC primero
         let speakerName = '';
-        let speakerEl = mainBox.querySelector('.storySpeaker301') || mainBox.querySelector('.speaker3000');
-        if (speakerEl) speakerName = speakerEl.textContent;
+        let npcEl = mainBox.querySelector('.storyChar301:not(.player) .storyCharName301');
+        if (npcEl) {
+            speakerName = npcEl.textContent;
+        } else {
+            let speakerEl = mainBox.querySelector('.storySpeaker301') || mainBox.querySelector('.speaker3000');
+            if (speakerEl) speakerName = speakerEl.textContent;
+        }
         
         let oldWrapper = document.getElementById('ps1-active-character');
         if (oldWrapper) oldWrapper.remove();
