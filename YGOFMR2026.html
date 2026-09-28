@@ -8059,10 +8059,13 @@ const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,joey:JOE
 const STORY_UNLOCK_NEXT={tristan:'weevil',weevil:'mai',mai:'joey',joey:'bakura'};
 
 const PROLOGUE=[
- {speaker:"TRISTAN",text:"�Hey, {PLAYER}! �Escuchaste las noticias? �Se est� organizando un torneo clandestino enorme!"},
- {speaker:"TRISTAN",text:"Dicen que los mejores duelistas de la ciudad est�n participando. Yo ya me inscrib� para demostrar de qu� estoy hecho."},
- {speaker:"TRISTAN",text:"Como t� apenas est�s empezando, yo ser� tu primer oponente. Te ense�ar� las reglas b�sicas del Duelo de Monstruos."},
- {speaker:"TRISTAN",text:"Deberemos ir recorriendo el camino y venciendo a cada duelista para avanzar en el torneo. �Prep�rate para tu primer duelo!"}
+ {speaker:"ATEM",text:"Todo comenz� en el Antiguo Egipto, bajo el reinado de mi padre Aknamkanon. Para salvar a su pueblo, mi t�o Aknadin forj� siete artefactos con magia oscura: los Art�culos del Milenio."},
+ {speaker:"ATEM",text:"El ritual requiri� un sacrificio terrible en Kul Elna, masacrando a 99 personas. Su odio despert� a una entidad de pura oscuridad: Zorc Necrophades."},
+ {speaker:"ATEM",text:"Yo gobern� junto a mis seis sacerdotes, usando los Art�culos para sellar monstruos en tablas de piedra. As� naci� el ancestral Duelo de Monstruos."},
+ {speaker:"ATEM",text:"Pero Bakura, el �nico superviviente de la masacre, reuni� los Art�culos e invoc� a Zorc. Mi ej�rcito fue masacrado por completo."},
+ {speaker:"ATEM",text:"Para salvar el mundo, us� mi propio poder para encerrar a Zorc y mi alma dentro del Rompecabezas del Milenio, borrando mis propios recuerdos y mi nombre."},
+ {speaker:"ATEM",text:"Tres mil a�os despu�s, {PLAYER}, t� has liberado mi alma. Pero la oscuridad de Zorc tambi�n ha despertado."},
+ {speaker:"ATEM",text:"El torneo clandestino al que hemos sido invitados es solo el comienzo. Debemos recuperar los fragmentos de memoria. �El destino del mundo depende de nuestras cartas!"}
 ];
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -8663,6 +8666,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 
 
 
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8701,7 +8705,7 @@ window.playChic = function() { if(!window.audioUnlocked) return; try { let ctx =
 function unlockAudio(e) { if(!window.audioUnlocked) { window.audioUnlocked = true; const ov = document.getElementById('start-overlay'); if(ov) ov.style.display = 'none'; let m = 'menu'; const camp = document.getElementById('campaign3000'); if (!camp || camp.classList.contains('hidden')) m = 'duel'; if (document.getElementById('keyboard-container')) m = 'nameEntry'; window.playBGM(m); } }
 document.addEventListener('click', unlockAudio, {capture: true}); document.addEventListener('touchstart', unlockAudio, {capture: true}); document.addEventListener('keydown', unlockAudio, {capture: true});
 document.addEventListener('click', (e) => { if(e.target.closest('.campBtn3000') || e.target.closest('.ps1-map-node')) { window.playChic(); } });
-const portraitMap = { 'TRISTAN': 'Tristan.jpg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'SetoKaiba.jpeg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg', 'MAI': 'Mai.jpeg', 'WEEVIL': 'Weevil.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg', 'BAKURA': 'Bakura.jpeg', 'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg' };
+const portraitMap = { 'ATEM': 'Ateam.jpeg', 'ABUELO': 'abueloYugi.jpg', 'TRISTAN': 'Tristan.jpg', 'JOEY': 'Joey.jpeg', 'KAIBA': 'SetoKaiba.jpeg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg', 'MAI': 'Mai.jpeg', 'WEEVIL': 'Weevil.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg', 'BAKURA': 'Bakura.jpeg', 'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg' };
 function getPortrait(name) { name = (name || '').toUpperCase(); for (let key in portraitMap) if (name.includes(key)) return 'ImagenesPersonajes/' + portraitMap[key]; return null; }
 function showLoadGameMenu() {
     let panel = document.querySelector('.campBtns3000').parentElement; let overlay = document.createElement('div'); overlay.id = 'login-overlay'; overlay.style.position = 'absolute'; overlay.style.inset = '0'; overlay.style.background = 'rgba(0,0,0,0.95)'; overlay.style.zIndex = '200'; overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center';
@@ -8813,7 +8817,24 @@ const observer = new MutationObserver((mutations) => {
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.style.position = 'absolute'; svg.style.top = '0'; svg.style.left = '0'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
         for(let i = 0; i < coords.length - 1; i++) { let line = document.createElementNS("http://www.w3.org/2000/svg", "line"); let c1 = coords[i], c2 = coords[i+1]; line.setAttribute('x1', c1.x + '%'); line.setAttribute('y1', c1.y + '%'); line.setAttribute('x2', c2.x + '%'); line.setAttribute('y2', c2.y + '%'); let isVisited = i < unlockedBtns.length - 1; line.setAttribute('stroke', isVisited ? '#ffcc00' : '#444444'); line.setAttribute('stroke-width', '4'); line.setAttribute('stroke-dasharray', '8, 8'); svg.appendChild(line); } visualMap.appendChild(svg);
         unlockedBtns.forEach((b, i) => { let name = ""; let str = b.querySelector('strong'); if(str) name = str.textContent.replace(/[0-9.]/g, '').trim(); let btn = document.createElement('div'); btn.className = 'ps1-map-node'; let c = coords[i % coords.length]; btn.style.left = c.x + '%'; btn.style.top = c.y + '%'; let isCurrent = (i === latestIndex); btn.innerHTML = `<div class="ps1-map-label" style="${isCurrent ? 'border-color:#00ff00;' : ''}">${name}</div>${isCurrent ? `<div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/YugiMoTo.jpeg');"></div>` : `<div class="ps1-map-dot"></div>`}`; btn.onclick = () => { window.playChic(); b.click(); }; visualMap.appendChild(btn); });
-        let shopBtn = document.createElement('div'); shopBtn.className = 'ps1-map-node'; shopBtn.style.left = '85%'; shopBtn.style.top = '85%'; shopBtn.innerHTML = `<div class="ps1-map-label" style="border-color:#ff00ff; color:#ff00ff;">TIENDA Y MEN�</div><div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/Pegasus.jpeg'); border-color:#ff00ff; border-radius:50%;"></div>`; shopBtn.onclick = () => { window.playChic(); showCustomShopMenu(); }; visualMap.appendChild(shopBtn);
+        let shopBtn = document.createElement('div'); shopBtn.className = 'ps1-map-node'; shopBtn.style.left = '85%'; shopBtn.style.top = '85%'; shopBtn.innerHTML = `<div class="ps1-map-label" style="border-color:#ff00ff; color:#ff00ff;">TIENDA Y MEN�</div><div class="ps1-player-token" style="background-image:url('ImagenesPersonajes/abueloYugi.jpg'); border-color:#ff00ff; border-radius:50%;"></div>`; 
+shopBtn.onclick = () => { 
+    window.playChic(); 
+    let d = document.createElement('div');
+    d.innerHTML = `<div class="dialog3000 campPanel3000" id="grandpa-dialog" style="z-index: 1000000 !important;"><div class="speaker3000">ABUELO MUTO</div><div class="dialogText3000">�Hola {PLAYER}! Pasa, pasa. Bienvenido a mi tienda de cartas Kame Game. �En qu� te puedo ayudar hoy?</div><div class="dialogActions3000"><button class="campBtn3000 primary" id="grandpa-btn">ENTRAR</button></div></div>`;
+    let mapContainer = document.querySelector('.worldMap3000').parentElement;
+    mapContainer.appendChild(d.firstElementChild);
+    setTimeout(() => {
+        let btn = document.getElementById('grandpa-btn');
+        if (btn) btn.onclick = () => {
+            window.playChic();
+            document.getElementById('grandpa-dialog').remove();
+            let c = document.getElementById('ps1-active-character'); if (c) c.remove();
+            showCustomShopMenu();
+        };
+    }, 100);
+}; 
+visualMap.appendChild(shopBtn);
         mapContainer.style.position = 'relative'; mapContainer.style.height = '100vh'; mapContainer.style.overflow = 'hidden'; mapContainer.appendChild(visualMap);
         let titleRow = mapContainer.querySelector('.campTitleRow3000'); if(titleRow) { titleRow.style.position = 'relative'; titleRow.style.zIndex = '20'; titleRow.style.background = 'rgba(0,0,0,0.8)'; titleRow.style.padding = '10px'; }
     }
@@ -8860,4 +8881,5 @@ const observer = new MutationObserver((mutations) => {
         }
     }
 });
-observer.observe(document.body, { childList: true, subtree: true });</script>
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
