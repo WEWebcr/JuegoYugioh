@@ -8651,6 +8651,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
 </style>
 <div id="start-overlay">HAZ CLIC EN CUALQUIER LUGAR</div>
 <script>
+
 const origSet = localStorage.setItem;
 const origGet = localStorage.getItem;
 window.activeAccount = null;
@@ -8733,8 +8734,9 @@ function showFreeDuelMenu() {
 function showCustomShopMenu() {
     let old = document.getElementById('custom-shop-menu'); if(old) old.remove();
     let mapContainer = document.querySelector('.worldMap3000').parentElement; let menu = document.createElement('div'); menu.id = 'custom-shop-menu'; menu.style.position = 'absolute'; menu.style.inset = '0'; menu.style.background = 'rgba(0,0,0,0.95)'; menu.style.zIndex = '100'; menu.style.display = 'flex'; menu.style.flexDirection = 'column'; menu.style.alignItems = 'center'; menu.style.justifyContent = 'center';
-    menu.innerHTML = `<h2 style="color:#ff00ff; font-family:'Press Start 2P', monospace; margin-bottom: 30px; text-align:center;">TIENDA DE CARTAS</h2><div class="campBtns3000" style="margin-top:0;"><button class="campBtn3000 primary" id="btn-free-duel">FREE DUEL</button><button class="campBtn3000" id="btn-col">COLECCIÓN</button><button class="campBtn3000" id="btn-deck">EDITAR DECK</button><button class="campBtn3000" id="btn-shop">TIENDA DE MEMORIAS</button><button class="campBtn3000" id="btn-shop-back" style="margin-top:30px;">VOLVER AL MAPA</button></div>`; mapContainer.appendChild(menu);
+    menu.innerHTML = `<h2 style="color:#ff00ff; font-family:'Press Start 2P', monospace; margin-bottom: 30px; text-align:center;">TIENDA DE CARTAS</h2><div class="campBtns3000" style="margin-top:0;"><button class="campBtn3000 primary" id="btn-free-duel">FREE DUEL</button><button class="campBtn3000" id="btn-col">COLECCIÓN</button><button class="campBtn3000" id="btn-deck">EDITAR DECK</button><button class="campBtn3000" id="btn-shop">TIENDA DE MEMORIAS</button><button class="campBtn3000" id="btn-save" style="color:#00ff00; border-color:#00ff00;">GUARDAR PARTIDA</button><button class="campBtn3000" id="btn-shop-back" style="margin-top:20px;">VOLVER AL MAPA</button></div>`; mapContainer.appendChild(menu);
     document.getElementById('btn-shop-back').onclick = () => { window.playChic(); menu.remove(); };
+    document.getElementById('btn-save').onclick = () => { window.playChic(); alert("Partida guardada correctamente en el archivo de la cuenta:\n" + window.activeAccount); };
     document.getElementById('btn-col').onclick = () => { window.playChic(); document.getElementById('back3000').click(); setTimeout(() => document.getElementById('collection3000').click(), 50); };
     document.getElementById('btn-deck').onclick = () => { window.playChic(); document.getElementById('back3000').click(); setTimeout(() => document.getElementById('deck3000').click(), 50); };
     document.getElementById('btn-shop').onclick = () => { window.playChic(); document.getElementById('back3000').click(); setTimeout(() => document.getElementById('shop3000').click(), 50); };
@@ -8744,12 +8746,38 @@ const observer = new MutationObserver((mutations) => {
     let musicType = 'menu'; const camp = document.getElementById('campaign3000');
     if (!camp || camp.classList.contains('hidden')) { musicType = 'duel'; } else if (document.getElementById('keyboard-container') || document.getElementById('name3000')) { musicType = 'nameEntry'; } else if (document.querySelector('.storyChat301') || document.querySelector('.dialog3000.campPanel3000')) { musicType = 'dialog'; }
     if (window.audioUnlocked && window.currentTrack !== musicType) { window.playBGM(musicType); }
-    if (window.currentFreeDuelId) {
-        let defeat = document.querySelector('.rewardHero3000 h2');
-        if (defeat && defeat.textContent === 'DERROTA' && !defeat.dataset.tracked) { defeat.dataset.tracked = '1'; let stats = JSON.parse(localStorage.getItem('FMR_FREE_DUEL_STATS') || '{}'); if(!stats[window.currentFreeDuelId]) stats[window.currentFreeDuelId] = {w:0, l:0}; stats[window.currentFreeDuelId].l += 1; localStorage.setItem('FMR_FREE_DUEL_STATS', JSON.stringify(stats)); window.currentFreeDuelId = null; }
-        let victory = document.querySelector('.rewardHero3000');
-        if (victory && victory.textContent.includes('VICTORIA') && !victory.dataset.tracked) { victory.dataset.tracked = '1'; let stats = JSON.parse(localStorage.getItem('FMR_FREE_DUEL_STATS') || '{}'); if(!stats[window.currentFreeDuelId]) stats[window.currentFreeDuelId] = {w:0, l:0}; stats[window.currentFreeDuelId].w += 1; localStorage.setItem('FMR_FREE_DUEL_STATS', JSON.stringify(stats)); window.currentFreeDuelId = null; }
+    
+    let defeat = document.querySelector('.rewardHero3000 h2');
+    if (defeat && defeat.textContent === 'DERROTA' && !defeat.dataset.tracked) { 
+        defeat.dataset.tracked = '1'; 
+        if (window.currentFreeDuelId) {
+            let stats = JSON.parse(localStorage.getItem('FMR_FREE_DUEL_STATS') || '{}'); 
+            if(!stats[window.currentFreeDuelId]) stats[window.currentFreeDuelId] = {w:0, l:0}; 
+            stats[window.currentFreeDuelId].l += 1; 
+            localStorage.setItem('FMR_FREE_DUEL_STATS', JSON.stringify(stats)); 
+            window.currentFreeDuelId = null; 
+        } else {
+            let rewardHero = document.querySelector('.rewardHero3000');
+            rewardHero.innerHTML = `
+                <h2 style="color:#ff0000; font-size:40px; margin-bottom:20px; text-shadow:0 0 20px #ff0000;">GAME OVER</h2>
+                <p style="color:#fff; margin-bottom:40px; font-family:monospace; font-size:16px;">Has sido derrotado en la historia.<br>Tu alma ha sido enviada al Reino de las Sombras.</p>
+                <button class="campBtn3000" id="btn-game-over" style="border-color:#ff0000; color:#ff0000;">VOLVER AL MENÚ</button>
+            `;
+            document.getElementById('btn-game-over').onclick = () => { window.playChic(); window.location.reload(); };
+        }
     }
+    let victory = document.querySelector('.rewardHero3000');
+    if (victory && victory.textContent.includes('VICTORIA') && !victory.dataset.tracked) { 
+        victory.dataset.tracked = '1'; 
+        if (window.currentFreeDuelId) {
+            let stats = JSON.parse(localStorage.getItem('FMR_FREE_DUEL_STATS') || '{}'); 
+            if(!stats[window.currentFreeDuelId]) stats[window.currentFreeDuelId] = {w:0, l:0}; 
+            stats[window.currentFreeDuelId].w += 1; 
+            localStorage.setItem('FMR_FREE_DUEL_STATS', JSON.stringify(stats)); 
+            window.currentFreeDuelId = null; 
+        }
+    }
+
     if (document.getElementById('new3000') && !document.getElementById('custom-new-game')) {
         let parent = document.querySelector('.campBtns3000'); Array.from(parent.children).forEach(c => c.style.display = 'none');
         let cm = document.createElement('div'); cm.id = 'custom-main-menu'; cm.style.display = 'flex'; cm.style.flexDirection = 'column'; cm.style.gap = '15px'; cm.style.alignItems = 'center'; cm.style.width = '100%';
@@ -8799,5 +8827,6 @@ const observer = new MutationObserver((mutations) => {
     });
 });
 observer.observe(document.body, { childList: true, subtree: true });
-</script>
 
+
+</script>
