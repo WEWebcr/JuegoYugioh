@@ -8675,7 +8675,7 @@ window.addEventListener('load',()=>setTimeout(()=>{ensureExtraCards();ensureUI()
     justify-content: center; align-items: center; color: #fff;
     font-family: 'Press Start 2P', monospace, sans-serif; font-size: 20px;
     text-shadow: 0 0 10px #fff; animation: pulse 1.5s infinite;
-    pointer-events: none; /* Allows clicking through it to the buttons! */
+    pointer-events: none;
 }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 </style>
@@ -8735,7 +8735,6 @@ function unlockAudio(e) {
     window.playBGM(m);
 }
 
-// Escuchar eventos globales en fase de captura para asegurar que dispare
 document.addEventListener('click', unlockAudio, {capture: true});
 document.addEventListener('touchstart', unlockAudio, {capture: true});
 document.addEventListener('keydown', unlockAudio, {capture: true});
@@ -8781,7 +8780,7 @@ const observer = new MutationObserver((mutations) => {
                     let img = getPortrait(speakerEl.textContent);
                     if (img) {
                         let portraitContainer = activeRow.querySelector('.storyPortrait301, .storyPlayerPortrait301');
-                        if (portraitContainer) portraitContainer.innerHTML = '<div class="real-portrait" style="background-image:url(' + img + ')"></div>';
+                        if (portraitContainer) portraitContainer.innerHTML = `<div class="real-portrait" style="background-image:url('${img}')"></div>`;
                     }
                 }
             }
@@ -8810,14 +8809,13 @@ const observer = new MutationObserver((mutations) => {
 });
 observer.observe(document.body, { childList: true, subtree: true });
 
-// Sobrescribir nueva partida
 if(typeof window.showNewGame === 'function'){
     window.showNewGame = function() {
         if(window.audioUnlocked) window.playBGM('nameEntry');
         showShell();
         const has = !!loadGame();
         
-        const html = 
+        const html = `
             <div class="campPanel3000" style="max-width:650px;margin:5vh auto; text-align:center; background:#1a1a1a; border: 4px solid #6b6b6b; border-style:ridge; padding: 20px;">
                 <div class="campTitleRow3000" style="margin-bottom:10px;">
                     <h2 style="color:#ffcc00; font-family:'Press Start 2P', monospace; font-size:16px;">REGISTRO DE NOMBRE</h2>
@@ -8838,7 +8836,7 @@ if(typeof window.showNewGame === 'function'){
                     <button class="campBtn3000" id="start3000" style="width:48% !important; padding:10px !important; font-size:12px !important;">ACEPTAR</button>
                 </div>
             </div>
-        ;
+        `;
         content(html);
         
         let currentName = "";
