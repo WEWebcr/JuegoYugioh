@@ -7934,10 +7934,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       'Cyber Shield', 'Mystical Moon', 'Silver Bow and Arrow', 'Book of Secret Arts',
       'Elf\'s Light', 'Beast Fangs', 'Steel Shell', 'Vile Germs', 'Shine Palace',
       'Salamandra', 'Kunai with Chain', 'Megamorph', 'Sword of Kusanagi', 'Cestus of Dagla',
-      'Magic Formula', 'Cyclon Laser', 'Mirror of Yata', 'Orb of Yasaka', 'Shattered Axe'
+      'Magic Formula', 'Cyclon Laser', 'Mirror of Yata', 'Orb of Yasaka', 'Shattered Axe',
+      'Mage Power', 'Poder del Mago'
     ];
     if (equipNames.includes(name)) return true;
-    if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON'].includes(val)) return true;
+    if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER'].includes(val)) return true;
     var desc = (c.text || c.desc || '').toLowerCase();
     if ((desc.includes('equipa a') || desc.includes('monstruo equipado')) && kind !== 'TRAP') return true;
     return false;
@@ -7961,6 +7962,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       atk = 800; def = 800;
     } else if (name === 'Fusion Weapon' || val === 'FUSION_WEAPON') {
       atk = 1500; def = 500;
+    } else if (name === 'Mage Power' || val === 'MAGE_POWER' || name === 'Poder del Mago') {
+      var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+      var stCount = 1;
+      if (g && Array.isArray(g.playerBack)) {
+        stCount = g.playerBack.filter(Boolean).length;
+        if (stCount < 1) stCount = 1;
+      }
+      atk = stCount * 500;
+      def = stCount * 500;
     }
     return { atk: atk, def: def };
   }
@@ -8331,6 +8341,290 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { setST = window.setST; setBackrow = function(i) { return window.setST(i); }; } catch(_) {}
 
+
+  // ================================================================
+  //  SPECIAL SPELL HANDLERS: Graceful Charity, Change of Heart, Scapegoat, Limiter Removal
+  // ================================================================
+  function isGracefulCharity(c) {
+    if (!c) return false;
+    var v = c.value || '';
+    var n = c.name || '';
+    return v === 'GRACEFUL_CHARITY' || n === 'Graceful Charity' || n === 'Graciosa Caridad';
+  }
+  function isChangeOfHeart(c) {
+    if (!c) return false;
+    var v = c.value || '';
+    var n = c.name || '';
+    return v === 'CHANGE_OF_HEART' || n === 'Change of Heart' || n === 'Cambio de Corazón';
+  }
+  function isScapegoat(c) {
+    if (!c) return false;
+    var v = c.value || '';
+    var n = c.name || '';
+    return v === 'SCAPEGOAT' || n === 'Scapegoat' || n === 'Chivo Expiatorio';
+  }
+  function isLimiterRemoval(c) {
+    if (!c) return false;
+    var v = c.value || '';
+    var n = c.name || '';
+    return v === 'LIMITER_REMOVAL' || n === 'Limiter Removal' || n === 'Eliminador de Límite';
+  }
+
+  window.resolveGracefulCharity = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+    var card;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+
+    // Robar 3 cartas
+    for (var d = 0; d < 3; d++) {
+      if (g.deck && g.deck.length) g.hand.push(g.deck.pop());
+    }
+    if (typeof enforceHandLimit === 'function') enforceHandLimit('player');
+    if (window.playDrawSound) window.playDrawSound();
+    if (typeof render === 'function') render();
+
+    if (!g.hand || g.hand.length <= 2) {
+      while (g.hand && g.hand.length) g.grave.push(g.hand.pop());
+      if (typeof render === 'function') render();
+      duelToast('¡Graceful Charity activada! Robaste 3 cartas y descartaste.');
+      if (typeof log === 'function') log('Graceful Charity: robas 3 cartas y descartas al cementerio.');
+      return;
+    }
+
+    // Modal interactivo para seleccionar 2 cartas a descartar
+    var overlay = document.createElement('div');
+    overlay.id = 'gracefulDiscardOverlay';
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:999999;display:flex;justify-content:center;align-items:center;font-family:VT323, monospace;";
+
+    var box = document.createElement('div');
+    box.style.cssText = "width:500px;max-width:92vw;background:linear-gradient(145deg, #1c152a, #0c0f18);border:3px solid #ffcc00;border-radius:10px;padding:20px;box-shadow:0 0 35px #000;display:flex;flex-direction:column;align-items:center;";
+    box.innerHTML = '<h3 style="color:#ffcc00;font-size:24px;margin:0 0 6px;text-align:center;">GRACEFUL CHARITY</h3>' +
+      '<p style="color:#fff;font-size:16px;margin:0 0 15px;text-align:center;">Elige exactamente <b style="color:#ff5555;">2 cartas</b> de tu mano para descartar:</p>' +
+      '<div id="gracefulHandList" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-height:50vh;overflow-y:auto;width:100%;"></div>' +
+      '<div style="margin-top:15px;display:flex;gap:15px;">' +
+        '<button id="btnConfirmGraceful" style="padding:10px 24px;background:#222;color:#888;border:2px solid #555;font-family:inherit;font-size:18px;cursor:not-allowed;" disabled>CONFIRMAR DESCARTE (0/2)</button>' +
+      '</div>';
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    var selectedIndices = [];
+    var list = document.getElementById('gracefulHandList');
+    var btnConfirm = document.getElementById('btnConfirmGraceful');
+
+    g.hand.forEach(function(hCard, idx) {
+      var item = document.createElement('div');
+      item.style.cssText = "width:100px;padding:8px;background:#222;border:2px solid #555;border-radius:6px;text-align:center;cursor:pointer;color:#fff;transition:0.15s;";
+      var cName = hCard.name || hCard[0] || 'Carta';
+      var num = (window.CARD_MAPPINGS && window.CARD_MAPPINGS[cName]) || 0;
+      var imgSrc = (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) || '';
+      if (!imgSrc && window.CUSTOM_LOCAL_IMAGES) {
+        var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : (window.CARD_MAPPINGS || {});
+        var dNum = dict[cName] && dict[cName].num ? dict[cName].num : dict[cName];
+        if (dNum && window.CUSTOM_LOCAL_IMAGES[dNum]) imgSrc = window.CUSTOM_LOCAL_IMAGES[dNum];
+      }
+      var imgH = imgSrc ? '<img src="' + imgSrc + '" style="width:70px;height:90px;object-fit:cover;border-radius:4px;border:1px solid #ffcc00;" />' : '<div style="width:70px;height:90px;background:#333;margin:auto;">?</div>';
+      item.innerHTML = imgH + '<div style="font-size:12px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + cName + '</div>';
+
+      item.onclick = function() {
+        if (window.playViolinClick) window.playViolinClick();
+        var pos = selectedIndices.indexOf(idx);
+        if (pos >= 0) {
+          selectedIndices.splice(pos, 1);
+          item.style.borderColor = '#555';
+          item.style.background = '#222';
+        } else {
+          if (selectedIndices.length >= 2) return;
+          selectedIndices.push(idx);
+          item.style.borderColor = '#ff3333';
+          item.style.background = '#441111';
+        }
+        btnConfirm.textContent = 'CONFIRMAR DESCARTE (' + selectedIndices.length + '/2)';
+        if (selectedIndices.length === 2) {
+          btnConfirm.style.background = '#990000';
+          btnConfirm.style.color = '#fff';
+          btnConfirm.style.borderColor = '#ff0000';
+          btnConfirm.style.cursor = 'pointer';
+          btnConfirm.disabled = false;
+        } else {
+          btnConfirm.style.background = '#222';
+          btnConfirm.style.color = '#888';
+          btnConfirm.style.borderColor = '#555';
+          btnConfirm.style.cursor = 'not-allowed';
+          btnConfirm.disabled = true;
+        }
+      };
+      list.appendChild(item);
+    });
+
+    btnConfirm.onclick = function() {
+      if (selectedIndices.length !== 2) return;
+      overlay.remove();
+      selectedIndices.sort(function(a, b) { return b - a; });
+      selectedIndices.forEach(function(sIdx) {
+        var discarded = g.hand.splice(sIdx, 1)[0];
+        if (discarded) g.grave.push(Object.assign({}, discarded, { set: false, faceUp: true }));
+      });
+      if (window.playDestroySound) window.playDestroySound();
+      if (typeof render === 'function') render();
+      duelToast('¡Graceful Charity! Robaste 3 cartas y descartaste 2.');
+      if (typeof log === 'function') log('Graceful Charity: robas 3 cartas y descartas 2 cartas al cementerio.');
+    };
+  };
+
+  window.resolveChangeOfHeart = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+
+    var enemyMonsters = [];
+    (g.enemy || []).forEach(function(m, idx) {
+      if (m) enemyMonsters.push({ m: m, idx: idx });
+    });
+
+    if (enemyMonsters.length === 0) {
+      duelToast('Change of Heart: El rival no tiene monstruos en el campo.');
+      return;
+    }
+
+    var freePlayerSlot = (g.field || []).findIndex(function(x) { return !x; });
+    if (freePlayerSlot < 0) {
+      duelToast('No tienes espacio libre en tu zona de monstruos para tomar el control.');
+      return;
+    }
+
+    var card;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+
+    function executeTake(ei) {
+      var mon = g.enemy[ei];
+      if (!mon) return;
+      g.enemy[ei] = null;
+      mon._changeOfHeartOriginalSide = 'enemy';
+      mon._changeOfHeartTurn = g.turnNo || 1;
+      mon.faceUp = true;
+      mon.faceDown = false;
+      mon.faceDownSet103 = false;
+      var dest = (g.field || []).findIndex(function(x) { return !x; });
+      if (dest >= 0) {
+        g.field[dest] = mon;
+      } else {
+        g.grave.push(mon);
+      }
+      if (window.playViolinClick) window.playViolinClick();
+      if (typeof render === 'function') render();
+      var mName = mon.name || mon[0] || 'Monstruo';
+      duelToast('¡Change of Heart! Has tomado el control de ' + mName + '.');
+      if (typeof log === 'function') log('Change of Heart: tomas el control de ' + mName + ' del rival hasta el final del turno.');
+    }
+
+    if (enemyMonsters.length === 1) {
+      executeTake(enemyMonsters[0].idx);
+      return;
+    }
+
+    var overlay = document.createElement('div');
+    overlay.id = 'changeHeartChoiceOverlay';
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999;display:flex;justify-content:center;align-items:center;font-family:VT323, monospace;";
+    var box = document.createElement('div');
+    box.style.cssText = "width:420px;padding:20px;background:rgba(25,12,35,0.95);border:3px solid #ff77ff;border-radius:10px;text-align:center;box-shadow:0 0 30px #000;";
+    box.innerHTML = '<h3 style="color:#ff77ff;font-size:24px;margin:0 0 10px;">CHANGE OF HEART</h3><p style="color:#fff;font-size:16px;margin:0 0 15px;">Selecciona el monstruo rival que deseas controlar:</p><div id="heartTargets" style="display:flex;flex-direction:column;gap:10px;"></div>';
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    var container = document.getElementById('heartTargets');
+    enemyMonsters.forEach(function(em) {
+      var btn = document.createElement('button');
+      btn.style.cssText = "padding:12px;background:#222;color:#ffcc00;border:2px solid #ff77ff;border-radius:6px;font-family:inherit;font-size:18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;";
+      var name = em.m.name || em.m[0] || 'Monstruo';
+      var atk = (typeof effectiveAtk === 'function') ? effectiveAtk(em.m) : (em.m.atk || 0);
+      btn.innerHTML = '<span>' + name + '</span><span style="color:#00ff88;">' + atk + ' ATK</span>';
+      btn.onclick = function() {
+        overlay.remove();
+        executeTake(em.idx);
+      };
+      container.appendChild(btn);
+    });
+  };
+
+  window.resolveScapegoat = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+    var card;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+
+    var summoned = 0;
+    for (var s = 0; s < (g.field || []).length; s++) {
+      if (!g.field[s] && summoned < 4) {
+        g.field[s] = {
+          name: 'Sheep Token',
+          num: 112,
+          kind: 'TOKEN',
+          type: 'Beast',
+          attr: 'EARTH',
+          level: 1,
+          atk: 0,
+          def: 0,
+          pos: 'DEF',
+          faceUp: true,
+          faceDown: false,
+          desc: 'Token de Oveja invocado por Scapegoat.'
+        };
+        summoned++;
+      }
+    }
+    if (window.playViolinClick) window.playViolinClick();
+    if (typeof render === 'function') render();
+    duelToast('¡Scapegoat! Se invocaron ' + summoned + ' Tokens Oveja en Defensa.');
+    if (typeof log === 'function') log('Scapegoat: invocas ' + summoned + ' Tokens Oveja (0 ATK / 0 DEF) en modo Defensa.');
+  };
+
+  window.resolveLimiterRemoval = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+    var card;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+
+    var boosted = 0;
+    for (var m = 0; m < (g.field || []).length; m++) {
+      var mon = g.field[m];
+      if (mon && (mon.type === 'Machine' || (mon[2] && mon[2].toLowerCase() === 'machine'))) {
+        var base = Number(mon.atk ?? mon[4] ?? 0);
+        mon.equip = (mon.equip || 0) + base;
+        mon._limiterBoost = (mon._limiterBoost || 0) + base;
+        mon._limiterTurn = g.turnNo || 1;
+        boosted++;
+      }
+    }
+    if (window.playViolinClick) window.playViolinClick();
+    if (typeof render === 'function') render();
+    duelToast('¡Limiter Removal! ATK duplicado en ' + boosted + ' monstruo(s) Máquina.');
+    if (typeof log === 'function') log('Limiter Removal: duplica el ATK de tus monstruos Tipo Máquina (' + boosted + ').');
+  };
+
   // 5. activateSTFromHand & activateSetCard
   var prevActivateHand = window.activateSTFromHand;
   window.activateSTFromHand = function(i) {
@@ -8384,6 +8678,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof render === 'function') render();
       duelToast('¡Pot of Greed activado! Robas 2 cartas.');
       if (typeof log === 'function') log('Pot of Greed activado: robas 2 cartas.');
+      return;
+    }
+    if (isGracefulCharity(c)) {
+      window.resolveGracefulCharity(null, i);
+      return;
+    }
+    if (isChangeOfHeart(c)) {
+      window.resolveChangeOfHeart(null, i);
+      return;
+    }
+    if (isScapegoat(c)) {
+      window.resolveScapegoat(null, i);
+      return;
+    }
+    if (isLimiterRemoval(c)) {
+      window.resolveLimiterRemoval(null, i);
       return;
     }
     if (prevActivateHand) return prevActivateHand.apply(this, arguments);
@@ -8445,6 +8755,24 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof render === 'function') render();
       duelToast('¡Pot of Greed activado! Robas 2 cartas.');
       if (typeof log === 'function') log('Pot of Greed activado: robas 2 cartas.');
+      return;
+    }
+
+    // 4b. Graceful Charity, Change of Heart, Scapegoat, Limiter Removal estando SET:
+    if (isGracefulCharity(c)) {
+      window.resolveGracefulCharity(i, null);
+      return;
+    }
+    if (isChangeOfHeart(c)) {
+      window.resolveChangeOfHeart(i, null);
+      return;
+    }
+    if (isScapegoat(c)) {
+      window.resolveScapegoat(i, null);
+      return;
+    }
+    if (isLimiterRemoval(c)) {
+      window.resolveLimiterRemoval(i, null);
       return;
     }
 
@@ -9403,6 +9731,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             duelToast('¡Waboku activado! Tus monstruos y LP están protegidos.');
             if (typeof log === 'function') log('¡Waboku activado! No habrá daño este turno, pero el rival continúa atacando.');
           } else if (chosenTrap.type === 'MIRROR_FORCE') {
+            if (typeof window.showTrap114 === 'function') window.showTrap114('Mirror Force', '¡Destruye todos los monstruos en modo de Ataque del rival!');
             var destroyedCount = 0;
             for (var k = 0; k < (game.enemy || []).length; k++) {
               if (game.enemy[k] && (game.enemy[k].pos !== 'DEF' || game.enemy[k].kind === 'LINK')) {
@@ -9414,7 +9743,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             }
             if (window.playDestroySound) window.playDestroySound();
             if (typeof render === 'function') render();
-            duelToast('¡Mirror Force destruyó ' + destroyedCount + ' monstruos atacantes!');
+            duelToast('¡Mirror Force destruyó ' + destroyedCount + ' monstruo(s) atacantes!');
             if (typeof log === 'function') log('¡Mirror Force! Destruye ' + destroyedCount + ' monstruos atacantes del rival.');
             if (!attackerIsGod && !game.enemy[ei]) continue;
           } else if (chosenTrap.type === 'SAKURETSU_ARMOR') {
@@ -9707,6 +10036,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           var eMir = game.enemyBack[enemyMirIdx];
           game.enemyBack[enemyMirIdx] = null;
           game.enemyGrave.push(Object.assign({}, eMir, { set: false, faceUp: true }));
+          if (typeof window.showTrap114 === 'function') window.showTrap114('Mirror Force', '¡' + oppName + ' activa Mirror Force y destruye tus monstruos en Ataque!');
           var pMirDestroyed = 0;
           for (var mi = 0; mi < (game.field || []).length; mi++) {
             if (game.field[mi] && (game.field[mi].pos !== 'DEF' || game.field[mi].kind === 'LINK')) {
@@ -11212,3 +11542,31 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 })();
 
 
+
+  // Interceptor de End Turn para revertir efectos temporales (Change of Heart, etc.)
+  var origEndTurn = window.endTurn;
+  window.endTurn = function() {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (g && Array.isArray(g.field)) {
+      for (var fi = 0; fi < g.field.length; fi++) {
+        var m = g.field[fi];
+        if (m && m._changeOfHeartOriginalSide === 'enemy') {
+          g.field[fi] = null;
+          delete m._changeOfHeartOriginalSide;
+          delete m._changeOfHeartTurn;
+          var eSlot = (g.enemy || []).findIndex(function(x) { return !x; });
+          if (eSlot >= 0) {
+            g.enemy[eSlot] = m;
+          } else {
+            g.enemyGrave.push(m);
+          }
+          if (typeof log === 'function') log(m.name + ' regresa al control del oponente.');
+        }
+      }
+      if (typeof render === 'function') render();
+    }
+    if (typeof origEndTurn === 'function') {
+      return origEndTurn.apply(this, arguments);
+    }
+  };
+  try { endTurn = window.endTurn; } catch(_) {}

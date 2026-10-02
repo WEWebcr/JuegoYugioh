@@ -531,7 +531,7 @@
     "name": "Graceful Charity",
     "kind": "SPELL",
     "value": "GRACEFUL_CHARITY",
-    "text": "Roba 3 cartas y luego descarta 2 cartas."
+    "text": "Roba 3 cartas de tu mazo, luego descarta 2 cartas de tu mano."
   },
   {
     "id": 225,
@@ -2893,7 +2893,7 @@
     "name": "Change of Heart",
     "kind": "SPELL",
     "value": "CHANGE_OF_HEART",
-    "text": "Target 1 monster your opponent controls; take control of it until the End Phase.",
+    "text": "Toma el control de 1 monstruo del oponente hasta el final del turno.",
     "image": "imagenescartas/Mundo1/291.jpg"
   },
   {
@@ -2923,9 +2923,9 @@
   {
     "id": 365,
     "name": "Mage Power",
-    "kind": "SPELL",
+    "kind": "EQUIP",
     "value": "MAGE_POWER",
-    "text": "The equipped monster gains 500 ATK and DEF for each Spell/Trap Card you control.",
+    "text": "El monstruo equipado gana +500 ATK y +500 DEF por cada carta Mágica/Trampa que controles en tu campo.",
     "image": "imagenescartas/Mundo1/295.jpg"
   },
   {
