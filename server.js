@@ -58,9 +58,21 @@ function savePath(name) {
   return path.join(ROOT, 'saves', safeName(name) + '.json');
 }
 function readSave(name) {
+  if (!name) return null;
   const p = savePath(name);
-  if (!fs.existsSync(p)) return null;
-  try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
+  if (fs.existsSync(p)) {
+    try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
+  }
+  // Fallback insensible a mayusculas/minusculas (crucial para entornos Linux como Render)
+  try {
+    const target = safeName(name).toLowerCase() + '.json';
+    const files = fs.readdirSync(SAVES_DIR);
+    const match = files.find(f => f.toLowerCase() === target);
+    if (match) {
+      return JSON.parse(fs.readFileSync(path.join(SAVES_DIR, match), 'utf8'));
+    }
+  } catch (_) {}
+  return null;
 }
 function writeSave(data) {
   fs.writeFileSync(savePath(data.name), JSON.stringify(data, null, 2), 'utf8');
@@ -88,6 +100,84 @@ function findSaveByEmailOrName(identifier) {
   } catch (_) {}
   return null;
 }
+
+// ── Inyeccion / Seeding de Cuentas Preconfiguradas (e.g. Render Deployment) ──
+function ensureSeedUsers() {
+  try {
+    const josueExisting = findSaveByEmailOrName('josue') || findSaveByEmailOrName('joavce@hotmail.com');
+    if (!josueExisting) {
+      const josueSeed = {
+        name: "josue",
+        email: "joavce@hotmail.com",
+        passwordHash: "69a6b100074bc1e3c319a6c533277fdb873c9a44d896accc5c42230b4ce3b3ce", // Clave: 1234
+        schema: 1,
+        world: 1,
+        pm: 2300,
+        unlocked: ["tristan"],
+        cleared: ["tristan"],
+        wins: { tristan: 1 },
+        losses: {},
+        collection: {
+          "Celtic Guardian": 2, "Beaver Warrior": 2, "Battle Ox": 2, "Mystical Elf": 2,
+          "Feral Imp": 2, "Winged Dragon, Guardian of the Fortress #1": 2, "Petit Dragon": 2,
+          "Baby Dragon": 2, "Giant Soldier of Stone": 2, "Man-Eater Bug": 2, "Silver Fang": 2,
+          "Flame Manipulator": 2, "Black Pendant": 2, "Dragon Treasure": 2, "Horn of the Unicorn": 2,
+          "Waboku": 2, "Trap Hole": 2, "Dust Tornado": 2, "Sakuretsu Armor": 2,
+          "Renace al Monstruo": 1, "Negate Attack": 1, "Cyber Ultimate Dragon Test": 2
+        },
+        deck: [
+          "Celtic Guardian", "Celtic Guardian", "Beaver Warrior", "Beaver Warrior", "Battle Ox", "Battle Ox",
+          "Mystical Elf", "Mystical Elf", "Feral Imp", "Feral Imp", "Winged Dragon, Guardian of the Fortress #1",
+          "Winged Dragon, Guardian of the Fortress #1", "Petit Dragon", "Petit Dragon", "Baby Dragon", "Baby Dragon",
+          "Giant Soldier of Stone", "Giant Soldier of Stone", "Man-Eater Bug", "Man-Eater Bug", "Silver Fang", "Silver Fang",
+          "Flame Manipulator", "Flame Manipulator", "Black Pendant", "Black Pendant", "Dragon Treasure", "Dragon Treasure",
+          "Horn of the Unicorn", "Horn of the Unicorn", "Waboku", "Waboku", "Trap Hole", "Trap Hole", "Dust Tornado",
+          "Dust Tornado", "Sakuretsu Armor", "Sakuretsu Armor", "Renace al Monstruo", "Negate Attack"
+        ],
+        legendary: {},
+        pity: {},
+        fusions: [],
+        createdAt: 1790869321027,
+        lastPlayed: Date.now(),
+        rewardsHistory: [
+          { type: "DP", amount: 5000, mode: "add", reason: "Cuenta Inicial Josue", date: 1790899326260 }
+        ],
+        decks: {
+          "Deck-Inicial": [
+            "Celtic Guardian", "Celtic Guardian", "Beaver Warrior", "Beaver Warrior", "Battle Ox", "Battle Ox",
+            "Mystical Elf", "Mystical Elf", "Feral Imp", "Feral Imp", "Winged Dragon, Guardian of the Fortress #1",
+            "Winged Dragon, Guardian of the Fortress #1", "Petit Dragon", "Petit Dragon", "Baby Dragon", "Baby Dragon",
+            "Giant Soldier of Stone", "Giant Soldier of Stone", "Man-Eater Bug", "Man-Eater Bug", "Silver Fang", "Silver Fang",
+            "Flame Manipulator", "Flame Manipulator", "Black Pendant", "Black Pendant", "Dragon Treasure", "Dragon Treasure",
+            "Horn of the Unicorn", "Horn of the Unicorn", "Waboku", "Waboku", "Trap Hole", "Trap Hole", "Dust Tornado",
+            "Dust Tornado", "Sakuretsu Armor", "Sakuretsu Armor", "Renace al Monstruo", "Negate Attack"
+          ]
+        },
+        activeDeck: "Deck-Inicial",
+        extra: [],
+        trialEndsAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        subscriptionEndsAt: Date.now() + 180 * 24 * 60 * 60 * 1000,
+        subscriptionPlan: "vip_6m",
+        subscriptionStatus: "active",
+        subscriptionHistory: [
+          {
+            type: "vip_extension",
+            months: 6,
+            grantedAt: Date.now(),
+            expiresAt: Date.now() + 180 * 24 * 60 * 60 * 1000,
+            reason: "Cuenta Fundador Josue (VIP 6 Meses)",
+            grantedBy: "system"
+          }
+        ]
+      };
+      fs.writeFileSync(path.join(SAVES_DIR, 'Josue.json'), JSON.stringify(josueSeed, null, 2), 'utf8');
+      console.log('[Seed] Cuenta "josue" inyectada exitosamente con suscripción VIP activa.');
+    }
+  } catch (err) {
+    console.error('[Seed] Error al inyectar cuenta josue:', err.message);
+  }
+}
+ensureSeedUsers();
 
 // ── Control de Suscripciones (1 mes de prueba, $10 por 6 meses) ──
 const TRIAL_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
@@ -405,6 +495,22 @@ app.get('/api/saves', requireAdmin, (req, res) => {
     }).filter(Boolean);
     res.json(files);
   } catch { res.json([]); }
+});
+
+// Forzar o verificar inyección de Josue  ALL /api/seed-josue
+app.all('/api/seed-josue', (req, res) => {
+  ensureSeedUsers();
+  const user = findSaveByEmailOrName('josue');
+  res.json({
+    ok: true,
+    message: 'Usuario "josue" verificado e inyectado con éxito en el servidor.',
+    user: {
+      name: user?.name,
+      email: user?.email,
+      pm: user?.pm,
+      subscription: user ? computeSubscriptionStatus(user) : null
+    }
+  });
 });
 
 // Guardar partida  POST /api/save  { name, password, ...saveData }

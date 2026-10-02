@@ -1,4 +1,4 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 
 # Environment Variables
@@ -27,9 +27,11 @@ YGOFMR2026-STABLE*.html
 *.rar
 *.tar.gz
 
-# Saves data (preserve directory with .gitkeep)
+# Saves data (preserve directory with .gitkeep and seed users)
 saves/*
 !saves/.gitkeep
+!saves/Josue.json
+!saves/josue.json
 
 # System & IDE files
 .DS_Store
