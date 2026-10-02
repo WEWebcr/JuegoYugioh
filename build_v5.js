@@ -33,6 +33,8 @@ try { window.nativeAPI.showPrologue = showPrologue; } catch(e){}
 try { window.nativeAPI.showShell = showShell; } catch(e){}
 try { if (typeof finishStoryDuel !== 'undefined') window.nativeAPI.finishStoryDuel = finishStoryDuel; } catch(e){}
 if (!window.nativeAPI.finishStoryDuel && typeof window.finishStoryDuel === 'function') window.nativeAPI.finishStoryDuel = window.finishStoryDuel;
+try { window.nativeAPI.setMemorySave = function(ns) { memorySave = ns; }; } catch(e){}
+try { window.nativeAPI.getMemorySave = function() { return memorySave; }; } catch(e){}
 try { window.MASTER40 = MASTER40; } catch(e){}
 try { window.CARDS109 = CARDS109; } catch(e){}
 try { window.CARD_FILES = CARD_FILES; } catch(e){}
@@ -46,7 +48,8 @@ html = html.replace(target, injection);
 html = html.replace('function showMap(){', 'function showMap(){ if(window.customShowMap && !window.forceNativeMap){ window.customShowMap(); return; }');
 html = html.replace('function showMain(){', 'function showMain(){ if(window.customShowMain){ window.customShowMain(); return; }');
 html = html.replace('function showPrologue(i){', 'function showPrologue(i){ if(window.customShowPrologue){ window.customShowPrologue(i); return; }');
-html = html.replace('function finishStoryDuel(win){', 'function finishStoryDuel(win){ if(window.customFinishStoryDuel){ window.customFinishStoryDuel(win); return; }');
+html = html.replace('function finishStoryDuel(win){', 'function finishStoryDuel(win){ if(!storyDuelActive||duelHandled) return; duelHandled=true; storyDuelActive=false; window.storyDuelActive=false; storyDeckReady=false; if(window.customFinishStoryDuel){ window.customFinishStoryDuel(win); return; }');
+html = html.replace('function loadGame(){if(memorySave)return memorySave;try{const x=localStorage.getItem(SAVE_KEY);', 'function loadGame(){try{const k=window.activeAccount?("FMR_SAVE_"+window.activeAccount):SAVE_KEY;const x=localStorage.getItem(k)||localStorage.getItem(SAVE_KEY);if(x)memorySave=JSON.parse(x);return memorySave;}catch(_){}if(memorySave)return memorySave;try{const x=localStorage.getItem(SAVE_KEY);');
 html = html.replace('function log(t){', 'function log(t){ if(window.customLog) window.customLog(t); ');
 html = html.replace('function paint96(p){', 'function paint96(p){ if(window.onPhaseChange) window.onPhaseChange(p); ');
 html = html.replace('function enemyHand58(chosen=-1){', 'function enemyHand58(chosen=-1){ if(window.onEnemyHand) window.onEnemyHand(chosen); ');

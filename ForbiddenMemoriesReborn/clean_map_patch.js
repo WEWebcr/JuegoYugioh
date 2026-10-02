@@ -90,16 +90,22 @@ window.activeAccount = localStorage.getItem('FMR_ACTIVE_ACCOUNT') || null;
 window.persistUserSave = function(s) {
     if (!s) return;
     try {
+        window.activeAccount = localStorage.getItem('FMR_ACTIVE_ACCOUNT') || window.activeAccount || null;
         let json = JSON.stringify(s);
         if (window.activeAccount) {
             origSet('FMR_SAVE_' + window.activeAccount, json);
+            let accs = JSON.parse(origGet('FMR_ACCOUNTS') || '{}');
+            if (accs[window.activeAccount]) {
+                accs[window.activeAccount].data = s;
+                origSet('FMR_ACCOUNTS', JSON.stringify(accs));
+            }
         }
         origSet('FMR_REBORN_STORY_V3000', json);
+        if (window.nativeAPI && window.nativeAPI.setMemorySave) {
+            window.nativeAPI.setMemorySave(s);
+        }
         if (typeof window.sendServerSave === 'function') {
             window.sendServerSave(s);
-        }
-        if (window.nativeAPI && window.nativeAPI.saveGame) {
-            window.nativeAPI.saveGame();
         }
     } catch(e) {
         console.error('[persistUserSave error]', e);
@@ -2081,7 +2087,8 @@ window.openFreeDuelMenu = function() {
     let wins = {};
     let losses = {};
     try {
-        let savedStr = origGet('FMR_SAVE_' + window.activeAccount);
+        let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+        let savedStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
         if (savedStr) {
             let saved = JSON.parse(savedStr);
             if (saved && saved.cleared) cleared = saved.cleared; 
@@ -2369,7 +2376,11 @@ function findLowestMonsterInDeck(deck, cardDict) {
 }
 
 window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
-    let sStr = origGet('FMR_SAVE_' + window.activeAccount);
+    let existingRewardOverlay = document.getElementById('custom-reward-choice-overlay');
+    if (existingRewardOverlay) existingRewardOverlay.remove();
+
+    let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+    let sStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
     let s = sStr ? JSON.parse(sStr) : (window.nativeAPI && window.nativeAPI.loadGame ? window.nativeAPI.loadGame() : null);
     if (!s) {
         if (typeof onComplete === 'function') onComplete();
@@ -2464,14 +2475,29 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         chooseBtn.textContent = '🎁 ELEGIR ESTA CARTA';
         chooseBtn.style.cssText = 'background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; border:2px solid #fff; border-radius:6px; padding:10px 14px; font-weight:900; font-size:15px; cursor:pointer; width:100%; box-shadow:0 4px 10px rgba(0,0,0,0.5); font-family:VT323, monospace;';
         chooseBtn.onclick = () => {
+            // Instantly disable all buttons so only exactly 1 card can be chosen
+            overlay.querySelectorAll('button').forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.5';
+                b.style.cursor = 'default';
+                b.onclick = null;
+            });
             window.playViolinClick && window.playViolinClick();
-            s.collection = s.collection || {};
-            s.collection[cardName] = (s.collection[cardName] || 0) + 1;
             
-            if (window.persistUserSave) window.persistUserSave(s);
-            else {
-                origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
-                if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
+            let curSaveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+            let curStr = origGet(curSaveKey) || origGet('FMR_REBORN_STORY_V3000');
+            let freshSave = curStr ? JSON.parse(curStr) : s;
+            freshSave.collection = freshSave.collection || {};
+            freshSave.collection[cardName] = (freshSave.collection[cardName] || 0) + 1;
+            
+            if (window.persistUserSave) {
+                window.persistUserSave(freshSave);
+            } else {
+                origSet(curSaveKey, JSON.stringify(freshSave));
+                origSet('FMR_REBORN_STORY_V3000', JSON.stringify(freshSave));
+                if (window.nativeAPI && window.nativeAPI.setMemorySave) {
+                    window.nativeAPI.setMemorySave(freshSave);
+                }
             }
             
             alert(`¡Has obtenido "${cardName}"!\n\n📦 La carta ha sido enviada directamente a tu BANCA / BAÚL DE RESERVA.\n\nPuedes verla y equiparla en cualquiera de tus decks abriendo el Dashboard del Deck.`);
@@ -3313,13 +3339,19 @@ window.openCustomShopMenu = function() {
 };
 
 window.customFinishStoryDuel = function(win) {
+    if (window._customDuelFinishing) return;
+    window._customDuelFinishing = true;
+    setTimeout(() => { window._customDuelFinishing = false; }, 3000);
+
     if (!window.nativeAPI) return;
     let s = window.nativeAPI.loadGame();
     let id = window.lastDuelOpponent || 'tristan';
+    id = id.toLowerCase() === 'seto' ? 'kaiba' : id.toLowerCase();
     if (!s) return window.customShowMain();
     
     // Set duelOver flag so native engine doesn't loop
     if (typeof game !== 'undefined' && game) game.duelOver = true;
+    window.storyDuelActive = false;
     
     try { document.getElementById('duelOver64').classList.remove('show'); } catch(e){}
     try { document.getElementById('deckOut67').classList.remove('show'); } catch(e){}
@@ -3336,12 +3368,14 @@ window.customFinishStoryDuel = function(win) {
     if (window.nativeAPI.showShell) window.nativeAPI.showShell();
     
     if (!win) {
+        s.losses = s.losses || {};
+        s.losses[id] = (s.losses[id] || 0) + 1;
         s.pm = (s.pm || 0) + 50;
         s.lastPlayed = Date.now();
         if (window.persistUserSave) window.persistUserSave(s);
         else {
-            window.nativeAPI.saveGame();
             origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
         }
         
         let lossLines = [{ role: 'system', speaker: id.toUpperCase(), text: '¿Eso es todo lo que tienes? ¡Vuelve cuando seas más fuerte!' }];
@@ -3352,6 +3386,8 @@ window.customFinishStoryDuel = function(win) {
         window.playCustomMusic('dialogos.mp3');
         window.renderCustomStoryDialog(lossLines, 0, () => window.customShowMap());
     } else {
+        s.wins = s.wins || {};
+        s.wins[id] = (s.wins[id] || 0) + 1;
         if (!(s.cleared || []).includes(id)) s.cleared.push(id);
         if (!s.unlocked) s.unlocked = [];
         if (!s.unlocked.includes(id)) s.unlocked.push(id);
@@ -3366,8 +3402,8 @@ window.customFinishStoryDuel = function(win) {
         s.lastPlayed = Date.now();
         if (window.persistUserSave) window.persistUserSave(s);
         else {
-            window.nativeAPI.saveGame();
             origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
         }
         
         let winLines = [{ role: 'system', speaker: id.toUpperCase(), text: '¡Increíble! Has demostrado tu valía como duelista.' }];
@@ -3454,7 +3490,8 @@ window.customFinishStoryDuel = function(win) {
 // endObserver removed to allow native finishStoryDuel hook to take over
 
 window.customShowDeckEditor = function() {
-    let sStr = origGet('FMR_SAVE_' + window.activeAccount);
+    let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+    let sStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
     if (!sStr) return;
     let s = JSON.parse(sStr);
     
@@ -3492,9 +3529,10 @@ window.customShowDeckEditor = function() {
         if (window.persistUserSave) {
             window.persistUserSave(s);
         } else {
-            origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            let curSaveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+            origSet(curSaveKey, JSON.stringify(s));
             origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
-            if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
+            if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(s);
         }
     }
     
