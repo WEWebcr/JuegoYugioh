@@ -329,7 +329,9 @@
     }
 
     /* Ajustes responsivos para teléfono en landscape (horizontal) */
-    @media (orientation: landscape) and (max-height: 560px) {
+    @media (orientation: landscape) {
+      #campaignDuelHud3000 { display: none !important; }
+      body.view-field { display: block !important; min-height: unset !important; padding: 0 !important; }
       .wrap,
       body.view-field .wrap,
       body.mobile-landscape .wrap {
@@ -444,6 +446,39 @@
 
     /* Cuadro de Información Compacto en Modo Vertical / Portrait */
     @media (orientation: portrait), (max-width: 768px) {
+      #campaignDuelHud3000 { display: none !important; }
+      #duelTopHeader .mode, #duelTopHeader .mode::after { display: none !important; content: '' !important; }
+      body.view-field,
+      body.mobile-portrait.view-field {
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 6px 4px 20px 4px !important;
+        box-sizing: border-box !important;
+      }
+      body.view-field .wrap,
+      body.mobile-portrait.view-field .wrap {
+        margin: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        max-width: min(520px, 98vw) !important;
+        zoom: 0.84 !important;
+      }
+      body.view-field #duelTopHeader {
+        width: 100% !important;
+        margin-bottom: 3px !important;
+        border-radius: 8px 8px 0 0 !important;
+        position: static !important;
+      }
+      body.view-field #duelBoardWrapper {
+        width: 100% !important;
+      }
       body.view-field #cardInfoPanel,
       body.view-field .cardInfoPanel,
       body.mobile-portrait #cardInfoPanel,
@@ -585,6 +620,7 @@
   try { portraitPromptDismissed = (localStorage.getItem('FMR_PORTRAIT_DISMISSED') === '1'); } catch(_) {}
 
   function updateOrientation() {
+    if (typeof window.syncDuelTopHeader === 'function') window.syncDuelTopHeader();
     window.isMobileDevice = checkIsMobile();
     const isPortrait = window.innerHeight > window.innerWidth;
 

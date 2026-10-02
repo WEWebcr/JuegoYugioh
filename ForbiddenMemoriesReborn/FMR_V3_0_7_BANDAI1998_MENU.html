@@ -8640,7 +8640,7 @@ function installStoryDecks(){
  storyDeckReady=true;duelHandled=false;
  if(typeof render==='function')render();
  const hud=document.getElementById('campaignDuelHud3000');
- if(hud){hud.textContent='MUNDO 1 · '+(DUELISTS.find(x=>x.id===storyOpponent)||{name:'Rival'}).name;hud.style.display='block';}
+ if(hud){hud.textContent='MUNDO 1 · '+(DUELISTS.find(x=>x.id===storyOpponent)||{name:'Rival'}).name;hud.style.display='none';} const topHeader=document.getElementById('duelTopHeader');if(topHeader){const b=topHeader.querySelector('b');if(b)b.textContent='MUNDO 1 · '+(DUELISTS.find(x=>x.id===storyOpponent)||{name:'Rival'}).name;}
  showLoading(false);
  if(typeof log==='function')log('Decks instalados: jugador='+p.length+' rival='+e.length);
 }
