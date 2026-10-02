@@ -1,0 +1,350 @@
+[
+  {
+    "num": 1,
+    "name": "Blue-Eyes White Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 2,
+    "name": "Dark Magician",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 3,
+    "name": "Red-Eyes Black Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 4,
+    "name": "Summoned Skull",
+    "type": "Fiend",
+    "isFusion": false
+  },
+  {
+    "num": 5,
+    "name": "Curse of Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 6,
+    "name": "Gaia the Fierce Knight",
+    "type": "Warrior",
+    "isFusion": false
+  },
+  {
+    "num": 7,
+    "name": "Celtic Guardian",
+    "type": "Warrior",
+    "isFusion": false
+  },
+  {
+    "num": 8,
+    "name": "Beaver Warrior",
+    "type": "Beast-Warrior",
+    "isFusion": false
+  },
+  {
+    "num": 9,
+    "name": "Battle Ox",
+    "type": "Beast-Warrior",
+    "isFusion": false
+  },
+  {
+    "num": 10,
+    "name": "Harpie Lady",
+    "type": "Winged Beast",
+    "isFusion": false
+  },
+  {
+    "num": 11,
+    "name": "Aqua Madoor",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 12,
+    "name": "Mystical Elf",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 13,
+    "name": "Feral Imp",
+    "type": "Fiend",
+    "isFusion": false
+  },
+  {
+    "num": 14,
+    "name": "Winged Dragon, Guardian of the Fortress #1",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 15,
+    "name": "Koumori Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 16,
+    "name": "Dragon Zombie",
+    "type": "Zombie",
+    "isFusion": false
+  },
+  {
+    "num": 17,
+    "name": "Thunder Dragon",
+    "type": "Thunder",
+    "isFusion": false
+  },
+  {
+    "num": 18,
+    "name": "Skull Servant",
+    "type": "Zombie",
+    "isFusion": false
+  },
+  {
+    "num": 19,
+    "name": "La Jinn the Mystical Genie of the Lamp",
+    "type": "Fiend",
+    "isFusion": false
+  },
+  {
+    "num": 20,
+    "name": "Neo the Magic Swordsman",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 21,
+    "name": "Uraby",
+    "type": "Dinosaur",
+    "isFusion": false
+  },
+  {
+    "num": 22,
+    "name": "Two-Headed King Rex",
+    "type": "Dinosaur",
+    "isFusion": false
+  },
+  {
+    "num": 23,
+    "name": "Crawling Dragon #2",
+    "type": "Dinosaur",
+    "isFusion": false
+  },
+  {
+    "num": 24,
+    "name": "Megazowler",
+    "type": "Dinosaur",
+    "isFusion": false
+  },
+  {
+    "num": 25,
+    "name": "Mammoth Graveyard",
+    "type": "Dinosaur",
+    "isFusion": false
+  },
+  {
+    "num": 26,
+    "name": "Petit Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 27,
+    "name": "Time Wizard",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 28,
+    "name": "Baby Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 29,
+    "name": "Sangan",
+    "type": "Fiend",
+    "isFusion": false
+  },
+  {
+    "num": 30,
+    "name": "Witch of the Black Forest",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 31,
+    "name": "Giant Soldier of Stone",
+    "type": "Rock",
+    "isFusion": false
+  },
+  {
+    "num": 32,
+    "name": "Blackland Fire Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 33,
+    "name": "Serpent Night Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 34,
+    "name": "Ryu-Kishin Powered",
+    "type": "Fiend",
+    "isFusion": false
+  },
+  {
+    "num": 35,
+    "name": "Armored Zombie",
+    "type": "Zombie",
+    "isFusion": false
+  },
+  {
+    "num": 36,
+    "name": "Clown Zombie",
+    "type": "Zombie",
+    "isFusion": false
+  },
+  {
+    "num": 37,
+    "name": "Pumpking the King of Ghosts",
+    "type": "Zombie",
+    "isFusion": false
+  },
+  {
+    "num": 38,
+    "name": "Man-Eater Bug",
+    "type": "Insect",
+    "isFusion": false
+  },
+  {
+    "num": 39,
+    "name": "Silver Fang",
+    "type": "Beast",
+    "isFusion": false
+  },
+  {
+    "num": 40,
+    "name": "Flame Manipulator",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 41,
+    "name": "Tuner Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 42,
+    "name": "Twin-Headed Thunder Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 43,
+    "name": "Meteor Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 44,
+    "name": "Dark Mystic Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 45,
+    "name": "Ancient Thunder Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 46,
+    "name": "Stardust Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 47,
+    "name": "Black Rose Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 48,
+    "name": "Gaia Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 49,
+    "name": "Dark Rebellion Xyz Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 50,
+    "name": "Decode Talker",
+    "type": "Cyberse",
+    "isFusion": false
+  },
+  {
+    "num": 51,
+    "name": "Pendulum Magician",
+    "type": "Spellcaster",
+    "isFusion": false
+  },
+  {
+    "num": 52,
+    "name": "Odd-Eyes Pendulum Dragon",
+    "type": "Dragon",
+    "isFusion": false
+  },
+  {
+    "num": 53,
+    "name": "Renace al Monstruo",
+    "type": "SPELL",
+    "isFusion": false
+  },
+  {
+    "num": 54,
+    "name": "Llamado de la Tumba",
+    "type": "TRAP",
+    "isFusion": false
+  },
+  {
+    "num": 55,
+    "name": "Campo Dragón",
+    "type": "SPELL",
+    "isFusion": false
+  },
+  {
+    "num": 56,
+    "name": "Garra del Dragón",
+    "type": "EQUIP",
+    "isFusion": false
+  },
+  {
+    "num": 57,
+    "name": "Refuerzo",
+    "type": "SPELL",
+    "isFusion": false
+  },
+  {
+    "num": 58,
+    "name": "Guardia de Batalla",
+    "type": "TRAP",
+    "isFusion": false
+  }
+]

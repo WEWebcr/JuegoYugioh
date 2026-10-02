@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin - Yu-Gi-Oh! Forbidden Memories Reborn</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a1a;color:#e8d5a3;font-family:'Segoe UI',sans-serif;min-height:100vh}
+header{background:linear-gradient(135deg,#1a0a00,#2d1500);padding:14px 24px;border-bottom:2px solid #8b6914;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+header h1{color:#ffd700;font-size:1.35rem;letter-spacing:2px;display:flex;align-items:center;gap:8px}
+header span{color:#aaa;font-size:.85rem}
+.header-actions{display:flex;align-items:center;gap:12px}
+.admin-badge{background:#2a200a;border:1px solid #ffd700;color:#ffd700;padding:5px 12px;border-radius:20px;font-size:.8rem;font-weight:600}
+.tabs{display:flex;gap:4px;padding:12px 24px 0;background:#0d0d20;border-bottom:1px solid #333;overflow-x:auto}
+.tab{padding:10px 22px;cursor:pointer;border-radius:6px 6px 0 0;background:#151525;color:#aaa;border:1px solid #333;border-bottom:none;transition:.2s;white-space:nowrap;font-size:.9rem}
+.tab:hover{color:#e8d5a3;background:#1a1a32}
+.tab.active{background:#1e1e38;color:#ffd700;border-color:#8b6914;font-weight:600}
+.panel{display:none;padding:24px;max-width:1300px;margin:0 auto}
+.panel.active{display:block}
+h2{color:#ffd700;margin-bottom:16px;font-size:1.1rem;letter-spacing:1px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:960px){.grid{grid-template-columns:1fr}}
+.card{background:#151525;border:1px solid #333;border-radius:8px;padding:18px}
+label{display:block;color:#aaa;font-size:.8rem;margin-bottom:4px;margin-top:10px;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{width:100%;background:#0a0a1a;border:1px solid #444;color:#e8d5a3;padding:8px 10px;border-radius:4px;font-size:.9rem}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#ffd700}
+textarea{resize:vertical;min-height:60px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 18px;border:none;border-radius:4px;cursor:pointer;font-size:.85rem;font-weight:600;letter-spacing:.5px;transition:.2s;text-decoration:none}
+.btn-gold{background:#8b6914;color:#fff}.btn-gold:hover{background:#b8881c;box-shadow:0 0 8px rgba(255,215,0,.4)}
+.btn-red{background:#8b1414;color:#fff}.btn-red:hover{background:#b81c1c}
+.btn-blue{background:#144488;color:#fff}.btn-blue:hover{background:#1c5ab8}
+.btn-green{background:#1b6d2e;color:#fff}.btn-green:hover{background:#238c3b}
+.btn-purple{background:#541c88;color:#fff}.btn-purple:hover{background:#6c23b0}
+.btn-sm{padding:4px 8px;font-size:.78rem}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px;max-height:620px;overflow-y:auto;padding-right:4px}
+.card-item{background:#1a1a30;border:1px solid #333;border-radius:6px;padding:10px;cursor:pointer;transition:.2s;position:relative}
+.card-item:hover{border-color:#ffd700;background:#1e1e38;transform:translateY(-1px)}
+.card-name{font-weight:600;font-size:.85rem;color:#ffd700;margin-bottom:4px}
+.card-stats{font-size:.75rem;color:#aaa}
+.card-price-badge{position:absolute;top:8px;right:8px;background:#2a200a;border:1px solid #ffd700;color:#ffd700;padding:2px 6px;border-radius:4px;font-size:.7rem;font-weight:bold}
+.card-kind{font-size:.7rem;padding:2px 6px;border-radius:3px;display:inline-block;margin-bottom:4px}
+.kind-MONSTER{background:#4a1a1a;color:#ff8888}
+.kind-SPELL{background:#1a3a1a;color:#88ff88}
+.kind-TRAP{background:#2a1a4a;color:#aa88ff}
+.kind-EQUIP{background:#3a2a1a;color:#ffcc88}
+.deck-slot{display:flex;align-items:center;justify-content:space-between;background:#1a1a2a;border:1px solid #333;border-radius:4px;padding:6px 10px;margin-bottom:4px;font-size:.82rem}
+.deck-slot .name{color:#e8d5a3}
+.deck-slot .remove{background:none;border:none;color:#ff4444;cursor:pointer;font-size:1rem;padding:0 4px}
+.deck-counter{color:#ffd700;font-weight:bold;font-size:.9rem;margin-bottom:8px}
+.deck-counter.ok{color:#44ff88}
+.deck-counter.err{color:#ff4444}
+.saves-table{width:100%;border-collapse:collapse;margin-top:12px}
+.saves-table th{background:#1a1a30;color:#ffd700;padding:10px 12px;text-align:left;border-bottom:2px solid #8b6914;font-size:.8rem;letter-spacing:.5px}
+.saves-table td{padding:10px 12px;border-bottom:1px solid #222;font-size:.85rem;vertical-align:middle}
+.saves-table tr:hover td{background:#1a1a30}
+.msg{padding:10px 14px;border-radius:4px;margin-top:10px;font-size:.85rem;display:none}
+.msg.ok{background:#1a3a1a;color:#88ff88;border:1px solid #3a6a3a;display:block}
+.msg.err{background:#3a1a1a;color:#ff8888;border:1px solid #6a3a3a;display:block}
+.flex{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.deck-area{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+@media(max-width:960px){.deck-area{grid-template-columns:1fr}}
+
+/* Stats Counters */
+.stats-banner{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.stat-box{background:#151528;border:1px solid #444;border-radius:8px;padding:14px 18px;display:flex;flex-direction:column;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.stat-box.gold{border-color:#8b6914}
+.stat-label{font-size:.78rem;color:#888;text-transform:uppercase;letter-spacing:1px}
+.stat-val{font-size:1.6rem;font-weight:bold;color:#ffd700}
+.stat-desc{font-size:.75rem;color:#aaa}
+
+/* Modal */
+.modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(5,5,12,.88);backdrop-filter:blur(4px);z-index:999999;display:none;align-items:center;justify-content:center}
+.modal-card{background:#151528;border:2px solid #8b6914;border-radius:10px;padding:24px;width:92%;max-width:520px;box-shadow:0 0 30px rgba(0,0,0,.8);position:relative}
+.modal-title{color:#ffd700;font-size:1.2rem;margin-bottom:12px;border-bottom:1px solid #333;padding-bottom:8px;display:flex;align-items:center;gap:8px}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#aaa;font-size:1.3rem;cursor:pointer}
+.modal-close:hover{color:#fff}
+.preset-btns{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.preset-btn{background:#1e1e38;border:1px solid #444;color:#ffd700;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:.8rem;font-weight:600}
+.preset-btn:hover{background:#ffd700;color:#000}
+</style>
+</head>
+<body>
+
+<!-- MODAL DE ACCESO / LOGIN ADMINISTRADOR -->
+<div class="modal-overlay" id="loginModal" style="display:flex;">
+  <div class="modal-card" style="max-width:420px;text-align:center;">
+    <div style="font-size:2.4rem;margin-bottom:10px;">🛡</div>
+    <h2 style="color:#ffd700;font-size:1.3rem;margin-bottom:6px;letter-spacing:1px;">ACCESO ADMINISTRATIVO</h2>
+    <p style="color:#aaa;font-size:.82rem;margin-bottom:18px;">Ingresa tus credenciales para administrar cartas, decks y duelistas.</p>
+    <div style="text-align:left;">
+      <label>Usuario</label>
+      <input id="adminUser" placeholder="Usuario administrador" autocomplete="username" value="admin">
+      <label>Contraseña</label>
+      <input id="adminPass" type="password" placeholder="Contraseña de administrador" autocomplete="current-password" onkeydown="if(event.key==='Enter')loginAdmin()">
+    </div>
+    <div class="msg" id="loginMsg" style="margin-top:12px;"></div>
+    <button class="btn btn-gold" style="width:100%;margin-top:18px;padding:10px;" onclick="loginAdmin()">INGRESAR AL PANEL</button>
+  </div>
+</div>
+
+<header>
+  <div>
+    <h1>⚔ ADMIN PANEL <span>FORBIDDEN MEMORIES REBORN</span></h1>
+    <span>Gestión de Catálogo, Tienda de Cartas, Decks y Jugadores</span>
+  </div>
+  <div class="header-actions">
+    <div class="admin-badge" id="adminBadge">🛡 ADMIN: admin</div>
+    <button class="btn btn-red btn-sm" onclick="logoutAdmin()">Cerrar Sesión</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('cards')">Cartas</div>
+  <div class="tab" onclick="showTab('decks')">Decks</div>
+  <div class="tab" onclick="showTab('saves')">Partidas</div>
+  <div class="tab" onclick="showTab('users')">Usuarios & Regalías</div>
+</div>
+
+<!-- PANEL 1: CATALOGO DE CARTAS Y TIENDA -->
+<div class="panel active" id="panel-cards">
+  <h2>CATÁLOGO DE CARTAS & TIENDA DE MEMORIAS</h2>
+  <div class="grid">
+    <div class="card">
+      <h2 id="formTitle">NUEVA CARTA</h2>
+      <input type="hidden" id="cardId">
+      
+      <label>Nombre *</label>
+      <input id="cName" placeholder="Ej: Celtic Guardian" oninput="updateCardImageNameHint()">
+      
+      <label>Tipo (kind) *</label>
+      <select id="cKind" onchange="toggleMonsterFields()">
+        <option value="MONSTER">MONSTER</option>
+        <option value="SPELL">SPELL</option>
+        <option value="TRAP">TRAP</option>
+        <option value="EQUIP">EQUIP</option>
+      </select>
+      
+      <div id="monsterFields">
+        <label>Tipo de monstruo</label>
+        <select id="cType">
+          <option>Warrior</option><option>Dragon</option><option>Spellcaster</option>
+          <option>Beast</option><option>Beast-Warrior</option><option>Fiend</option>
+          <option>Machine</option><option>Aqua</option><option>Rock</option>
+          <option>Insect</option><option>Zombie</option><option>Thunder</option>
+          <option>Winged Beast</option><option>Pyro</option><option>Dinosaur</option>
+        </select>
+        <label>Atributo</label>
+        <select id="cAttr">
+          <option>EARTH</option><option>WATER</option><option>FIRE</option>
+          <option>WIND</option><option>LIGHT</option><option>DARK</option>
+        </select>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <div><label>Nivel</label><input id="cLevel" type="number" min="1" max="12" value="4"></div>
+          <div><label>ATK</label><input id="cAtk" type="number" min="0" value="1000"></div>
+          <div><label>DEF</label><input id="cDef" type="number" min="0" value="1000"></div>
+        </div>
+      </div>
+      
+      <div id="stFields" style="display:none">
+        <label>Valor (value) - para el engine</label>
+        <input id="cValue" placeholder="Ej: HEAVY_STORM">
+      </div>
+      
+      <label>Texto / Efecto</label>
+      <textarea id="cText" rows="3" placeholder="Descripción del efecto o lore de la carta..."></textarea>
+      
+      <!-- INTEGRACION DE COSTO EN TIENDA -->
+      <div style="background:#1a1a2e;border:1px solid #8b6914;border-radius:6px;padding:12px;margin-top:14px;">
+        <div style="color:#ffd700;font-size:.85rem;font-weight:bold;margin-bottom:6px;">🏪 CONFIGURACIÓN PARA LA TIENDA DE CARTAS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="margin-top:0;">Precio en Tienda (PM / DP) *</label>
+            <input id="cPrice" type="number" min="0" value="25000" placeholder="Ej: 25000">
+          </div>
+          <div>
+            <label style="margin-top:0;">Tier / Rango en Tienda</label>
+            <input id="cTier" placeholder="Ej: ÉLITE, ESPECIAL, PODEROSA">
+          </div>
+        </div>
+        <div style="font-size:.75rem;color:#aaa;margin-top:6px;">
+          * Si el precio es mayor a 0, la carta aparecerá automáticamente en la Tienda de Memorias del Abuelo Moto.
+        </div>
+      </div>
+
+      <!-- SUBIDA DE IMAGEN MEDIANTE EXAMINAR -->
+      <div style="margin-top:14px;background:#131322;border:1px dashed #444;border-radius:6px;padding:12px;">
+        <label style="margin-top:0;">Imagen de la Carta (Examinar Archivo)</label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px;">
+          <input type="file" id="cImageFile" accept="image/*" style="display:none;" onchange="handleImagePicked(this)">
+          <button type="button" class="btn btn-blue btn-sm" onclick="document.getElementById('cImageFile').click()">📁 Examinar archivo...</button>
+          <span id="cImageFileName" style="font-size:.8rem;color:#aaa;">Ningún archivo seleccionado</span>
+        </div>
+        <div style="margin-top:8px;">
+          <label style="font-size:.75rem;color:#888;">O ingresa la ruta relativa manualmente:</label>
+          <input id="cImage" placeholder="imagenescartas/Mundo1/001.jpg" oninput="updateImagePreview(this.value)">
+        </div>
+        <div id="cImagePreviewWrap" style="margin-top:10px;display:none;align-items:center;gap:12px;">
+          <img id="cImagePreview" src="" alt="Vista previa" style="width:75px;height:110px;object-fit:contain;border:2px solid #8b6914;border-radius:4px;background:#000;box-shadow:0 0 10px rgba(0,0,0,.6)">
+          <div>
+            <div style="color:#88ff88;font-size:.82rem;font-weight:600;">✓ Vista previa de imagen</div>
+            <div id="cImageStatus" style="color:#aaa;font-size:.75rem;">Lista para guardar</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button class="btn btn-gold" onclick="saveCard()">💾 GUARDAR CARTA</button>
+        <button class="btn btn-blue" onclick="clearForm()">✨ NUEVA CARTA</button>
+      </div>
+      <div class="msg" id="cardMsg"></div>
+    </div>
+    
+    <div class="card">
+      <div class="flex" style="margin-bottom:10px">
+        <input id="cardSearch" placeholder="Buscar carta..." oninput="renderCardList()" style="max-width:240px">
+        <select id="kindFilter" onchange="renderCardList()" style="max-width:160px">
+          <option value="">Todos los tipos</option>
+          <option value="MONSTER">MONSTER</option>
+          <option value="SPELL">SPELL</option>
+          <option value="TRAP">TRAP</option>
+          <option value="EQUIP">EQUIP</option>
+        </select>
+      </div>
+      <div class="card-grid" id="cardList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 2: DECKS DE PERSONAJES -->
+<div class="panel" id="panel-decks">
+  <h2>DECKS DE PERSONAJES</h2>
+  <div class="flex" style="margin-bottom:16px">
+    <div>
+      <label>Personaje</label>
+      <select id="charSelect" onchange="loadCharDeck()">
+        <option value="tristan">Tristan Taylor</option>
+        <option value="weevil">Weevil Underwood</option>
+        <option value="mai">Mai Valentine</option>
+        <option value="mako">Mako Tsunami</option>
+        <option value="joey">Joey Wheeler</option>
+        <option value="pegasus">Maximillion Pegasus</option>
+        <option value="bakura">Yami Bakura</option>
+        <option value="marik">Yami Marik</option>
+        <option value="noah">Noah Kaiba</option>
+        <option value="kosaburo">Kosaburo Kaiba</option>
+        <option value="ishizu">Ishizu Ishtar</option>
+        <option value="odion">Odion</option>
+        <option value="kaiba">Seto Kaiba</option>
+        <option value="yugi">Yami Yugi</option>
+      </select>
+    </div>
+    <button class="btn btn-gold" onclick="saveDeck()" style="margin-top:20px">GUARDAR DECK</button>
+  </div>
+  <div id="deckMsg" class="msg"></div>
+  <div class="deck-area">
+    <div class="card">
+      <div class="deck-counter err" id="deckCounter">0 / 40-60 cartas</div>
+      <div id="deckSlots" style="max-height:550px;overflow-y:auto;padding-right:4px;"></div>
+    </div>
+    <div class="card">
+      <h2>AGREGAR CARTA AL DECK</h2>
+      <input id="deckSearch" placeholder="Buscar carta..." oninput="renderDeckCatalog()" style="width:100%;margin-bottom:10px">
+      <select id="deckKindFilter" onchange="renderDeckCatalog()" style="width:100%;margin-bottom:10px">
+        <option value="">Todos los tipos</option>
+        <option value="MONSTER">MONSTER</option>
+        <option value="SPELL">SPELL</option>
+        <option value="TRAP">TRAP</option>
+        <option value="EQUIP">EQUIP</option>
+      </select>
+      <div id="deckCatalog" style="max-height:500px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL 3: PARTIDAS GUARDADAS -->
+<div class="panel" id="panel-saves">
+  <h2>PARTIDAS GUARDADAS</h2>
+  <button class="btn btn-blue" onclick="loadSaves()" style="margin-bottom:12px">🔄 Actualizar</button>
+  <table class="saves-table">
+    <thead><tr><th>Jugador</th><th>Mundo</th><th>Última sesión</th><th>Acciones</th></tr></thead>
+    <tbody id="savesBody"></tbody>
+  </table>
+</div>
+
+<!-- PANEL 4: GESTION DE USUARIOS, PROGRESO Y REGALIAS -->
+<div class="panel" id="panel-users">
+  <h2>ADMINISTRACIÓN DE JUGADORES, PROGRESO & REGALÍAS</h2>
+  
+  <div class="stats-banner">
+    <div class="stat-box gold">
+      <span class="stat-label">Total Registrados</span>
+      <span class="stat-val" id="statTotalUsers">0</span>
+      <span class="stat-desc">Cuentas creadas en el servidor</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Activos (Últimas 24h)</span>
+      <span class="stat-val" style="color:#7ee787;" id="statActiveUsers">0</span>
+      <span class="stat-desc">Jugadores con sesión reciente</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Total DP en Circulación</span>
+      <span class="stat-val" style="color:#e3b341;" id="statTotalDP">0 DP</span>
+      <span class="stat-desc">Puntos de duelo de la comunidad</span>
+    </div>
+  </div>
+
+  <!-- REGALÍAS PROGRAMADAS Y MASIVAS -->
+  <div class="card" style="margin-bottom:18px;background:linear-gradient(135deg,#151528,#1e1832);border:1px solid #8b6914;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h3 style="color:#ffd700;font-size:1rem;margin-bottom:4px;">🎁 REGALÍAS MASIVAS & PROGRAMADAS</h3>
+        <p style="color:#aaa;font-size:.8rem;">Otorga incentivos automáticos a jugadores por actividad o avance en la campaña.</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-gold btn-sm" onclick="promptBroadcastReward('all')">📢 +10,000 DP a Todos</button>
+        <button class="btn btn-green btn-sm" onclick="promptBroadcastReward('active24h')">⚡ +5,000 DP a Activos 24h</button>
+        <button class="btn btn-purple btn-sm" onclick="promptBroadcastReward('progressM1')">🏆 +15,000 DP por Campaña</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="flex" style="margin-bottom:12px;justify-content:space-between;">
+      <div class="flex">
+        <input id="userSearch" placeholder="Buscar jugador o correo..." oninput="renderUsersTable()" style="min-width:260px;">
+        <select id="userFilter" onchange="renderUsersTable()" style="width:190px;">
+          <option value="all">Todos los jugadores</option>
+          <option value="active">Activos en 24h</option>
+          <option value="topDp">Mayor cantidad de DP</option>
+          <option value="topWins">Mayor cantidad de victorias</option>
+        </select>
+      </div>
+      <button class="btn btn-blue" onclick="loadUsers()">🔄 Refrescar Jugadores</button>
+    </div>
+
+    <table class="saves-table">
+      <thead>
+        <tr>
+          <th>Duelista / Correo</th>
+          <th>Progreso Campaña</th>
+          <th>Victorias / Derrotas</th>
+          <th>Balance DP</th>
+          <th>Deck / Baúl</th>
+          <th>Última Conexión</th>
+          <th style="text-align:center;">Acciones / Regalías</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL: OTORGAR DP -->
+<div class="modal-overlay" id="dpModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('dpModal')">✕</button>
+    <div class="modal-title">💰 Otorgar Puntos de Duelo (DP)</div>
+    <div style="font-size:.85rem;color:#aaa;margin-bottom:12px;">
+      Jugador: <b style="color:#ffd700;" id="dpTargetName">-</b> · Saldo actual: <b style="color:#88ff88;" id="dpCurrentBalance">0 DP</b>
+    </div>
+    
+    <label>Monto Rápido</label>
+    <div class="preset-btns">
+      <button class="preset-btn" onclick="setDpAmount(1000)">+1,000</button>
+      <button class="preset-btn" onclick="setDpAmount(5000)">+5,000</button>
+      <button class="preset-btn" onclick="setDpAmount(10000)">+10,000</button>
+      <button class="preset-btn" onclick="setDpAmount(50000)">+50,000</button>
+      <button class="preset-btn" onclick="setDpAmount(100000)">+100,000</button>
+    </div>
+
+    <label>Cantidad de DP</label>
+    <input type="number" id="dpAmount" placeholder="Ej: 5000" value="5000">
+
+    <label>Modo de Asignación</label>
+    <select id="dpMode">
+      <option value="add">Sumar al saldo actual (+Regalía)</option>
+      <option value="set">Fijar saldo exacto</option>
+    </select>
+
+    <label>Motivo o Nota</label>
+    <input id="dpReason" placeholder="Ej: Regalía de Administrador / Fidelidad" value="Regalía de Administrador">
+
+    <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn btn-blue" onclick="closeModal('dpModal')">Cancelar</button>
+      <button class="btn btn-gold" onclick="submitGrantDp()">CONFIRMAR DP</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REGALAR CARTA -->
+<div class="modal-overlay" id="giftCardModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('giftCardModal')">✕</button>
+    <div class="modal-title">🃏 Regalar Carta al Inventario / Baúl</div>
+    <div style="font-size:.85rem;color:#aaa;margin-bottom:12px;">
+      Destinatario: <b style="color:#ffd700;" id="giftCardTargetName">-</b>
+    </div>
+
+    <label>Buscar Carta</label>
+    <input id="giftCardSearch" placeholder="Buscar por nombre..." oninput="filterGiftCards()">
+    
+    <label>Seleccionar Carta</label>
+    <select id="giftCardSelect" size="6" style="margin-top:4px;height:140px;"></select>
+
+    <label>Cantidad de Copias</label>
+    <select id="giftCardCount">
+      <option value="1">1 Copia</option>
+      <option value="2">2 Copias</option>
+      <option value="3">3 Copias (Máximo permitido por mazo)</option>
+    </select>
+
+    <label>Motivo</label>
+    <input id="giftCardReason" placeholder="Ej: Premio de Torneo / Regalía especial" value="Regalía de Carta de Administrador">
+
+    <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn btn-blue" onclick="closeModal('giftCardModal')">Cancelar</button>
+      <button class="btn btn-gold" onclick="submitGrantCard()">ENVIAR CARTA</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var allCards = [];
+var currentDeck = [];
+var allUsers = [];
+var selectedUserName = '';
+var adminToken = sessionStorage.getItem('fmr_admin_token') || localStorage.getItem('fmr_admin_token') || '';
+
+// ── AUTENTICACIÓN ADMIN ───────────────────────────────────────────
+async function checkAuth() {
+  if (!adminToken) {
+    document.getElementById('loginModal').style.display = 'flex';
+    return;
+  }
+  try {
+    var r = await fetch('/api/admin/verify', {
+      headers: { 'Authorization': 'Bearer ' + adminToken }
+    });
+    var d = await r.json();
+    if (d.ok) {
+      document.getElementById('loginModal').style.display = 'none';
+      initAdmin();
+    } else {
+      document.getElementById('loginModal').style.display = 'flex';
+    }
+  } catch (_) {
+    document.getElementById('loginModal').style.display = 'flex';
+  }
+}
+
+async function loginAdmin() {
+  var u = document.getElementById('adminUser').value.trim();
+  var p = document.getElementById('adminPass').value;
+  var msg = document.getElementById('loginMsg');
+  if (!u || !p) {
+    msg.textContent = 'Ingresa usuario y contraseña';
+    msg.className = 'msg err';
+    return;
+  }
+  try {
+    var r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    var d = null;
+    try { d = await r.json(); } catch(_) {}
+    if (r.ok && d && d.ok && d.token) {
+      adminToken = d.token;
+      sessionStorage.setItem('fmr_admin_token', adminToken);
+      localStorage.setItem('fmr_admin_token', adminToken);
+      document.getElementById('loginModal').style.display = 'none';
+      initAdmin();
+    } else {
+      msg.textContent = (d && d.error) ? d.error : (r.status === 401 ? 'Credenciales de administrador incorrectas' : 'Error en el servidor (' + r.status + ')');
+      msg.className = 'msg err';
+    }
+  } catch (e) {
+    msg.textContent = 'Error de red al conectar con el servidor: ' + (e.message || e);
+    msg.className = 'msg err';
+  }
+}
+
+function logoutAdmin() {
+  adminToken = '';
+  sessionStorage.removeItem('fmr_admin_token');
+  localStorage.removeItem('fmr_admin_token');
+  document.getElementById('loginModal').style.display = 'flex';
+}
+
+function adminHeaders(extra) {
+  var h = { 'Authorization': 'Bearer ' + adminToken };
+  if (extra) Object.assign(h, extra);
+  return h;
+}
+
+// ── INICIALIZACIÓN Y NAVEGACIÓN ──────────────────────────────────
+function initAdmin() {
+  loadAllCards();
+  toggleMonsterFields();
+}
+
+function showTab(name) {
+  var tabs = ['cards','decks','saves','users'];
+  document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('active', tabs[i]===name); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('active', p.id==='panel-'+name); });
+  if(name==='decks'){ loadAllCards().then(function(){ renderDeckCatalog(); loadCharDeck(); }); }
+  if(name==='saves') loadSaves();
+  if(name==='users') loadUsers();
+}
+
+// ── CARTAS & EXAMINAR IMAGEN ─────────────────────────────────────
+async function loadAllCards() {
+  try {
+    var r = await fetch('/api/cards');
+    allCards = await r.json();
+    renderCardList();
+  } catch(_) {}
+}
+
+function renderCardList() {
+  var q = (document.getElementById('cardSearch').value||'').toLowerCase();
+  var k = document.getElementById('kindFilter').value;
+  var list = document.getElementById('cardList');
+  var filtered = allCards.filter(function(c){ return (!q||c.name.toLowerCase().includes(q))&&(!k||c.kind===k); });
+  list.innerHTML = filtered.map(function(c){
+    var priceTag = c.price ? '<span class="card-price-badge">💰 ' + Number(c.price).toLocaleString('es') + ' PM</span>' : '';
+    return '<div class="card-item" onclick="editCard('+c.id+')">' +
+      priceTag +
+      '<span class="card-kind kind-'+c.kind+'">'+c.kind+'</span>' +
+      '<div class="card-name">'+c.name+'</div>' +
+      '<div class="card-stats">'+(c.kind==='MONSTER'?'Lv'+c.level+' ATK:'+c.atk+' DEF:'+c.def:(c.value||''))+'</div>' +
+      '</div>';
+  }).join('');
+}
+
+function toggleMonsterFields() {
+  var k = document.getElementById('cKind').value;
+  document.getElementById('monsterFields').style.display = k==='MONSTER'?'block':'none';
+  document.getElementById('stFields').style.display = k!=='MONSTER'?'block':'none';
+}
+
+function updateCardImageNameHint() {
+  // Opcional para guiar la subida
+}
+
+function updateImagePreview(src) {
+  var wrap = document.getElementById('cImagePreviewWrap');
+  var img = document.getElementById('cImagePreview');
+  var status = document.getElementById('cImageStatus');
+  if (!src) {
+    wrap.style.display = 'none';
+    return;
+  }
+  img.src = src;
+  wrap.style.display = 'flex';
+  status.textContent = 'Ruta configurada';
+}
+
+async function handleImagePicked(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  document.getElementById('cImageFileName').textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+  
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var base64 = e.target.result;
+    updateImagePreview(base64);
+    document.getElementById('cImageStatus').textContent = 'Subiendo al servidor...';
+
+    var cardName = document.getElementById('cName').value.trim() || 'custom';
+    try {
+      var r = await fetch('/api/upload-image', {
+        method: 'POST',
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ filename: file.name, base64Data: base64, cardName: cardName })
+      });
+      var d = await r.json();
+      if (d.ok && d.path) {
+        document.getElementById('cImage').value = d.path;
+        document.getElementById('cImageStatus').textContent = '✓ Guardada como ' + d.filename;
+        showMsg('cardMsg', 'Imagen subida correctamente al servidor', 'ok');
+      } else {
+        document.getElementById('cImageStatus').textContent = 'Error: ' + (d.error || 'Fallo al subir');
+      }
+    } catch (err) {
+      document.getElementById('cImageStatus').textContent = 'Error de conexión al subir imagen';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function editCard(id) {
+  var c = allCards.find(function(x){ return x.id===id; });
+  if(!c) return;
+  document.getElementById('formTitle').textContent = 'EDITAR CARTA (ID: ' + c.id + ')';
+  document.getElementById('cardId').value = c.id;
+  document.getElementById('cName').value = c.name||'';
+  document.getElementById('cKind').value = c.kind||'MONSTER';
+  if(c.type) document.getElementById('cType').value = c.type;
+  if(c.attr) document.getElementById('cAttr').value = c.attr;
+  document.getElementById('cLevel').value = c.level||4;
+  document.getElementById('cAtk').value = c.atk||0;
+  document.getElementById('cDef').value = c.def||0;
+  document.getElementById('cValue').value = c.value||'';
+  document.getElementById('cText').value = c.text||'';
+  document.getElementById('cImage').value = c.image||'';
+  document.getElementById('cPrice').value = c.price !== undefined ? c.price : 25000;
+  document.getElementById('cTier').value = c.tier||'';
+  if (c.image) updateImagePreview(c.image);
+  else document.getElementById('cImagePreviewWrap').style.display = 'none';
+  toggleMonsterFields();
+}
+
+function clearForm() {
+  document.getElementById('formTitle').textContent = 'NUEVA CARTA';
+  document.getElementById('cardId').value = '';
+  ['cName','cValue','cText','cImage','cTier'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('cPrice').value = 25000;
+  document.getElementById('cKind').value = 'MONSTER';
+  document.getElementById('cLevel').value = 4;
+  document.getElementById('cAtk').value = 1000;
+  document.getElementById('cDef').value = 1000;
+  document.getElementById('cImageFileName').textContent = 'Ningún archivo seleccionado';
+  document.getElementById('cImagePreviewWrap').style.display = 'none';
+  toggleMonsterFields();
+}
+
+async function saveCard() {
+  var k = document.getElementById('cKind').value;
+  var idVal = document.getElementById('cardId').value;
+  var card = {
+    name: document.getElementById('cName').value.trim(),
+    kind: k,
+    text: document.getElementById('cText').value.trim(),
+    image: document.getElementById('cImage').value.trim(),
+    price: parseInt(document.getElementById('cPrice').value) || 0,
+    tier: document.getElementById('cTier').value.trim() || 'TIENDA'
+  };
+  if(idVal) card.id = parseInt(idVal);
+  if(!card.name) return showMsg('cardMsg','El nombre es requerido','err');
+  if(k==='MONSTER') {
+    card.type = document.getElementById('cType').value;
+    card.attr = document.getElementById('cAttr').value;
+    card.level = parseInt(document.getElementById('cLevel').value);
+    card.atk = parseInt(document.getElementById('cAtk').value);
+    card.def = parseInt(document.getElementById('cDef').value);
+  } else {
+    card.value = document.getElementById('cValue').value.trim();
+  }
+
+  var r = await fetch('/api/cards', {
+    method: 'POST',
+    headers: adminHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(card)
+  });
+  var d = await r.json();
+  if(d.ok){
+    showMsg('cardMsg','¡Carta guardada con éxito! Disponible en catálogo y tienda.','ok');
+    await loadAllCards();
+  } else {
+    showMsg('cardMsg','Error: '+(d.error||'No se pudo guardar'),'err');
+  }
+}
+
+function showMsg(id,text,type) {
+  var el=document.getElementById(id);
+  el.textContent=text; el.className='msg '+type;
+  setTimeout(function(){ el.style.display='none'; },4000);
+}
+
+// ── DECKS DE PERSONAJES ───────────────────────────────────────────
+async function loadCharDeck() {
+  var char = document.getElementById('charSelect').value;
+  var r = await fetch('/api/deck/'+char);
+  var d = await r.json();
+  currentDeck = Array.isArray(d.cards) ? d.cards.slice() : [];
+  renderDeck();
+  renderDeckCatalog();
+}
+
+function renderDeck() {
+  var el = document.getElementById('deckSlots');
+  var counter = document.getElementById('deckCounter');
+  var n = currentDeck.length;
+  counter.textContent = n+' / 40-60 cartas';
+  counter.className = 'deck-counter '+((n>=40&&n<=60)?'ok':'err');
+  el.innerHTML = currentDeck.map(function(name,i){
+    return '<div class="deck-slot"><span class="name">'+name+'</span><button class="remove" onclick="removeFromDeck('+i+')">✕</button></div>';
+  }).join('');
+}
+
+function renderDeckCatalog() {
+  var q = (document.getElementById('deckSearch').value||'').toLowerCase();
+  var k = document.getElementById('deckKindFilter').value;
+  var el = document.getElementById('deckCatalog');
+  var filtered = allCards.filter(function(c){ return (!q||c.name.toLowerCase().includes(q))&&(!k||c.kind===k); });
+  el.innerHTML = filtered.map(function(c){
+    var esc = c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<div class="card-item" onclick="addToDeck(\''+esc+'\')">' +
+      '<span class="card-kind kind-'+c.kind+'">'+c.kind+'</span>' +
+      '<div class="card-name">'+c.name+'</div>' +
+      '<div class="card-stats">'+(c.kind==='MONSTER'?'Lv'+c.level+' ATK:'+c.atk+' DEF:'+c.def:'')+'</div>' +
+      '</div>';
+  }).join('');
+}
+
+function addToDeck(name) {
+  if(currentDeck.length>=60){alert('El deck ya tiene el máximo de 60 cartas');return;}
+  var copies=currentDeck.filter(function(n){return n===name;}).length;
+  if(copies>=3){alert('Máximo 3 copias de la misma carta');return;}
+  currentDeck.push(name);
+  renderDeck();
+}
+
+function removeFromDeck(idx) { currentDeck.splice(idx,1); renderDeck(); }
+
+async function saveDeck() {
+  if(currentDeck.length<40 || currentDeck.length>60){
+    showMsg('deckMsg','El deck debe tener entre 40 y 60 cartas (actual: '+currentDeck.length+')','err');
+    return;
+  }
+  var char = document.getElementById('charSelect').value;
+  var r = await fetch('/api/deck/'+char, {
+    method:'POST',
+    headers: adminHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ character: char, displayName: char, world: 1, cards: currentDeck })
+  });
+  var d = await r.json();
+  if(d.ok) showMsg('deckMsg','Deck guardado correctamente','ok');
+  else showMsg('deckMsg','Error: '+d.error,'err');
+}
+
+// ── PARTIDAS GUARDADAS ───────────────────────────────────────────
+async function loadSaves() {
+  var r = await fetch('/api/saves', { headers: adminHeaders() });
+  var saves = await r.json();
+  var body = document.getElementById('savesBody');
+  if(!saves || !saves.length){
+    body.innerHTML='<tr><td colspan="4" style="color:#666;text-align:center;padding:20px">No hay partidas guardadas</td></tr>';
+    return;
+  }
+  body.innerHTML = saves.map(function(s){
+    var dt = s.lastPlayed ? new Date(s.lastPlayed).toLocaleString('es') : '-';
+    return '<tr><td style="color:#ffd700;font-weight:600">'+(s.name||s.file)+'</td><td>Mundo '+(s.world||'?')+'</td><td>'+dt+'</td><td><button class="btn btn-red btn-sm" onclick="deleteSave(\''+(s.name||s.file)+'\')">Borrar</button></td></tr>';
+  }).join('');
+}
+
+async function deleteSave(name) {
+  if(!confirm('¿Estás seguro de borrar la partida de '+name+'? Esta acción no se puede deshacer.')) return;
+  await fetch('/api/saves/'+encodeURIComponent(name), {
+    method:'DELETE',
+    headers: adminHeaders()
+  });
+  loadSaves();
+  loadUsers();
+}
+
+// ── PANEL DE USUARIOS, PROGRESO & REGALIAS ───────────────────────
+async function loadUsers() {
+  try {
+    var r = await fetch('/api/admin/users', { headers: adminHeaders() });
+    allUsers = await r.json();
+    if (!Array.isArray(allUsers)) allUsers = [];
+
+    // Calcular metricas
+    var active24h = allUsers.filter(function(u){ return u.isActive24h; }).length;
+    var totalDp = allUsers.reduce(function(acc,u){ return acc + (parseInt(u.pm)||0); }, 0);
+
+    document.getElementById('statTotalUsers').textContent = allUsers.length;
+    document.getElementById('statActiveUsers').textContent = active24h;
+    document.getElementById('statTotalDP').textContent = totalDp.toLocaleString('es') + ' DP';
+
+    renderUsersTable();
+  } catch (err) {
+    console.error('Error cargando usuarios:', err);
+  }
+}
+
+function renderUsersTable() {
+  var q = (document.getElementById('userSearch').value || '').toLowerCase();
+  var filter = document.getElementById('userFilter').value;
+  var body = document.getElementById('usersBody');
+
+  var list = allUsers.filter(function(u) {
+    var mQ = !q || (u.name && u.name.toLowerCase().includes(q)) || (u.email && u.email.toLowerCase().includes(q));
+    if (!mQ) return false;
+    if (filter === 'active') return u.isActive24h;
+    return true;
+  });
+
+  if (filter === 'topDp') list.sort(function(a,b){ return (b.pm||0) - (a.pm||0); });
+  if (filter === 'topWins') list.sort(function(a,b){ return (b.totalWins||0) - (a.totalWins||0); });
+
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="7" style="color:#777;text-align:center;padding:24px;">No se encontraron jugadores registrados.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = list.map(function(u) {
+    var dt = u.lastPlayed ? new Date(u.lastPlayed).toLocaleString('es') : 'Sin actividad';
+    var activeBadge = u.isActive24h ? ' <span style="background:#1b4d24;color:#7ee787;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:bold;">ACTIVO</span>' : '';
+    var esc = (u.name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    var clearedCount = Array.isArray(u.cleared) ? u.cleared.length : 0;
+
+    return '<tr>' +
+      '<td>' +
+        '<div style="font-weight:bold;color:#ffd700;font-size:.9rem;">' + u.name + activeBadge + '</div>' +
+        '<div style="font-size:.75rem;color:#8b949e;">' + u.email + '</div>' +
+      '</td>' +
+      '<td>' +
+        '<div>Mundo <b>' + (u.world || 1) + '</b></div>' +
+        '<div style="font-size:.75rem;color:#aaa;">' + clearedCount + ' duelistas vencidos</div>' +
+      '</td>' +
+      '<td>' +
+        '<span style="color:#7ee787;font-weight:bold;">⚔ ' + (u.totalWins || 0) + ' W</span> / ' +
+        '<span style="color:#ff7b72;">' + (u.totalLosses || 0) + ' L</span>' +
+      '</td>' +
+      '<td>' +
+        '<div style="color:#ffd700;font-weight:bold;font-size:.95rem;">💰 ' + Number(u.pm || 0).toLocaleString('es') + ' DP</div>' +
+      '</td>' +
+      '<td>' +
+        '<span style="color:#58a6ff;">' + (u.deckCount || 0) + '/40</span> deck · ' +
+        '<span style="color:#aaa;">' + (u.collectionCount || 0) + ' baúl</span>' +
+      '</td>' +
+      '<td style="font-size:.78rem;color:#aaa;">' + dt + '</td>' +
+      '<td style="text-align:center;white-space:nowrap;">' +
+        '<button class="btn btn-gold btn-sm" onclick="openDpModal(\'' + esc + '\', ' + (u.pm || 0) + ')">💰 +DP</button> ' +
+        '<button class="btn btn-purple btn-sm" onclick="openGiftCardModal(\'' + esc + '\')">🎁 Carta</button> ' +
+        '<button class="btn btn-red btn-sm" onclick="deleteSave(\'' + esc + '\')">🗑</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// Modales de Regalías
+function openDpModal(userName, currentPm) {
+  selectedUserName = userName;
+  document.getElementById('dpTargetName').textContent = userName;
+  document.getElementById('dpCurrentBalance').textContent = Number(currentPm).toLocaleString('es') + ' DP';
+  document.getElementById('dpAmount').value = '5000';
+  document.getElementById('dpModal').style.display = 'flex';
+}
+
+function setDpAmount(val) {
+  document.getElementById('dpAmount').value = val;
+}
+
+async function submitGrantDp() {
+  var amt = document.getElementById('dpAmount').value;
+  var mode = document.getElementById('dpMode').value;
+  var reason = document.getElementById('dpReason').value.trim();
+
+  try {
+    var r = await fetch('/api/admin/user/' + encodeURIComponent(selectedUserName) + '/grant-dp', {
+      method: 'POST',
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ amount: amt, mode: mode, reason: reason })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      alert('¡Se otorgaron los DP con éxito!\nNuevo saldo de ' + selectedUserName + ': ' + Number(d.newPm).toLocaleString('es') + ' DP');
+      closeModal('dpModal');
+      loadUsers();
+    } else {
+      alert('Error: ' + (d.error || 'No se pudo otorgar'));
+    }
+  } catch (err) {
+    alert('Error al conectar con el servidor');
+  }
+}
+
+function openGiftCardModal(userName) {
+  selectedUserName = userName;
+  document.getElementById('giftCardTargetName').textContent = userName;
+  filterGiftCards();
+  document.getElementById('giftCardModal').style.display = 'flex';
+}
+
+function filterGiftCards() {
+  var q = (document.getElementById('giftCardSearch').value || '').toLowerCase();
+  var sel = document.getElementById('giftCardSelect');
+  var list = allCards.filter(function(c) { return !q || c.name.toLowerCase().includes(q); });
+  sel.innerHTML = list.slice(0, 100).map(function(c) {
+    return '<option value="' + c.name.replace(/"/g, '&quot;') + '">' + c.name + ' (' + c.kind + (c.kind==='MONSTER' ? ' ATK:'+c.atk : '') + ')</option>';
+  }).join('');
+  if (list.length > 0) sel.selectedIndex = 0;
+}
+
+async function submitGrantCard() {
+  var sel = document.getElementById('giftCardSelect');
+  var cardName = sel.value;
+  var count = document.getElementById('giftCardCount').value;
+  var reason = document.getElementById('giftCardReason').value.trim();
+
+  if (!cardName) return alert('Debes seleccionar una carta del listado');
+
+  try {
+    var r = await fetch('/api/admin/user/' + encodeURIComponent(selectedUserName) + '/grant-card', {
+      method: 'POST',
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ cardName: cardName, count: count, reason: reason })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      alert('¡Carta regalada con éxito!\nSe añadieron ' + d.count + ' copia(s) de "' + d.card + '" al baúl de ' + selectedUserName + '.');
+      closeModal('giftCardModal');
+      loadUsers();
+    } else {
+      alert('Error: ' + (d.error || 'No se pudo regalar'));
+    }
+  } catch (_) {
+    alert('Error de conexión al otorgar carta');
+  }
+}
+
+async function promptBroadcastReward(filterType) {
+  var dp = 10000;
+  var desc = 'todos los jugadores';
+  if (filterType === 'active24h') { dp = 5000; desc = 'jugadores activos en las últimas 24 horas'; }
+  if (filterType === 'progressM1') { dp = 15000; desc = 'duelistas que avanzaron en la campaña'; }
+
+  var custom = prompt('¿Cuántos DP deseas otorgar como regalía a ' + desc + '?', dp);
+  if (custom === null) return;
+  var num = parseInt(custom);
+  if (isNaN(num) || num <= 0) return alert('Monto inválido');
+
+  if (!confirm('¿Confirmas el envío masivo de ' + num.toLocaleString('es') + ' DP a ' + desc + '?')) return;
+
+  try {
+    var r = await fetch('/api/admin/broadcast-reward', {
+      method: 'POST',
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ dpAmount: num, filter: filterType, reason: 'Regalía Global: ' + desc })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      alert('¡Regalía masiva enviada!\nSe beneficiaron ' + d.affectedCount + ' jugadores con +' + num.toLocaleString('es') + ' DP cada uno.');
+      loadUsers();
+    } else {
+      alert('Error: ' + (d.error || 'No se pudo enviar'));
+    }
+  } catch (_) {
+    alert('Error en conexión');
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+// Iniciar verificando autenticación
+checkAuth();
+</script>
+</body>
+</html>

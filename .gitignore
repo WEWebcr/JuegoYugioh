@@ -1,0 +1,38 @@
+﻿# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test & Debug Scripts
+test*.js
+test*.html
+check_braces.js
+syntax_check*.js
+
+# Intermediate & Backup HTML Bundles
+YGOFMR2026-1_clean.html
+YGOFMR2026-2.html
+YGOFMR2026-STABLE*.html
+
+# Archive Files
+*.zip
+*.rar
+*.tar.gz
+
+# Saves data (preserve directory with .gitkeep)
+saves/*
+!saves/.gitkeep
+
+# System & IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

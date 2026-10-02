@@ -1,0 +1,596 @@
+{
+  "set": "Yu-Gi-Oh! Bandai OCG 1998",
+  "cards": [
+    {
+      "number": 1,
+      "name": "Yugi Muto",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 2,
+      "name": "Yami Yugi",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 3,
+      "name": "Joey Wheeler",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 4,
+      "name": "Seto Kaiba",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 5,
+      "name": "Tristan Taylor",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 6,
+      "name": "Téa Gardner",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 7,
+      "name": "Melody",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 8,
+      "name": "Shadi",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 9,
+      "name": "Blue-Eyes White Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 10,
+      "name": "Red-Eyes Black Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 11,
+      "name": "Gaia the Fierce Knight",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 12,
+      "name": "Curse of Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 13,
+      "name": "Gaia the Dragon Champion",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 14,
+      "name": "Dark Magician",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 15,
+      "name": "Thousand Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 16,
+      "name": "Basic Insect",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 17,
+      "name": "Armored Basic Insect w/Laser Cannon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 18,
+      "name": "Harpie Lady 1",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 19,
+      "name": "Megazowler",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 20,
+      "name": "Two-Headed King Rex",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 21,
+      "name": "Summoned Skull",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 22,
+      "name": "Aphrodite",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 23,
+      "name": "Winged Dragon, Guardian of the Fortress #1",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 24,
+      "name": "Blackland Fire Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 25,
+      "name": "Dragon Capture Jar",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 26,
+      "name": "Judge Man",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 27,
+      "name": "Celtic Guardian",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 28,
+      "name": "Baby Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 29,
+      "name": "Silver Fang",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 30,
+      "name": "Saggi the Dark Clown",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 31,
+      "name": "Rogue Doll",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 32,
+      "name": "Larvae Moth",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 33,
+      "name": "Great Moth",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 34,
+      "name": "Beaver Warrior",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 35,
+      "name": "Mystical Elf",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 36,
+      "name": "Flame Swordsman",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 37,
+      "name": "King of Yamimakai",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 38,
+      "name": "Exodia the Forbidden One",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 39,
+      "name": "Right Leg of the Forbidden One",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 40,
+      "name": "Right Arm of the Forbidden One",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 41,
+      "name": "Left Leg of the Forbidden One",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 42,
+      "name": "Left Arm of the Forbidden One",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 43,
+      "name": "Labyrinth Tank",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 44,
+      "name": "Sanga of the Thunder",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 45,
+      "name": "Kazejin",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 46,
+      "name": "Suijin",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 47,
+      "name": "Time Wizard",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 48,
+      "name": "Polymerization",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 49,
+      "name": "B. Skull Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 50,
+      "name": "Kunai with Chain",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 51,
+      "name": "Horn of the Unicorn",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 52,
+      "name": "Cyber Shield",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 53,
+      "name": "Elegant Egotist",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 54,
+      "name": "Pumpking the King of Ghosts",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 55,
+      "name": "Gyakutenno Megami",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 56,
+      "name": "Catapult Turtle",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 57,
+      "name": "Kairyu-Shin",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 58,
+      "name": "Metal Guardian",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 59,
+      "name": "Giant Soldier of Stone",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 60,
+      "name": "Axe Raider",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 61,
+      "name": "Battle Ox",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 62,
+      "name": "Swamp Battleguard",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 63,
+      "name": "Garoozis",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 64,
+      "name": "Shadow Ghoul",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 65,
+      "name": "Dragon Zombie",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 66,
+      "name": "Sword Arm of Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 67,
+      "name": "Crawling Dragon #2",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 68,
+      "name": "Feral Imp",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 69,
+      "name": "Hercules Beetle",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 70,
+      "name": "Kojikocy",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 71,
+      "name": "Fiend Kraken",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 72,
+      "name": "Jellyfish",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 73,
+      "name": "Armored Lizard",
+      "image": "available in prototype"
+    },
+    {
+      "number": 74,
+      "name": "Battle Steer",
+      "image": "available in prototype"
+    },
+    {
+      "number": 75,
+      "name": "Mammoth Graveyard",
+      "image": "available in prototype"
+    },
+    {
+      "number": 76,
+      "name": "Barox",
+      "image": "available in prototype"
+    },
+    {
+      "number": 77,
+      "name": "Harpie Lady 2",
+      "image": "available in prototype"
+    },
+    {
+      "number": 78,
+      "name": "Harpie Lady 3",
+      "image": "available in prototype"
+    },
+    {
+      "number": 79,
+      "name": "Battle Warrior",
+      "image": "available in prototype"
+    },
+    {
+      "number": 80,
+      "name": "Armored Zombie",
+      "image": "available in prototype"
+    },
+    {
+      "number": 81,
+      "name": "Torike",
+      "image": "available in prototype"
+    },
+    {
+      "number": 82,
+      "name": "Killer Needle",
+      "image": "available in prototype"
+    },
+    {
+      "number": 83,
+      "name": "Clown Zombie",
+      "image": "available in prototype"
+    },
+    {
+      "number": 84,
+      "name": "Dragon Piper",
+      "image": "available in prototype"
+    },
+    {
+      "number": 85,
+      "name": "Tiger Axe",
+      "image": "available in prototype"
+    },
+    {
+      "number": 86,
+      "name": "Horn Imp",
+      "image": "available in prototype"
+    },
+    {
+      "number": 87,
+      "name": "Wattkid",
+      "image": "available in prototype"
+    },
+    {
+      "number": 88,
+      "name": "Monster Reborn",
+      "image": "available in prototype"
+    },
+    {
+      "number": 89,
+      "name": "Ryu-Kishin",
+      "image": "available in prototype"
+    },
+    {
+      "number": 90,
+      "name": "Skull Servant",
+      "image": "available in prototype"
+    },
+    {
+      "number": 91,
+      "name": "Megamorph",
+      "image": "available in prototype"
+    },
+    {
+      "number": 92,
+      "name": "Mushroom Man",
+      "image": "available in prototype"
+    },
+    {
+      "number": 93,
+      "name": "Hitotsu-Me Giant",
+      "image": "available in prototype"
+    },
+    {
+      "number": 94,
+      "name": "The Wicked Worm Beast",
+      "image": "available in prototype"
+    },
+    {
+      "number": 95,
+      "name": "Dark Energy",
+      "image": "available in prototype"
+    },
+    {
+      "number": 96,
+      "name": "Golden Pegasus",
+      "image": "available in prototype"
+    },
+    {
+      "number": 97,
+      "name": "King Rex",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 98,
+      "name": "Yellow Hecate",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 99,
+      "name": "Red Hecate",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 100,
+      "name": "Violet Hecate",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 101,
+      "name": "Gorgon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 102,
+      "name": "King Beetle",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 103,
+      "name": "Rock Gun",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 104,
+      "name": "Night Soldier",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 105,
+      "name": "Neon Knight",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 106,
+      "name": "Chimera",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 107,
+      "name": "Koumori Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 108,
+      "name": "Dark Zorla",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 109,
+      "name": "Magical Hats",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 110,
+      "name": "[110]",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 111,
+      "name": "Meteor Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 112,
+      "name": "Dragonic Pulse of the Land",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 113,
+      "name": "Meteor Black Dragon",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 114,
+      "name": "Blue-Eyes Ultimate Dragon (114)",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 115,
+      "name": "Blue-Eyes Ultimate Dragon (115)",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 116,
+      "name": "Blue-Eyes Ultimate Dragon (116)",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 117,
+      "name": "Blue-Eyes Ultimate Dragon (117)",
+      "image": "needs exact Bandai scan"
+    },
+    {
+      "number": 118,
+      "name": "Blue-Eyes White Dragon (EN)",
+      "image": "needs exact Bandai scan"
+    }
+  ],
+  "note": "Prototype currently contains 24 Bandai-art files supplied/created in the previous prototype. Exact 118-scan replacement requires the image pack."
+}

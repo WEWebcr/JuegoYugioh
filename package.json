@@ -1,0 +1,29 @@
+{
+    "name": "proyectoygo",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "build": "node build_v5.js",
+        "dev": "node build_v5.js && node server.js",
+        "test": "echo No tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/WEWebcr/JuegoYugioh.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/WEWebcr/JuegoYugioh/issues"
+    },
+    "homepage": "https://github.com/WEWebcr/JuegoYugioh#readme",
+    "dependencies": {
+        "acorn": "^8.18.0",
+        "express": "^5.2.1",
+        "nodemailer": "^10.0.13"
+    }
+}

@@ -1,0 +1,60 @@
+
+  // ==== OVERLAY DIRECTO ====================================================
+  // Capturamos customShowMain y mostramos el login como overlay de alta
+  // prioridad. No dependemos de interceptar la llamada - el overlay aparece
+  // encima de cualquier estado del juego (z-index 99999).
+
+  function captureOrig() {
+    if (window.customShowMain && !window._fmrOrig) {
+      window._fmrOrig = window.customShowMain;
+    }
+  }
+
+  function showLoginOverlay() {
+    captureOrig();
+    if (!SERVER_MODE) return;
+    if (document.getElementById('fmrLogin')) return;
+    if (!document.body) { setTimeout(showLoginOverlay, 50); return; }
+    buildLoginUI();
+  }
+
+  // Iniciar deteccion de servidor inmediatamente
+  fetch('/api/saves')
+    .then(function(r) {
+      SERVER_MODE = r.ok;
+      SERVER_CHECK_DONE = true;
+      if (SERVER_MODE) showLoginOverlay();
+    })
+    .catch(function() {
+      SERVER_MODE = false;
+      SERVER_CHECK_DONE = true;
+    });
+
+  // Fallback en DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', function() {
+    captureOrig();
+
+    if (SERVER_CHECK_DONE && SERVER_MODE) {
+      showLoginOverlay();
+    } else if (!SERVER_CHECK_DONE) {
+      var waited = 0;
+      var fallbackTimer = setInterval(function() {
+        waited += 100;
+        if (SERVER_CHECK_DONE) {
+          clearInterval(fallbackTimer);
+          if (SERVER_MODE) showLoginOverlay();
+        } else if (waited >= 1500) {
+          clearInterval(fallbackTimer);
+          SERVER_MODE = false;
+          SERVER_CHECK_DONE = true;
+        }
+      }, 100);
+    }
+
+    setTimeout(function() {
+      if (SERVER_MODE) preloadServerDecks();
+      patchInstallStoryDecks();
+    }, 600);
+  });
+
+})();
