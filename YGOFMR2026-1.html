@@ -300,7 +300,7 @@ function equipSpell(i){
 function enforceHandLimit(side){let hand=side==='enemy'?game.enemyHand:game.hand;let grave=side==='enemy'?game.enemyGrave:game.grave;while(hand.length>6){let c=hand.pop();grave.push(isST(c)?{...c,faceUp:true}:mk(c[0]));log((side==='enemy'?'Rival':'Tú')+' descarta '+(c.name||c[0])+' al Cementerio por superar 6 cartas.')}}
 function draw(){if(game.turn!=='player')return;if(window.playDrawSound) window.playDrawSound();if(game.deck.length){game.hand.push(game.deck.pop());enforceHandLimit('player');render();log('Robaste una carta.')}}
 function normalSummon(){if(game.turn!=='player')return;if(game.handSummoned)return log('Ya hiciste tu invocación desde la mano este turno.'); if(window.playSummonSound) window.playSummonSound();let i=game.selected.find(x=>x[0]==='h')?.[1];if(i==null)return log('Selecciona una carta de la mano.');let c=game.hand[i];let slot=game.field.findIndex(x=>!x);if(slot<0)return log('No hay espacio en el campo.');game.field[slot]=mk(c[0]);game.hand.splice(i,1);game.handSummoned=true;game.selected=[];render();setDuelView('field');log('Invocaste '+c[0]+'.')}
-function fuse(){if(game.turn!=='player')return;let ids=game.selected.filter(x=>x[0]==='h').map(x=>x[1]).sort((a,b)=>b-a);if(ids.length<2)return log('Selecciona 2 o más cartas de la mano.');let names=ids.map(i=>game.hand[i]?.[0]);let result=fusionResult(names);if(!result)return log('No existe una Fusión para esos materiales.');let slot=game.field.findIndex(x=>!x);if(slot<0)return log('No hay espacio para el resultado.');ids.forEach(i=>game.grave.push(mk(game.hand[i][0])));ids.forEach(i=>game.hand.splice(i,1));game.field[slot]=mk(result);if(window.playFusionSound)window.playFusionSound();game.handSummoned=true;game.selected=[];render();log('FUSIÓN ? '+result+'.')}
+function fuse(){if(game.turn!=='player')return;let ids=game.selected.filter(x=>x[0]==='h').map(x=>x[1]).sort((a,b)=>b-a);if(ids.length<2)return log('Selecciona 2 o más cartas de la mano.');let names=ids.map(i=>game.hand[i]?.[0]);let result=fusionResult(names);if(!result)return log('No existe una Fusión para esos materiales.');let slot=game.field.findIndex(x=>!x);if(slot<0)return log('No hay espacio para el resultado.');ids.forEach(i=>game.grave.push(mk(game.hand[i][0])));ids.forEach(i=>game.hand.splice(i,1));game.field[slot]=mk(result);if(typeof window.recordDiscoveredFusion==='function')try{window.recordDiscoveredFusion(result);}catch(_){}if(window.playFusionSound)window.playFusionSound();game.handSummoned=true;game.selected=[];render();log('FUSIÓN ? '+result+'.')}
 function fusionResult(names){
   if(names.includes('Baby Dragon')&&names.includes('Thunder Dragon'))return 'Twin-Headed Thunder Dragon';
   if(names.includes('Dragon Zombie')&&names.includes('Thunder Dragon'))return 'Maga Oscura';
@@ -10744,6 +10744,8 @@ window.customShowMain = function() {
                 
                 window.memorySave = save;
                 origSet('FMR_REBORN_STORY_V3000', JSON.stringify(save));
+                if (actualName) origSet('FMR_SAVE_' + actualName, JSON.stringify(save));
+                if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(save);
                 
                 if (typeof window.preloadServerDecks === 'function') window.preloadServerDecks();
                 
@@ -12874,6 +12876,21 @@ window.customFinishStoryDuel = function(win) {
     id = id.toLowerCase() === 'seto' ? 'kaiba' : id.toLowerCase();
     if (!s) return window.customShowMain();
     
+    // PRESERVAR FUSIONES DESCUBIERTAS DURANTE EL DUELO
+    try {
+        let curAccount = window.activeAccount || localStorage.getItem('FMR_ACTIVE_ACCOUNT') || '';
+        let curSavedStr = origGet(curAccount ? ('FMR_SAVE_' + curAccount) : 'FMR_REBORN_STORY_V3000');
+        if (curSavedStr) {
+            let curSaved = JSON.parse(curSavedStr);
+            if (Array.isArray(curSaved.fusions)) {
+                s.fusions = Array.from(new Set([...(s.fusions || []), ...curSaved.fusions]));
+            }
+        }
+        if (window.memorySave && Array.isArray(window.memorySave.fusions)) {
+            s.fusions = Array.from(new Set([...(s.fusions || []), ...window.memorySave.fusions]));
+        }
+    } catch(_) {}
+    
     // Set duelOver flag so native engine doesn't loop
     if (typeof game !== 'undefined' && game) game.duelOver = true;
     window.storyDuelActive = false;
@@ -14052,7 +14069,20 @@ setTimeout(() => {
             { exact: ["King's Knight", "Jack's Knight"], result: "Arcana Knight Joker" },
             { exact: ["Alpha The Magnet Warrior", "Beta The Magnet Warrior"], result: "Valkyrion the Magna Warrior" },
             { exact: ["Alpha The Magnet Warrior", "Gamma the Magnet Warrior"], result: "Valkyrion the Magna Warrior" },
-            { exact: ["Beta The Magnet Warrior", "Gamma the Magnet Warrior"], result: "Valkyrion the Magna Warrior" }
+            { exact: ["Beta The Magnet Warrior", "Gamma the Magnet Warrior"], result: "Valkyrion the Magna Warrior" },
+            // TRISTAN & CLASSIC EXACT FUSIONS
+            { exact: ["Warrior Dai Grepher", "Spirit Ryu"], result: "Ryu Senshi" },
+            { exact: ["Spirit Ryu", "Warrior Dai Grepher"], result: "Ryu Senshi" },
+            { exact: ["Robolady", "Roboyarou"], result: "Super Roboyarou" },
+            { exact: ["Roboyarou", "Robolady"], result: "Super Roboyarou" },
+            { exact: ["Roboyarou", "Roboyarou"], result: "Super Roboyarou" },
+            { exact: ["Robolady", "Robolady"], result: "Super Robolady" },
+            { exact: ["Baby Dragon", "Thunder Dragon"], result: "Twin-Headed Thunder Dragon" },
+            { exact: ["Thunder Dragon", "Baby Dragon"], result: "Twin-Headed Thunder Dragon" },
+            { exact: ["Dragon Zombie", "Thunder Dragon"], result: "Maga Oscura" },
+            { exact: ["Thunder Dragon", "Dragon Zombie"], result: "Maga Oscura" },
+            { exact: ["Curse of Dragon", "Baby Dragon"], result: "Meteor Dragon" },
+            { exact: ["Baby Dragon", "Curse of Dragon"], result: "Meteor Dragon" }
         );
     }
 }, 500);
@@ -14179,32 +14209,108 @@ try { stHTML = window.stHTML; } catch(_) {}
 
 
 
-// DASHBOARDS PATCH V4
-
-const oldFuse = window.fuse;
-window.onBeforeFuse = function() {
-    if (game && game.turn === 'player' && game.selected) {
-        let ids = game.selected.filter(x => x && x[0] === 'h').map(x => x[1]).sort((a,b) => b-a);
-        if (ids.length >= 2) {
-            let names = ids.map(i => game.hand[i]?.[0]);
-            let result = window.fusionResult(names);
-            if (result) {
-                let savedStr = origGet('FMR_SAVE_' + window.activeAccount);
-                if (savedStr) {
-                    let s = JSON.parse(savedStr);
-                    if (!s.fusions) s.fusions = [];
-                    if (!s.fusions.includes(result)) {
-                        s.fusions.push(result);
-                        origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
-                        if (typeof memorySave !== 'undefined') window.memorySave.fusions = s.fusions;
+// ==========================================
+// REGISTRO Y PERSISTENCIA DEFINITIVA DE FUSIONES
+// ==========================================
+window.recordDiscoveredFusion = function(resultName) {
+    if (!resultName || typeof resultName !== 'string') return;
+    try {
+        let curAccount = window.activeAccount || localStorage.getItem('FMR_ACTIVE_ACCOUNT') || '';
+        let sKey = curAccount ? ('FMR_SAVE_' + curAccount) : 'FMR_REBORN_STORY_V3000';
+        let sStr = origGet(sKey) || origGet('FMR_REBORN_STORY_V3000');
+        let s = {};
+        if (sStr) { try { s = JSON.parse(sStr); } catch(_) {} }
+        
+        s.fusions = Array.isArray(s.fusions) ? s.fusions : [];
+        if (!s.fusions.includes(resultName)) {
+            s.fusions.push(resultName);
+            console.log('✨ [FUSIÓN DESCUBIERTA REGISTRADA]', resultName, 'Total:', s.fusions.length);
+            
+            let json = JSON.stringify(s);
+            if (curAccount) origSet('FMR_SAVE_' + curAccount, json);
+            origSet('FMR_REBORN_STORY_V3000', json);
+            
+            // Sincronizar en cuentas registradas
+            let accsStr = origGet('FMR_ACCOUNTS');
+            if (accsStr && curAccount) {
+                try {
+                    let accs = JSON.parse(accsStr);
+                    if (accs[curAccount]) {
+                        accs[curAccount].data = s;
+                        origSet('FMR_ACCOUNTS', JSON.stringify(accs));
                     }
-                }
+                } catch(_) {}
+            }
+
+            // Sincronizar memorySave y nativeAPI
+            if (window.memorySave) {
+                if (!Array.isArray(window.memorySave.fusions)) window.memorySave.fusions = [];
+                if (!window.memorySave.fusions.includes(resultName)) window.memorySave.fusions.push(resultName);
+            }
+            if (window.nativeAPI && window.nativeAPI.setMemorySave) {
+                window.nativeAPI.setMemorySave(s);
+            }
+            
+            // Persistir de inmediato en servidor y local
+            if (typeof window.persistUserSave === 'function') {
+                window.persistUserSave(s);
+            } else if (typeof window.sendServerSave === 'function') {
+                window.sendServerSave(s);
+            }
+            
+            if (typeof duelToast === 'function') {
+                duelToast('✨ ¡FUSIÓN DESCUBIERTA: ' + resultName.toUpperCase() + '!');
+            } else if (typeof toast === 'function') {
+                toast('✨ ¡FUSIÓN DESCUBIERTA: ' + resultName.toUpperCase() + '!');
+            }
+        }
+    } catch(err) {
+        console.error('[Error guardando fusión descubierta]', err);
+    }
+};
+
+window.onBeforeFuse = function(maybeResult) {
+    if (maybeResult && typeof maybeResult === 'string') {
+        window.recordDiscoveredFusion(maybeResult);
+        return;
+    }
+    if (typeof game !== 'undefined' && game && game.turn === 'player' && Array.isArray(game.selected)) {
+        let ids = game.selected.filter(x => x && x[0] === 'h').map(x => x[1]).sort((a,b) => b-a);
+        if (ids.length >= 2 && Array.isArray(game.hand)) {
+            let names = ids.map(i => {
+                let c = game.hand[i];
+                return (c && (c.name || c[0])) || null;
+            }).filter(Boolean);
+            let fnRes = typeof window.fusionResult === 'function' ? window.fusionResult : (typeof fusionResult === 'function' ? fusionResult : null);
+            let result = fnRes ? fnRes(names) : null;
+            if (result) {
+                window.recordDiscoveredFusion(result);
             }
         }
     }
-    
+};
+
+// Interceptor global para llamada a fuse() manual
+const origGlobalFuse = window.fuse;
+window.fuse = function() {
+    try {
+        if (typeof window.onBeforeFuse === 'function') window.onBeforeFuse();
+    } catch(_) {}
+    if (typeof origGlobalFuse === 'function') {
+        return origGlobalFuse.apply(this, arguments);
+    }
 };
 try { fuse = window.fuse; } catch(e){}
+
+// Captura de clic en el botón de Fusión para asegurar registro instantáneo
+document.addEventListener('click', function(e) {
+    let btn = e.target && e.target.closest ? e.target.closest('#fusionBtn') : null;
+    if (btn) {
+        try {
+            if (typeof window.onBeforeFuse === 'function') window.onBeforeFuse();
+        } catch(_) {}
+    }
+}, true);
 
 window.getGlobalCardDict = function() {
     if (window.globalCardDict) return window.globalCardDict;
@@ -14520,12 +14626,25 @@ function createDashboardBase(titleText, backAction) {
 // Obsolete duplicate customShowShop removed to ensure the modern high-power shop table is active.
 
 window.customShowFusions = function() {
-    let s = JSON.parse(origGet('FMR_SAVE_' + window.activeAccount) || '{}');
+    let curAccount = window.activeAccount || localStorage.getItem('FMR_ACTIVE_ACCOUNT') || '';
+    let sKey = curAccount ? ('FMR_SAVE_' + curAccount) : 'FMR_REBORN_STORY_V3000';
+    let sStr = origGet(sKey) || origGet('FMR_REBORN_STORY_V3000');
+    let s = {};
+    if (sStr) { try { s = JSON.parse(sStr); } catch(_) {} }
+    
+    let fusionsList = Array.isArray(s.fusions) ? [...s.fusions] : [];
+    if (window.memorySave && Array.isArray(window.memorySave.fusions)) {
+        window.memorySave.fusions.forEach(f => {
+            if (!fusionsList.includes(f)) fusionsList.push(f);
+        });
+    }
+    let discovered = new Set(fusionsList);
+
     let overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: #1a1a1a; z-index:9999999; display:flex; flex-direction:row; padding: 20px; box-sizing:border-box; color: #fff; font-family: "Segoe UI", Arial, sans-serif;';
     
     let leftSide = document.createElement('div');
-    leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px;';
+    leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px; flex-shrink: 0;';
     
     let previewImgWrap = document.createElement('div');
     previewImgWrap.style.cssText = 'width:100%; height: 460px; border: 3px solid #a67c00; border-radius: 8px; background: #000; overflow: hidden; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 15px #000;';
@@ -14546,8 +14665,11 @@ window.customShowFusions = function() {
     let header = document.createElement('div');
     header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #e4c06b; padding-bottom: 10px; margin-bottom: 10px;';
     header.innerHTML = `
-        <div style="font-family:VT323, monospace; color:#ffcc00; font-size: 24px; text-shadow: 2px 2px 0 #000;">FUSIONES DESCUBIERTAS</div>
-        <button id="btn-exit-fus" style="background:#8b0000; color:#fff; border:2px solid #ff4d4d; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:bold; font-family:VT323, monospace; font-size:12px;">VOLVER</button>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div style="font-family:VT323, monospace; color:#ffcc00; font-size: 26px; text-shadow: 2px 2px 0 #000;">FUSIONES DESCUBIERTAS</div>
+            <span style="background: rgba(0,255,204,0.15); border: 1px solid #00ffcc; color: #00ffcc; padding: 2px 10px; border-radius: 4px; font-size: 16px; font-weight: bold; font-family:VT323, monospace;">${discovered.size} DESCUBIERTAS</span>
+        </div>
+        <button id="btn-exit-fus" style="background:#8b0000; color:#fff; border:2px solid #ff4d4d; padding:8px 18px; border-radius:6px; cursor:pointer; font-weight:bold; font-family:VT323, monospace; font-size:16px;">VOLVER</button>
     `;
     rightSide.appendChild(header);
     
@@ -14572,10 +14694,38 @@ window.customShowFusions = function() {
     document.body.appendChild(overlay);
     
     let tbody = overlay.querySelector('#fus-tbody');
-    let exact = (window.FMR_FUSION_RULES_V1 || []).filter(r => r.exact);
-    let discovered = new Set(s.fusions || []);
+    let allRules = (window.FMR_FUSION_RULES_V1 || []).filter(r => r && r.exact);
     
-    exact.forEach(r => {
+    // Deduplicar recetas simétricas (A+B vs B+A)
+    let seenEntries = new Set();
+    let uniqueExact = [];
+    allRules.forEach(r => {
+        let sortedMat = [...r.exact].sort().join(' + ');
+        let key = r.result + '::' + sortedMat;
+        if (!seenEntries.has(key)) {
+            seenEntries.add(key);
+            uniqueExact.push(r);
+        }
+    });
+
+    // Agregar fusiones descubiertas que no estén en uniqueExact
+    let knownResults = new Set(uniqueExact.map(r => r.result));
+    discovered.forEach(name => {
+        if (!knownResults.has(name)) {
+            uniqueExact.push({ exact: ['Material A', 'Material B'], result: name, customDiscovered: true });
+            knownResults.add(name);
+        }
+    });
+    
+    // Ordenar: primero las descubiertas, luego por nombre
+    uniqueExact.sort((a, b) => {
+        let aDis = discovered.has(a.result) ? 0 : 1;
+        let bDis = discovered.has(b.result) ? 0 : 1;
+        if (aDis !== bDis) return aDis - bDis;
+        return a.result.localeCompare(b.result);
+    });
+
+    uniqueExact.forEach(r => {
         let isKnown = discovered.has(r.result);
         let name = isKnown ? r.result : '???';
         let tr = document.createElement('tr');
@@ -14592,7 +14742,8 @@ window.customShowFusions = function() {
             siblings.forEach(sib => { if(sib!==tr) sib.onmouseout = () => sib.style.background = 'transparent'; });
             
             if (isKnown) {
-                updatePreview(previewImg, infoBox, name, `<strong>Receta Exacta:</strong><br/>${r.exact[0]}<br/>+<br/>${r.exact[1]}`);
+                let recipeDesc = r.customDiscovered ? '<strong>Fusión Descubierta en Combate</strong>' : `<strong>Receta Exacta:</strong><br/>${r.exact[0]}<br/>+<br/>${r.exact[1]}`;
+                updatePreview(previewImg, infoBox, name, recipeDesc);
             } else {
                 previewImg.src = '';
                 previewImg.style.display = 'none';
@@ -14601,13 +14752,13 @@ window.customShowFusions = function() {
             }
         };
         
-        let displayRecipe = isKnown ? `<span style="color:#4da6ff">${r.exact[0]}</span> + <span style="color:#ff4d4d">${r.exact[1]}</span>` : '??? + ???';
+        let displayRecipe = isKnown ? (r.customDiscovered ? '<span style="color:#00ffcc">Descubierta en Duelo</span>' : `<span style="color:#4da6ff">${r.exact[0]}</span> + <span style="color:#ff4d4d">${r.exact[1]}</span>`) : '??? + ???';
         
         tr.innerHTML = `
             <td style="padding: 10px; font-weight: bold; color: ${isKnown ? '#ffcc00' : '#666'};">${name}</td>
             <td style="padding: 10px; font-size: 14px;">${displayRecipe}</td>
             <td style="padding: 10px; text-align:center;">
-                ${isKnown ? `<b style="color:#00ffcc;">DESCUBIERTA</b>` : `<b style="color:#555;">OCULTA</b>`}
+                ${isKnown ? `<b style="color:#00ffcc; text-shadow:0 0 5px rgba(0,255,204,0.5);">DESCUBIERTA</b>` : `<b style="color:#555;">OCULTA</b>`}
             </td>
         `;
         tbody.appendChild(tr);
@@ -15672,7 +15823,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
 
     try {
-      if (typeof window.onBeforeFuse === 'function') window.onBeforeFuse();
+      if (typeof window.onBeforeFuse === 'function') window.onBeforeFuse(resultName);
+      if (typeof window.recordDiscoveredFusion === 'function') window.recordDiscoveredFusion(resultName);
     } catch(_) {}
 
     // Enviar materiales al cementerio
@@ -15714,6 +15866,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     fused.faceUp = true;
     fused.faceDownSet103 = false;
     game.field[targetSlot] = fused;
+    if (typeof window.recordDiscoveredFusion === 'function') {
+      try { window.recordDiscoveredFusion(resultName); } catch(_) {}
+    }
 
     game.handSummoned = true; // Consumes the turn's summon!
     game.selected = [];
