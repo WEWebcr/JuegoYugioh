@@ -198,18 +198,18 @@ duelScaleStyle.textContent = `
     .lp, #campaignDuelHud3000 { font-size: 20px !important; letter-spacing: 1px; }
 
     /* ════════════════════════════════════════════════════════════════
-       1. PANTALLAS DE ESCRITORIO GRANDES (> 1024px)
+       1. PANTALLAS DE ESCRITORIO GRANDES (> 1024px y altura > 560px)
        ════════════════════════════════════════════════════════════════ */
-    @media (min-width: 1025px) {
+    @media (min-width: 1025px) and (min-height: 561px) {
         .wrap { zoom: 1.20; margin-top: 3vh !important; }
         .cardInfoPanel { transform: scale(1.15); transform-origin: center right; font-size: 15px !important; }
         .cardInfoPanel h3 { font-size: 16px !important; }
     }
 
     /* ════════════════════════════════════════════════════════════════
-       2. TABLETS Y PANTALLAS MEDIANAS (769px - 1024px)
+       2. TABLETS Y PANTALLAS MEDIANAS (769px - 1024px y altura > 560px)
        ════════════════════════════════════════════════════════════════ */
-    @media (min-width: 769px) and (max-width: 1024px) {
+    @media (min-width: 769px) and (max-width: 1024px) and (min-height: 561px) {
         .wrap { zoom: 0.95; margin-top: 1vh !important; max-width: 98vw !important; }
         .cardInfoPanel { transform: scale(0.95); font-size: 14px !important; }
     }
@@ -329,19 +329,82 @@ duelScaleStyle.textContent = `
             font-size: 15px !important;
             padding: 4px 6px !important;
         }
+        body.view-field #cardInfoPanel,
+        body.view-field .cardInfoPanel,
+        body.mobile-portrait #cardInfoPanel,
+        body.mobile-portrait .cardInfoPanel,
+        #cardInfoPanel,
         .cardInfoPanel {
             position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100vw !important;
-            max-width: 100vw !important;
+            top: auto !important;
+            bottom: 4px !important;
+            left: 8px !important;
+            right: 8px !important;
+            width: auto !important;
+            max-width: min(440px, calc(100vw - 16px)) !important;
+            margin: 0 auto !important;
             transform: none !important;
-            border-radius: 12px 12px 0 0 !important;
-            z-index: 1000 !important;
-            max-height: 38vh !important;
+            border-radius: 8px !important;
+            z-index: 9999 !important;
+            min-height: unset !important;
+            max-height: 58px !important;
+            height: auto !important;
             overflow-y: auto !important;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.85) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.85) !important;
+            padding: 4px 8px !important;
+            border: 1.5px solid #d4af37 !important;
+            background: rgba(14, 11, 7, 0.94) !important;
+            box-sizing: border-box !important;
+        }
+
+        #cardInfoPanel.empty-info,
+        .cardInfoPanel.empty-info,
+        #cardInfoPanel:has(.mutedInfo),
+        .cardInfoPanel:has(.mutedInfo),
+        body.has-no-selection #cardInfoPanel,
+        body.has-no-selection .cardInfoPanel,
+        body.no-card-selected #cardInfoPanel,
+        body.no-card-selected .cardInfoPanel,
+        body.mobile-bar-active #cardInfoPanel,
+        body.mobile-bar-active .cardInfoPanel {
+            display: none !important;
+        }
+        .cardInfoTitle {
+            font-size: 9px !important;
+            letter-spacing: 1px !important;
+            padding-bottom: 2px !important;
+            margin-bottom: 2px !important;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.4) !important;
+            text-align: left !important;
+        }
+        .cardInfoBody, #cardInfoBody {
+            font-size: 10px !important;
+            line-height: 1.25 !important;
+        }
+        .infoName {
+            font-size: 11px !important;
+            margin-bottom: 1px !important;
+            display: inline-block !important;
+        }
+        .infoStars {
+            font-size: 9px !important;
+            margin-bottom: 1px !important;
+            display: inline-block !important;
+            margin-left: 6px !important;
+        }
+        .infoGrid {
+            font-size: 10px !important;
+            gap: 2px 8px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+        }
+        .infoAtk {
+            font-size: 10.5px !important;
+        }
+        .infoDef {
+            font-size: 10.5px !important;
         }
 
         /* MODALES ADAPTABLES AL ANCHO DE PANTALLA */
@@ -497,13 +560,52 @@ duelScaleStyle.textContent = `
     /* ════════════════════════════════════════════════════════════════
        5. TELÉFONOS EN MODO PANORÁMICO / LANDSCAPE (HORIZONTAL)
        ════════════════════════════════════════════════════════════════ */
-    @media (max-height: 520px) and (orientation: landscape) {
+    @media (max-height: 560px) and (orientation: landscape) {
         .wrap {
-            zoom: 0.68 !important;
+            zoom: 0.74 !important;
             max-width: 100vw !important;
             margin: 0 auto !important;
-            padding: 0 !important;
+            padding: 0 4px !important;
         }
+        /* Barra de Vida Superior (LP) Fija / Sticky para evitar que quede cortada */
+        #duelTopHeader, .top {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+            padding: max(4px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)) !important;
+            background: linear-gradient(180deg, rgba(20, 14, 8, 0.98) 0%, rgba(10, 7, 4, 0.95) 100%) !important;
+            border-bottom: 1.5px solid #d4af37 !important;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.85) !important;
+            margin-bottom: 3px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            box-sizing: border-box !important;
+        }
+        #duelTopHeader .mode {
+            display: none !important;
+        }
+        #duelTopHeader b {
+            font-size: 13px !important;
+            color: #ffd700 !important;
+            letter-spacing: 0.5px !important;
+            text-shadow: 1px 1px 2px #000 !important;
+        }
+        .lp {
+            font-size: 16px !important;
+            padding: 2px 8px !important;
+            font-weight: 900 !important;
+            border-radius: 6px !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            border: 1px solid rgba(212, 175, 55, 0.4) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            white-space: nowrap !important;
+        }
+        #plp { color: #4df !important; font-weight: 900 !important; font-size: 17px !important; }
+        #elp { color: #ff5252 !important; font-weight: 900 !important; font-size: 17px !important; }
+
         .hand .zone {
             height: 110px !important;
             min-height: 110px !important;
@@ -3126,9 +3228,11 @@ window.customShowShop = function() {
     
     // LEFT SIDEBAR for Preview
     let leftSide = document.createElement('div');
-    leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px;';
+    leftSide.id = 'shop-left-preview';
+    leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px; flex-shrink: 0;';
     
     let previewImgWrap = document.createElement('div');
+    previewImgWrap.id = 'preview-img-wrap';
     previewImgWrap.style.cssText = 'width:100%; height: 460px; border: 3px solid #ffd700; border-radius: 8px; background: #000; overflow: hidden; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);';
     
     let previewImg = document.createElement('img');
@@ -3137,6 +3241,7 @@ window.customShowShop = function() {
     previewImgWrap.appendChild(previewImg);
     
     let previewText = document.createElement('div');
+    previewText.id = 'preview-text-box';
     previewText.style.cssText = 'margin-top: 15px; background: #1c1c24; padding: 15px; border-radius: 6px; border: 1px solid #444; min-height: 150px;';
     previewText.innerHTML = '<i>Pasa el ratón sobre una carta para ver sus detalles, costo y poder.</i>';
     
@@ -3441,12 +3546,12 @@ window.openCustomShopMenu = function() {
         styleTag.textContent = `
             @keyframes grandpaFloat {
                 0%, 100% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-10px) rotate(0.4deg); }
+                50% { transform: translateY(-8px) rotate(0.4deg); }
             }
             @keyframes grandpaBounce {
                 0% { transform: scale(1) translateY(0); }
-                30% { transform: scale(1.08) translateY(-22px); }
-                60% { transform: scale(0.96) translateY(5px); }
+                30% { transform: scale(1.06) translateY(-16px); }
+                60% { transform: scale(0.97) translateY(4px); }
                 100% { transform: scale(1) translateY(0); }
             }
             @keyframes shopSparkle {
@@ -3462,7 +3567,7 @@ window.openCustomShopMenu = function() {
                 background: linear-gradient(90deg, #2b1d09 0%, #170e03 100%);
                 border: 2px solid #b8860b;
                 border-radius: 6px;
-                padding: 12px 18px;
+                padding: 10px 16px;
                 color: #fff;
                 font-family: 'Segoe UI', VT323, sans-serif;
                 font-size: 14px;
@@ -3477,6 +3582,7 @@ window.openCustomShopMenu = function() {
                 box-shadow: 0 4px 10px rgba(0,0,0,0.5);
                 position: relative;
                 overflow: hidden;
+                box-sizing: border-box;
             }
             .shop-interactive-btn::before {
                 content: '';
@@ -3486,20 +3592,337 @@ window.openCustomShopMenu = function() {
                 transition: width 0.18s ease;
             }
             .shop-interactive-btn:hover {
-                transform: translateX(8px);
+                transform: translateX(6px);
                 border-color: #ffd700;
                 background: linear-gradient(90deg, #442f10 0%, #201305 100%);
                 box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
             }
             .shop-interactive-btn:hover::before {
-                width: 10px;
+                width: 8px;
             }
             .millennium-pedestal {
                 transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 cursor: pointer;
             }
             .millennium-pedestal:hover {
-                transform: translateY(-6px) scale(1.08);
+                transform: translateY(-4px) scale(1.06);
+            }
+
+            /* Scrollbars */
+            #shop-menu-actions::-webkit-scrollbar,
+            #shop-workspace::-webkit-scrollbar,
+            #millennium-items-grid::-webkit-scrollbar,
+            #custom-shop-menu::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            #shop-menu-actions::-webkit-scrollbar-thumb,
+            #shop-workspace::-webkit-scrollbar-thumb,
+            #millennium-items-grid::-webkit-scrollbar-thumb,
+            #custom-shop-menu::-webkit-scrollbar-thumb {
+                background: #ffd700;
+                border-radius: 3px;
+            }
+            #shop-menu-actions::-webkit-scrollbar-track,
+            #shop-workspace::-webkit-scrollbar-track,
+            #millennium-items-grid::-webkit-scrollbar-track {
+                background: rgba(0,0,0,0.4);
+            }
+
+            /* Mobile Landscape Mode (Max Height <= 580px) */
+            @media (max-height: 580px) {
+                #shop-top-bar {
+                    padding: 4px 14px !important;
+                }
+                .shop-header-title {
+                    font-size: 18px !important;
+                }
+                .shop-header-subtitle {
+                    display: none !important;
+                }
+                .shop-stat-badge {
+                    padding: 3px 8px !important;
+                    font-size: 11px !important;
+                    gap: 4px !important;
+                }
+                #shop-workspace {
+                    padding: 4px 16px 2px 16px !important;
+                    gap: 12px !important;
+                }
+                #shop-grandpa-wrap {
+                    max-width: 190px !important;
+                    justify-content: flex-end !important;
+                    padding-bottom: 2px !important;
+                }
+                #shop-grandpa-img {
+                    height: 40vh !important;
+                    max-height: 160px !important;
+                }
+                #grandpa-speech-bubble {
+                    position: static !important;
+                    padding: 5px 8px !important;
+                    margin-bottom: 4px !important;
+                    min-height: auto !important;
+                    border-radius: 8px !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+                #bubble-pointer-tail {
+                    display: none !important;
+                }
+                #grandpa-speech-title {
+                    font-size: 10px !important;
+                    margin-bottom: 2px !important;
+                }
+                #grandpa-speech-text {
+                    font-size: 11px !important;
+                    line-height: 1.2 !important;
+                    display: -webkit-box !important;
+                    -webkit-line-clamp: 2 !important;
+                    -webkit-box-orient: vertical !important;
+                    overflow: hidden !important;
+                }
+                #shop-grandpa-hint {
+                    display: none !important;
+                }
+                #shop-right-side {
+                    max-width: none !important;
+                    flex: 1 !important;
+                }
+                #shop-menu-actions {
+                    display: grid !important;
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 5px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    max-height: calc(100vh - 84px) !important;
+                    overflow-y: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    padding-right: 4px !important;
+                }
+                .shop-interactive-btn {
+                    padding: 6px 10px !important;
+                    gap: 8px !important;
+                    min-height: 36px !important;
+                }
+                .shop-interactive-btn .btn-icon {
+                    font-size: 18px !important;
+                }
+                .shop-interactive-btn .btn-label {
+                    font-size: 12px !important;
+                    letter-spacing: 0.5px !important;
+                }
+                .shop-interactive-btn .btn-desc {
+                    display: none !important;
+                }
+                .shop-interactive-btn .btn-arrow {
+                    display: none !important;
+                }
+                #shop-millennium-showcase {
+                    padding: 3px 14px !important;
+                    gap: 2px !important;
+                }
+                #shop-millennium-showcase.collapsed #millennium-items-grid {
+                    display: none !important;
+                }
+                #shop-millennium-showcase.collapsed {
+                    padding: 3px 14px !important;
+                }
+                .showcase-desc-hint {
+                    display: none !important;
+                }
+                .millennium-pedestal {
+                    min-width: 80px !important;
+                    max-width: 105px !important;
+                    height: 56px !important;
+                    padding: 2px !important;
+                }
+                .pedestal-svg-box {
+                    width: 26px !important;
+                    height: 26px !important;
+                }
+                .pedestal-name-box {
+                    font-size: 9px !important;
+                }
+                .pedestal-status-badge {
+                    font-size: 8px !important;
+                    padding: 1px 4px !important;
+                }
+                /* customShowShop in landscape */
+                #custom-shop-dashboard {
+                    padding: 6px 10px !important;
+                }
+                #shop-left-preview {
+                    width: 170px !important;
+                    margin-right: 10px !important;
+                    padding-right: 10px !important;
+                }
+                #preview-img-wrap {
+                    height: 175px !important;
+                }
+                #preview-text-box {
+                    margin-top: 6px !important;
+                    padding: 6px !important;
+                    min-height: 70px !important;
+                    font-size: 11px !important;
+                }
+            }
+
+            /* Mobile Portrait Mode (@media (orientation: portrait), (max-width: 680px)) */
+            @media (orientation: portrait), (max-width: 680px) {
+                #shop-top-bar {
+                    flex-direction: column !important;
+                    gap: 6px !important;
+                    padding: 8px 12px !important;
+                }
+                .shop-header-title {
+                    font-size: 19px !important;
+                    text-align: center !important;
+                }
+                .shop-header-subtitle {
+                    display: none !important;
+                }
+                .shop-top-stats {
+                    flex-wrap: wrap !important;
+                    gap: 6px !important;
+                    justify-content: center !important;
+                }
+                .shop-stat-badge {
+                    padding: 4px 8px !important;
+                    font-size: 11px !important;
+                }
+                #shop-workspace {
+                    flex-direction: column !important;
+                    overflow-y: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    padding: 8px 12px !important;
+                    gap: 10px !important;
+                    justify-content: flex-start !important;
+                    align-items: stretch !important;
+                }
+                #shop-grandpa-wrap {
+                    flex-direction: row !important;
+                    max-width: 100% !important;
+                    width: 100% !important;
+                    height: auto !important;
+                    align-items: center !important;
+                    justify-content: flex-start !important;
+                    gap: 10px !important;
+                }
+                #shop-grandpa-img {
+                    width: 64px !important;
+                    height: 64px !important;
+                    border-radius: 50% !important;
+                    border: 2px solid #ffd700 !important;
+                    object-fit: cover !important;
+                    object-position: top !important;
+                    animation: none !important;
+                    flex-shrink: 0 !important;
+                }
+                #grandpa-speech-bubble {
+                    position: static !important;
+                    flex: 1 !important;
+                    padding: 8px 10px !important;
+                    min-height: auto !important;
+                }
+                #bubble-pointer-tail {
+                    display: none !important;
+                }
+                #shop-grandpa-hint {
+                    display: none !important;
+                }
+                #shop-right-side {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                #shop-menu-actions {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 8px !important;
+                    max-height: none !important;
+                    overflow: visible !important;
+                }
+                .shop-interactive-btn {
+                    padding: 10px 14px !important;
+                    width: 100% !important;
+                }
+                .shop-interactive-btn .btn-desc {
+                    display: block !important;
+                    font-size: 10px !important;
+                }
+                #shop-millennium-showcase {
+                    padding: 8px 12px !important;
+                }
+                #millennium-items-grid {
+                    overflow-x: auto !important;
+                    justify-content: flex-start !important;
+                    -webkit-overflow-scrolling: touch !important;
+                }
+                .millennium-pedestal {
+                    min-width: 95px !important;
+                    height: 75px !important;
+                }
+                /* customShowShop in portrait */
+                #custom-shop-dashboard {
+                    flex-direction: column !important;
+                    padding: 8px !important;
+                    overflow-y: auto !important;
+                }
+                #shop-left-preview {
+                    width: 100% !important;
+                    margin-right: 0 !important;
+                    padding-right: 0 !important;
+                    border-right: none !important;
+                    border-bottom: 2px solid #333 !important;
+                    padding-bottom: 8px !important;
+                    margin-bottom: 8px !important;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    gap: 10px !important;
+                }
+                #preview-img-wrap {
+                    width: 90px !important;
+                    height: 120px !important;
+                    flex-shrink: 0 !important;
+                }
+                #preview-text-box {
+                    flex: 1 !important;
+                    margin-top: 0 !important;
+                    min-height: auto !important;
+                    font-size: 11px !important;
+                }
+
+                /* customShowDeckEditor in portrait */
+                #custom-deck-editor {
+                    flex-direction: column !important;
+                    padding: 8px !important;
+                    overflow-y: auto !important;
+                }
+                #deck-editor-left-preview {
+                    width: 100% !important;
+                    margin-right: 0 !important;
+                    padding-right: 0 !important;
+                    border-right: none !important;
+                    border-bottom: 2px solid #333 !important;
+                    padding-bottom: 8px !important;
+                    margin-bottom: 8px !important;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    gap: 10px !important;
+                }
+                #deck-preview-img-wrap {
+                    width: 90px !important;
+                    height: 120px !important;
+                    flex-shrink: 0 !important;
+                }
+                #deck-preview-text {
+                    flex: 1 !important;
+                    margin-top: 0 !important;
+                    min-height: auto !important;
+                    font-size: 11px !important;
+                }
             }
         `;
         document.head.appendChild(styleTag);
@@ -3547,31 +3970,31 @@ window.openCustomShopMenu = function() {
     topBar.id = 'shop-top-bar';
     topBar.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:12px 28px; background:linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%); border-bottom:2px solid #b8860b; box-shadow:0 4px 15px rgba(0,0,0,0.6); z-index:10;';
     topBar.innerHTML = `
-        <div style="display:flex; align-items:center; gap:14px;">
-            <span style="font-size:26px; filter:drop-shadow(0 0 6px #ffd700);">🏺</span>
-            <div>
-                <div style="font-family:VT323, monospace; color:#ffd700; font-size:28px; letter-spacing:2px; text-shadow:2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5);">
+        <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+            <span style="font-size:24px; filter:drop-shadow(0 0 6px #ffd700); flex-shrink:0;">🏺</span>
+            <div style="min-width:0;">
+                <div class="shop-header-title" style="font-family:VT323, monospace; color:#ffd700; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                     KAME GAME · TIENDA DEL ABUELO MOTO
                 </div>
-                <div style="font-size:12px; color:#c7a76d; letter-spacing:0.5px;">Bazar Ancestral de Cartas y Reliquias Milenarias</div>
+                <div class="shop-header-subtitle" style="font-size:12px; color:#c7a76d; letter-spacing:0.5px;">Bazar Ancestral de Cartas y Reliquias Milenarias</div>
             </div>
         </div>
-        <div style="display:flex; align-items:center; gap:16px;">
-            <div style="background:#201608; border:1px solid #ffd700; border-radius:6px; padding:6px 14px; display:flex; align-items:center; gap:8px;">
-                <span style="font-size:16px;">💰</span>
-                <span style="color:#aaa; font-size:12px; font-weight:bold;">PM:</span>
-                <span style="color:#ffd700; font-weight:bold; font-size:16px; font-family:VT323, monospace;" id="shop-menu-pm">${s.pm || 0}</span>
+        <div class="shop-top-stats" style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
+            <div class="shop-stat-badge" style="background:#201608; border:1px solid #ffd700; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
+                <span style="font-size:15px;">💰</span>
+                <span style="color:#aaa; font-size:11px; font-weight:bold;">PM:</span>
+                <span style="color:#ffd700; font-weight:bold; font-size:15px; font-family:VT323, monospace;" id="shop-menu-pm">${s.pm || 0}</span>
             </div>
-            <div style="background:#16202d; border:1px solid #4a90e2; border-radius:6px; padding:6px 14px; display:flex; align-items:center; gap:8px;">
-                <span style="font-size:16px;">🎴</span>
-                <span style="color:#aaa; font-size:12px; font-weight:bold;">DECK ACTIVO:</span>
-                <span style="color:#66c0f4; font-weight:bold; font-size:13px;">${(s.activeDeck || 'Deck 1').toUpperCase()}</span>
-                <span style="background:#0d47a1; color:#fff; font-size:11px; padding:2px 6px; border-radius:3px;">${activeDeckCount}/40</span>
+            <div class="shop-stat-badge" style="background:#16202d; border:1px solid #4a90e2; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
+                <span style="font-size:15px;">🎴</span>
+                <span style="color:#aaa; font-size:11px; font-weight:bold;">DECK:</span>
+                <span style="color:#66c0f4; font-weight:bold; font-size:12px;">${(s.activeDeck || 'Deck 1').toUpperCase()}</span>
+                <span style="background:#0d47a1; color:#fff; font-size:10px; padding:1px 5px; border-radius:3px;">${activeDeckCount}/40</span>
             </div>
-            <div style="background:#281c00; border:1px solid #b8860b; border-radius:6px; padding:6px 14px; display:flex; align-items:center; gap:8px;" title="Artículos del Milenio en tu poder">
-                <span style="font-size:16px;">✨</span>
-                <span style="color:#ffd700; font-size:12px; font-weight:bold;">MILENIO:</span>
-                <span style="color:#fff; font-weight:bold; font-size:13px;">${unlockedCount} / 7</span>
+            <div class="shop-stat-badge" style="background:#281c00; border:1px solid #b8860b; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Artículos del Milenio en tu poder">
+                <span style="font-size:15px;">✨</span>
+                <span style="color:#ffd700; font-size:11px; font-weight:bold;">MILENIO:</span>
+                <span style="color:#fff; font-weight:bold; font-size:12px;">${unlockedCount} / 7</span>
             </div>
         </div>
     `;
@@ -3580,31 +4003,33 @@ window.openCustomShopMenu = function() {
     // 2. MIDDLE WORKSPACE (Left: Grandpa Moto with Speech Bubble, Right: Action Menu)
     let workspace = document.createElement('div');
     workspace.id = 'shop-workspace';
-    workspace.style.cssText = 'flex: 1; display:flex; flex-direction:row; padding:10px 40px 0 40px; box-sizing:border-box; overflow:hidden; position:relative; align-items:center; justify-content:space-between;';
+    workspace.style.cssText = 'flex: 1; display:flex; flex-direction:row; padding:10px 30px 4px 30px; box-sizing:border-box; overflow:hidden; position:relative; align-items:center; justify-content:space-between; gap:20px;';
 
     // LEFT: GRANDPA MOTO + SPEECH BUBBLE
     let grandpaWrap = document.createElement('div');
     grandpaWrap.id = 'shop-grandpa-wrap';
-    grandpaWrap.style.cssText = 'flex: 1; height: 100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; max-width: 520px;';
+    grandpaWrap.style.cssText = 'flex: 1; height: 100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; max-width: 480px; box-sizing:border-box;';
 
     // Speech bubble
     let bubble = document.createElement('div');
     bubble.id = 'grandpa-speech-bubble';
-    bubble.style.cssText = 'position:absolute; top: 15px; left: 10px; right: 10px; background: linear-gradient(135deg, #2b2010 0%, #181208 100%); border: 2px solid #ffd700; border-radius: 14px; padding: 14px 18px; box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 15px rgba(255,215,0,0.25); z-index: 5; transition: all 0.25s ease; min-height: 58px; display:flex; flex-direction:column; justify-content:center;';
+    bubble.style.cssText = 'position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, #2b2010 0%, #181208 100%); border: 2px solid #ffd700; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px rgba(255,215,0,0.25); z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;';
     
     // Bubble pointer tail
     let bubbleTail = document.createElement('div');
-    bubbleTail.style.cssText = 'position:absolute; bottom:-12px; left:50%; margin-left:-10px; width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-top:12px solid #ffd700;';
+    bubbleTail.id = 'bubble-pointer-tail';
+    bubbleTail.style.cssText = 'position:absolute; bottom:-10px; left:50%; margin-left:-8px; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid #ffd700;';
     bubble.appendChild(bubbleTail);
 
     let bubbleTitle = document.createElement('div');
-    bubbleTitle.style.cssText = 'font-weight:bold; font-size:12px; color:#ffd700; font-family:VT323, monospace; letter-spacing:1px; margin-bottom:4px; display:flex; align-items:center; gap:6px;';
+    bubbleTitle.id = 'grandpa-speech-title';
+    bubbleTitle.style.cssText = 'font-weight:bold; font-size:11px; color:#ffd700; font-family:VT323, monospace; letter-spacing:1px; margin-bottom:3px; display:flex; align-items:center; gap:5px;';
     bubbleTitle.innerHTML = '<span>👴 ABUELO MOTO DICE:</span>';
     bubble.appendChild(bubbleTitle);
 
     let bubbleText = document.createElement('div');
     bubbleText.id = 'grandpa-speech-text';
-    bubbleText.style.cssText = 'font-size:14px; color:#fff; line-height:1.4; transition: opacity 0.15s ease; font-style:italic;';
+    bubbleText.style.cssText = 'font-size:13px; color:#fff; line-height:1.35; transition: opacity 0.15s ease; font-style:italic;';
     bubbleText.textContent = '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?';
     bubble.appendChild(bubbleText);
 
@@ -3612,7 +4037,8 @@ window.openCustomShopMenu = function() {
 
     // Warm radial aura behind Grandpa Moto
     let auraGlow = document.createElement('div');
-    auraGlow.style.cssText = 'position:absolute; bottom: 0; width: 440px; height: 440px; background: radial-gradient(circle, rgba(255, 190, 40, 0.28) 0%, rgba(255, 140, 0, 0.12) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;';
+    auraGlow.id = 'shop-aura-glow';
+    auraGlow.style.cssText = 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;';
     grandpaWrap.appendChild(auraGlow);
 
     // Grandpa Moto Image (Interactive + Breathing animation)
@@ -3620,7 +4046,7 @@ window.openCustomShopMenu = function() {
     grandpaImg.id = 'shop-grandpa-img';
     grandpaImg.src = 'ImagenesPersonajes/abueloYugi.jpg';
     grandpaImg.alt = 'Abuelo Moto';
-    grandpaImg.style.cssText = 'height: 58vh; max-height: 520px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 20px rgba(255, 180, 0, 0.45)); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;';
+    grandpaImg.style.cssText = 'height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px rgba(255, 180, 0, 0.45)); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;';
     grandpaImg.title = '¡Haz clic para hablar con el Abuelo Moto!';
 
     // Random wisdom quotes for clicking Grandpa
@@ -3656,7 +4082,8 @@ window.openCustomShopMenu = function() {
 
     // Floating hint badge below Grandpa
     let clickHint = document.createElement('div');
-    clickHint.style.cssText = 'font-size:11px; color:#ffd700; background:rgba(0,0,0,0.7); border:1px solid #b8860b; border-radius:12px; padding:3px 12px; margin-bottom:8px; z-index:3; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px #000;';
+    clickHint.id = 'shop-grandpa-hint';
+    clickHint.style.cssText = 'font-size:11px; color:#ffd700; background:rgba(0,0,0,0.7); border:1px solid #b8860b; border-radius:12px; padding:2px 10px; margin-bottom:6px; z-index:3; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px #000;';
     clickHint.textContent = '💬 ¡Haz clic en el Abuelo!';
     clickHint.onclick = grandpaImg.onclick;
     grandpaWrap.appendChild(clickHint);
@@ -3665,11 +4092,12 @@ window.openCustomShopMenu = function() {
 
     // RIGHT: INTERACTIVE NAVIGATION BUTTONS
     let rightSide = document.createElement('div');
-    rightSide.style.cssText = 'flex: 1; display:flex; flex-direction:column; justify-content:center; align-items:flex-end; max-width: 520px; z-index: 4;';
+    rightSide.id = 'shop-right-side';
+    rightSide.style.cssText = 'flex: 1; display:flex; flex-direction:column; justify-content:center; align-items:flex-end; max-width: 500px; z-index: 4; box-sizing:border-box;';
 
     let btnContainer = document.createElement('div');
     btnContainer.id = 'shop-menu-actions';
-    btnContainer.style.cssText = 'display:flex; flex-direction:column; gap: 11px; width: 100%; max-width: 440px;';
+    btnContainer.style.cssText = 'display:flex; flex-direction:column; gap: 9px; width: 100%; max-width: 440px; box-sizing:border-box;';
 
     function runNativeView(funcName) {
         if (funcName === 'showShop') {
@@ -3808,12 +4236,12 @@ window.openCustomShopMenu = function() {
         let btn = document.createElement('button');
         btn.className = 'shop-interactive-btn';
         btn.innerHTML = `
-            <span style="font-size:20px; filter:drop-shadow(0 0 4px #ffd700);">${opt.icon}</span>
-            <div style="flex:1;">
-                <div style="font-weight:bold; font-size:14px; color:#ffd700; font-family:VT323, monospace; letter-spacing:1.5px; text-shadow:1px 1px 0 #000;">${opt.label}</div>
-                <div style="font-size:11px; color:#aaa; font-weight:normal; margin-top:2px;">${opt.desc}</div>
+            <span class="btn-icon" style="font-size:20px; filter:drop-shadow(0 0 4px #ffd700); flex-shrink:0;">${opt.icon}</span>
+            <div style="flex:1; min-width:0; overflow:hidden;">
+                <div class="btn-label" style="font-weight:bold; font-size:14px; color:#ffd700; font-family:VT323, monospace; letter-spacing:1px; text-shadow:1px 1px 0 #000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${opt.label}</div>
+                <div class="btn-desc" style="font-size:11px; color:#aaa; font-weight:normal; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${opt.desc}</div>
             </div>
-            <span style="font-size:12px; color:#888;">▶</span>
+            <span class="btn-arrow" style="font-size:12px; color:#888; flex-shrink:0;">▶</span>
         `;
         btn.onmouseenter = () => {
             window.playHoverSound && window.playHoverSound();
@@ -3835,44 +4263,62 @@ window.openCustomShopMenu = function() {
 
     // 3. BOTTOM SHOWCASE: VITRINA DE LOS 7 ARTÍCULOS DEL MILENIO
     let showcaseBar = document.createElement('div');
-    showcaseBar.style.cssText = 'background: linear-gradient(180deg, rgba(15,11,6,0.95) 0%, rgba(28,20,10,0.98) 100%); border-top: 2px solid #b8860b; padding: 10px 24px 14px 24px; box-shadow: 0 -6px 20px rgba(0,0,0,0.7); z-index: 10; display:flex; flex-direction:column; gap:8px;';
+    showcaseBar.id = 'shop-millennium-showcase';
+    showcaseBar.style.cssText = 'background: linear-gradient(180deg, rgba(15,11,6,0.95) 0%, rgba(28,20,10,0.98) 100%); border-top: 2px solid #b8860b; padding: 6px 20px 8px 20px; box-shadow: 0 -6px 20px rgba(0,0,0,0.7); z-index: 10; display:flex; flex-direction:column; gap:6px; flex-shrink:0;';
+
+    // Collapsed by default on compact mobile landscape screens to prioritize full view of the 8 buttons
+    if (window.innerHeight <= 580) {
+        showcaseBar.classList.add('collapsed');
+    }
 
     let showcaseHeader = document.createElement('div');
-    showcaseHeader.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-family:VT323, monospace; font-size:16px; color:#ffd700; letter-spacing:1px;';
+    showcaseHeader.id = 'showcase-header';
+    showcaseHeader.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-family:VT323, monospace; font-size:15px; color:#ffd700; letter-spacing:1px; cursor:pointer; user-select:none;';
     showcaseHeader.innerHTML = `
         <div style="display:flex; align-items:center; gap:8px;">
-            <span>🏺</span>
-            <span>VITRINA DE RELIQUIAS SAGRADAS · 7 ARTÍCULOS DEL MILENIO</span>
-            <span style="background:#3a2800; border:1px solid #ffd700; color:#fff; font-size:13px; padding:2px 8px; border-radius:4px;">
-                ${unlockedCount} / 7 RECUPERADOS
+            <span style="font-size:18px;">🏺</span>
+            <span class="showcase-title">VITRINA DE RELIQUIAS SAGRADAS · 7 ARTÍCULOS DEL MILENIO</span>
+            <span class="pedestal-count-badge" style="background:#3a2800; border:1px solid #ffd700; color:#fff; font-size:12px; padding:1px 8px; border-radius:4px;">
+                ${unlockedCount} / 7
             </span>
         </div>
-        <div style="font-size:13px; color:#c7a76d; font-family:'Segoe UI', sans-serif;">Pasa el ratón o haz clic sobre un artículo para desvelar sus secretos antiguos</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="showcase-desc-hint" style="font-size:12px; color:#c7a76d; font-family:'Segoe UI', sans-serif;">Toca para ver secretos</span>
+            <button id="btn-toggle-showcase" style="background:#2b2010; border:1px solid #ffd700; color:#ffd700; padding:2px 8px; border-radius:4px; font-size:12px; font-family:VT323, monospace; cursor:pointer;">▾ Ver / Ocultar</button>
+        </div>
     `;
+    showcaseHeader.onclick = () => {
+        window.playViolinClick && window.playViolinClick();
+        showcaseBar.classList.toggle('collapsed');
+    };
     showcaseBar.appendChild(showcaseHeader);
 
     let itemsGrid = document.createElement('div');
-    itemsGrid.style.cssText = 'display:flex; justify-content:space-around; align-items:center; gap:12px; flex-wrap:nowrap; overflow-x:auto; padding:4px 0;';
+    itemsGrid.id = 'millennium-items-grid';
+    itemsGrid.style.cssText = 'display:flex; justify-content:space-around; align-items:center; gap:10px; flex-wrap:nowrap; overflow-x:auto; padding:3px 0; -webkit-overflow-scrolling:touch;';
 
     MILLENNIUM_ITEMS.forEach(it => {
         let pedestal = document.createElement('div');
         pedestal.className = 'millennium-pedestal';
-        pedestal.style.cssText = `flex: 1; min-width: 120px; max-width: 165px; height: 95px; background: ${it.unlocked ? 'linear-gradient(180deg, #332408 0%, #1a1204 100%)' : '#141416'}; border: 1.5px solid ${it.unlocked ? '#ffd700' : '#444'}; border-radius: 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 6px; box-sizing:border-box; position:relative; box-shadow: ${it.unlocked ? '0 0 12px rgba(255, 215, 0, 0.25)' : 'none'}; opacity: ${it.unlocked ? '1' : '0.55'};`;
+        pedestal.style.cssText = `flex: 1; min-width: 110px; max-width: 155px; height: 85px; background: ${it.unlocked ? 'linear-gradient(180deg, #332408 0%, #1a1204 100%)' : '#141416'}; border: 1.5px solid ${it.unlocked ? '#ffd700' : '#444'}; border-radius: 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 4px; box-sizing:border-box; position:relative; box-shadow: ${it.unlocked ? '0 0 12px rgba(255, 215, 0, 0.25)' : 'none'}; opacity: ${it.unlocked ? '1' : '0.55'};`;
 
         // SVG Render
         let svgContainer = document.createElement('div');
-        svgContainer.style.cssText = 'width: 48px; height: 48px; display:flex; align-items:center; justify-content:center; filter:' + (it.unlocked ? 'drop-shadow(0 0 6px #ffd700)' : 'grayscale(100%) opacity(40%)') + ';';
+        svgContainer.className = 'pedestal-svg-box';
+        svgContainer.style.cssText = 'width: 42px; height: 42px; display:flex; align-items:center; justify-content:center; filter:' + (it.unlocked ? 'drop-shadow(0 0 6px #ffd700)' : 'grayscale(100%) opacity(40%)') + ';';
         svgContainer.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">${it.svgPath}</svg>`;
         pedestal.appendChild(svgContainer);
 
         // Name
         let nameEl = document.createElement('div');
-        nameEl.style.cssText = 'font-weight:bold; font-size:11px; color:' + (it.unlocked ? '#ffd700' : '#888') + '; margin-top:4px; text-align:center; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; width:100%;';
+        nameEl.className = 'pedestal-name-box';
+        nameEl.style.cssText = 'font-weight:bold; font-size:11px; color:' + (it.unlocked ? '#ffd700' : '#888') + '; margin-top:3px; text-align:center; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; width:100%;';
         nameEl.textContent = it.shortName;
         pedestal.appendChild(nameEl);
 
         // Badge
         let badgeEl = document.createElement('div');
+        badgeEl.className = 'pedestal-status-badge';
         badgeEl.style.cssText = 'font-size:9px; font-weight:bold; padding:1px 6px; border-radius:3px; margin-top:2px; ' + (it.unlocked ? 'background:#1b5e20; color:#a5d6a7; border:1px solid #4caf50;' : 'background:#222; color:#888; border:1px solid #444;');
         badgeEl.textContent = it.unlocked ? '✨ ACTIVO' : '🔒 BLOQUEADO';
         pedestal.appendChild(badgeEl);
@@ -4174,6 +4620,7 @@ window.customShowDeckEditor = function() {
     leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px;';
     
     let previewImgWrap = document.createElement('div');
+    previewImgWrap.id = 'deck-preview-img-wrap';
     previewImgWrap.style.cssText = 'width:100%; height: 460px; border: 3px solid #a67c00; border-radius: 8px; background: #000; overflow: hidden; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 15px #000;';
     
     let previewImg = document.createElement('img');
@@ -4182,6 +4629,7 @@ window.customShowDeckEditor = function() {
     previewImgWrap.appendChild(previewImg);
     
     let previewText = document.createElement('div');
+    previewText.id = 'deck-preview-text';
     previewText.style.cssText = 'margin-top: 15px; background: #222; padding: 15px; border-radius: 6px; border: 1px solid #444; min-height: 150px;';
     previewText.innerHTML = '<i>Pasa el ratón sobre una carta para ver sus detalles.</i>';
     
@@ -5275,8 +5723,9 @@ window.stHTML = function(c, zone, i) {
   }
 
   // Field backrow
-  var ready = c.kind !== 'TRAP' || (typeof game !== 'undefined' && game && game.turnNo >= (c.readyTurn || 0));
-  var statusText = c.set ? (c.kind === 'TRAP' ? (ready ? 'LISTA' : 'ESPERA') : 'SET') : 'ACTIVA';
+  var isTrapField = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado' || (c.value && String(c.value).includes('TRAP')));
+  var ready = !isTrapField || (typeof window.isTrapReady === 'function' ? window.isTrapReady(c) : false);
+  var statusText = c.set ? (isTrapField ? (ready ? 'LISTA' : 'ESPERA') : 'SET') : 'ACTIVA';
   return '<div data-zone="' + zone + '" data-index="' + i + '" class="' + cls + '" onclick="select(\'' + zone + '\',' + i + ')" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:4px;box-sizing:border-box;height:100%;">' +
     '<div class="name" style="font-size:9px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;flex-shrink:0;" title="' + name + '">' + name + '</div>' +
     '<div class="fieldArt" style="flex:1;min-height:48px;width:100%;overflow:hidden;border-radius:3px;background:#000;margin:2px 0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">' +
@@ -6776,7 +7225,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var freeBack = (game.enemyBack || []).findIndex(function(x) { return !x; });
       if (trapIdx >= 0 && freeBack >= 0) {
         var trapCard = hand.splice(trapIdx, 1)[0];
-        game.enemyBack[freeBack] = Object.assign({}, trapCard, { set: true, readyTurn: game.turnNo + 1 });
+        var curT = Number((game && game.turnNo) || 1);
+        game.enemyBack[freeBack] = Object.assign({}, trapCard, {
+          set: true,
+          setSide: 'enemy',
+          setTurn: curT,
+          readyTurn: curT + 1,
+          _setThisTurn: curT
+        });
         if (typeof log === 'function') log(opp.toUpperCase() + ' coloca una Trampa agresivamente.');
       }
 
@@ -7652,6 +8108,131 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { activateEquipPlayer109 = window.activateEquipPlayer109; } catch(_) {}
 
+  // Helper for Swords of Concealing Light
+  function isConcealingSwords(c) {
+    if (!c) return false;
+    var v = c.value || '';
+    var n = c.name || '';
+    return v === 'SWORDS_OF_CONCEALING_LIGHT' || v === 'CONCEALING_SWORDS' || n === 'Swords of Concealing Light' || n === 'Espadas de Luz Ocultadora';
+  }
+  window.isConcealingSwords = isConcealingSwords;
+
+  function getActiveConcealingSwords(side) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return null;
+    var back = side === 'player' ? g.playerBack : g.enemyBack;
+    if (!back) return null;
+    for (var i = 0; i < back.length; i++) {
+      var c = back[i];
+      if (c && !c.set && isConcealingSwords(c) && Number(c.turnsLeft || 0) > 0) {
+        return { card: c, index: i, side: side };
+      }
+    }
+    return null;
+  }
+  window.getActiveConcealingSwords = getActiveConcealingSwords;
+
+  function applyConcealingLightEffect(activatorSide, card) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return;
+    var targetList = activatorSide === 'player' ? (g.enemy || []) : (g.field || []);
+    var count = 0;
+    for (var k = 0; k < targetList.length; k++) {
+      var m = targetList[k];
+      if (m) {
+        if (typeof isEgyptianGod === 'function' && isEgyptianGod(m.name || m[0])) {
+          if (typeof duelToast === 'function') duelToast('¡' + (m.name || 'Dios Egipcio') + ' es inmune a las Espadas de Luz Ocultadora!');
+          continue;
+        }
+        m.pos = 'DEF';
+        m.faceDown = true;
+        m.faceUp = false;
+        m.faceDownSet103 = true;
+        m._concealed = true;
+        count++;
+      }
+    }
+    if (activatorSide === 'player' && g.enemyLinkField) {
+      if (typeof isEgyptianGod !== 'function' || !isEgyptianGod(g.enemyLinkField.name || g.enemyLinkField[0])) {
+        g.enemyLinkField.pos = 'DEF';
+        g.enemyLinkField.faceDown = true;
+        g.enemyLinkField.faceUp = false;
+        g.enemyLinkField.faceDownSet103 = true;
+        count++;
+      }
+    }
+    if (window.playSetSound) window.playSetSound();
+    if (typeof render === 'function') render();
+    var actName = activatorSide === 'player' ? '¡Swords of Concealing Light!' : '¡El rival activa Swords of Concealing Light!';
+    var msg = actName + ' ' + count + ' monstruo(s) cambiados a DEFENSA boca abajo. ¡No podrán cambiar de posición por 2 turnos!';
+    if (typeof duelToast === 'function') duelToast(msg);
+    if (typeof log === 'function') log(msg);
+  }
+  window.applyConcealingLightEffect = applyConcealingLightEffect;
+
+  function checkConcealingTurnExpire(ownerSide) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return;
+    var back = ownerSide === 'player' ? g.playerBack : g.enemyBack;
+    var grave = ownerSide === 'player' ? g.grave : g.enemyGrave;
+    if (!back) return;
+    for (var i = 0; i < back.length; i++) {
+      var c = back[i];
+      if (c && !c.set && isConcealingSwords(c)) {
+        var currentTurn = Number(g.turnNo || 1);
+        var lastTicked = Number(c.lastTickedTurn || c.activatedTurn || 0);
+        if (currentTurn > lastTicked) {
+          c.lastTickedTurn = currentTurn;
+          c.turnsLeft = Number(c.turnsLeft || 2) - 1;
+          if (typeof log === 'function') {
+            log('Swords of Concealing Light (' + (ownerSide === 'player' ? 'Jugador' : 'Rival') + '): ' + c.turnsLeft + ' turno(s) restante(s).');
+          }
+          if (c.turnsLeft <= 0) {
+            back[i] = null;
+            c.set = false;
+            c.faceUp = true;
+            grave.push(c);
+            if (window.playDestroySound) window.playDestroySound();
+            if (typeof duelToast === 'function') {
+              duelToast('¡Swords of Concealing Light se autodestruye tras cumplir su 2do turno!');
+            }
+            if (typeof log === 'function') {
+              log('Swords of Concealing Light se autodestruye en tu 2do turno tras activarse y va al Cementerio.');
+            }
+            if (typeof render === 'function') render();
+          }
+        }
+      }
+    }
+  }
+  window.checkConcealingTurnExpire = checkConcealingTurnExpire;
+
+  // 4b. Wrapper robusto para setST (Garantiza timing estricto de trampas para el jugador)
+  var prevSetST = window.setST;
+  window.setST = function(i) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g || g.turn !== 'player') return;
+    var beforeBack = (g.playerBack || []).slice();
+    var curTurn = Number(g.turnNo || 1);
+    var res;
+    if (typeof prevSetST === 'function') {
+      res = prevSetST.apply(this, arguments);
+    }
+    try {
+      for (var z = 0; z < (g.playerBack || []).length; z++) {
+        var card = g.playerBack[z];
+        if (card && card !== beforeBack[z] && card.set) {
+          card.setSide = 'player';
+          card.setTurn = curTurn;
+          card.readyTurn = curTurn + 1;
+          card._setThisTurn = curTurn;
+        }
+      }
+    } catch (_) {}
+    return res;
+  };
+  try { setST = window.setST; setBackrow = function(i) { return window.setST(i); }; } catch(_) {}
+
   // 5. activateSTFromHand & activateSetCard
   var prevActivateHand = window.activateSTFromHand;
   window.activateSTFromHand = function(i) {
@@ -7661,7 +8242,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!c) return;
     var val = c.value || '';
     var cName = c.name || '';
-    if (c.kind === 'TRAP' || val === 'DUST_TORNADO' || cName === 'Dust Tornado' || (c.type && c.type.toUpperCase() === 'TRAP')) {
+    if (c.kind === 'TRAP' || val === 'DUST_TORNADO' || cName === 'Dust Tornado' || (c.type && String(c.type).toUpperCase() === 'TRAP') || (val && String(val).includes('TRAP'))) {
       duelToast(cName + ' es una Trampa: debes colocarla (SET) boca abajo primero.');
       if (typeof log === 'function') log(cName + ' es una Trampa: primero debes colocarla SET en el campo.');
       return;
@@ -7673,6 +8254,27 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     // Intercept EQUIP cards
     if (c.kind === 'EQUIP' || val === 'EQUIP' || isEquipSpell(c)) {
       window.promptEquipTarget(c, { type: 'hand', index: i });
+      return;
+    }
+    // Intercept Swords of Concealing Light desde la mano
+    if (isConcealingSwords(c)) {
+      var slot = (g.playerBack || []).findIndex(function(x) { return !x; });
+      if (slot < 0) {
+        duelToast('No hay espacio en la zona de Magia/Trampa para Swords of Concealing Light.');
+        if (typeof log === 'function') log('No hay espacio en la zona de Magia/Trampa para mantener Swords of Concealing Light.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      var placed = Object.assign({}, c, {
+        set: false,
+        faceUp: true,
+        value: 'SWORDS_OF_CONCEALING_LIGHT',
+        turnsLeft: 2,
+        activatedTurn: g.turnNo || 1,
+        lastTickedTurn: g.turnNo || 1
+      });
+      g.playerBack[slot] = placed;
+      applyConcealingLightEffect('player', placed);
       return;
     }
     if (val === 'POT_OF_GREED' || cName === 'Pot of Greed') {
@@ -7720,6 +8322,18 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof render === 'function') render();
       duelToast('¡Swords of Revealing Light activada! El rival no podrá atacar por 3 turnos.');
       if (typeof log === 'function') log('Swords of Revealing Light: el rival no podrá atacar durante 3 turnos.');
+      return;
+    }
+
+    // 3b. Swords of Concealing Light estando SET:
+    if (isConcealingSwords(c)) {
+      c.set = false;
+      c.faceUp = true;
+      c.value = 'SWORDS_OF_CONCEALING_LIGHT';
+      c.turnsLeft = 2;
+      c.activatedTurn = g.turnNo || 1;
+      c.lastTickedTurn = g.turnNo || 1;
+      applyConcealingLightEffect('player', c);
       return;
     }
 
@@ -7787,10 +8401,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
 
     // 9. Trampas (chequeo de turno y manuales):
-    if (c.kind === 'TRAP') {
-      var currentTurn = g.turnNo || 1;
-      if (c.readyTurn && currentTurn < c.readyTurn) {
+    var isTrapCard = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || val === 'DUST_TORNADO' || cName === 'Dust Tornado' || (val && String(val).includes('TRAP')));
+    if (isTrapCard) {
+      if (typeof window.isTrapReady === 'function' && !window.isTrapReady(c)) {
         duelToast(cName + ' fue colocada este turno. Debe permanecer SET hasta el próximo turno.');
+        if (typeof log === 'function') log(cName + ' fue colocada este turno. Debe permanecer SET hasta el próximo turno.');
         return;
       }
 
@@ -7927,6 +8542,27 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
   };
   try { activateSetCard = window.activateSetCard; } catch(_) {}
+
+  // Override de dustTornadoPlayer109 para garantizar que nunca se active desde la mano ni en el turno que fue seteada
+  window.dustTornadoPlayer109 = function(c, fromBackIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return;
+    if (fromBackIndex == null) {
+      duelToast('Dust Tornado es una Trampa: debes colocarla (SET) boca abajo primero.');
+      if (typeof log === 'function') log('Dust Tornado es una Trampa: debes colocarla (SET) boca abajo primero.');
+      return;
+    }
+    var cardInBack = g.playerBack ? g.playerBack[fromBackIndex] : null;
+    if (cardInBack && !window.isTrapReady(cardInBack)) {
+      duelToast('Dust Tornado fue colocada este turno. Debe permanecer SET hasta el próximo turno.');
+      if (typeof log === 'function') log('Dust Tornado fue colocada este turno. Debe permanecer SET hasta el próximo turno.');
+      return;
+    }
+    if (typeof activateSetCard === 'function') {
+      return activateSetCard(fromBackIndex);
+    }
+  };
+  try { dustTornadoPlayer109 = window.dustTornadoPlayer109; } catch(_) {}
 
   // ==========================================
   // GUARDIAN SIGNS SYSTEM (YGO FM Core Mechanic)
@@ -8089,6 +8725,108 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   }
   window.updateGuardianBattleHints = updateGuardianBattleHints;
 
+  // Universal Trap Timing & Readiness Resolver (Regla Oficial FMR: 1 turno completo / Fase Final tras colocar)
+  window.isTrapReady = function(c) {
+    if (!c || !c.set) return false;
+    var isTrap = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado' || (c.value && String(c.value).includes('TRAP')));
+    if (!isTrap) return true;
+
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return false;
+
+    var currentTurn = Number(g.turnNo || 1);
+    var currentSide = g.turn; // 'player' or 'enemy'
+
+    // Si fue colocada en esta misma acción / turno por el jugador actual
+    if (c._setThisTurn != null && Number(c._setThisTurn) === currentTurn) {
+      if (c.setSide && c.setSide === currentSide) return false;
+    }
+
+    // Chequeo estricto de setSide y setTurn:
+    // Una trampa NUNCA puede activarse en el mismo turno por el jugador que la colocó
+    if (c.setSide && c.setSide === currentSide) {
+      if (c.setTurn != null && Number(c.setTurn) === currentTurn) return false;
+      if (c.readyTurn != null && currentTurn < Number(c.readyTurn)) return false;
+    }
+
+    // Si no tiene setTurn ni readyTurn (cartas colocadas sin metadatos):
+    if (c.setTurn == null && c.readyTurn == null) {
+      c.setSide = c.setSide || currentSide;
+      c.setTurn = currentTurn;
+      c.readyTurn = currentTurn + 1;
+      return false;
+    }
+
+    return true;
+  };
+  var isTrapReady = window.isTrapReady;
+
+  // Verificador Universal de Trampas ante Invocación (Trap Hole, Torrential Tribute)
+  window.checkSummonTraps = function(summonedCard, summonedSide, slotIndex) {
+    if (!game || !summonedCard) return false;
+    var defendingSide = summonedSide === 'enemy' ? 'player' : 'enemy';
+    var defBack = defendingSide === 'player' ? (game.playerBack || []) : (game.enemyBack || []);
+    var defGrave = defendingSide === 'player' ? game.grave : game.enemyGrave;
+    var sumField = summonedSide === 'enemy' ? game.enemy : game.field;
+    var sumGrave = summonedSide === 'enemy' ? game.enemyGrave : game.grave;
+
+    // 1. Torrential Tribute
+    var torIdx = defBack.findIndex(function(c) {
+      return c && c.set && isTrapReady(c) && (c.value === 'TORRENTIAL' || c.name === 'Torrential Tribute');
+    });
+    if (torIdx >= 0) {
+      var trapTor = defBack[torIdx];
+      defBack[torIdx] = null;
+      defGrave.push(Object.assign({}, trapTor, { set: false, faceUp: true }));
+      var torDest = 0;
+      for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+        var em = game.enemy[ei];
+        if (em && !isEgyptianGod(em.name || em[0])) {
+          game.enemyGrave.push(em); game.enemy[ei] = null; torDest++;
+        }
+      }
+      for (var pi = 0; pi < (game.field || []).length; pi++) {
+        var pm = game.field[pi];
+        if (pm && !isEgyptianGod(pm.name || pm[0])) {
+          game.grave.push(pm); game.field[pi] = null; torDest++;
+        }
+      }
+      if (window.playDestroySound) window.playDestroySound();
+      var labelTor = defendingSide === 'player' ? '¡Tu Torrential Tribute activado!' : '¡El rival activa Torrential Tribute!';
+      if (typeof duelToast === 'function') duelToast(labelTor + ' (' + torDest + ' monstruos destruidos)');
+      if (typeof log === 'function') log(labelTor + ' Destruye todos los monstruos en el campo (' + torDest + ').');
+      if (typeof render === 'function') render();
+      return true;
+    }
+
+    // 2. Trap Hole (Monstruos invocados con ATK >= 1000)
+    var sAtk = Number(summonedCard.atk || summonedCard[4] || 0);
+    var thIdx = defBack.findIndex(function(c) {
+      return c && c.set && isTrapReady(c) && (c.value === 'TRAP_HOLE' || c.name === 'Trap Hole');
+    });
+    if (thIdx >= 0 && sAtk >= 1000) {
+      var sName = summonedCard.name || summonedCard[0] || 'Monstruo';
+      if (isEgyptianGod(sName)) {
+        if (typeof duelToast === 'function') duelToast('¡Trap Hole falla! ¡Los Dioses Egipcios no caen en trampas!');
+        if (typeof log === 'function') log('¡Trap Hole no puede atrapar al Dios Egipcio ' + sName + '!');
+        return false;
+      }
+      var trapH = defBack[thIdx];
+      defBack[thIdx] = null;
+      defGrave.push(Object.assign({}, trapH, { set: false, faceUp: true }));
+      if (slotIndex != null) sumField[slotIndex] = null;
+      sumGrave.push(summonedCard);
+      if (window.playDestroySound) window.playDestroySound();
+      var labelTH = defendingSide === 'player' ? '¡Tu Trap Hole activado!' : '¡El rival activa Trap Hole!';
+      if (typeof duelToast === 'function') duelToast(labelTH + ' ' + sName + ' (' + sAtk + ' ATK) cayó en el pozo y fue destruido.');
+      if (typeof log === 'function') log(labelTH + ' ' + sName + ' (' + sAtk + ' ATK) es destruido de inmediato al ser invocado.');
+      if (typeof render === 'function') render();
+      return true;
+    }
+
+    return false;
+  };
+
   // 6. MOTOR DE INTELIGENCIA ARTIFICIAL AGRESIVA Y FUSIONES (FMR MÁXIMO PODER)
   window.aiHandSummonOrSet = function() {
     if (!game || game.turn !== 'enemy' || !Array.isArray(game.enemyHand)) return;
@@ -8096,20 +8834,33 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     // A. Colocar Trampas en la fila trasera
     for (var h = game.enemyHand.length - 1; h >= 0; h--) {
       var c = game.enemyHand[h];
-      if (c && (c.kind === 'TRAP' || c.type === 'Trap' || c.type === 'TRAP')) {
+      if (c && (c.kind === 'TRAP' || c.type === 'Trap' || c.type === 'TRAP' || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado' || (c.value && String(c.value).includes('TRAP')))) {
         var backSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
         if (backSlot >= 0) {
           game.enemyHand.splice(h, 1);
-          game.enemyBack[backSlot] = Object.assign({}, c, { set: true, readyTurn: game.turnNo });
+          var curTurn = Number(game.turnNo || 1);
+          game.enemyBack[backSlot] = Object.assign({}, c, {
+            set: true,
+            setSide: 'enemy',
+            setTurn: curTurn,
+            readyTurn: curTurn + 1,
+            _setThisTurn: curTurn
+          });
           if (typeof log === 'function') log('El rival coloca una Trampa boca abajo.');
         }
       }
     }
 
-    // A2. IA Activa Dust Tornado si tiene una SET y el jugador tiene cartas en su fila trasera
+    // A2. IA Activa Dust Tornado si tiene una SET y lista (colocada en un turno anterior), y el jugador tiene cartas en su fila trasera
     for (var b = 0; b < (game.enemyBack || []).length; b++) {
       var bCard = game.enemyBack[b];
-      if (bCard && (bCard.value === 'DUST_TORNADO' || bCard.name === 'Dust Tornado')) {
+      if (!bCard || !bCard.set) continue;
+      var curTurn = Number(game.turnNo || 1);
+      if (bCard._setThisTurn === curTurn) continue;
+      if (bCard.setSide === 'enemy' && bCard.setTurn === curTurn) continue;
+      if (!isTrapReady(bCard)) continue;
+
+      if (bCard.value === 'DUST_TORNADO' || bCard.name === 'Dust Tornado') {
         var pTargets = (game.playerBack || []).map(function(x, idx) { return x ? { card: x, index: idx } : null; }).filter(Boolean);
         if (pTargets.length > 0) {
           game.enemyBack[b] = null;
@@ -8186,6 +8937,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (typeof log === 'function') log('¡FUSIÓN RIVAL! ' + (idxs.length) + ' cartas combinadas ➔ ' + bestFusion + ' (' + (fusedCard.atk || bestAtk) + ' ATK).');
         if (typeof duelToast === 'function') duelToast('¡FUSIÓN RIVAL: ' + bestFusion.toUpperCase() + '!');
         if (typeof render === 'function') render();
+        if (typeof window.checkSummonTraps === 'function') window.checkSummonTraps(fusedCard, 'enemy', freeMonsterSlot);
         return;
       }
     }
@@ -8216,6 +8968,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               if (typeof log === 'function') log('¡FUSIÓN CAMPO + MANO RIVAL! ' + fName + ' + ' + hName + ' ➔ ' + resF + ' (' + evolved.atk + ' ATK).');
               if (typeof duelToast === 'function') duelToast('¡FUSIÓN RIVAL: ' + resF.toUpperCase() + '!');
               if (typeof render === 'function') render();
+              if (typeof window.checkSummonTraps === 'function') window.checkSummonTraps(evolved, 'enemy', f);
               return;
             }
           }
@@ -8287,12 +9040,142 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (window.playSummonSound) window.playSummonSound();
         if (typeof log === 'function') log('El rival invoca a ' + (summoned.name || 'un monstruo') + ' (' + (summoned.atk || 0) + ' ATK).');
         if (typeof render === 'function') render();
+        if (typeof window.checkSummonTraps === 'function') window.checkSummonTraps(summoned, 'enemy', openSlot);
       }
     }
   };
   try { aiHandSummonOrSet = window.aiHandSummonOrSet; } catch(_) {}
 
-  window.aiBattle = function() {
+  // Battle Trap Selection Prompt System
+  function getPlayerBattleTraps() {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g || !g.playerBack) return [];
+    var list = [];
+    for (var i = 0; i < g.playerBack.length; i++) {
+      var c = g.playerBack[i];
+      if (!c || !c.set) continue;
+      if (typeof isTrapReady === 'function' && !isTrapReady(c)) continue;
+
+      var val = c.value || '';
+      var name = c.name || '';
+      var trapType = null;
+      var trapDesc = '';
+
+      if (val === 'CRUSH_CARD_VIRUS' || name === 'Crush Card Virus') {
+        trapType = 'CRUSH_CARD_VIRUS';
+        trapDesc = 'Destruye todos los monstruos en el campo rival.';
+      } else if (val === 'NEGATE_ATTACK' || name === 'Negate Attack') {
+        trapType = 'NEGATE_ATTACK';
+        trapDesc = 'Niega el ataque y termina la Battle Phase rival.';
+      } else if (val === 'WABOKU' || name === 'Waboku') {
+        if (!g._wabokuActiveThisTurn) {
+          trapType = 'WABOKU';
+          trapDesc = 'Tus monstruos y LP no reciben daño de batalla este turno.';
+        }
+      } else if (val === 'MIRROR_FORCE' || name === 'Mirror Force') {
+        trapType = 'MIRROR_FORCE';
+        trapDesc = 'Destruye todos los monstruos rivales en modo de Ataque.';
+      } else if (val === 'SAKURETSU_ARMOR' || name === 'Sakuretsu Armor') {
+        trapType = 'SAKURETSU_ARMOR';
+        trapDesc = 'Destruye al atacante e interrumpe su combate.';
+      } else if (val === 'MAGIC_CYLINDER' || name === 'Magic Cylinder') {
+        trapType = 'MAGIC_CYLINDER';
+        trapDesc = 'Niega el ataque y refleja el daño de ATK directamente al rival.';
+      }
+
+      if (trapType) {
+        list.push({
+          index: i,
+          card: c,
+          type: trapType,
+          name: name || c.name || trapType,
+          desc: trapDesc
+        });
+      }
+    }
+    return list;
+  }
+  window.getPlayerBattleTraps = getPlayerBattleTraps;
+
+  function promptPlayerBattleTrap(attackerCard, readyTraps) {
+    return new Promise(function(resolve) {
+      if (!readyTraps || readyTraps.length === 0) {
+        return resolve(null);
+      }
+
+      var existing = document.getElementById('battleTrapModal');
+      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+
+      var atkName = (attackerCard && (attackerCard.name || attackerCard[0])) || 'Monstruo Rival';
+      var atkPower = (typeof effectiveAtk === 'function' ? effectiveAtk(attackerCard) : (attackerCard && attackerCard.atk)) || 0;
+
+      var overlay = document.createElement('div');
+      overlay.id = 'battleTrapModal';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(4px);';
+
+      var box = document.createElement('div');
+      box.style.cssText = 'background:linear-gradient(150deg,#1c152a 0%,#0c0f18 100%);border:2.5px solid #d500f9;border-radius:12px;box-shadow:0 0 30px rgba(213,0,249,0.5), inset 0 0 15px rgba(213,0,249,0.2);width:100%;max-width:390px;padding:16px;color:#fff;text-align:center;font-family:sans-serif;box-sizing:border-box;';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'font-size:11px;font-weight:900;color:#ff5252;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;';
+      header.textContent = '⚔️ ¡DECLARACIÓN DE ATAQUE RIVAL!';
+      box.appendChild(header);
+
+      var title = document.createElement('div');
+      title.style.cssText = 'font-size:15px;font-weight:bold;color:#ffe57f;margin-bottom:4px;';
+      title.textContent = atkName + ' (' + atkPower + ' ATK)';
+      box.appendChild(title);
+
+      var sub = document.createElement('div');
+      sub.style.cssText = 'font-size:12px;color:#bbb;margin-bottom:14px;';
+      sub.textContent = '¿Deseas activar una Carta Trampa de respuesta?';
+      box.appendChild(sub);
+
+      var listCont = document.createElement('div');
+      listCont.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:12px;max-height:55vh;overflow-y:auto;';
+
+      function cleanup(choice) {
+        if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        window._activeTrapPromptResolve = null;
+        resolve(choice);
+      }
+      window._activeTrapPromptResolve = cleanup;
+
+      readyTraps.forEach(function(trapItem) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'width:100%;padding:10px 12px;background:linear-gradient(135deg,#7b1fa2 0%,#4a148c 100%);color:#fff;border:1.5px solid #ea80fc;border-radius:8px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:2px;box-shadow:0 3px 10px rgba(0,0,0,0.6);';
+
+        var btnTitle = document.createElement('span');
+        btnTitle.style.cssText = 'font-size:13px;font-weight:900;color:#f3e5f5;letter-spacing:0.3px;';
+        btnTitle.textContent = '🟣 Activar ' + trapItem.name;
+
+        var btnDesc = document.createElement('span');
+        btnDesc.style.cssText = 'font-size:11px;color:#e1bee7;opacity:0.92;line-height:1.25;';
+        btnDesc.textContent = trapItem.desc;
+
+        btn.appendChild(btnTitle);
+        btn.appendChild(btnDesc);
+
+        btn.onclick = function() { cleanup(trapItem); };
+        listCont.appendChild(btn);
+      });
+      box.appendChild(listCont);
+
+      var passBtn = document.createElement('button');
+      passBtn.type = 'button';
+      passBtn.style.cssText = 'width:100%;padding:10px 12px;background:#263238;color:#cfd8dc;border:1.5px solid #546e7a;border-radius:8px;font-size:12.5px;font-weight:bold;cursor:pointer;';
+      passBtn.textContent = '❌ NO ACTIVAR NINGUNA';
+      passBtn.onclick = function() { cleanup(null); };
+      box.appendChild(passBtn);
+
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    });
+  }
+  window.promptPlayerBattleTrap = promptPlayerBattleTrap;
+
+  window.aiBattle = async function() {
     if (!game || game.turn !== 'enemy') return;
 
     if (game.first === 'enemy' && game.firstTurn) {
@@ -8323,6 +9206,31 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    // Swords of Revealing Light (Espadas de Luz Reveladora)
+    var sRevealing = (typeof findSwords109 === 'function') ? findSwords109('player') : null;
+    if (!sRevealing && game.playerBack) {
+      var sIdx = game.playerBack.findIndex(function(c) {
+        return c && !c.set && (c.value === 'SWORDS' || c.value === 'SWORDS_REVEALING' || c.name === 'Swords of Revealing Light') && Number(c.turns109 || 0) > 0;
+      });
+      if (sIdx >= 0) sRevealing = { card: game.playerBack[sIdx], index: sIdx };
+    }
+    if (sRevealing) {
+      if (typeof tickSwords109 === 'function') {
+        tickSwords109('player');
+      } else {
+        sRevealing.card.turns109 = Math.max(0, Number(sRevealing.card.turns109 || 0) - 1);
+        if (sRevealing.card.turns109 <= 0) {
+          game.playerBack[sRevealing.index] = null;
+          sRevealing.card.set = false; sRevealing.card.faceUp = true;
+          game.grave.push(sRevealing.card);
+          if (typeof log === 'function') log('Swords of Revealing Light expira y va al Cementerio.');
+        }
+      }
+      duelToast('Swords of Revealing Light impide los ataques del rival.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
     var trapTriggeredThisTurn = false;
 
     // Iterar sobre TODOS los monstruos del rival para atacar con todos
@@ -8336,138 +9244,107 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var currentEffectiveAtk = typeof effectiveAtk === 'function' ? effectiveAtk(e) : (e.atk || 0);
       var playerMonsters = (game.field || []).filter(Boolean);
 
+      var playerHasConcealing = (typeof getActiveConcealingSwords === 'function') ? !!getActiveConcealingSwords('player') : false;
+
       // ¡MODO ULTRA AGRESIVO! Todo monstruo del rival cambia a posición de ATAQUE para embestir
-      if (e.pos !== 'ATK' && e.kind !== 'LINK') {
-        e.pos = 'ATK';
-        if (typeof log === 'function') log(e.name + ' cambia a posición de ATAQUE.');
+      // SALVO que Swords of Concealing Light esté activo, en cuyo caso los monstruos rivales NO pueden cambiar de posición:
+      if (!playerHasConcealing) {
+        if (e.pos !== 'ATK' && e.kind !== 'LINK') {
+          e.pos = 'ATK';
+          if (typeof log === 'function') log(e.name + ' cambia a posición de ATAQUE.');
+        }
       }
 
-      // VERIFICACIÓN DE TRAMPAS EN EL PRIMER ATAQUE
-      if (!trapTriggeredThisTurn) {
-        // 0. Crush Card Virus
-        var ccvIdx = (game.playerBack || []).findIndex(function(c) {
-          return c && c.set && (c.value === 'CRUSH_CARD_VIRUS' || c.name === 'Crush Card Virus');
-        });
-        if (ccvIdx >= 0) {
-          trapTriggeredThisTurn = true;
-          var trapCCV = game.playerBack[ccvIdx];
-          game.playerBack[ccvIdx] = null;
-          game.grave.push(Object.assign({}, trapCCV, { set: false, faceUp: true }));
-          var eDestroyed = 0;
-          for (var ek = 0; ek < (game.enemy || []).length; ek++) {
-            var em = game.enemy[ek];
-            if (em) {
-              if (isEgyptianGod(em.name || em[0])) continue;
-              game.enemyGrave.push(em);
-              game.enemy[ek] = null;
-              eDestroyed++;
+      // Si el monstruo está en posición de DEFENSA o boca abajo (por Swords of Concealing Light o set), NO PUEDE ATACAR:
+      if (e.pos === 'DEF' || e.faceDown || e.faceDownSet103) {
+        continue;
+      }
+
+      // VERIFICACIÓN DE TRAMPAS DE RESPUESTA ANTE EL ATAQUE CON SELECTOR INTERACTIVO
+      var readyBattleTraps = getPlayerBattleTraps();
+      if (readyBattleTraps.length > 0) {
+        var trapPrompt = (typeof window.promptPlayerBattleTrap === 'function') ? window.promptPlayerBattleTrap : promptPlayerBattleTrap;
+        var chosenTrap = await trapPrompt(e, readyBattleTraps);
+        if (chosenTrap) {
+          var tIdx = chosenTrap.index;
+          var tCard = game.playerBack[tIdx];
+          game.playerBack[tIdx] = null;
+          game.grave.push(Object.assign({}, tCard, { set: false, faceUp: true }));
+
+          if (chosenTrap.type === 'CRUSH_CARD_VIRUS') {
+            var eDestroyed = 0;
+            for (var ek = 0; ek < (game.enemy || []).length; ek++) {
+              var em = game.enemy[ek];
+              if (em) {
+                if (isEgyptianGod(em.name || em[0])) continue;
+                game.enemyGrave.push(em);
+                game.enemy[ek] = null;
+                eDestroyed++;
+              }
+            }
+            if (window.playDestroySound) window.playDestroySound();
+            if (typeof render === 'function') render();
+            if (typeof window.showTrap114 === 'function') window.showTrap114('Crush Card Virus', 'Destruye ' + eDestroyed + ' monstruos en el campo rival.');
+            duelToast('¡Crush Card Virus activado! Destruye ' + eDestroyed + ' monstruo(s) rivales.');
+            if (typeof log === 'function') log('¡Crush Card Virus! Destruye todos los monstruos en el campo rival (' + eDestroyed + ').');
+            if (!attackerIsGod) continue;
+          } else if (chosenTrap.type === 'NEGATE_ATTACK') {
+            if (attackerIsGod) {
+              duelToast('¡Negate Attack falla contra Dios Egipcio!');
+            } else {
+              (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
+              if (typeof render === 'function') render();
+              duelToast('¡Negate Attack activado! Ataque negado y Battle Phase rival terminada.');
+              if (typeof log === 'function') log('¡Negate Attack! Niega el ataque y termina la Battle Phase.');
+              return;
+            }
+          } else if (chosenTrap.type === 'WABOKU') {
+            game._wabokuActiveThisTurn = true;
+            game._wabokuActiveTurn = game.turnNo;
+            if (typeof render === 'function') render();
+            duelToast('¡Waboku activado! Tus monstruos y LP están protegidos.');
+            if (typeof log === 'function') log('¡Waboku activado! No habrá daño este turno, pero el rival continúa atacando.');
+          } else if (chosenTrap.type === 'MIRROR_FORCE') {
+            var destroyedCount = 0;
+            for (var k = 0; k < (game.enemy || []).length; k++) {
+              if (game.enemy[k] && (game.enemy[k].pos !== 'DEF' || game.enemy[k].kind === 'LINK')) {
+                if (isEgyptianGod(game.enemy[k].name || game.enemy[k][0])) continue;
+                game.enemyGrave.push(game.enemy[k]);
+                game.enemy[k] = null;
+                destroyedCount++;
+              }
+            }
+            if (window.playDestroySound) window.playDestroySound();
+            if (typeof render === 'function') render();
+            duelToast('¡Mirror Force destruyó ' + destroyedCount + ' monstruos atacantes!');
+            if (typeof log === 'function') log('¡Mirror Force! Destruye ' + destroyedCount + ' monstruos atacantes del rival.');
+            if (!attackerIsGod && !game.enemy[ei]) continue;
+          } else if (chosenTrap.type === 'SAKURETSU_ARMOR') {
+            if (attackerIsGod) {
+              duelToast('¡Sakuretsu Armor falla contra Dios Egipcio!');
+            } else {
+              game.enemy[ei] = null;
+              game.enemyGrave.push(e);
+              e.attackedTurn = game.turnNo;
+              if (window.playDestroySound) window.playDestroySound();
+              if (typeof render === 'function') render();
+              duelToast('¡Sakuretsu Armor destruyó a ' + (e.name || 'el atacante') + '!');
+              if (typeof log === 'function') log('¡Sakuretsu Armor! Destruye al atacante ' + (e.name || 'el atacante') + '. Tu monstruo y LP quedan a salvo.');
+              continue; // Atacante destruido
+            }
+          } else if (chosenTrap.type === 'MAGIC_CYLINDER') {
+            if (attackerIsGod) {
+              duelToast('¡Magic Cylinder falla contra Dios Egipcio!');
+            } else {
+              var dmgCyl = Number(currentEffectiveAtk || 0);
+              game.elp = Math.max(0, game.elp - dmgCyl);
+              e.attackedTurn = game.turnNo;
+              if (typeof render === 'function') render();
+              duelToast('¡Magic Cylinder! Ataque negado y ' + dmgCyl + ' de daño al rival.');
+              if (typeof log === 'function') log('¡Magic Cylinder! Ataque negado y refleja ' + dmgCyl + ' LP de daño al rival.');
+              continue; // Ataque negado y reflejado
             }
           }
-          if (window.playDestroySound) window.playDestroySound();
-          if (typeof render === 'function') render();
-          if (typeof window.showTrap114 === 'function') window.showTrap114('Crush Card Virus', 'Destruye ' + eDestroyed + ' monstruos en el campo rival.');
-          duelToast('¡Crush Card Virus activado! Destruye ' + eDestroyed + ' monstruo(s) rivales.');
-          if (!attackerIsGod) break;
-        }
-
-        // 1. Negate Attack
-        var negIdx = (game.playerBack || []).findIndex(function(c) {
-          return c && c.set && (c.value === 'NEGATE_ATTACK' || c.name === 'Negate Attack');
-        });
-        if (negIdx >= 0) {
-          trapTriggeredThisTurn = true;
-          if (attackerIsGod) {
-            duelToast('¡Negate Attack falla contra Dios Egipcio!');
-          } else {
-            var trapN = game.playerBack[negIdx];
-            game.playerBack[negIdx] = null;
-            game.grave.push(Object.assign({}, trapN, { set: false, faceUp: true }));
-            (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
-            if (typeof render === 'function') render();
-            duelToast('¡Negate Attack activado! Ataque negado y Battle Phase rival terminada.');
-            if (typeof log === 'function') log('¡Negate Attack! Niega el ataque y termina la Battle Phase.');
-            return;
-          }
-        }
-
-        // 2. Waboku (Protege daño pero permite a la IA seguir atacando y revelando cartas)
-        var wabIdx = (game.playerBack || []).findIndex(function(c) {
-          return c && c.set && (c.value === 'WABOKU' || c.name === 'Waboku');
-        });
-        if (wabIdx >= 0) {
-          trapTriggeredThisTurn = true;
-          var trapW = game.playerBack[wabIdx];
-          game.playerBack[wabIdx] = null;
-          game.grave.push(Object.assign({}, trapW, { set: false, faceUp: true }));
-          game._wabokuActiveThisTurn = true;
-          game._wabokuActiveTurn = game.turnNo;
-          if (typeof render === 'function') render();
-          duelToast('¡Waboku activado! Tus monstruos y LP están protegidos.');
-          if (typeof log === 'function') log('¡Waboku activado! No habrá daño este turno, pero el rival continúa atacando.');
-        }
-
-        // 3. Sakuretsu Armor
-        var sakIdx = (game.playerBack || []).findIndex(function(c) {
-          return c && c.set && (c.value === 'SAKURETSU_ARMOR' || c.name === 'Sakuretsu Armor');
-        });
-        if (sakIdx >= 0) {
-          trapTriggeredThisTurn = true;
-          if (attackerIsGod) {
-            duelToast('¡Sakuretsu Armor falla contra Dios Egipcio!');
-          } else {
-            var trapS = game.playerBack[sakIdx];
-            game.playerBack[sakIdx] = null;
-            game.grave.push(Object.assign({}, trapS, { set: false, faceUp: true }));
-            game.enemy[ei] = null;
-            game.enemyGrave.push(e);
-            if (typeof render === 'function') render();
-            duelToast('¡Sakuretsu Armor destruyó a ' + (e.name || 'el atacante') + '!');
-            continue;
-          }
-        }
-
-        // 4. Magic Cylinder
-        var cylIdx = (game.playerBack || []).findIndex(function(c) {
-          return c && c.set && (c.value === 'MAGIC_CYLINDER' || c.name === 'Magic Cylinder');
-        });
-        if (cylIdx >= 0) {
-          trapTriggeredThisTurn = true;
-          if (attackerIsGod) {
-            duelToast('¡Magic Cylinder falla contra Dios Egipcio!');
-          } else {
-            var trapC = game.playerBack[cylIdx];
-            game.playerBack[cylIdx] = null;
-            game.grave.push(Object.assign({}, trapC, { set: false, faceUp: true }));
-            var dmgCyl = Number(currentEffectiveAtk || 0);
-            game.elp = Math.max(0, game.elp - dmgCyl);
-            e.attackedTurn = game.turnNo;
-            if (typeof render === 'function') render();
-            duelToast('¡Magic Cylinder! Ataque negado y ' + dmgCyl + ' de daño al rival.');
-            continue;
-          }
-        }
-
-        // 5. Mirror Force
-        var mirIdx = (game.playerBack || []).findIndex(function(c) {
-          return c && c.set && (c.value === 'MIRROR_FORCE' || c.name === 'Mirror Force');
-        });
-        if (mirIdx >= 0) {
-          trapTriggeredThisTurn = true;
-          var trapM = game.playerBack[mirIdx];
-          game.playerBack[mirIdx] = null;
-          game.grave.push(Object.assign({}, trapM, { set: false, faceUp: true }));
-          var destroyedCount = 0;
-          for (var k = 0; k < (game.enemy || []).length; k++) {
-            if (game.enemy[k] && (game.enemy[k].pos !== 'DEF' || game.enemy[k].kind === 'LINK')) {
-              if (isEgyptianGod(game.enemy[k].name || game.enemy[k][0])) continue;
-              game.enemyGrave.push(game.enemy[k]);
-              game.enemy[k] = null;
-              destroyedCount++;
-            }
-          }
-          if (typeof render === 'function') render();
-          duelToast('¡Mirror Force destruyó ' + destroyedCount + ' monstruos atacantes!');
-          if (!attackerIsGod) break;
         }
       }
 
@@ -8655,44 +9532,152 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         e = game.enemyLinkField;
       }
 
-      // Enemy Crush Card Virus response on attack
-      var enemyCCVIdx = (game.enemyBack || []).findIndex(function(c) {
-        return c && c.set && (c.value === 'CRUSH_CARD_VIRUS' || c.name === 'Crush Card Virus') && (game.turnNo >= (c.readyTurn || 0));
-      });
-      if (enemyCCVIdx >= 0 && p) {
-        var eCCV = game.enemyBack[enemyCCVIdx];
-        game.enemyBack[enemyCCVIdx] = null;
-        game.enemyGrave.push(Object.assign({}, eCCV, { set: false, faceUp: true }));
-        var pDestroyed = 0;
-        var attackerDied = false;
-        for (var pi2 = 0; pi2 < (game.field || []).length; pi2++) {
-          var pm = game.field[pi2];
-          if (pm) {
-            if (isEgyptianGod(pm.name || pm[0])) {
-              if (typeof log === 'function') log('\u00a1Tu Dios Egipcio ' + (pm.name || 'Dios') + ' resiste Crush Card Virus!');
-              continue;
+      // AI Battle Traps in response to Player Attack
+      if (p) {
+        var oppName = (typeof storyOpponent !== 'undefined' && storyOpponent) ? storyOpponent.toUpperCase() : 'EL RIVAL';
+
+        // 0. Enemy Crush Card Virus
+        var enemyCCVIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'CRUSH_CARD_VIRUS' || c.name === 'Crush Card Virus');
+        });
+        if (enemyCCVIdx >= 0) {
+          var eCCV = game.enemyBack[enemyCCVIdx];
+          game.enemyBack[enemyCCVIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eCCV, { set: false, faceUp: true }));
+          var pDestroyed = 0;
+          var attackerDied = false;
+          for (var pi2 = 0; pi2 < (game.field || []).length; pi2++) {
+            var pm = game.field[pi2];
+            if (pm) {
+              if (isEgyptianGod(pm.name || pm[0])) {
+                if (typeof log === 'function') log('\u00a1Tu Dios Egipcio ' + (pm.name || 'Dios') + ' resiste Crush Card Virus!');
+                continue;
+              }
+              if (pm === p) attackerDied = true;
+              game.grave.push(pm);
+              game.field[pi2] = null;
+              pDestroyed++;
             }
-            if (pm === p) attackerDied = true;
-            game.grave.push(pm);
-            game.field[pi2] = null;
-            pDestroyed++;
+          }
+          if (window.playDestroySound) window.playDestroySound();
+          if (typeof render === 'function') render();
+          var ccvMsg = '\u00a1' + oppName + ' activa Crush Card Virus! Destruye ' + pDestroyed + ' monstruo(s) en tu campo.';
+          duelToast(ccvMsg);
+          if (typeof log === 'function') log(ccvMsg);
+          if (attackerDied) {
+            game.selected = [];
+            if (typeof render === 'function') render();
+            return;
           }
         }
-        if (window.playDestroySound) window.playDestroySound();
-        if (typeof render === 'function') render();
-        var oppName = (typeof storyOpponent !== 'undefined' && storyOpponent) ? storyOpponent.toUpperCase() : 'EL RIVAL';
-        var ccvMsg = '\u00a1' + oppName + ' activa Crush Card Virus! Destruye ' + pDestroyed + ' monstruo(s) en tu campo. (Mano y deck no son afectados)';
-        duelToast(ccvMsg);
-        if (typeof log === 'function') log(ccvMsg);
-        if (attackerDied) {
+
+        // 1. Enemy Negate Attack
+        var enemyNegIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'NEGATE_ATTACK' || c.name === 'Negate Attack');
+        });
+        if (enemyNegIdx >= 0) {
+          var eNeg = game.enemyBack[enemyNegIdx];
+          game.enemyBack[enemyNegIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eNeg, { set: false, faceUp: true }));
+          (game.field || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
           game.selected = [];
           if (typeof render === 'function') render();
+          duelToast('\u00a1' + oppName + ' activa Negate Attack! Tu ataque fue negado y la Battle Phase termin\u00f3.');
+          if (typeof log === 'function') log('\u00a1' + oppName + ' activa Negate Attack! El ataque fue negado.');
+          return;
+        }
+
+        // 2. Enemy Waboku
+        var enemyWabIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'WABOKU' || c.name === 'Waboku');
+        });
+        if (enemyWabIdx >= 0) {
+          var eWab = game.enemyBack[enemyWabIdx];
+          game.enemyBack[enemyWabIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eWab, { set: false, faceUp: true }));
+          game._wabokuEnemyActiveTurn = game.turnNo;
+          duelToast('\u00a1' + oppName + ' activa Waboku! Sus monstruos no recibir\u00e1n da\u00f1o de batalla este turno.');
+          if (typeof log === 'function') log('\u00a1' + oppName + ' activa Waboku!');
+          if (typeof render === 'function') render();
+        }
+
+        // 3. Enemy Mirror Force
+        var enemyMirIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'MIRROR_FORCE' || c.name === 'Mirror Force');
+        });
+        if (enemyMirIdx >= 0) {
+          var eMir = game.enemyBack[enemyMirIdx];
+          game.enemyBack[enemyMirIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eMir, { set: false, faceUp: true }));
+          var pMirDestroyed = 0;
+          for (var mi = 0; mi < (game.field || []).length; mi++) {
+            if (game.field[mi] && (game.field[mi].pos !== 'DEF' || game.field[mi].kind === 'LINK')) {
+              if (isEgyptianGod(game.field[mi].name || game.field[mi][0])) continue;
+              game.grave.push(game.field[mi]);
+              game.field[mi] = null;
+              pMirDestroyed++;
+            }
+          }
+          game.selected = [];
+          if (window.playDestroySound) window.playDestroySound();
+          if (typeof render === 'function') render();
+          duelToast('\u00a1' + oppName + ' activa Mirror Force! Destruye ' + pMirDestroyed + ' de tus monstruos atacantes.');
+          if (typeof log === 'function') log('\u00a1' + oppName + ' activa Mirror Force! Destruye tus monstruos en modo de ataque.');
+          return;
+        }
+
+        // 4. Enemy Sakuretsu Armor
+        var enemySakIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'SAKURETSU_ARMOR' || c.name === 'Sakuretsu Armor');
+        });
+        if (enemySakIdx >= 0) {
+          var eSak = game.enemyBack[enemySakIdx];
+          game.enemyBack[enemySakIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eSak, { set: false, faceUp: true }));
+          if (isEgyptianGod(p.name || p[0])) {
+            duelToast('\u00a1Tu Dios Egipcio no es afectado por Sakuretsu Armor!');
+          } else {
+            if (pi != null) game.field[pi[1]] = null;
+            else game.linkField = null;
+            game.grave.push(p);
+            game.selected = [];
+            if (window.playDestroySound) window.playDestroySound();
+            if (typeof render === 'function') render();
+            duelToast('\u00a1' + oppName + ' activa Sakuretsu Armor! ' + (p.name || 'Tu atacante') + ' fue destruido.');
+            if (typeof log === 'function') log('\u00a1' + oppName + ' activa Sakuretsu Armor! Destruye a tu atacante ' + (p.name || 'atacante') + '.');
+            return;
+          }
+        }
+
+        // 5. Enemy Magic Cylinder
+        var enemyCylIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'MAGIC_CYLINDER' || c.name === 'Magic Cylinder');
+        });
+        if (enemyCylIdx >= 0) {
+          var eCyl = game.enemyBack[enemyCylIdx];
+          game.enemyBack[enemyCylIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eCyl, { set: false, faceUp: true }));
+          var pDmg = typeof effectiveAtk === 'function' ? effectiveAtk(p) : (p.atk || 0);
+          game.plp = Math.max(0, game.plp - pDmg);
+          p.attackedTurn = game.turnNo;
+          game.selected = [];
+          if (typeof render === 'function') render();
+          duelToast('\u00a1' + oppName + ' activa Magic Cylinder! Ataque negado y recibes ' + pDmg + ' LP de da\u00f1o.');
+          if (typeof log === 'function') log('\u00a1' + oppName + ' activa Magic Cylinder! Ataque negado, recibes ' + pDmg + ' LP de da\u00f1o.');
           return;
         }
       }
 
       var cleanedP = null, cleanedE = null;
       if (p && e) {
+        if (e && (e.faceDown || e.faceDownSet103)) {
+          e.faceDown = false;
+          e.faceDownSet103 = false;
+          e.faceUp = true;
+          e.pos = 'DEF';
+          if (typeof duelToast === 'function') duelToast('¡Ataque revela a ' + (e.name || 'Monstruo') + ' en Defensa!');
+          if (typeof log === 'function') log('¡El ataque revela a ' + (e.name || 'Monstruo') + ' en posición de DEFENSA!');
+        }
         var rel = getSignCombatRelation(p, e);
         var pSign = getCardSign(p), eSign = getCardSign(e);
         var pSym = GUARDIAN_SYMBOLS[pSign] || pSign, eSym = GUARDIAN_SYMBOLS[eSign] || eSign;
@@ -8751,6 +9736,177 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     return r;
   };
   try { select = window.select; } catch(_) {}
+
+  // Hook window.changePosition: official rules (summon turn restriction) & Flip Summon to Attack
+  window.changePosition = function() {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return;
+
+    if (g.turn !== 'player') {
+      if (typeof duelToast === 'function') duelToast('Solo puedes cambiar posiciones durante tu turno.');
+      return;
+    }
+
+    if (g.battlePhaseStarted) {
+      if (typeof duelToast === 'function') duelToast('Ya entraste en fase de ataque. No puedes cambiar posiciones este turno.');
+      if (typeof log === 'function') log('Ya entraste en fase de ataque. No puedes cambiar la posición de tus monstruos este turno.');
+      return;
+    }
+
+    if (typeof getActiveConcealingSwords === 'function' && getActiveConcealingSwords('enemy')) {
+      if (typeof duelToast === 'function') duelToast('Swords of Concealing Light del rival impide cambiar posiciones.');
+      if (typeof log === 'function') log('Swords of Concealing Light rival impide cambiar de posición a tus monstruos.');
+      return;
+    }
+
+    var pick = [...(g.selected || [])].reverse().find(function(x) { return x && (x[0] === 'f' || x[0] === 'l'); });
+    var c = pick ? (pick[0] === 'f' ? (g.field && g.field[Number(pick[1])]) : (g.linkZones && g.linkZones[Number(pick[1])])) : null;
+
+    if (!c) {
+      if (typeof duelToast === 'function') duelToast('Selecciona uno de tus monstruos para cambiar su posición.');
+      if (typeof log === 'function') log('Selecciona uno de tus monstruos para cambiar su posición.');
+      return;
+    }
+
+    if (c.kind === 'LINK') {
+      g.selected = [];
+      if (typeof render === 'function') render();
+      if (typeof duelToast === 'function') duelToast(c.name + ' es Link: permanece siempre en ATAQUE.');
+      if (typeof log === 'function') log(c.name + ' es un monstruo Link: permanece siempre en ATAQUE y no tiene DEF.');
+      return;
+    }
+
+    // Regla Oficial Yu-Gi-Oh!: No se puede cambiar la posición de batalla en el turno de invocación o colocación
+    if (c.summonedTurn === g.turnNo) {
+      if (typeof duelToast === 'function') duelToast('No puedes cambiar la posición en el turno de invocación o colocación.');
+      if (typeof log === 'function') log('No puedes cambiar la posición de ' + (c.name || 'este monstruo') + ' en el mismo turno en que fue invocado o colocado.');
+      return;
+    }
+
+    // Regla Oficial: Solo 1 cambio manual de posición por turno
+    if (c.changedPositionTurn === g.turnNo) {
+      if (typeof duelToast === 'function') duelToast('Este monstruo ya cambió de posición este turno.');
+      if (typeof log === 'function') log((c.name || 'El monstruo') + ' ya cambió de posición este turno.');
+      return;
+    }
+
+    // Regla Oficial: Un monstruo que ya atacó este turno no puede cambiar de posición
+    if (c.attackedTurn === g.turnNo) {
+      if (typeof duelToast === 'function') duelToast('Un monstruo que ya atacó este turno no puede cambiar de posición.');
+      if (typeof log === 'function') log((c.name || 'El monstruo') + ' ya atacó este turno.');
+      return;
+    }
+
+    // Invocación por Volteo (Flip Summon) desde modo SET / Boca Abajo
+    if (c.faceDown || c.faceDownSet103) {
+      c.faceDown = false;
+      c.faceDownSet103 = false;
+      c.faceUp = true;
+      c.pos = 'ATK';
+      c.changedPositionTurn = g.turnNo;
+      g.selected = [];
+      if (window.playSummonSound) window.playSummonSound();
+      if (typeof duelToast === 'function') duelToast('¡Invocación por Volteo! ' + (c.name || 'Monstruo') + ' se coloca en ATAQUE.');
+      if (typeof log === 'function') log('¡Invocación por Volteo! ' + (c.name || 'Monstruo') + ' se voltea boca arriba en posición de ATAQUE.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // Cambio manual de posición entre ATK y DEF
+    c.pos = (c.pos === 'DEF' ? 'ATK' : 'DEF');
+    c.changedPositionTurn = g.turnNo;
+    g.selected = [];
+    if (window.playSummonSound) window.playSummonSound();
+    if (typeof duelToast === 'function') duelToast((c.name || 'Monstruo') + ' cambió a posición de ' + (c.pos === 'ATK' ? 'ATAQUE' : 'DEFENSA') + '.');
+    if (typeof log === 'function') log((c.name || 'Monstruo') + ' cambió a posición de ' + (c.pos === 'ATK' ? 'ATAQUE.' : 'DEFENSA.'));
+    if (typeof render === 'function') render();
+  };
+  try { changePosition = window.changePosition; } catch(_) {}
+
+  // Hook window.playerHand50: start of player turn countdown check for continuous spells
+  var prevPlayerHandConceal = window.playerHand50;
+  window.playerHand50 = function() {
+    var r = prevPlayerHandConceal ? prevPlayerHandConceal.apply(this, arguments) : undefined;
+    try {
+      if (typeof checkConcealingTurnExpire === 'function') {
+        checkConcealingTurnExpire('player');
+      }
+    } catch(e) {}
+    return r;
+  };
+  try { playerHand50 = window.playerHand50; } catch(_) {}
+
+  // Hook window.startRival58: start of rival turn countdown check
+  var prevStartRivalConceal = window.startRival58;
+  if (typeof prevStartRivalConceal === 'function') {
+    window.startRival58 = function() {
+      try {
+        if (typeof checkConcealingTurnExpire === 'function') {
+          checkConcealingTurnExpire('enemy');
+        }
+      } catch(e) {}
+      return prevStartRivalConceal.apply(this, arguments);
+    };
+    try { startRival58 = window.startRival58; } catch(_) {}
+  }
+
+  // Hook window.cardHTML: render face-down defense cards correctly on field
+  var prevCardHTMLConceal = window.cardHTML;
+  if (typeof prevCardHTMLConceal === 'function') {
+    window.cardHTML = function(c, zone, i) {
+      if (c && (zone === 'e' || zone === 'f') && (c.faceDown || c.faceDownSet103)) {
+        var sel = typeof game !== 'undefined' && game && game.selected && game.selected.some(function(x) { return x && x[0] === zone && Number(x[1]) === Number(i); });
+        var label = c._concealed ? 'OCULTO' : 'SET';
+        return '<div data-zone="' + zone + '" data-index="' + i + '" class="fieldMonster defense faceDownSet103 ' + (sel ? 'selected' : '') + '" onclick="select(\'' + zone + '\',' + i + ')"><div class="setMonsterBack103"><span>' + label + '</span></div><div class="setMonsterDef103">🛡 DEF</div></div>';
+      }
+      return prevCardHTMLConceal.apply(this, arguments);
+    };
+    try { cardHTML = window.cardHTML; } catch(_) {}
+  }
+
+  // Hook window.updateCardInfo: show detailed info for concealed cards
+  var prevUpdateCardInfoConceal = window.updateCardInfo;
+  if (typeof prevUpdateCardInfoConceal === 'function') {
+    window.updateCardInfo = function() {
+      var r = prevUpdateCardInfoConceal.apply(this, arguments);
+      try {
+        if (typeof game === 'undefined' || !game) return r;
+        var pick = [...(game.selected || [])].reverse().find(function(x) { return x && ['f', 'e', 'l', 'el'].includes(x[0]); });
+        if (!pick) return r;
+        var zone = pick[0], idx = Number(pick[1]);
+        var targetList = (zone === 'f') ? game.field : (zone === 'e' ? game.enemy : null);
+        var c = targetList ? targetList[idx] : null;
+        if (c && (c.faceDown || c.faceDownSet103)) {
+          var body = document.getElementById('cardInfoBody');
+          var grid = body && body.querySelector('.infoGrid');
+          if (grid) {
+            var s = document.createElement('span'); s.textContent = 'Posición';
+            var b = document.createElement('b'); b.className = 'infoSet103';
+            b.textContent = c._concealed ? 'DEFENSA BOCA ABAJO (Espadas de Luz Ocultadora)' : 'SET · DEFENSA BOCA ABAJO';
+            grid.append(s, b);
+          }
+        }
+      } catch(_) {}
+      return r;
+    };
+    try { updateCardInfo = window.updateCardInfo; } catch(_) {}
+  }
+
+  // Hook window.stHTML: display active turn badge on continuous spells in backrow
+  var prevStHTMLConceal = window.stHTML;
+  if (typeof prevStHTMLConceal === 'function') {
+    window.stHTML = function(c, zone, i) {
+      if (c && !c.set && zone !== 'h') {
+        var tLeft = c.turnsLeft != null ? c.turnsLeft : c.turns109;
+        if (tLeft != null) {
+          var res = prevStHTMLConceal.apply(this, arguments);
+          return res.replace('<div style="font-size:10px"></div>', '<div style="font-size:10px; color:#4df; font-weight:bold;">ACTIVA · ' + tLeft + 'T</div>');
+        }
+      }
+      return prevStHTMLConceal.apply(this, arguments);
+    };
+    try { stHTML = window.stHTML; } catch(_) {}
+  }
 
   // Hook autoPlayerTrapAtEnemyBP60 as backup trap trigger
   var prevAutoBP60 = window.autoPlayerTrapAtEnemyBP60;
@@ -9520,110 +10676,160 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       align-items: center !important;
     }
 
-    /* Panel de Información de Cartas - Ampliado, legible y nítido */
-    #cardInfoPanel, .cardInfoPanel {
-      width: 250px !important;
-      min-width: 230px !important;
-      min-height: 180px !important;
-      background: rgba(14, 11, 7, 0.95) !important;
-      border: 2px solid #d4af37 !important;
-      border-radius: 10px !important;
-      padding: 12px !important;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.15) !important;
-      z-index: 100 !important;
+    /* Panel de Información de Cartas - Solo en Escritorio Grande Horizontal */
+    @media (min-width: 769px) and (min-height: 601px) and (orientation: landscape) {
+      #cardInfoPanel, .cardInfoPanel {
+        width: 250px !important;
+        min-width: 230px !important;
+        min-height: 180px !important;
+        background: rgba(14, 11, 7, 0.95) !important;
+        border: 2px solid #d4af37 !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.15) !important;
+        z-index: 100 !important;
+      }
+
+      .cardInfoTitle {
+        font-size: 16px !important;
+        font-weight: bold !important;
+        color: #ffd700 !important;
+        letter-spacing: 2px !important;
+        border-bottom: 1.5px solid #d4af37 !important;
+        padding-bottom: 6px !important;
+        margin-bottom: 8px !important;
+        text-shadow: 1px 1px 2px #000 !important;
+        text-align: center !important;
+      }
+
+      .cardInfoBody, #cardInfoBody {
+        font-size: 14px !important;
+        line-height: 1.45 !important;
+        color: #f0f0f0 !important;
+      }
+
+      .infoName {
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        color: #ffffff !important;
+        margin-bottom: 4px !important;
+        text-shadow: 1px 1px 2px #000 !important;
+      }
+
+      .infoStars {
+        font-size: 14px !important;
+        color: #ffd700 !important;
+        margin-bottom: 6px !important;
+      }
+
+      .infoGrid {
+        font-size: 13.5px !important;
+        gap: 5px 10px !important;
+        display: grid !important;
+        grid-template-columns: auto 1fr !important;
+      }
+
+      .infoGrid span {
+        color: #aaa !important;
+        font-weight: normal !important;
+      }
+
+      .infoGrid b {
+        color: #fff !important;
+        font-weight: bold !important;
+      }
+
+      .infoAtk {
+        color: #ff5252 !important;
+        font-size: 15px !important;
+        font-weight: 900 !important;
+      }
+
+      .infoDef {
+        color: #4da6ff !important;
+        font-size: 15px !important;
+        font-weight: 900 !important;
+      }
     }
 
-    .cardInfoTitle {
-      font-size: 16px !important;
-      font-weight: bold !important;
-      color: #ffd700 !important;
-      letter-spacing: 2px !important;
-      border-bottom: 1.5px solid #d4af37 !important;
-      padding-bottom: 6px !important;
-      margin-bottom: 8px !important;
-      text-shadow: 1px 1px 2px #000 !important;
-      text-align: center !important;
-    }
-
-    .cardInfoBody, #cardInfoBody {
-      font-size: 14px !important;
-      line-height: 1.45 !important;
-      color: #f0f0f0 !important;
-    }
-
-    .infoName {
-      font-size: 16px !important;
-      font-weight: 900 !important;
-      color: #ffffff !important;
-      margin-bottom: 4px !important;
-      text-shadow: 1px 1px 2px #000 !important;
-    }
-
-    .infoStars {
-      font-size: 14px !important;
-      color: #ffd700 !important;
-      margin-bottom: 6px !important;
-    }
-
-    .infoGrid {
-      font-size: 13.5px !important;
-      gap: 5px 10px !important;
-      display: grid !important;
-      grid-template-columns: auto 1fr !important;
-    }
-
-    .infoGrid span {
-      color: #aaa !important;
-      font-weight: normal !important;
-    }
-
-    .infoGrid b {
-      color: #fff !important;
-      font-weight: bold !important;
-    }
-
-    .infoAtk {
-      color: #ff5252 !important;
-      font-size: 15px !important;
-      font-weight: 900 !important;
-    }
-
-    .infoDef {
-      color: #4da6ff !important;
-      font-size: 15px !important;
-      font-weight: 900 !important;
-    }
-
-    /* Defense Position on Field: card rotates horizontally with clear blue border */
+    /* Defense Position on Field: card rotates horizontally with clear blue border & defense shield */
     body.view-field #player .fieldMonster.defense,
     body.view-field #enemy .fieldMonster.defense,
     .fieldMonster.defense {
-      transform: rotate(90deg) scale(0.9) !important;
-      border-color: #5bb2e8 !important;
+      transform: rotate(90deg) scale(0.86) !important;
+      transform-origin: center center !important;
+      border: 2.5px solid #29b6f6 !important;
+      box-shadow: 0 0 14px rgba(41, 182, 246, 0.85), inset 0 0 10px rgba(41, 182, 246, 0.35) !important;
+      background: linear-gradient(135deg, #071526, #0e294b) !important;
+      position: relative !important;
+    }
+
+    body.view-field #player .fieldMonster.defense::after,
+    body.view-field #enemy .fieldMonster.defense::after,
+    .fieldMonster.defense::after {
+      content: '🛡️ DEFENSA' !important;
+      position: absolute !important;
+      top: 2px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      background: linear-gradient(90deg, #0d47a1, #1976d2) !important;
+      color: #ffffff !important;
+      font-size: 8px !important;
+      font-weight: 900 !important;
+      padding: 1px 5px !important;
+      border-radius: 4px !important;
+      border: 1px solid #64b5f6 !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.85) !important;
+      z-index: 15 !important;
+      letter-spacing: 0.5px !important;
+      pointer-events: none !important;
+      white-space: nowrap !important;
     }
 
     body.view-field #player .fieldMonster.defense:hover,
     body.view-field #enemy .fieldMonster.defense:hover,
     .fieldMonster.defense:hover {
-      transform: rotate(90deg) scale(0.96) !important;
+      transform: rotate(90deg) scale(0.92) !important;
     }
 
     body.view-field #player .fieldMonster.defense.selected,
     body.view-field #enemy .fieldMonster.defense.selected,
     .fieldMonster.defense.selected {
-      transform: rotate(90deg) scale(0.98) !important;
+      transform: rotate(90deg) scale(0.92) !important;
       outline: 2.5px solid #f4d35e !important;
-      box-shadow: 0 0 14px rgba(244, 211, 94, 0.75) !important;
+      box-shadow: 0 0 16px rgba(244, 211, 94, 0.85), inset 0 0 10px rgba(41, 182, 246, 0.5) !important;
     }
 
     body.view-field #player .fieldMonster.defense .fieldStats,
     body.view-field #enemy .fieldMonster.defense .fieldStats,
     .fieldMonster.defense .fieldStats {
-      border-top-color: #2b5570 !important;
+      border-top: 1.5px solid #29b6f6 !important;
+      background: rgba(6, 20, 38, 0.92) !important;
     }
 
-    /* Responsive adjustments for mobile */
-    @media (max-width: 650px) {
+    body.view-field #player .fieldMonster.defense .fieldStats .def,
+    body.view-field #enemy .fieldMonster.defense .fieldStats .def,
+    .fieldMonster.defense .fieldStats .def {
+      color: #4fc3f7 !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 8px rgba(79, 195, 247, 0.95) !important;
+      font-size: 1.1em !important;
+    }
+
+    body.view-field #player .fieldMonster.defense .fieldStats .atk,
+    body.view-field #enemy .fieldMonster.defense .fieldStats .atk,
+    .fieldMonster.defense .fieldStats .atk {
+      opacity: 0.45 !important;
+    }
+
+    /* Prevent clipping on defense zones */
+    body.view-field .zone:has(.fieldMonster.defense) {
+      overflow: visible !important;
+      z-index: 8 !important;
+    }
+
+    /* Responsive adjustments for mobile and portrait */
+    @media (max-width: 768px), (orientation: portrait) {
       body.view-hand #hand {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
         gap: 8px !important;
@@ -9676,9 +10882,82 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       .fieldStats .def {
         font-size: 11px !important;
       }
+      body.view-field #cardInfoPanel,
+      body.view-field .cardInfoPanel,
+      body.mobile-portrait #cardInfoPanel,
+      body.mobile-portrait .cardInfoPanel,
       #cardInfoPanel, .cardInfoPanel {
-        width: 95vw !important;
-        max-width: 95vw !important;
+        min-height: unset !important;
+        min-width: unset !important;
+        width: auto !important;
+        max-width: min(440px, calc(100vw - 16px)) !important;
+        max-height: 58px !important;
+        height: auto !important;
+        padding: 4px 8px !important;
+        border-radius: 8px !important;
+        border: 1.5px solid #d4af37 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.85) !important;
+        overflow-y: auto !important;
+        position: fixed !important;
+        top: auto !important;
+        bottom: 4px !important;
+        left: 8px !important;
+        right: 8px !important;
+        transform: none !important;
+        margin: 0 auto !important;
+        z-index: 9999 !important;
+        background: rgba(14, 11, 7, 0.94) !important;
+        box-sizing: border-box !important;
+      }
+
+      #cardInfoPanel.empty-info,
+      .cardInfoPanel.empty-info,
+      #cardInfoPanel:has(.mutedInfo),
+      .cardInfoPanel:has(.mutedInfo),
+      body.has-no-selection #cardInfoPanel,
+      body.has-no-selection .cardInfoPanel,
+      body.no-card-selected #cardInfoPanel,
+      body.no-card-selected .cardInfoPanel,
+      body.mobile-bar-active #cardInfoPanel,
+      body.mobile-bar-active .cardInfoPanel {
+        display: none !important;
+      }
+      .cardInfoTitle {
+        font-size: 9px !important;
+        letter-spacing: 1px !important;
+        padding-bottom: 2px !important;
+        margin-bottom: 2px !important;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.4) !important;
+        text-align: left !important;
+      }
+      .cardInfoBody, #cardInfoBody {
+        font-size: 10px !important;
+        line-height: 1.25 !important;
+      }
+      .infoName {
+        font-size: 11px !important;
+        margin-bottom: 1px !important;
+        display: inline-block !important;
+      }
+      .infoStars {
+        font-size: 9px !important;
+        margin-bottom: 1px !important;
+        display: inline-block !important;
+        margin-left: 6px !important;
+      }
+      .infoGrid {
+        font-size: 10px !important;
+        gap: 2px 8px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+      }
+      .infoAtk {
+        font-size: 10.5px !important;
+      }
+      .infoDef {
+        font-size: 10.5px !important;
       }
     }
   `;

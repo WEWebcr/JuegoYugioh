@@ -43,7 +43,7 @@ try {
     console.log('[2/7] Enlazando manifiesto y generando R.java...');
     const unalignedResApk = path.join(BUILD_DIR, 'unaligned_resources.apk');
     const manifestPath = path.join(ANDROID_DIR, 'AndroidManifest.xml');
-    execSync(`"${AAPT2}" link -I "${ANDROID_JAR}" --manifest "${manifestPath}" "${compiledResZip}" --java "${GEN_DIR}" -o "${unalignedResApk}" --auto-add-overlay`, { stdio: 'inherit' });
+    execSync(`"${AAPT2}" link -I "${ANDROID_JAR}" --manifest "${manifestPath}" --min-sdk-version 24 --target-sdk-version 34 "${compiledResZip}" --java "${GEN_DIR}" -o "${unalignedResApk}" --auto-add-overlay`, { stdio: 'inherit' });
 
     // 3. JAVAC
     console.log('[3/7] Compilando código Java con OpenJDK 21...');
@@ -55,7 +55,7 @@ try {
     console.log('[4/7] Convirtiendo bytecode a Android DEX con d8...');
     const fmrDir = path.join(CLASSES_DIR, 'com', 'yugioh', 'fmr');
     const classFiles = fs.readdirSync(fmrDir).filter(f => f.endsWith('.class')).map(f => path.join(fmrDir, f));
-    execSync(`"${D8}" --lib "${ANDROID_JAR}" --output "${DEX_DIR}" ${classFiles.map(c => `"${c}"`).join(' ')}`, { stdio: 'inherit' });
+    execSync(`"${D8}" --min-api 24 --lib "${ANDROID_JAR}" --output "${DEX_DIR}" ${classFiles.map(c => `"${c}"`).join(' ')}`, { stdio: 'inherit' });
 
     // 5. PACKAGING DEX INTO APK
     console.log('[5/7] Empaquetando classes.dex dentro del APK...');

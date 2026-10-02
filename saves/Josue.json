@@ -4,14 +4,27 @@
   "passwordHash": "69a6b100074bc1e3c319a6c533277fdb873c9a44d896accc5c42230b4ce3b3ce",
   "schema": 1,
   "world": 1,
-  "pm": 2300,
+  "pm": 3825,
   "unlocked": [
-    "tristan"
+    "tristan",
+    "weevil",
+    "mai",
+    "mako",
+    "joey"
   ],
   "cleared": [
-    "tristan"
+    "tristan",
+    "weevil",
+    "mai",
+    "mako",
+    "joey"
   ],
-  "wins": {},
+  "wins": {
+    "weevil": 1,
+    "mai": 1,
+    "mako": 1,
+    "joey": 1
+  },
   "losses": {},
   "collection": {
     "Celtic Guardian": 2,
@@ -34,19 +47,20 @@
     "Dust Tornado": 2,
     "Sakuretsu Armor": 2,
     "Renace al Monstruo": 1,
-    "Negate Attack": 1
+    "Negate Attack": 1,
+    "Flying Kamakiri #1": 1,
+    "Birdface": 1,
+    "Swords of Concealing Light": 1,
+    "Cyber-Tech Alligator": 1
   },
   "deck": [
     "Celtic Guardian",
     "Celtic Guardian",
     "Beaver Warrior",
-    "Beaver Warrior",
     "Battle Ox",
     "Battle Ox",
     "Mystical Elf",
     "Mystical Elf",
-    "Feral Imp",
-    "Feral Imp",
     "Winged Dragon, Guardian of the Fortress #1",
     "Winged Dragon, Guardian of the Fortress #1",
     "Petit Dragon",
@@ -57,8 +71,6 @@
     "Giant Soldier of Stone",
     "Man-Eater Bug",
     "Man-Eater Bug",
-    "Silver Fang",
-    "Silver Fang",
     "Flame Manipulator",
     "Flame Manipulator",
     "Black Pendant",
@@ -76,13 +88,25 @@
     "Sakuretsu Armor",
     "Sakuretsu Armor",
     "Renace al Monstruo",
-    "Negate Attack"
+    "Negate Attack",
+    "Flying Kamakiri #1",
+    "Birdface",
+    "Silver Fang",
+    "Swords of Concealing Light",
+    "Cyber-Tech Alligator"
   ],
   "legendary": {},
   "pity": {},
-  "fusions": [],
+  "fusions": [
+    "Sword Arm of Dragon",
+    "Ushi Oni",
+    "Flame Cerebrus",
+    "Nekogal #2",
+    "Thousand Dragon",
+    "Crimson Sunbird"
+  ],
   "createdAt": 1790869321027,
-  "lastPlayed": 1790910762232,
+  "lastPlayed": 1790948272542,
   "rewardsHistory": [
     {
       "type": "DP",
@@ -118,13 +142,10 @@
       "Celtic Guardian",
       "Celtic Guardian",
       "Beaver Warrior",
-      "Beaver Warrior",
       "Battle Ox",
       "Battle Ox",
       "Mystical Elf",
       "Mystical Elf",
-      "Feral Imp",
-      "Feral Imp",
       "Winged Dragon, Guardian of the Fortress #1",
       "Winged Dragon, Guardian of the Fortress #1",
       "Petit Dragon",
@@ -135,8 +156,6 @@
       "Giant Soldier of Stone",
       "Man-Eater Bug",
       "Man-Eater Bug",
-      "Silver Fang",
-      "Silver Fang",
       "Flame Manipulator",
       "Flame Manipulator",
       "Black Pendant",
@@ -154,12 +173,16 @@
       "Sakuretsu Armor",
       "Sakuretsu Armor",
       "Renace al Monstruo",
-      "Negate Attack"
+      "Negate Attack",
+      "Flying Kamakiri #1",
+      "Birdface",
+      "Silver Fang",
+      "Swords of Concealing Light",
+      "Cyber-Tech Alligator"
     ]
   },
   "activeDeck": "Deck-Inicial",
   "extra": [],
-  "fusions": [],
   "trialEndsAt": 1793461321027,
   "subscriptionHistory": [
     {
@@ -173,5 +196,16 @@
   ],
   "subscriptionEndsAt": 1806462241953,
   "subscriptionPlan": "vip_6m",
-  "subscriptionStatus": "active"
+  "subscriptionStatus": "active",
+  "subscription": {
+    "isActive": true,
+    "status": "vip_6m",
+    "isTrial": false,
+    "trialEndsAt": 1793461321027,
+    "subscriptionEndsAt": 1806462241953,
+    "effectiveExpiresAt": 1806462241953,
+    "remainingMs": 15515086714,
+    "remainingDays": 180,
+    "plan": "vip_6m"
+  }
 }

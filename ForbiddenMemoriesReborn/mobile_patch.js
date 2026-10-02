@@ -329,10 +329,75 @@
     }
 
     /* Ajustes responsivos para teléfono en landscape (horizontal) */
-    @media (orientation: landscape) and (max-height: 540px) {
-      .wrap {
-        padding: 2px !important;
+    @media (orientation: landscape) and (max-height: 560px) {
+      .wrap,
+      body.view-field .wrap,
+      body.mobile-landscape .wrap {
+        padding: 0 4px !important;
         max-width: 100vw !important;
+        margin: 0 auto !important;
+        zoom: 0.74 !important;
+      }
+      /* Barra de LP Sticky y destacada que nunca se corta ni desaparece */
+      body.view-field #duelTopHeader,
+      body.mobile-landscape #duelTopHeader,
+      #duelTopHeader,
+      .top {
+        position: sticky !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        z-index: 1000 !important;
+        padding: max(4px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 4px max(12px, env(safe-area-inset-left)) !important;
+        background: linear-gradient(180deg, rgba(20, 14, 8, 0.98) 0%, rgba(10, 7, 4, 0.95) 100%) !important;
+        border-bottom: 1.5px solid #d4af37 !important;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.85) !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin: 0 0 3px 0 !important;
+        box-sizing: border-box !important;
+      }
+      #duelTopHeader .mode,
+      body.view-field #duelTopHeader .mode,
+      body.mobile-landscape #duelTopHeader .mode {
+        display: none !important;
+      }
+      #duelTopHeader b,
+      body.view-field #duelTopHeader b,
+      body.mobile-landscape #duelTopHeader b {
+        font-size: 13px !important;
+        color: #ffd700 !important;
+        letter-spacing: 0.5px !important;
+        text-shadow: 1px 1px 2px #000 !important;
+      }
+      #duelTopHeader .lp,
+      body.view-field #duelTopHeader .lp,
+      body.mobile-landscape #duelTopHeader .lp,
+      .lp {
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        padding: 2px 10px !important;
+        border-radius: 6px !important;
+        background: rgba(0, 0, 0, 0.65) !important;
+        border: 1px solid rgba(212, 175, 55, 0.5) !important;
+        color: #fff !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        white-space: nowrap !important;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.9) !important;
+      }
+      #plp {
+        color: #4df !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
+      }
+      #elp {
+        color: #ff5252 !important;
+        font-size: 18px !important;
+        font-weight: 900 !important;
       }
       .board {
         padding: 4px !important;
@@ -370,6 +435,135 @@
         padding: 4px 6px !important;
         font-size: 11px !important;
       }
+      #fmr-mobile-floating-hud {
+        top: auto !important;
+        bottom: 8px !important;
+        right: 8px !important;
+      }
+    }
+
+    /* Cuadro de Información Compacto en Modo Vertical / Portrait */
+    @media (orientation: portrait), (max-width: 768px) {
+      body.view-field #cardInfoPanel,
+      body.view-field .cardInfoPanel,
+      body.mobile-portrait #cardInfoPanel,
+      body.mobile-portrait .cardInfoPanel,
+      #cardInfoPanel,
+      .cardInfoPanel {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 4px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: auto !important;
+        max-width: min(440px, calc(100vw - 16px)) !important;
+        min-width: unset !important;
+        min-height: unset !important;
+        max-height: 58px !important;
+        height: auto !important;
+        padding: 4px 8px !important;
+        border-radius: 8px !important;
+        border: 1.5px solid #d4af37 !important;
+        background: rgba(14, 11, 7, 0.94) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.85) !important;
+        z-index: 9999 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        transform: none !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+      }
+      .cardInfoTitle {
+        font-size: 9px !important;
+        letter-spacing: 1px !important;
+        padding-bottom: 2px !important;
+        margin-bottom: 2px !important;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.4) !important;
+        text-align: left !important;
+        color: #ffd700 !important;
+      }
+      .cardInfoBody,
+      #cardInfoBody {
+        font-size: 10px !important;
+        line-height: 1.25 !important;
+        color: #eee !important;
+      }
+      .infoName {
+        font-size: 11px !important;
+        font-weight: 900 !important;
+        margin-bottom: 1px !important;
+        color: #fff !important;
+        display: inline-block !important;
+      }
+      .infoStars {
+        font-size: 9px !important;
+        margin-bottom: 1px !important;
+        color: #ffd700 !important;
+        display: inline-block !important;
+        margin-left: 6px !important;
+      }
+      .infoGrid {
+        font-size: 10px !important;
+        gap: 2px 8px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        margin-top: 1px !important;
+      }
+      .infoAtk {
+        color: #ff5252 !important;
+        font-size: 10.5px !important;
+        font-weight: 900 !important;
+      }
+      .infoDef {
+        color: #4da6ff !important;
+        font-size: 10.5px !important;
+        font-weight: 900 !important;
+      }
+      .m-card-modal-content {
+        width: min(320px, 88vw) !important;
+        max-height: 72vh !important;
+        padding: 12px 14px !important;
+      }
+      .m-card-modal-title {
+        font-size: 15px !important;
+      }
+      .m-card-modal-art {
+        flex: 0 0 75px !important;
+        height: 105px !important;
+      }
+      .m-card-modal-desc {
+        font-size: 10.5px !important;
+        padding: 6px !important;
+      }
+
+      /* Ocultar cuadro de información cuando esté vacío o la barra de acción esté activa */
+      #cardInfoPanel.empty-info,
+      .cardInfoPanel.empty-info,
+      #cardInfoPanel:has(.mutedInfo),
+      .cardInfoPanel:has(.mutedInfo),
+      body.has-no-selection #cardInfoPanel,
+      body.has-no-selection .cardInfoPanel,
+      body.no-card-selected #cardInfoPanel,
+      body.no-card-selected .cardInfoPanel,
+      body.mobile-bar-active #cardInfoPanel,
+      body.mobile-bar-active .cardInfoPanel {
+        display: none !important;
+      }
+    }
+
+    body.mobile-portrait #cardInfoPanel.empty-info,
+    body.mobile-portrait .cardInfoPanel.empty-info,
+    body.mobile-portrait #cardInfoPanel:has(.mutedInfo),
+    body.mobile-portrait .cardInfoPanel:has(.mutedInfo),
+    body.mobile-portrait.has-no-selection #cardInfoPanel,
+    body.mobile-portrait.has-no-selection .cardInfoPanel,
+    body.mobile-portrait.no-card-selected #cardInfoPanel,
+    body.mobile-portrait.no-card-selected .cardInfoPanel,
+    body.mobile-bar-active #cardInfoPanel,
+    body.mobile-bar-active .cardInfoPanel {
+      display: none !important;
     }
   `;
   document.head.appendChild(mStyle);
@@ -388,6 +582,8 @@
 
   // 2. Detección de Orientación
   let portraitPromptDismissed = false;
+  try { portraitPromptDismissed = (localStorage.getItem('FMR_PORTRAIT_DISMISSED') === '1'); } catch(_) {}
+
   function updateOrientation() {
     window.isMobileDevice = checkIsMobile();
     const isPortrait = window.innerHeight > window.innerWidth;
@@ -407,12 +603,43 @@
     }
 
     handlePortraitPrompt(isPortrait);
+    updateCardInfoVisibility();
   }
 
-  // 3. Aviso Retro PS1 de Giro de Pantalla
+  // 2.1 Visibilidad Inteligente del Panel de Información
+  function updateCardInfoVisibility() {
+    const panel = document.getElementById('cardInfoPanel');
+    const body = document.getElementById('cardInfoBody');
+    if (!panel) return;
+    const isPortrait = (window.innerHeight > window.innerWidth) || document.body.classList.contains('mobile-portrait');
+    const hasCardSelected = window.game && window.game.selected && window.game.selected.length > 0;
+    const isMuted = !hasCardSelected || (body && (body.querySelector('.mutedInfo') || (body.textContent && body.textContent.includes('Selecciona un'))));
+
+    if (isMuted) {
+      panel.classList.add('empty-info');
+      document.body.classList.add('no-card-selected');
+    } else {
+      panel.classList.remove('empty-info');
+      document.body.classList.remove('no-card-selected');
+    }
+
+    if (isPortrait) {
+      if (isMuted || document.body.classList.contains('mobile-bar-active')) {
+        panel.style.setProperty('display', 'none', 'important');
+      } else {
+        panel.style.removeProperty('display');
+      }
+    } else {
+      panel.style.removeProperty('display');
+    }
+  }
+  window.updateCardInfoVisibility = updateCardInfoVisibility;
+
+  // 3. Aviso Retro PS1 de Giro de Pantalla (Solo en combate si el usuario lo desea, nunca en tiendas ni menús)
   function handlePortraitPrompt(isPortrait) {
     let promptEl = document.getElementById('fmr-mobile-portrait-prompt');
-    if (!window.isMobileDevice || !isPortrait || portraitPromptDismissed) {
+    let isMenuOrShop = !!(document.getElementById('custom-shop-menu') || document.getElementById('custom-shop-dashboard') || document.getElementById('map-container-overlay') || document.getElementById('deck-editor-modern-overlay'));
+    if (!window.isMobileDevice || !isPortrait || portraitPromptDismissed || isMenuOrShop) {
       if (promptEl) promptEl.style.display = 'none';
       return;
     }
@@ -439,6 +666,7 @@
       const disBtn = document.getElementById('m-btn-dismiss');
       if (disBtn) disBtn.addEventListener('click', () => {
         portraitPromptDismissed = true;
+        try { localStorage.setItem('FMR_PORTRAIT_DISMISSED', '1'); } catch(_) {}
         promptEl.style.display = 'none';
       });
     }
@@ -468,6 +696,13 @@
 
   // 5. Botón Flotante de Pantalla Completa y Enlace APK
   function injectMobileFloatingControls() {
+    const isAPK = (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('YuGiOhFMR-AndroidApp'));
+    if (isAPK) {
+      document.body.classList.add('is-apk-app');
+      const existing = document.getElementById('fmr-mobile-floating-hud');
+      if (existing) existing.remove();
+      return;
+    }
     if (document.getElementById('fmr-mobile-floating-hud')) return;
 
     const hud = document.createElement('div');
@@ -495,7 +730,10 @@
     const g = window.game;
     if (!g || !g.selected || g.selected.length === 0) {
       bar.classList.remove('active');
+      document.body.classList.remove('mobile-bar-active');
+      document.body.classList.add('has-no-selection');
       bar.innerHTML = '';
+      updateCardInfoVisibility();
       return;
     }
 
@@ -513,8 +751,15 @@
       card = g.field[idx];
     }
 
-    if (!card) {
+    function closeActionBar() {
       bar.classList.remove('active');
+      document.body.classList.remove('mobile-bar-active');
+      document.body.classList.add('has-no-selection');
+      updateCardInfoVisibility();
+    }
+
+    if (!card) {
+      closeActionBar();
       bar.innerHTML = '';
       return;
     }
@@ -539,8 +784,14 @@
         buttonsHtml += '<button class="m-act-btn m-act-trap" id="m-btn-trap-set">🛡 COLOCAR SET</button>';
       }
     } else if (isPlayerField) {
-      buttonsHtml += '<button class="m-act-btn m-act-atk" id="m-btn-field-atk">⚔ ATACAR</button>';
-      buttonsHtml += '<button class="m-act-btn m-act-pos" id="m-btn-field-pos">🔄 CAMBIAR POS</button>';
+      const isSet = !!(cObj.faceDown || cObj.faceDownSet103);
+      if (isSet) {
+        buttonsHtml += '<button class="m-act-btn m-act-atk" id="m-btn-field-pos">⚡ VOLTEO ATK</button>';
+      } else {
+        buttonsHtml += '<button class="m-act-btn m-act-atk" id="m-btn-field-atk">⚔ ATACAR</button>';
+        const nextPos = (cObj.pos === 'DEF' ? 'ATAQUE' : 'DEFENSA');
+        buttonsHtml += '<button class="m-act-btn m-act-pos" id="m-btn-field-pos">🔄 A ' + nextPos + '</button>';
+      }
     }
 
     buttonsHtml += '<button class="m-act-btn m-act-info" id="m-btn-details">👁 DETALLES</button>';
@@ -556,43 +807,46 @@
       <div class="m-bar-buttons">${buttonsHtml}</div>
     `;
     bar.classList.add('active');
+    document.body.classList.remove('has-no-selection');
+    document.body.classList.add('mobile-bar-active');
+    updateCardInfoVisibility();
 
     const btnAtk = document.getElementById('m-btn-summon-atk');
     if (btnAtk) btnAtk.onclick = () => {
       if (typeof window.normalSummon === 'function') window.normalSummon();
-      bar.classList.remove('active');
+      closeActionBar();
     };
 
     const btnSet = document.getElementById('m-btn-summon-set') || document.getElementById('m-btn-trap-set') || document.getElementById('m-btn-spell-set');
     if (btnSet) btnSet.onclick = () => {
       if (typeof window.setCard === 'function') window.setCard();
       else if (typeof window.normalSummon === 'function') window.normalSummon();
-      bar.classList.remove('active');
+      closeActionBar();
     };
 
     const btnSpellAct = document.getElementById('m-btn-spell-act');
     if (btnSpellAct) btnSpellAct.onclick = () => {
       if (typeof window.activateSpell === 'function') window.activateSpell(idx);
       else if (typeof window.normalSummon === 'function') window.normalSummon();
-      bar.classList.remove('active');
+      closeActionBar();
     };
 
     const btnFuse = document.getElementById('m-btn-fuse');
     if (btnFuse) btnFuse.onclick = () => {
       if (typeof window.fuse === 'function') window.fuse();
-      bar.classList.remove('active');
+      closeActionBar();
     };
 
     const btnFieldAtk = document.getElementById('m-btn-field-atk');
     if (btnFieldAtk) btnFieldAtk.onclick = () => {
       if (typeof window.attack === 'function') window.attack();
-      bar.classList.remove('active');
+      closeActionBar();
     };
 
     const btnFieldPos = document.getElementById('m-btn-field-pos');
     if (btnFieldPos) btnFieldPos.onclick = () => {
       if (typeof window.changePosition === 'function') window.changePosition();
-      bar.classList.remove('active');
+      closeActionBar();
     };
 
     const btnDetails = document.getElementById('m-btn-details');
@@ -604,7 +858,7 @@
     if (btnCancel) btnCancel.onclick = () => {
       if (window.game) window.game.selected = [];
       if (typeof window.render === 'function') window.render();
-      bar.classList.remove('active');
+      closeActionBar();
     };
   }
 
@@ -658,15 +912,28 @@
   }
   window.showMobileCardDetailsModal = showMobileCardDetailsModal;
 
-  // 8. Integración con el Render Loop
+  // 8. Integración con el Render Loop y Panel de Información
   function attachMobileRenderHook() {
     const origRender = window.render;
     if (typeof origRender === 'function' && !window.__origRenderHooked) {
       window.__origRenderHooked = true;
       window.render = function() {
-        origRender.apply(this, arguments);
+        const res = origRender.apply(this, arguments);
         try { updateMobileActionBar(); } catch (_) {}
+        try { updateCardInfoVisibility(); } catch (_) {}
+        return res;
       };
+    }
+
+    const origUpdateCardInfo = window.updateCardInfo;
+    if (typeof origUpdateCardInfo === 'function' && !window.__origUpdateCardInfoHooked) {
+      window.__origUpdateCardInfoHooked = true;
+      window.updateCardInfo = function() {
+        const res = origUpdateCardInfo.apply(this, arguments);
+        try { updateCardInfoVisibility(); } catch (_) {}
+        return res;
+      };
+      try { updateCardInfo = window.updateCardInfo; } catch (_) {}
     }
   }
 
