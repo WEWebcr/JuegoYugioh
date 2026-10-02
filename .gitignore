@@ -38,3 +38,8 @@ saves/*
 Thumbs.db
 .vscode/
 .idea/
+
+# Android build outputs
+android/build/
+android/*.keystore
+*.idsig

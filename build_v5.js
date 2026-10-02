@@ -141,9 +141,15 @@ try {
 }
 
 let patch = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/clean_map_patch.js', 'utf8');
+let mobilePatch = '';
+try {
+    mobilePatch = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/mobile_patch.js', 'utf8');
+} catch(e) {
+    console.log('mobile_patch.js not found');
+}
 
 // 5. Append patch cleanly at end of HTML
-let outHtml = html + '\n<script>\nwindow.CUSTOM_LOCAL_IMAGES = ' + JSON.stringify(customImages) + ';\nwindow.CARD_MAPPINGS = ' + JSON.stringify(mappings) + ';\nwindow.CARDS_DATA = ' + JSON.stringify(cardsData) + ';\nwindow.CHARACTER_DECKS = ' + JSON.stringify(characterDecks) + ';\n</script>\n<script>\n' + patch + '\n</script>\n';
+let outHtml = html + '\n<script>\nwindow.CUSTOM_LOCAL_IMAGES = ' + JSON.stringify(customImages) + ';\nwindow.CARD_MAPPINGS = ' + JSON.stringify(mappings) + ';\nwindow.CARDS_DATA = ' + JSON.stringify(cardsData) + ';\nwindow.CHARACTER_DECKS = ' + JSON.stringify(characterDecks) + ';\n</script>\n<script>\n' + patch + '\n</script>\n<script>\n' + mobilePatch + '\n</script>\n';
 
 fs.writeFileSync('C:/Deploy/proyectoygo/YGOFMR2026-1.html', outHtml);
 console.log('Build V6 successful! Output size: ' + outHtml.length + ' bytes');

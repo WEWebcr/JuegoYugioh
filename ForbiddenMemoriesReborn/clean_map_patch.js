@@ -1643,6 +1643,7 @@ window.customShowMain = function() {
             </div>
             <div id="login-msg" style="color:#ff5555; font-size:15px; min-height:18px; text-align:center;"></div>
             <button id="btn-login" style="width:100%; padding:14px; background:#006600; color:#fff; border:2px solid #00ff00; font-family:inherit; cursor:pointer; font-size:18px; font-weight:bold;">INICIAR SESIÓN</button>
+            <a href="/download/app.apk" download style="display:block; text-align:center; text-decoration:none; padding:10px; background:#1b3a1d; color:#a3f7a3; border:1.5px solid #5cd65c; border-radius:6px; font-size:16px; font-weight:bold; letter-spacing:1px;">📲 DESCARGAR APK ANDROID</a>
             <button id="btn-login-close" style="width:100%; padding:12px; background:#660000; color:#fff; border:2px solid #ff0000; font-family:inherit; cursor:pointer; font-size:16px;">CANCELAR</button>`;
         overlay.appendChild(box); document.body.appendChild(overlay);
         
