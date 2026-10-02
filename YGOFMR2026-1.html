@@ -9790,6 +9790,171 @@ if (!document.getElementById('anim-styles')) {
     document.head.appendChild(st);
 }
 
+// Sistema de Suscripción (1 mes de prueba, $10 por 6 meses con SINPE Móvil)
+window.showSubscriptionPurchaseModal = function(isBlocked = false, userObj = null, subObj = null) {
+    let existing = document.getElementById('custom-subscription-modal');
+    if (existing) existing.remove();
+
+    let userName = (userObj && userObj.name) || window.activeAccount || localStorage.getItem('FMR_ACTIVE_ACCOUNT') || 'Duelista';
+    let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+    let sStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
+    let s = sStr ? JSON.parse(sStr) : null;
+    
+    let sub = subObj || (s && s.subscription) || {
+        isActive: true,
+        status: 'trial',
+        remainingDays: 30,
+        remainingMs: 30 * 24 * 60 * 60 * 1000,
+        trialEndsAt: Date.now() + 30 * 24 * 60 * 60 * 1000
+    };
+
+    let overlay = document.createElement('div');
+    overlay.id = 'custom-subscription-modal';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(4, 5, 10, 0.95); backdrop-filter:blur(6px); z-index:999999999; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; font-family:"Segoe UI", Arial, sans-serif; overflow-y:auto;';
+
+    let card = document.createElement('div');
+    card.style.cssText = 'background: linear-gradient(145deg, #151824 0%, #0d0e17 100%); border: 3px solid #ffd700; border-radius: 12px; width: 100%; max-width: 620px; padding: 28px; box-shadow: 0 0 35px rgba(255, 215, 0, 0.35); position: relative; color: #fff; box-sizing: border-box; text-align: center;';
+
+    // WhatsApp URL with prefilled text
+    let waText = encodeURIComponent(`Hola Josue, adjunto comprobante de pago por SINPE Móvil de $10 USD para la suscripción de 6 meses de mi cuenta de duelista: ${userName}`);
+    let waUrl = `https://wa.me/50657035886?text=${waText}`;
+
+    card.innerHTML = `
+        ${!isBlocked ? '<button id="btn-close-sub-modal" style="position:absolute; top:16px; right:18px; background:none; border:none; color:#ffd700; font-size:24px; cursor:pointer; font-weight:bold;">✕</button>' : ''}
+        
+        <div style="font-size:38px; margin-bottom:4px;">⭐</div>
+        <div style="font-family:VT323, monospace; color:#ffd700; font-size:32px; letter-spacing:2px; text-shadow:2px 2px 0 #000;">
+            ${isBlocked ? '⚠️ ACCESO SUSPENDIDO · RENOVACIÓN VIP' : 'SUSCRIPCIÓN DE JUEGO (6 MESES) - $10 USD'}
+        </div>
+        
+        <div style="color:#aaa; font-size:14px; margin-top:8px; line-height:1.4;">
+            ${isBlocked 
+                ? `<b style="color:#ff6b6b;">Tu período de prueba o suscripción ha vencido.</b><br>Tus progresos, cartas y decks están <b>100% seguros y respaldados</b>. Para continuar jugando y participando en duelos, adquiere la suscripción por 6 meses.`
+                : `Todos los usuarios reciben <b>1 mes de prueba gratuita</b>. Para continuar jugando y disfrutando del catálogo completo de cartas, duelos y torneos, suscríbete por <b>6 meses completos por solo $10 USD</b>.`
+            }
+        </div>
+
+        <!-- RELOJ CONTADOR EN TIEMPO REAL -->
+        <div style="margin:16px 0; background:#1e1a0f; border:1.5px solid #d4af37; border-radius:8px; padding:12px; display:flex; align-items:center; justify-content:center; gap:10px;">
+            <span style="font-size:20px;">⏱️</span>
+            <div>
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#aaa;">Estado de tu Cuenta (${userName})</div>
+                <div id="sub-countdown-text" style="font-family:VT323, monospace; font-size:22px; font-weight:bold; color:${sub.isActive ? '#55ff55' : '#ff4d4d'};">
+                    ${sub.isActive 
+                        ? (sub.status === 'vip_6m' ? `⭐ VIP ACTIVO · ${sub.remainingDays} Días Restantes` : `⏳ PRUEBA ACTIVA · ${sub.remainingDays} Días Restantes`) 
+                        : '⚠️ SUSCRIPCIÓN EXPIRADA'
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- DATOS DE PAGO SINPE MOVIL -->
+        <div style="background:#111420; border:2px dashed #ffd700; border-radius:8px; padding:16px; margin-bottom:16px; text-align:left;">
+            <div style="color:#ffd700; font-weight:bold; font-size:15px; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <span>📱</span> DATOS PARA PAGO POR SINPE MÓVIL:
+            </div>
+            <div style="display:grid; grid-template-columns:1fr; gap:6px; font-size:14px;">
+                <div>• <b>Número de Teléfono:</b> <span style="color:#64b5f6; font-size:17px; font-weight:bold; letter-spacing:1px;">5703-5886</span></div>
+                <div>• <b>Titular de la Cuenta:</b> <span style="color:#81c784; font-weight:bold; font-size:16px;">Josue Avalos</span></div>
+                <div>• <b>Monto:</b> <span style="color:#ffd700; font-weight:bold; font-size:16px;">$10 USD</span> <span style="color:#aaa; font-size:12px;">(o ~5,000 Colones)</span></div>
+                <div>• <b>Duración:</b> <span style="color:#fff;">6 Meses de Acceso Ilimitado</span></div>
+                <div>• <b>Tiempo de Activación:</b> <span style="color:#ffcc00; font-weight:bold;">¡Menos de 1 hora!</span></div>
+            </div>
+        </div>
+
+        <!-- BOTÓN WHATSAPP -->
+        <a href="${waUrl}" target="_blank" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(180deg, #25d366 0%, #128c7e 100%); color:#fff; font-weight:bold; font-size:16px; padding:12px 20px; border-radius:8px; margin-bottom:14px; box-shadow:0 4px 15px rgba(37,211,102,0.4); font-family:VT323, monospace; letter-spacing:1px; cursor:pointer;">
+            <span style="font-size:20px;">💬</span> ENVIAR COMPROBANTE POR WHATSAPP (+506 5703-5886)
+        </a>
+
+        <!-- FORMULARIO DE NOTIFICACION POR CORREO -->
+        <div style="background:#161a29; border:1px solid #334466; border-radius:8px; padding:12px; margin-bottom:14px; text-align:left;">
+            <div style="font-size:12px; color:#aaa; margin-bottom:6px;">
+                ¿Ya realizaste el SINPE? Envía una alerta automática a <b>joavce@hotmail.com</b> para agilizar la activación:
+            </div>
+            <div style="display:flex; gap:8px;">
+                <input id="sub-notify-phone" type="text" placeholder="Tu número de teléfono o referencia..." style="flex:1; background:#0b0d14; border:1px solid #445577; color:#fff; padding:8px 10px; border-radius:4px; font-size:13px;">
+                <button id="btn-sub-notify" style="background:#1976d2; color:#fff; border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:13px; white-space:nowrap;">
+                    📨 NOTIFICAR AHORA
+                </button>
+            </div>
+            <div id="sub-notify-msg" style="font-size:12px; margin-top:6px; display:none;"></div>
+        </div>
+
+        <!-- BOTÓN DE VERIFICACIÓN / REINTENTO -->
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button id="btn-verify-sub" style="background:linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; border:2px solid #fff; padding:10px 24px; border-radius:6px; cursor:pointer; font-weight:900; font-family:VT323, monospace; font-size:18px; letter-spacing:1px; box-shadow:0 4px 12px rgba(0,0,0,0.6);">
+                🔄 YA PAGUÉ: VERIFICAR Y ENTRAR AL JUEGO
+            </button>
+        </div>
+    `;
+
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+
+    if (!isBlocked) {
+        let closeBtn = card.querySelector('#btn-close-sub-modal');
+        if (closeBtn) closeBtn.onclick = () => overlay.remove();
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    }
+
+    // Handler: Notificar por correo
+    let btnNotify = card.querySelector('#btn-sub-notify');
+    let notifyMsg = card.querySelector('#sub-notify-msg');
+    btnNotify.onclick = async () => {
+        let phoneInput = card.querySelector('#sub-notify-phone').value.trim();
+        btnNotify.disabled = true;
+        btnNotify.textContent = 'Enviando...';
+        try {
+            let res = await fetch('/api/subscription/notify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: userName, phone: phoneInput, reference: 'SINPE Móvil $10' })
+            });
+            let d = await res.json();
+            if (d.ok) {
+                notifyMsg.style.display = 'block';
+                notifyMsg.style.color = '#7ee787';
+                notifyMsg.textContent = '✅ Notificación enviada a Josue Avalos (joavce@hotmail.com). Tu cuenta será activada en breve.';
+            } else {
+                notifyMsg.style.display = 'block';
+                notifyMsg.style.color = '#ff6b6b';
+                notifyMsg.textContent = 'Error: ' + (d.error || 'No se pudo enviar la alerta');
+            }
+        } catch(e) {
+            notifyMsg.style.display = 'block';
+            notifyMsg.style.color = '#ff6b6b';
+            notifyMsg.textContent = 'Error de conexión con el servidor.';
+        }
+        btnNotify.disabled = false;
+        btnNotify.textContent = '📨 NOTIFICAR AHORA';
+    };
+
+    // Handler: Verificar y entrar
+    let btnVerify = card.querySelector('#btn-verify-sub');
+    btnVerify.onclick = async () => {
+        btnVerify.disabled = true;
+        btnVerify.textContent = 'Comprobando...';
+        try {
+            let res = await fetch('/api/subscription/status/' + encodeURIComponent(userName));
+            let d = await res.json();
+            if (d.ok && d.subscription && d.subscription.isActive) {
+                alert(`¡Excelente, ${userName}!\n\nTu suscripción está ACTIVA (${d.subscription.remainingDays} días restantes).\n¡Bienvenido al juego!`);
+                overlay.remove();
+                let loginOverlay = document.getElementById('account-modal-overlay');
+                if (loginOverlay) loginOverlay.remove();
+                if (window.customShowMap) window.customShowMap();
+            } else {
+                alert(`Aún no se ha registrado la activación para ${userName}.\n\nSi ya enviaste el comprobante de SINPE Móvil al 5703-5886, el administrador activará tu cuenta en menos de 1 hora.`);
+            }
+        } catch(e) {
+            alert('Error de conexión al verificar el estado.');
+        }
+        btnVerify.disabled = false;
+        btnVerify.textContent = '🔄 YA PAGUÉ: VERIFICAR Y ENTRAR AL JUEGO';
+    };
+};
+
 // Dialog renderer
 window.renderCustomStoryDialog = function(lines, index, onFinish, btnText) {
     if (index === 0) window.playCustomMusic('dialogos.mp3');
@@ -10235,6 +10400,18 @@ window.customShowMain = function() {
                 });
                 let data = await res.json();
                 if (!res.ok || data.error) {
+                    if (data && data.subscriptionExpired) {
+                        msg.style.color = '#ff5555';
+                        msg.textContent = 'Tu período de prueba o suscripción ha finalizado.';
+                        setTimeout(() => {
+                            if (window.showSubscriptionPurchaseModal) {
+                                window.showSubscriptionPurchaseModal(true, data.user || { name: name }, data.subscription);
+                            } else {
+                                alert('⚠️ Tu suscripción ha finalizado.\nPor favor realiza el pago de $10 vía SINPE Móvil al 5703-5886 a nombre de Josue Avalos.');
+                            }
+                        }, 300);
+                        return;
+                    }
                     msg.style.color = '#ff5555';
                     msg.textContent = data.error || 'Usuario o clave incorrecta.';
                     return;
@@ -10706,6 +10883,26 @@ window.customShowMap = function() {
     milenioBadge.style.cssText = 'background:#382200; border:1.5px solid #ffd700; border-radius:6px; padding:4px 12px; color:#ffd700; font-family:VT323, monospace; font-size:16px; font-weight:bold; box-shadow:0 0 10px rgba(255,215,0,0.3);';
     milenioBadge.textContent = `✨ MILENIO: ${unlockedCount} / 7`;
     actionsWrap.appendChild(milenioBadge);
+
+    // Suscripción Countdown Pill
+    let subBadge = document.createElement('div');
+    subBadge.id = 'map-subscription-pill';
+    let subInfo = (s && s.subscription) || { isActive: true, status: 'trial', remainingDays: 30 };
+    let isVip = subInfo.status === 'vip_6m';
+    let subColor = isVip ? '#ffd700' : (subInfo.isActive ? '#7ee787' : '#ff4d4d');
+    let subBorder = isVip ? '#ffd700' : (subInfo.isActive ? '#2e7d32' : '#d32f2f');
+    let subText = isVip ? `⭐ VIP: ${subInfo.remainingDays}d` : (subInfo.isActive ? `⏳ PRUEBA: ${subInfo.remainingDays}d` : `⚠️ EXPIRADA`);
+    
+    subBadge.style.cssText = `background:#151824; border:1.5px solid ${subBorder}; border-radius:6px; padding:4px 10px; color:${subColor}; font-family:VT323, monospace; font-size:15px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:4px; box-shadow:0 0 10px rgba(0,0,0,0.6); transition:transform 0.15s;`;
+    subBadge.title = 'Haz clic para consultar o adquirir tu suscripción de 6 meses ($10 USD)';
+    subBadge.textContent = subText;
+    subBadge.onmouseover = () => { subBadge.style.transform = 'scale(1.05)'; };
+    subBadge.onmouseout = () => { subBadge.style.transform = 'scale(1)'; };
+    subBadge.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        if (window.showSubscriptionPurchaseModal) window.showSubscriptionPurchaseModal(false, { name: window.activeAccount }, subInfo);
+    };
+    actionsWrap.appendChild(subBadge);
     
     // Botón Tienda
     let btnShop = document.createElement('button');
@@ -11544,6 +11741,9 @@ window.customShowShop = function() {
             <div style="color:#aaa; font-size:12px;">Cartas de élite para ayudarte a vencer a los rivales más desafiantes</div>
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
+            <button id="btn-shop-subscription" style="background:linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; border:2px solid #fff; padding:7px 16px; border-radius:6px; cursor:pointer; font-weight:900; font-family:VT323, monospace; font-size:16px; box-shadow:0 0 10px rgba(255,215,0,0.4); display:flex; align-items:center; gap:6px;">
+                <span>⭐</span><span>SUSCRIPCIÓN (6 MESES) · $10</span>
+            </button>
             <div id="shop-pm-balance" style="background:#2b2200; border:2px solid #ffd700; color:#ffd700; padding:8px 16px; border-radius:6px; font-weight:bold; font-size:16px; text-shadow:1px 1px 0 #000;">
                 💰 ${s.pm || 0} PM
             </div>
@@ -11554,6 +11754,14 @@ window.customShowShop = function() {
         </div>
     `;
     rightSide.appendChild(header);
+
+    let btnSub = header.querySelector('#btn-shop-subscription');
+    if (btnSub) {
+        btnSub.onclick = () => {
+            if (window.playViolinClick) window.playViolinClick();
+            if (window.showSubscriptionPurchaseModal) window.showSubscriptionPurchaseModal(false);
+        };
+    }
     
     let filterBar = document.createElement('div');
     filterBar.style.cssText = 'display:flex; gap:10px; margin-bottom: 12px; align-items:center;';
@@ -12124,6 +12332,15 @@ window.openCustomShopMenu = function() {
             action: () => {
                 overlay.remove();
                 window.customShowShop();
+            } 
+        },
+        { 
+            icon: '⭐', 
+            label: 'SUSCRIPCIÓN VIP (6 MESES)', 
+            desc: 'Renueva o amplía tu acceso completo al juego por 6 meses ($10 USD).',
+            speech: '¡Mantén tu acceso ilimitado a duelos, torneos y la tienda completa! Suscríbete por 6 meses vía SINPE Móvil al 5703-5886.',
+            action: () => {
+                if (window.showSubscriptionPurchaseModal) window.showSubscriptionPurchaseModal(false);
             } 
         },
         { 

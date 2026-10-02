@@ -89,6 +89,78 @@ function findSaveByEmailOrName(identifier) {
   return null;
 }
 
+// ── Control de Suscripciones (1 mes de prueba, $10 por 6 meses) ──
+const TRIAL_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
+const VIP_6M_DURATION_MS = 180 * 24 * 60 * 60 * 1000; // 180 dias (~6 meses)
+
+function computeSubscriptionStatus(save) {
+  if (!save) return { isActive: false, status: 'expired', remainingDays: 0, remainingMs: 0 };
+
+  // Cuenta admin siempre activa
+  if (save.name && save.name.toLowerCase() === 'admin') {
+    return {
+      isActive: true,
+      status: 'admin',
+      isTrial: false,
+      trialEndsAt: Date.now() + 3650 * 24 * 60 * 60 * 1000,
+      subscriptionEndsAt: Date.now() + 3650 * 24 * 60 * 60 * 1000,
+      remainingMs: 3650 * 24 * 60 * 60 * 1000,
+      remainingDays: 3650,
+      plan: 'admin'
+    };
+  }
+
+  const now = Date.now();
+
+  // Asegurar trialEndsAt (30 dias de prueba)
+  if (!save.trialEndsAt) {
+    if (save.createdAt && (now - save.createdAt) < TRIAL_DURATION_MS) {
+      save.trialEndsAt = save.createdAt + TRIAL_DURATION_MS;
+    } else {
+      save.trialEndsAt = now + TRIAL_DURATION_MS;
+    }
+  }
+
+  const trialEnds = Number(save.trialEndsAt) || 0;
+  const subEnds = Number(save.subscriptionEndsAt) || 0;
+
+  const isSubActive = subEnds > now;
+  const isTrialActive = trialEnds > now;
+  const isActive = isSubActive || isTrialActive;
+
+  let status = 'expired';
+  let effectiveExpiresAt = trialEnds;
+  let isTrial = false;
+
+  if (isSubActive) {
+    status = 'vip_6m';
+    effectiveExpiresAt = subEnds;
+    isTrial = false;
+  } else if (isTrialActive) {
+    status = 'trial';
+    effectiveExpiresAt = trialEnds;
+    isTrial = true;
+  } else {
+    status = 'expired';
+    effectiveExpiresAt = Math.max(trialEnds, subEnds);
+  }
+
+  const remainingMs = Math.max(0, effectiveExpiresAt - now);
+  const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
+
+  return {
+    isActive,
+    status,
+    isTrial,
+    trialEndsAt: trialEnds,
+    subscriptionEndsAt: subEnds > 0 ? subEnds : null,
+    effectiveExpiresAt,
+    remainingMs,
+    remainingDays,
+    plan: status
+  };
+}
+
 // ── Archivos estaticos ──────────────────────────────────────────
 app.use('/imagenescartas',     express.static(path.join(ROOT, 'imagenescartas')));
 app.use('/ImagenesPersonajes', express.static(path.join(ROOT, 'ImagenesPersonajes')));
@@ -151,6 +223,11 @@ app.post('/api/register', async (req, res) => {
     legendary:    {},
     pity:         {},
     fusions:      [],
+    trialEndsAt:        Date.now() + TRIAL_DURATION_MS,
+    subscriptionEndsAt: null,
+    subscriptionPlan:   'trial',
+    subscriptionStatus: 'active',
+    subscriptionHistory: [{ type: 'trial', date: Date.now(), days: 30 }],
     createdAt:    Date.now(),
     lastPlayed:   Date.now()
   };
@@ -168,10 +245,11 @@ app.post('/api/register', async (req, res) => {
           <div style="background:#0d1117; color:#c9d1d9; font-family:'Segoe UI',Arial,sans-serif; padding:25px; border:2px solid #e4c06b; border-radius:10px; max-width:600px; margin:auto;">
             <h1 style="color:#ffd700; text-align:center; font-size:24px; margin-top:0;">YU-GI-OH! FORBIDDEN MEMORIES REBORN</h1>
             <p style="font-size:16px;">¡Hola, Duelista <b>${name}</b>!</p>
-            <p>Tu cuenta ha sido creada exitosamente. Este correo electrónico está vinculado a tu partida para recuperar tu contraseña en caso de olvido.</p>
+            <p>Tu cuenta ha sido creada exitosamente. Tienes <b>1 mes de prueba gratuita (30 días)</b> para disfrutar de todos los duelos y la tienda de cartas.</p>
             <div style="background:#161b22; border:1px solid #30363d; padding:15px; border-radius:6px; margin:20px 0;">
               <p style="margin:5px 0;"><b>Nombre de Duelista:</b> <span style="color:#58a6ff;">${name}</span></p>
               <p style="margin:5px 0;"><b>Correo Vinculado:</b> <span style="color:#7ee787;">${cleanEmail}</span></p>
+              <p style="margin:5px 0;"><b>Período de Prueba:</b> <span style="color:#ffd700;">30 Días Activo</span></p>
             </div>
             <p style="color:#8b949e; font-size:13px; text-align:center; margin-top:30px; border-top:1px solid #21262d; padding-top:15px;">
               ¡Que comiencen los duelos!
@@ -181,7 +259,9 @@ app.post('/api/register', async (req, res) => {
       }).catch(err => console.error('[Mailer] Error bienvenida:', err.message));
     } catch (_) {}
 
+    const subStatus = computeSubscriptionStatus(save);
     const { passwordHash, resetCode, resetCodeExpires, ...publicSave } = save;
+    publicSave.subscription = subStatus;
     res.json({ ok: true, save: publicSave });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -196,10 +276,22 @@ app.post('/api/login', (req, res) => {
   if (!save) return res.status(404).json({ error: 'Cuenta no encontrada. Verifica el nombre o correo.' });
   if (save.passwordHash !== hashPassword(password)) return res.status(401).json({ error: 'Clave incorrecta' });
 
+  const subStatus = computeSubscriptionStatus(save);
   save.lastPlayed = Date.now();
   writeSave(save);
 
+  if (!subStatus.isActive) {
+    return res.status(403).json({
+      ok: false,
+      subscriptionExpired: true,
+      error: 'Tu período de prueba o suscripción ha finalizado.',
+      subscription: subStatus,
+      user: { name: save.name, email: save.email }
+    });
+  }
+
   const { passwordHash, resetCode, resetCodeExpires, ...publicSave } = save;
+  publicSave.subscription = subStatus;
   res.json({ ok: true, save: publicSave });
 });
 
@@ -324,10 +416,79 @@ app.post('/api/save', (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Cuenta no encontrada. Registrate primero.' });
   if (existing.passwordHash !== hashPassword(password)) return res.status(401).json({ error: 'Clave incorrecta' });
 
+  const subStatus = computeSubscriptionStatus(existing);
+  if (!subStatus.isActive) {
+    return res.status(403).json({
+      error: 'Tu suscripción ha finalizado. Por favor adquiere la suscripción de 6 meses para continuar jugando.',
+      subscriptionExpired: true,
+      subscription: subStatus
+    });
+  }
+
   // Mantener passwordHash existente, actualizar el resto
   const updated = { ...existing, ...data, name, passwordHash: existing.passwordHash, lastPlayed: Date.now() };
-  try { writeSave(updated); res.json({ ok: true }); }
+  try { writeSave(updated); res.json({ ok: true, subscription: subStatus }); }
   catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// Consultar estado de suscripción de un usuario  GET /api/subscription/status/:name
+app.get('/api/subscription/status/:name', (req, res) => {
+  const save = readSave(req.params.name);
+  if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
+  const status = computeSubscriptionStatus(save);
+  res.json({ ok: true, name: save.name, subscription: status });
+});
+
+// Notificación de comprobante de pago SINPE Móvil  POST /api/subscription/notify-payment
+app.post('/api/subscription/notify-payment', async (req, res) => {
+  const { name, phone, reference, notes } = req.body || {};
+  if (!name) return res.status(400).json({ error: 'Nombre de usuario requerido' });
+
+  const save = readSave(name);
+  const userEmail = (save && save.email) ? save.email : 'No especificado';
+  const nowStr = new Date().toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' });
+
+  try {
+    // Enviar correo a joavce@hotmail.com
+    await mailer.sendMail({
+      from: '"Yu-Gi-Oh! Reborn Suscripciones" <joavce@mantixor.com>',
+      to: 'joavce@hotmail.com',
+      subject: `🔔 Nueva Solicitud de Suscripción ($10) - Duelista: ${name}`,
+      html: `
+        <div style="background:#0d1117; color:#c9d1d9; font-family:'Segoe UI',Arial,sans-serif; padding:30px; border:2px solid #ffd700; border-radius:10px; max-width:650px; margin:auto;">
+          <h1 style="color:#ffd700; text-align:center; font-size:22px; margin-top:0;">
+            ⭐ SOLICITUD DE SUSCRIPCIÓN (6 MESES) - $10 USD
+          </h1>
+          <p style="font-size:16px;">Hola <b>Josue</b>:</p>
+          <p>El duelista <b>${name}</b> ha enviado una solicitud de activación de suscripción de 6 meses por SINPE Móvil.</p>
+          
+          <div style="background:#161b22; border:1px solid #30363d; padding:20px; border-radius:8px; margin:20px 0;">
+            <p style="margin:8px 0;"><b>Duelista:</b> <span style="color:#58a6ff; font-size:17px; font-weight:bold;">${name}</span></p>
+            <p style="margin:8px 0;"><b>Correo del Jugador:</b> <span style="color:#7ee787;">${userEmail}</span></p>
+            <p style="margin:8px 0;"><b>Teléfono WhatsApp:</b> <span style="color:#ffd700;">${phone || 'No especificado'}</span></p>
+            <p style="margin:8px 0;"><b>Comprobante / Referencia:</b> <span>${reference || 'Enviado por WhatsApp'}</span></p>
+            <p style="margin:8px 0;"><b>Notas:</b> <span>${notes || 'Sin notas adicionales'}</span></p>
+            <p style="margin:8px 0;"><b>Fecha / Hora:</b> <span>${nowStr}</span></p>
+          </div>
+
+          <div style="text-align:center; margin:30px 0;">
+            <a href="https://juegoyugioh.onrender.com/admin" style="background:linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; text-decoration:none; padding:12px 28px; border-radius:6px; font-weight:bold; font-size:15px; display:inline-block;">
+              IR AL PANEL DE USUARIOS PARA ACTIVAR (+6 MESES)
+            </a>
+          </div>
+
+          <p style="color:#8b949e; font-size:12px; text-align:center; border-top:1px solid #21262d; padding-top:15px;">
+            Servidor Yu-Gi-Oh! Forbidden Memories Reborn · Notificación Automática de Pagos
+          </p>
+        </div>
+      `
+    });
+
+    res.json({ ok: true, message: 'Notificación enviada a Josue Avalos exitosamente.' });
+  } catch (err) {
+    console.error('[Subscription Notify Error]', err);
+    res.status(500).json({ error: 'Error al enviar la notificación: ' + err.message });
+  }
 });
 
 // Cargar partida  GET /api/load/:name  (sin contrasena, solo datos publicos del juego)
@@ -490,6 +651,8 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
           Object.values(d.collection).forEach(v => collectionCardsTotal += (parseInt(v) || 0));
         }
 
+        const sub = computeSubscriptionStatus(d);
+
         return {
           name: d.name,
           email: d.email || 'Sin correo',
@@ -505,7 +668,12 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
           createdAt: d.createdAt || null,
           lastPlayed: lastPlayedMs,
           isActive24h: diffHours <= 24,
-          file: f
+          file: f,
+          trialEndsAt: sub.trialEndsAt,
+          subscriptionEndsAt: sub.subscriptionEndsAt,
+          isSubscriptionActive: sub.isActive,
+          subscriptionStatus: sub.status,
+          remainingDays: sub.remainingDays
         };
       } catch { return null; }
     }).filter(Boolean);
@@ -630,6 +798,79 @@ app.post('/api/admin/broadcast-reward', requireAdmin, (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Error en regalía masiva: ' + err.message });
   }
+});
+
+// Activar / Modificar Suscripción  POST /api/admin/user/:name/subscription
+app.post('/api/admin/user/:name/subscription', requireAdmin, async (req, res) => {
+  const save = readSave(req.params.name);
+  if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+  const { action, months, customDate, reason } = req.body || {};
+  const numMonths = parseInt(months) || 6;
+  const now = Date.now();
+
+  save.subscriptionHistory = save.subscriptionHistory || [];
+
+  if (action === 'set_date' && customDate) {
+    save.subscriptionEndsAt = new Date(customDate).getTime();
+  } else {
+    // Por defecto 'extend_6m' o meses especificados
+    const durationMs = numMonths * 30 * 24 * 60 * 60 * 1000;
+    const currentBase = Math.max(now, save.subscriptionEndsAt || 0);
+    save.subscriptionEndsAt = currentBase + durationMs;
+  }
+
+  save.subscriptionPlan = 'vip_6m';
+  save.subscriptionStatus = 'active';
+
+  save.subscriptionHistory.push({
+    type: 'vip_extension',
+    months: numMonths,
+    grantedAt: now,
+    expiresAt: save.subscriptionEndsAt,
+    reason: reason || 'Activación / Renovación de Suscripción 6 Meses ($10)',
+    grantedBy: req.adminUser || 'admin'
+  });
+
+  writeSave(save);
+
+  const newStatus = computeSubscriptionStatus(save);
+
+  // Opcional: Notificar por correo al jugador si tiene correo vinculado
+  if (save.email && isValidEmail(save.email)) {
+    try {
+      const expDateStr = new Date(save.subscriptionEndsAt).toLocaleDateString('es-CR');
+      mailer.sendMail({
+        from: '"Yu-Gi-Oh! Forbidden Memories Reborn" <joavce@mantixor.com>',
+        to: save.email,
+        subject: '⭐ ¡Tu Suscripción VIP ha sido activada! - Yu-Gi-Oh! FMR',
+        html: `
+          <div style="background:#0d1117; color:#c9d1d9; font-family:'Segoe UI',Arial,sans-serif; padding:30px; border:2px solid #ffd700; border-radius:10px; max-width:600px; margin:auto;">
+            <h1 style="color:#ffd700; text-align:center; font-size:24px; margin-top:0;">¡SUSCRIPCIÓN VIP ACTIVADA!</h1>
+            <p style="font-size:16px;">¡Felicidades, Duelista <b>${save.name}</b>!</p>
+            <p>Tu comprobante de pago por SINPE Móvil ha sido verificado y tu suscripción de 6 meses ya se encuentra <b>100% activa</b>.</p>
+            <div style="background:#161b22; border:1px solid #30363d; padding:15px; border-radius:6px; margin:20px 0;">
+              <p style="margin:6px 0;"><b>Plan:</b> <span style="color:#ffd700; font-weight:bold;">VIP 6 Meses ($10 USD)</span></p>
+              <p style="margin:6px 0;"><b>Fecha de Vencimiento:</b> <span style="color:#7ee787; font-weight:bold;">${expDateStr}</span> (${newStatus.remainingDays} días restantes)</p>
+              <p style="margin:6px 0;"><b>Acceso:</b> <span style="color:#58a6ff;">Total (Duelos, Cartas, Baúl, Nube)</span></p>
+            </div>
+            <p>Ya puedes iniciar sesión en el juego y continuar tu progreso normalmente.</p>
+            <p style="color:#8b949e; font-size:12px; text-align:center; margin-top:30px; border-top:1px solid #21262d; padding-top:15px;">
+              ¡Gracias por apoyar a Yu-Gi-Oh! Forbidden Memories Reborn!
+            </p>
+          </div>
+        `
+      }).catch(e => console.error('[Subscription Email Error]', e));
+    } catch (_) {}
+  }
+
+  res.json({
+    ok: true,
+    name: save.name,
+    subscriptionEndsAt: save.subscriptionEndsAt,
+    remainingDays: newStatus.remainingDays,
+    status: newStatus
+  });
 });
 
 // ════════════════════════════════════════════════════════════════
