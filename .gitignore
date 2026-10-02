@@ -32,6 +32,8 @@ saves/*
 !saves/.gitkeep
 !saves/Josue.json
 !saves/josue.json
+!saves/Octavio.json
+!saves/octavio.json
 
 # System & IDE files
 .DS_Store

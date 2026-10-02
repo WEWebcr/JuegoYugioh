@@ -181,7 +181,11 @@ function findSaveByEmailOrName(identifier) {
     for (const f of files) {
       try {
         const d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-        if (d && ((d.email && d.email.toLowerCase() === lower) || (d.name && d.name.toLowerCase() === lower))) {
+        if (d && (
+          (d.email && d.email.toLowerCase() === lower) ||
+          (d.name && d.name.toLowerCase() === lower) ||
+          (Array.isArray(d.aliases) && d.aliases.some(a => String(a).toLowerCase() === lower))
+        )) {
           return d;
         }
       } catch (_) {}
@@ -262,8 +266,63 @@ function ensureSeedUsers() {
       fs.writeFileSync(path.join(SAVES_DIR, 'Josue.json'), JSON.stringify(josueSeed, null, 2), 'utf8');
       console.log('[Seed] Cuenta "josue" inyectada exitosamente con suscripción VIP activa.');
     }
+
+    const octavioExisting = findSaveByEmailOrName('octavio') || findSaveByEmailOrName('aplizar') || findSaveByEmailOrName('aplizaroctavio707@gmail.com');
+    if (!octavioExisting) {
+      const octavioSeed = {
+        name: "Octavio",
+        email: "aplizaroctavio707@gmail.com",
+        aliases: ["octavio", "aplizar", "aplizaroctavio", "aplizaroctavio707"],
+        passwordHash: "69a6b100074bc1e3c319a6c533277fdb873c9a44d896accc5c42230b4ce3b3ce", // Clave: 1234
+        schema: 1,
+        world: 1,
+        pm: 3000,
+        unlocked: ["tristan"],
+        cleared: [],
+        wins: {},
+        losses: {},
+        collection: {
+          "Celtic Guardian": 2, "Beaver Warrior": 2, "Battle Ox": 2, "Mystical Elf": 2,
+          "Feral Imp": 2, "Winged Dragon, Guardian of the Fortress #1": 2, "Petit Dragon": 2,
+          "Baby Dragon": 2, "Giant Soldier of Stone": 2, "Man-Eater Bug": 2, "Silver Fang": 2,
+          "Flame Manipulator": 2, "Black Pendant": 2, "Dragon Treasure": 2, "Horn of the Unicorn": 2,
+          "Waboku": 2, "Trap Hole": 2, "Dust Tornado": 2, "Sakuretsu Armor": 2,
+          "Renace al Monstruo": 1, "Negate Attack": 1
+        },
+        deck: [
+          "Celtic Guardian", "Celtic Guardian", "Beaver Warrior", "Beaver Warrior", "Battle Ox", "Battle Ox",
+          "Mystical Elf", "Mystical Elf", "Feral Imp", "Feral Imp", "Winged Dragon, Guardian of the Fortress #1",
+          "Winged Dragon, Guardian of the Fortress #1", "Petit Dragon", "Petit Dragon", "Baby Dragon", "Baby Dragon",
+          "Giant Soldier of Stone", "Giant Soldier of Stone", "Man-Eater Bug", "Man-Eater Bug", "Silver Fang", "Silver Fang",
+          "Flame Manipulator", "Flame Manipulator", "Black Pendant", "Black Pendant", "Dragon Treasure", "Dragon Treasure",
+          "Horn of the Unicorn", "Horn of the Unicorn", "Waboku", "Waboku", "Trap Hole", "Trap Hole", "Dust Tornado",
+          "Dust Tornado", "Sakuretsu Armor", "Sakuretsu Armor", "Renace al Monstruo", "Negate Attack"
+        ],
+        legendary: {},
+        pity: {},
+        fusions: [],
+        createdAt: Date.now(),
+        lastPlayed: Date.now(),
+        trialEndsAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        subscriptionEndsAt: Date.now() + 180 * 24 * 60 * 60 * 1000,
+        subscriptionPlan: "vip_6m",
+        subscriptionStatus: "active",
+        subscriptionHistory: [
+          {
+            type: "vip_extension",
+            months: 6,
+            grantedAt: Date.now(),
+            expiresAt: Date.now() + 180 * 24 * 60 * 60 * 1000,
+            reason: "Beta Tester Octavio (VIP 6 Meses)",
+            grantedBy: "system"
+          }
+        ]
+      };
+      fs.writeFileSync(path.join(SAVES_DIR, 'Octavio.json'), JSON.stringify(octavioSeed, null, 2), 'utf8');
+      console.log('[Seed] Cuenta "Octavio" inyectada exitosamente con suscripción VIP activa.');
+    }
   } catch (err) {
-    console.error('[Seed] Error al inyectar cuenta josue:', err.message);
+    console.error('[Seed] Error al inyectar cuentas iniciales:', err.message);
   }
 }
 ensureSeedUsers();
