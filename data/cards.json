@@ -612,7 +612,7 @@
     "attr": "EARTH",
     "atk": 1800,
     "def": 2000,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusi?n de Curse of Dragon + Baby Dragon.",
     "image": "imagenescartas/Mundo1/054.jpg"
   },
@@ -720,7 +720,7 @@
     "attr": "WATER",
     "atk": 1800,
     "def": 1500,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Dragon + Aqua",
     "image": "imagenescartas/Mundo1/123.jpg"
   },
@@ -852,7 +852,7 @@
     "attr": "DARK",
     "atk": 1800,
     "def": 2000,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Zombie + Plant",
     "image": "imagenescartas/Mundo1/134.jpg"
   },
@@ -1128,7 +1128,7 @@
     "attr": "EARTH",
     "atk": 1400,
     "def": 1300,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Plant + Warrior",
     "image": "imagenescartas/Mundo1/157.jpg"
   },
@@ -1140,7 +1140,7 @@
     "attr": "EARTH",
     "atk": 700,
     "def": 600,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Plant + Pyro",
     "image": "imagenescartas/Mundo1/158.jpg"
   },
@@ -1152,7 +1152,7 @@
     "attr": "EARTH",
     "atk": 900,
     "def": 1000,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Pyro + Rock",
     "image": "imagenescartas/Mundo1/159.jpg"
   },
@@ -1164,7 +1164,7 @@
     "attr": "FIRE",
     "atk": 1300,
     "def": 900,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Pyro + Winged Beast",
     "image": "imagenescartas/Mundo1/160.jpg"
   },
@@ -1200,7 +1200,7 @@
     "attr": "DARK",
     "atk": 2150,
     "def": 1950,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Spellcaster + Rock",
     "image": "imagenescartas/Mundo1/163.jpg"
   },
@@ -1212,7 +1212,7 @@
     "attr": "LIGHT",
     "atk": 1500,
     "def": 1300,
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "desc": "Fusión: Spellcaster + Thunder",
     "image": "imagenescartas/Mundo1/164.jpg"
   },
@@ -1231,7 +1231,7 @@
   {
     "id": 230,
     "name": "Great Moth",
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "type": "Insect",
     "attr": "EARTH",
     "level": 8,
@@ -1609,7 +1609,7 @@
   {
     "id": 257,
     "name": "Perfectly Ultimate Great Moth",
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "type": "Insect",
     "attr": "EARTH",
     "level": 8,
@@ -2001,7 +2001,7 @@
   {
     "id": 285,
     "name": "Harpie's Pet Dragon",
-    "kind": "FUSION",
+    "kind": "MONSTER",
     "type": "Dragon",
     "attr": "WIND",
     "level": 7,

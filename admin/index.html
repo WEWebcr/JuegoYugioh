@@ -401,7 +401,7 @@ textarea{resize:vertical;min-height:60px}
     <label>Buscar Carta</label>
     <input id="giftCardSearch" placeholder="Buscar por nombre..." oninput="filterGiftCards()">
     
-    <label>Seleccionar Carta</label>
+    <label>Seleccionar Carta <span style="font-size:.78rem;color:#70b0ff;font-weight:normal;">(Solo cartas completas jugables)</span></label>
     <select id="giftCardSelect" size="6" style="margin-top:4px;height:140px;"></select>
 
     <label>Cantidad de Copias</label>
@@ -919,7 +919,11 @@ function openGiftCardModal(userName) {
 function filterGiftCards() {
   var q = (document.getElementById('giftCardSearch').value || '').toLowerCase();
   var sel = document.getElementById('giftCardSelect');
-  var list = allCards.filter(function(c) { return !q || c.name.toLowerCase().includes(q); });
+  // Solo cartas completas jugables en mazo/baúl (MONSTER, SPELL, TRAP, EQUIP), excluyendo fusiones
+  var list = allCards.filter(function(c) {
+    if (c.kind === 'FUSION') return false;
+    return !q || c.name.toLowerCase().includes(q);
+  });
   sel.innerHTML = list.slice(0, 100).map(function(c) {
     return '<option value="' + c.name.replace(/"/g, '&quot;') + '">' + c.name + ' (' + c.kind + (c.kind==='MONSTER' ? ' ATK:'+c.atk : '') + ')</option>';
   }).join('');
