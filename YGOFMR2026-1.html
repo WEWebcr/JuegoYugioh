@@ -17137,17 +17137,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var currentEffectiveAtk = typeof effectiveAtk === 'function' ? effectiveAtk(e) : (e.atk || 0);
       var playerMonsters = (game.field || []).filter(Boolean);
 
-      // Si está en defensa pero no hay monstruos del jugador o tiene buen ATK, cambiar a ATAQUE
-      if (e.pos === 'DEF' && e.kind !== 'LINK') {
-        if (playerMonsters.length === 0 || currentEffectiveAtk >= 800) {
-          e.pos = 'ATK';
-          if (typeof log === 'function') log(e.name + ' cambia a posición de ATAQUE.');
-        } else {
-          continue;
-        }
+      // ¡MODO ULTRA AGRESIVO! Todo monstruo del rival cambia a posición de ATAQUE para embestir
+      if (e.pos !== 'ATK' && e.kind !== 'LINK') {
+        e.pos = 'ATK';
+        if (typeof log === 'function') log(e.name + ' cambia a posición de ATAQUE.');
       }
-
-      if (e.pos !== 'ATK' && e.kind !== 'LINK') continue;
 
       // VERIFICACIÓN DE TRAMPAS EN EL PRIMER ATAQUE
       if (!trapTriggeredThisTurn) {
@@ -17197,7 +17191,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           }
         }
 
-        // 2. Waboku
+        // 2. Waboku (Protege daño pero permite a la IA seguir atacando y revelando cartas)
         var wabIdx = (game.playerBack || []).findIndex(function(c) {
           return c && c.set && (c.value === 'WABOKU' || c.name === 'Waboku');
         });
@@ -17208,10 +17202,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           game.grave.push(Object.assign({}, trapW, { set: false, faceUp: true }));
           game._wabokuActiveThisTurn = true;
           game._wabokuActiveTurn = game.turnNo;
-          (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
           if (typeof render === 'function') render();
-          duelToast('¡Waboku activado! No hay daño este turno.');
-          return;
+          duelToast('¡Waboku activado! Tus monstruos y LP están protegidos.');
+          if (typeof log === 'function') log('¡Waboku activado! No habrá daño este turno, pero el rival continúa atacando.');
         }
 
         // 3. Sakuretsu Armor
@@ -17297,32 +17290,53 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         continue;
       }
 
-      // CASO CON MONSTRUOS: BUSCAR MEJOR OBJETIVO
+      // CASO CON MONSTRUOS: SELECCIÓN DE OBJETIVO ULTRA AGRESIVA
       var bestTarget = null;
-      var maxLpDamage = -1;
+      var bestScore = -Infinity;
 
       for (var t = 0; t < remainingPlayerMonsters.length; t++) {
         var targetObj = remainingPlayerMonsters[t];
         var targetCard = targetObj.c;
         var isSet = !!(targetCard.faceDownSet103 || targetCard.faceDown);
+
+        var aiBonus = 0;
+        if (typeof getSignCombatRelation === 'function') {
+          var relCombat = getSignCombatRelation(e, targetCard);
+          if (relCombat === 'adv') aiBonus = 500;
+          else if (relCombat === 'disadv') aiBonus = -500;
+        }
+        var effectiveAttackerPower = currentEffectiveAtk + aiBonus;
+
         var tAtk = typeof effectiveAtk === 'function' ? effectiveAtk(targetCard) : (targetCard.atk || 0);
         var tDef = (targetCard.def || 0) + (targetCard.tempDefense || 0) + (targetCard.tempBoostDef || 0);
 
-        if (!isSet && targetCard.pos === 'ATK') {
-          if (currentEffectiveAtk > tAtk) {
-            var diffDmg = currentEffectiveAtk - tAtk;
-            if (diffDmg > maxLpDamage) {
-              maxLpDamage = diffDmg;
-              bestTarget = targetObj;
-            }
+        var score = 0;
+        if (isSet) {
+          // 1. OBJETIVO PRIORITARIO: Atacar cartas SET para revelarlas y destruirlas de inmediato
+          score = 8000 + (effectiveAttackerPower - 1000);
+        } else if (targetCard.pos === 'ATK') {
+          if (effectiveAttackerPower > tAtk) {
+            // Destruir monstruo en ATAQUE y causar daño directo a los LP
+            score = 10000 + (effectiveAttackerPower - tAtk);
+          } else if (effectiveAttackerPower === tAtk) {
+            // Empate de ataque: ambos destruidos
+            score = 6000;
+          } else {
+            // Monstruo más fuerte: objetivo menos prioritario pero válido si no hay otro
+            score = -1000 - (tAtk - effectiveAttackerPower);
           }
         } else {
-          if (isSet || currentEffectiveAtk > tDef) {
-            if (maxLpDamage < 0) {
-              bestTarget = targetObj;
-              maxLpDamage = 0;
-            }
+          // Monstruo boca arriba en DEFENSA
+          if (effectiveAttackerPower > tDef) {
+            score = 7000 + (effectiveAttackerPower - tDef);
+          } else {
+            score = -2000 - (tDef - effectiveAttackerPower);
           }
+        }
+
+        if (score > bestScore || bestTarget === null) {
+          bestScore = score;
+          bestTarget = targetObj;
         }
       }
 
@@ -17338,7 +17352,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           pCard.faceDownSet103 = false;
           pCard.faceUp = true;
           pCard.pos = 'DEF';
-          if (typeof log === 'function') log('El ataque revela a ' + (pCard.name || 'tu monstruo') + ' en DEFENSA.');
+          if (typeof log === 'function') log('¡El ataque rival revela a ' + (pCard.name || 'tu monstruo') + ' en DEFENSA!');
+          duelToast('¡Monstruo revelado en defensa: ' + (pCard.name || 'Monstruo') + '!');
         }
 
         // Bonificaciones de Signos Guardianes
@@ -17353,18 +17368,26 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         var finalTargetAtk = (typeof effectiveAtk === 'function' ? effectiveAtk(pCard) : (pCard.atk || 0)) + plSignBonus;
         var finalTargetDef = (pCard.def || 0) + (pCard.tempDefense || 0) + (pCard.tempBoostDef || 0) + plSignBonus;
 
+        var isWaboku = !!game._wabokuActiveThisTurn;
+
         if (pCard.pos === 'DEF' && pCard.kind !== 'LINK') {
           if (finalAttackerAtk > finalTargetDef) {
-            game.field[pIdx] = null;
-            game.grave.push(pCard);
-            if (typeof log === 'function') log(e.name + ' (' + finalAttackerAtk + ' ATK) destruye a ' + pCard.name + ' (' + finalTargetDef + ' DEF).');
-            duelToast('¡Rival destruyó a tu ' + pCard.name + '!');
-            if (window.playDestroySound) window.playDestroySound();
+            if (!isWaboku) {
+              game.field[pIdx] = null;
+              game.grave.push(pCard);
+              if (typeof log === 'function') log(e.name + ' (' + finalAttackerAtk + ' ATK) destruye a ' + pCard.name + ' (' + finalTargetDef + ' DEF).');
+              duelToast('¡Rival destruyó a tu ' + pCard.name + '!');
+              if (window.playDestroySound) window.playDestroySound();
+            } else {
+              if (typeof log === 'function') log('Waboku protege a ' + pCard.name + ' de la destrucción.');
+            }
           } else if (finalAttackerAtk < finalTargetDef) {
             var recoil = finalTargetDef - finalAttackerAtk;
-            game.elp = Math.max(0, game.elp - recoil);
-            if (typeof log === 'function') log(e.name + ' no supera la DEF de ' + pCard.name + '. El rival recibe ' + recoil + ' de daño.');
-            if (window.playLPGainSound) window.playLPGainSound();
+            if (!isWaboku) {
+              game.elp = Math.max(0, game.elp - recoil);
+              if (typeof log === 'function') log(e.name + ' no supera la DEF de ' + pCard.name + '. El rival recibe ' + recoil + ' de daño.');
+              if (window.playLPGainSound) window.playLPGainSound();
+            }
           } else {
             if (typeof log === 'function') log('Empate con la DEF de ' + pCard.name + ': nadie es destruido.');
           }
@@ -17372,12 +17395,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           // Objetivo en ATAQUE
           if (finalAttackerAtk > finalTargetAtk) {
             var diff = finalAttackerAtk - finalTargetAtk;
-            game.plp = Math.max(0, game.plp - diff);
-            game.field[pIdx] = null;
-            game.grave.push(pCard);
-            if (typeof log === 'function') log(e.name + ' destruye a ' + pCard.name + '. Recibes ' + diff + ' LP de daño.');
-            duelToast('¡' + e.name + ' destruyó a ' + pCard.name + '! (-' + diff + ' LP)');
-            if (window.playDestroySound) window.playDestroySound();
+            if (!isWaboku) {
+              game.plp = Math.max(0, game.plp - diff);
+              game.field[pIdx] = null;
+              game.grave.push(pCard);
+              if (typeof log === 'function') log(e.name + ' destruye a ' + pCard.name + '. Recibes ' + diff + ' LP de daño.');
+              duelToast('¡' + e.name + ' destruyó a ' + pCard.name + '! (-' + diff + ' LP)');
+              if (window.playDestroySound) window.playDestroySound();
+            } else {
+              if (typeof log === 'function') log('Waboku evita el daño de batalla.');
+            }
           } else if (finalAttackerAtk < finalTargetAtk) {
             var recoilAtk = finalTargetAtk - finalAttackerAtk;
             game.elp = Math.max(0, game.elp - recoilAtk);
@@ -17386,21 +17413,24 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             if (typeof log === 'function') log(e.name + ' es destruido al atacar a ' + pCard.name + '. El rival pierde ' + recoilAtk + ' LP.');
             if (window.playDestroySound) window.playDestroySound();
           } else {
-            game.enemy[ei] = null;
-            game.field[pIdx] = null;
-            game.enemyGrave.push(e);
-            game.grave.push(pCard);
-            if (typeof log === 'function') log('Empate de ATK entre ' + e.name + ' y ' + pCard.name + ': ambos destruidos.');
-            if (window.playDestroySound) window.playDestroySound();
+            if (!isWaboku) {
+              game.enemy[ei] = null;
+              game.field[pIdx] = null;
+              game.enemyGrave.push(e);
+              game.grave.push(pCard);
+              if (typeof log === 'function') log('Empate de ATK entre ' + e.name + ' y ' + pCard.name + ': ambos destruidos.');
+              if (window.playDestroySound) window.playDestroySound();
+            } else {
+              game.enemy[ei] = null;
+              game.enemyGrave.push(e);
+              if (typeof log === 'function') log(e.name + ' es destruido en empate. Waboku protege a ' + pCard.name + '.');
+            }
           }
         }
 
         e.attackedTurn = game.turnNo;
+        if (typeof cleanupOrphanedEquips === 'function') try { cleanupOrphanedEquips(); } catch(_) {}
         if (typeof render === 'function') render();
-      } else {
-        e.pos = 'DEF';
-        if (typeof log === 'function') log(e.name + ' adopta posición de DEFENSA.');
-        e.attackedTurn = game.turnNo;
       }
     }
 
@@ -17560,7 +17590,6 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         game.grave.push(Object.assign({}, trapW, { set: false, faceUp: true }));
         game._wabokuActiveThisTurn = true;
         game._wabokuActiveTurn = game.turnNo;
-        (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
         if (typeof render === 'function') render();
         if (typeof window.showTrap114 === 'function') window.showTrap114('Waboku', 'Tus monstruos y LP están protegidos este turno.');
         duelToast('¡Waboku activado! Tus monstruos y LP están protegidos contra daño de batalla.');
