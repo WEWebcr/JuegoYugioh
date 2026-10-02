@@ -6858,7 +6858,7 @@ body[data-phase106="EP"] #epBtn{
     {name:'Negate Attack',kind:'TRAP',value:'NEGATE_ATTACK',text:'Niega el ataque y termina la Battle Phase rival.'},
     {name:'Sakuretsu Armor',kind:'TRAP',value:'SAKURETSU_ARMOR',text:'Cuando un monstruo rival ataca, destruye al atacante.'},
     {name:'Torrential Tribute',kind:'TRAP',value:'TORRENTIAL',text:'Cuando se invoca un monstruo, destruye todos los monstruos en el Campo.'},
-    {name:'Dust Tornado',kind:'TRAP',value:'DUST_TORNADO',text:'Selecciona y destruye 1 Magia, Trampa o Equipo del rival.'},
+    {name:'Dust Tornado',kind:'TRAP',value:'DUST_TORNADO',text:'Selecciona y destruye 1 Magia o Trampa del rival.'},
     {name:'Cyber Commander',kind:'MONSTER',type:'Machine',attr:'DARK',atk:750,def:700,level:2,faceUp:true,value:'CYBER_COMMANDER',text:'Un soldado cibernético de élite con habilidades avanzadas de combate.',desc:'Un soldado cibernético de élite con habilidades avanzadas de combate.'}
   ];
   const BY_VALUE109=Object.fromEntries(CARDS109.map(c=>[c.value,c]));
@@ -6963,7 +6963,7 @@ body[data-phase106="EP"] #epBtn{
     document.getElementById('card109Modal').classList.remove('hidden');
   }
 
-  function ownerData109(side){return side==='player'?{field:game.field,links:game.linkZones,back:game.playerBack,grave:game.grave,hand:game.hand}:{field:game.enemy,links:game.enemyLinkZones,back:game.enemyBack,grave:game.enemyGrave,hand:game.enemyHand};}
+  function ownerData109(side){return side==='player'?{field:game.field||[],links:game.linkZones||[],back:game.playerBack||[],grave:game.grave||[],hand:game.hand||[]}:{field:game.enemy||[],links:game.enemyLinkZones||[],back:game.enemyBack||[],grave:game.enemyGrave||[],hand:game.enemyHand||[]};}
   function other109(side){return side==='player'?'enemy':'player';}
   function monsterFaceUp109(c){return !!(c&&!c.faceDown&&!c.faceDownSet103);}
   function allFieldMons109(side){
@@ -6974,9 +6974,10 @@ body[data-phase106="EP"] #epBtn{
   }
   function findMonsterToken109(side,token,includeGrave){
     if(!token)return null;const d=ownerData109(side);
-    for(let i=0;i<d.field.length;i++)if(d.field[i]&&d.field[i]._equipToken109===token)return {card:d.field[i],zone:'field',index:i};
-    for(let i=0;i<d.links.length;i++)if(d.links[i]&&d.links[i]._equipToken109===token)return {card:d.links[i],zone:'link',index:i};
-    if(includeGrave)for(let i=d.grave.length-1;i>=0;i--)if(d.grave[i]&&d.grave[i]._equipToken109===token)return {card:d.grave[i],zone:'grave',index:i};
+    const f=d.field||[], l=d.links||[], g=d.grave||[];
+    for(let i=0;i<f.length;i++)if(f[i]&&f[i]._equipToken109===token)return {card:f[i],zone:'field',index:i};
+    for(let i=0;i<l.length;i++)if(l[i]&&l[i]._equipToken109===token)return {card:l[i],zone:'link',index:i};
+    if(includeGrave)for(let i=g.length-1;i>=0;i--)if(g[i]&&g[i]._equipToken109===token)return {card:g[i],zone:'grave',index:i};
     return null;
   }
   function faceUpCount109(side){return allFieldMons109(side).filter(x=>monsterFaceUp109(x.card)).length;}

@@ -7189,8 +7189,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   function isEquipSpell(c) {
     if (!c) return false;
     var name = (c.name || c[0] || '').trim();
-    var val = c.value || '';
+    var val = (c.value || '').toUpperCase();
     var kind = (c.kind || c.type || '').toUpperCase();
+
+    // Las cartas de Trampa y Monstruos NUNCA son equipos
+    if (kind === 'TRAP' || val === 'TRAP' || val.includes('TRAP') || name === 'Dust Tornado' || val === 'DUST_TORNADO') return false;
+    if (kind === 'MONSTER') return false;
+
     if (kind === 'EQUIP' || val === 'EQUIP') return true;
     var equipNames = [
       'Axe of Despair', 'Black Pendant', 'Horn of the Unicorn', 'Dragon Treasure',
@@ -7204,7 +7209,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (equipNames.includes(name)) return true;
     if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON'].includes(val)) return true;
     var desc = (c.text || c.desc || '').toLowerCase();
-    if (desc.includes('equipa') || desc.includes('equip') || desc.includes('monstruo equipado')) return true;
+    if ((desc.includes('equipa a') || desc.includes('monstruo equipado')) && kind !== 'TRAP') return true;
     return false;
   }
   window.isEquipSpell = isEquipSpell;
@@ -7410,9 +7415,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         var freeBackIdx = (g.playerBack || []).findIndex(function(x) { return !x; });
         if (freeBackIdx >= 0) {
           g.playerBack[freeBackIdx] = Object.assign({}, splicedCard, {
+            kind: 'EQUIP',
+            type: 'EQUIP',
             set: false,
             faceUp: true,
             equipToken109: token,
+            _targetMonster: tCard,
             _appliedAtk109: atk,
             _appliedDef109: def
           });
@@ -7423,9 +7431,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         }
       } else if (source && source.type === 'back') {
         if (g.playerBack[source.index]) {
+          g.playerBack[source.index].kind = 'EQUIP';
+          g.playerBack[source.index].type = 'EQUIP';
           g.playerBack[source.index].set = false;
           g.playerBack[source.index].faceUp = true;
           g.playerBack[source.index].equipToken109 = token;
+          g.playerBack[source.index]._targetMonster = tCard;
           g.playerBack[source.index]._appliedAtk109 = atk;
           g.playerBack[source.index]._appliedDef109 = def;
         }
@@ -7474,6 +7485,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!c) return;
     var val = c.value || '';
     var cName = c.name || '';
+    if (c.kind === 'TRAP' || val === 'DUST_TORNADO' || cName === 'Dust Tornado' || (c.type && c.type.toUpperCase() === 'TRAP')) {
+      duelToast(cName + ' es una Trampa: debes colocarla (SET) boca abajo primero.');
+      if (typeof log === 'function') log(cName + ' es una Trampa: primero debes colocarla SET en el campo.');
+      return;
+    }
     if (val === 'REBORN' || cName === 'Renace al Monstruo') {
       resolveMonsterReborn(null, i);
       return;
@@ -7637,8 +7653,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             g.playerBack[i] = null;
             g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
             g.selected = [];
+
+            // Si la carta destruida era un Equipo, despojar los stats del monstruo rival
+            if (targetCard && (targetCard.kind === 'EQUIP' || targetCard.type === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(targetCard)))) {
+              if (typeof stripEquip109 === 'function') try { stripEquip109('enemy', targetCard); } catch(_) {}
+              else if (targetCard._targetMonster) {
+                targetCard._targetMonster.equip = Math.max(0, (targetCard._targetMonster.equip || 0) - (targetCard._appliedAtk109 || 500));
+                targetCard._targetMonster.atk = Math.max(0, (targetCard._targetMonster.atk || 0) - (targetCard._appliedAtk109 || 500));
+              }
+            }
+
+            if (window.playDestroySound) window.playDestroySound();
+            if (typeof cleanupOrphanedEquips === 'function') try { cleanupOrphanedEquips(); } catch(_) {}
             if (typeof render === 'function') render();
-            duelToast('¡Dust Tornado destruyó ' + (targetCard.name || 'la carta rival') + '!');
+            var tName = targetCard.set ? 'la carta SET rival' : (targetCard.name || 'la carta rival');
+            duelToast('¡Dust Tornado destruyó ' + tName + '!');
+            if (typeof log === 'function') log('Dust Tornado destruye ' + tName + ' de la zona de Magia/Trampa.');
           };
           container.appendChild(btn);
         });
@@ -7900,6 +7930,37 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    // A2. IA Activa Dust Tornado si tiene una SET y el jugador tiene cartas en su fila trasera
+    for (var b = 0; b < (game.enemyBack || []).length; b++) {
+      var bCard = game.enemyBack[b];
+      if (bCard && (bCard.value === 'DUST_TORNADO' || bCard.name === 'Dust Tornado')) {
+        var pTargets = (game.playerBack || []).map(function(x, idx) { return x ? { card: x, index: idx } : null; }).filter(Boolean);
+        if (pTargets.length > 0) {
+          game.enemyBack[b] = null;
+          game.enemyGrave.push(Object.assign({}, bCard, { set: false, faceUp: true }));
+          var pTargetObj = pTargets[0];
+          var pCardDestroyed = game.playerBack[pTargetObj.index];
+          game.playerBack[pTargetObj.index] = null;
+          game.grave.push(Object.assign({}, pCardDestroyed, { set: false, faceUp: true }));
+
+          if (pCardDestroyed && (pCardDestroyed.kind === 'EQUIP' || pCardDestroyed.type === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(pCardDestroyed)))) {
+            if (typeof stripEquip109 === 'function') try { stripEquip109('player', pCardDestroyed); } catch(_) {}
+            else if (pCardDestroyed._targetMonster) {
+              pCardDestroyed._targetMonster.equip = Math.max(0, (pCardDestroyed._targetMonster.equip || 0) - (pCardDestroyed._appliedAtk109 || 500));
+            }
+          }
+
+          if (window.playDestroySound) window.playDestroySound();
+          if (typeof cleanupOrphanedEquips === 'function') try { cleanupOrphanedEquips(); } catch(_) {}
+          if (typeof render === 'function') render();
+          var pCardName = pCardDestroyed.set ? 'tu carta SET' : (pCardDestroyed.name || 'tu carta de Magia/Trampa');
+          duelToast('¡El rival activó Dust Tornado y destruyó ' + pCardName + '!');
+          if (typeof log === 'function') log('¡El rival activa Dust Tornado y destruye ' + pCardName + '!');
+          break;
+        }
+      }
+    }
+
     var freeMonsterSlot = (game.enemy || []).findIndex(function(x) { return !x; });
     var fnFusion = typeof window.fusionResult === 'function' ? window.fusionResult : (typeof fusionResult === 'function' ? fusionResult : null);
 
@@ -7989,7 +8050,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     // D. EQUIPAR CARTAS DE MAGIA / EQUIPO
     for (var h = game.enemyHand.length - 1; h >= 0; h--) {
       var eq = game.enemyHand[h];
-      if (eq && (eq.kind === 'EQUIP' || eq.value === 'EQUIP' || (eq.name && (eq.name.includes('Pendant') || eq.name.includes('Treasure') || eq.name.includes('Unicorn'))))) {
+      if (eq && (eq.kind === 'EQUIP' || eq.type === 'EQUIP' || eq.value === 'EQUIP' || isEquipSpell(eq) || (eq.name && (eq.name.includes('Pendant') || eq.name.includes('Treasure') || eq.name.includes('Unicorn'))))) {
         var strongestTarget = null, sAtk = -1;
         (game.enemy || []).forEach(function(mon) {
           if (mon && (mon.atk || 0) > sAtk) {
@@ -7999,15 +8060,33 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         });
         if (strongestTarget) {
           game.enemyHand.splice(h, 1);
+          var token = strongestTarget._equipToken109 || ('EQM109-' + Date.now() + '-' + Math.random());
+          strongestTarget._equipToken109 = token;
           var eqSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
-          if (eqSlot >= 0) game.enemyBack[eqSlot] = Object.assign({}, eq, { set: false, faceUp: true });
-          else game.enemyGrave.push(eq);
-
           var boost = 500;
+          if (eq.name === 'Axe of Despair' || eq.value === 'AXE_DESPAIR') boost = 1000;
+          else if (eq.name === 'Horn of the Unicorn' || eq.value === 'HORN_UNICORN') boost = 700;
+          else if (eq.name === 'United We Stand' || eq.value === 'UNITED_WE_STAND') boost = 800;
+
+          if (eqSlot >= 0) {
+            game.enemyBack[eqSlot] = Object.assign({}, eq, {
+              kind: 'EQUIP',
+              type: 'EQUIP',
+              set: false,
+              faceUp: true,
+              equipToken109: token,
+              _targetMonster: strongestTarget,
+              _appliedAtk109: boost,
+              _appliedDef109: 0
+            });
+          } else {
+            game.enemyGrave.push(eq);
+          }
+
           strongestTarget.atk = (strongestTarget.atk || 0) + boost;
           strongestTarget.equip = (strongestTarget.equip || 0) + boost;
-          if (typeof log === 'function') log('¡El rival activa ' + eq.name + ' y equipa a ' + strongestTarget.name + ' (+500 ATK)!');
-          if (typeof duelToast === 'function') duelToast('¡El rival equipó ' + eq.name + ' (+500 ATK)!');
+          if (typeof log === 'function') log('¡El rival activa ' + eq.name + ' y equipa a ' + strongestTarget.name + ' (+' + boost + ' ATK)!');
+          if (typeof duelToast === 'function') duelToast('¡El rival equipó ' + eq.name + ' (+' + boost + ' ATK)!');
         }
       }
     }
@@ -8707,8 +8786,80 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   }
   window.fixBadChars = fixBadChars;
 
+  // 5c. LIMPIEZA DE EQUIPOS CUANDO EL MONSTRUO DEJA EL CAMPO
+  function cleanupOrphanedEquips() {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return;
+
+    var sides = [
+      { side: 'player', field: g.field, links: g.linkZones, back: g.playerBack, grave: g.grave },
+      { side: 'enemy', field: g.enemy, links: g.enemyLinkZones, back: g.enemyBack, grave: g.enemyGrave }
+    ];
+
+    sides.forEach(function(s) {
+      if (!Array.isArray(s.back) || !Array.isArray(s.grave)) return;
+      var activeFieldMonsters = (s.field || []).concat(s.links || []).filter(Boolean);
+
+      for (var i = 0; i < s.back.length; i++) {
+        var eq = s.back[i];
+        if (!eq) continue;
+
+        // Si la carta está SET boca abajo, aún no ha sido activada/equipada
+        if (eq.set) continue;
+
+        var isEq = (eq.kind === 'EQUIP' || eq.type === 'EQUIP' || eq.value === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(eq)));
+        if (!isEq && !eq.equipToken109 && !eq._targetMonster) continue;
+
+        var hasTargetOnField = false;
+
+        if (eq.equipToken109) {
+          hasTargetOnField = activeFieldMonsters.some(function(m) {
+            return m && m._equipToken109 === eq.equipToken109;
+          });
+        } else if (eq._targetMonster) {
+          hasTargetOnField = activeFieldMonsters.some(function(m) {
+            return m === eq._targetMonster;
+          });
+        }
+
+        if (!hasTargetOnField) {
+          // El monstruo equipado ya no está en el campo: el equipo va al cementerio
+          s.back[i] = null;
+          eq.set = false;
+          eq.faceUp = true;
+          s.grave.push(eq);
+
+          var eqName = eq.name || eq[0] || 'Carta de Equipo';
+          var eqVal = eq.value || '';
+
+          // Efecto de Cementerio de Black Pendant (-500 LP al rival)
+          if (eqVal === 'BLACK_PENDANT' || eqName === 'Black Pendant') {
+            if (s.side === 'player') {
+              g.elp = Math.max(0, Number(g.elp || 0) - 500);
+              if (typeof log === 'function') log('Black Pendant va al Cementerio: el rival pierde 500 LP.');
+            } else {
+              g.plp = Math.max(0, Number(g.plp || 0) - 500);
+              if (typeof log === 'function') log('Black Pendant va al Cementerio: recibes 500 LP de daño.');
+            }
+          }
+
+          if (typeof log === 'function') {
+            log(eqName + ' es destruido y enviado al Cementerio (el monstruo equipado dejó el Campo).');
+          }
+          if (typeof duelToast === 'function') {
+            duelToast(eqName + ' al Cementerio (monstruo equipado destruido)');
+          }
+        }
+      }
+    });
+  }
+  window.cleanupOrphanedEquips = cleanupOrphanedEquips;
+
   var prevRenderMaster = window.render;
   window.render = function() {
+    if (typeof cleanupOrphanedEquips === 'function') {
+      try { cleanupOrphanedEquips(); } catch(_) {}
+    }
     if (typeof game !== 'undefined' && game) {
       if (game.turn === 'player' || (game._wabokuActiveTurn && game.turnNo !== game._wabokuActiveTurn)) {
         game._wabokuActiveThisTurn = false;
