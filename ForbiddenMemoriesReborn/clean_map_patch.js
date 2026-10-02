@@ -141,6 +141,15 @@ localStorage.setItem = function(k, v) {
 
 window.activeAccount = localStorage.getItem('FMR_ACTIVE_ACCOUNT') || null;
 
+window.cleanAllOverlays = function() {
+    document.querySelectorAll('#map-container-overlay').forEach(el => el.remove());
+    document.querySelectorAll('#custom-freeduel-menu').forEach(el => el.remove());
+    document.querySelectorAll('#custom-shop-overlay').forEach(el => el.remove());
+    document.querySelectorAll('#custom-reward-choice-overlay').forEach(el => el.remove());
+    document.querySelectorAll('#custom-dialog-fullscreen').forEach(el => el.remove());
+    document.querySelectorAll('#relic-celebration-modal').forEach(el => el.remove());
+};
+
 window.persistUserSave = function(s) {
     if (!s) return;
     try {
@@ -2253,6 +2262,8 @@ window.CUSTOM_NODES = [
 ];
 
 window.customShowMap = function() {
+    window.isFreeDuelMode = false;
+    if (window.cleanAllOverlays) window.cleanAllOverlays();
     if (window.hideDuelBoard) window.hideDuelBoard();
     if (window.nativeAPI && window.nativeAPI.showShell) window.nativeAPI.showShell();
     window.playCustomMusic('mapa.mp3');
@@ -2417,6 +2428,17 @@ window.customShowMap = function() {
     };
     actionsWrap.appendChild(subBadge);
     
+    // Botón Duelo Libre
+    let btnFreeDuel = document.createElement('button');
+    btnFreeDuel.className = 'map-top-action-btn';
+    btnFreeDuel.style.cssText = 'background: linear-gradient(180deg, #1b2838 0%, #0d1520 100%); border: 1.5px solid #64b5f6; color: #e1f5fe;';
+    btnFreeDuel.innerHTML = '<span>⚡</span><span>DUELO LIBRE</span>';
+    btnFreeDuel.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        if (window.openFreeDuelMenu) window.openFreeDuelMenu();
+    };
+    actionsWrap.appendChild(btnFreeDuel);
+
     // Botón Tienda
     let btnShop = document.createElement('button');
     btnShop.className = 'map-top-action-btn';
@@ -2620,8 +2642,41 @@ window.customShowMap = function() {
             // Ya superado
             if (isCleared) {
                 let rematchChoice = confirm(`Ya has derrotado a ${n.label} en la Campaña principal.\n\n¿Deseas retarlo nuevamente en el DUELO LIBRE para ganar más cartas y PM?`);
-                if (rematchChoice && window.openFreeDuelMenu) {
-                    window.openFreeDuelMenu();
+                if (rematchChoice) {
+                    window.isFreeDuelMode = true;
+                    if (window.cleanAllOverlays) window.cleanAllOverlays();
+                    let sCheckStr = origGet('FMR_SAVE_' + window.activeAccount);
+                    if (sCheckStr) {
+                        try {
+                            let sCheck = JSON.parse(sCheckStr);
+                            if (sCheck) {
+                                if (sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
+                                    sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
+                                    if (window.persistUserSave) window.persistUserSave(sCheck);
+                                }
+                                if (sCheck.deck && sCheck.deck.length !== 40) {
+                                    alert(`⚠️ DECK ACTIVO NO VÁLIDO (${sCheck.deck.length}/40) ⚠️\n\nTu Deck Activo ("${sCheck.activeDeck || 'Principal'}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
+                                    if (window.customShowDeckEditor) window.customShowDeckEditor();
+                                    return;
+                                }
+                            }
+                        } catch(e) {}
+                    }
+                    let startDuelFn = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
+                    if (startDuelFn && n.char) {
+                        let cid = n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase();
+                        window.playViolinClick();
+                        window.lastDuelOpponent = cid;
+                        if (window.FMRMusic302) {
+                            window.FMRMusic302.start = function(){};
+                            window.FMRMusic302.stop = function(){};
+                        }
+                        if (window.showDuelBoard) window.showDuelBoard();
+                        startDuelFn(cid);
+                        window.playCustomMusic(window.getDuelMusic(cid));
+                    } else if (window.openFreeDuelMenu) {
+                        window.openFreeDuelMenu();
+                    }
                 }
                 return;
             }
@@ -2758,8 +2813,9 @@ window.customShowMap = function() {
     document.body.appendChild(map);
 };
 window.openFreeDuelMenu = function() {
-    let mapOverlay = document.getElementById('map-container-overlay');
-    if (mapOverlay) mapOverlay.style.display = 'none';
+    window.isFreeDuelMode = true;
+    if (window.cleanAllOverlays) window.cleanAllOverlays();
+    if (window.hideDuelBoard) window.hideDuelBoard();
     
     let overlay = document.createElement('div');
     overlay.id = 'custom-freeduel-menu';
@@ -2781,7 +2837,7 @@ window.openFreeDuelMenu = function() {
         let savedStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
         if (savedStr) {
             let saved = JSON.parse(savedStr);
-            if (saved && saved.cleared) cleared = saved.cleared; 
+            if (saved && saved.cleared) cleared = saved.cleared.map(x => String(x).toLowerCase()); 
             if (saved && saved.wins) wins = saved.wins;
             if (saved && saved.losses) losses = saved.losses;
         }
@@ -2826,7 +2882,9 @@ window.openFreeDuelMenu = function() {
                     return;
                 }
                 window.playViolinClick();
-                overlay.remove();
+                window.isFreeDuelMode = true;
+                if (window.cleanAllOverlays) window.cleanAllOverlays();
+                else overlay.remove();
                 window.lastDuelOpponent = cid;
                 // Disable native music and play minijefes.mp3
                 if (window.FMRMusic302) {
@@ -2843,24 +2901,44 @@ window.openFreeDuelMenu = function() {
     
     if (grid.children.length === 0) {
         let msg = document.createElement('div');
-        msg.innerHTML = 'Aún no has derrotado a ningún oponente.';
-        msg.style.cssText = 'color: #fff; font-family: VT323, monospace; font-size: 16px; margin-top: 50px;';
+        msg.innerHTML = 'Aún no has derrotado a ningún oponente en la Campaña para desbloquearlo en Duelo Libre.';
+        msg.style.cssText = 'color: #fff; font-family: VT323, monospace; font-size: 18px; margin-top: 50px; text-align:center; text-shadow: 2px 2px 4px #000;';
         grid.appendChild(msg);
     }
     
     overlay.appendChild(grid);
     
-    let backBtn = document.createElement('button');
-    backBtn.textContent = 'VOLVER A LA TIENDA';
-    backBtn.style.cssText = 'margin-top: 50px; background: rgba(0,0,0,0.8); border: 3px solid #c4a04d; color: #fceea4; padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family:VT323, monospace; font-size:16px;';
-    backBtn.onmouseover = window.playHoverSound;
-    backBtn.onclick = () => {
+    let btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-top:50px;';
+
+    let mapBtn = document.createElement('button');
+    mapBtn.textContent = '🏛️ VOLVER AL MAPA';
+    mapBtn.className = 'campBtn3000 ps1-btn ps1-btn-blue';
+    mapBtn.style.cssText = 'background: rgba(0,0,0,0.85); border: 3px solid #3b82f6; color: #93c5fd; padding: 12px 28px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family:VT323, monospace; font-size:18px; letter-spacing:1px;';
+    mapBtn.onmouseover = window.playHoverSound;
+    mapBtn.onclick = () => {
         window.playViolinClick();
-        overlay.remove();
+        window.isFreeDuelMode = false;
+        if (window.cleanAllOverlays) window.cleanAllOverlays();
+        else overlay.remove();
+        if (window.customShowMap) window.customShowMap();
+    };
+    btnRow.appendChild(mapBtn);
+
+    let shopBtn = document.createElement('button');
+    shopBtn.textContent = '🏪 VOLVER A LA TIENDA';
+    shopBtn.className = 'campBtn3000 ps1-btn ps1-btn-gold';
+    shopBtn.style.cssText = 'background: rgba(0,0,0,0.85); border: 3px solid #c4a04d; color: #fceea4; padding: 12px 28px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family:VT323, monospace; font-size:18px; letter-spacing:1px;';
+    shopBtn.onmouseover = window.playHoverSound;
+    shopBtn.onclick = () => {
+        window.playViolinClick();
+        if (window.cleanAllOverlays) window.cleanAllOverlays();
+        else overlay.remove();
         if (window.openCustomShopMenu) window.openCustomShopMenu();
     };
-    overlay.appendChild(backBtn);
-    
+    btnRow.appendChild(shopBtn);
+
+    overlay.appendChild(btnRow);
     document.body.appendChild(overlay);
 };
 
@@ -4458,7 +4536,14 @@ window.customFinishStoryDuel = function(win) {
         else if (id === 'kosaburo') lossLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Necios! ¡Nadie puede oponerse al poder absoluto de Exodia Necross!' }];
         
         window.playCustomMusic('dialogos.mp3');
-        window.renderCustomStoryDialog(lossLines, 0, () => window.customShowMap());
+        window.renderCustomStoryDialog(lossLines, 0, () => {
+            if (window.cleanAllOverlays) window.cleanAllOverlays();
+            if (window.isFreeDuelMode && window.openFreeDuelMenu) {
+                window.openFreeDuelMenu();
+            } else {
+                window.customShowMap();
+            }
+        });
     } else {
         s.wins = s.wins || {};
         s.wins[id] = (s.wins[id] || 0) + 1;
@@ -4536,6 +4621,15 @@ window.customFinishStoryDuel = function(win) {
         window.showCustomDuelRewardChoice(id, rank, gain, () => {
             window.playCustomMusic('dialogos.mp3');
             window.renderCustomStoryDialog(winLines, 0, () => {
+                const nextStep = () => {
+                    if (window.cleanAllOverlays) window.cleanAllOverlays();
+                    if (window.isFreeDuelMode && window.openFreeDuelMenu) {
+                        window.openFreeDuelMenu();
+                    } else {
+                        window.customShowMap();
+                    }
+                };
+
                 // Check if this defeated opponent carries a Millennium Item
                 const allItems = window.getMillenniumItems ? window.getMillenniumItems(s) : [];
                 const wonItem = allItems.find(it => {
@@ -4549,12 +4643,12 @@ window.customFinishStoryDuel = function(win) {
                 if (wonItem && !alreadyClaimed) {
                     origSet(claimKey, '1');
                     if (window.showMillenniumItemCelebration) {
-                        window.showMillenniumItemCelebration(wonItem, id, () => window.customShowMap());
+                        window.showMillenniumItemCelebration(wonItem, id, nextStep);
                     } else {
-                        window.customShowMap();
+                        nextStep();
                     }
                 } else {
-                    window.customShowMap();
+                    nextStep();
                 }
             });
         });
@@ -6398,6 +6492,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
   var origBeginStoryDuel = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
   window.beginStoryDuel = function(id) {
+    if (window.cleanAllOverlays) window.cleanAllOverlays();
+    if (window.showDuelBoard) window.showDuelBoard();
+    window._customDuelFinishing = false;
+    
     var rawId = String(id || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
     var normId = rawId === 'seto' ? 'kaiba' : (rawId === 'gozaburo' ? 'kosaburo' : rawId);
     
