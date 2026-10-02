@@ -36,6 +36,60 @@
   syncCardsData();
   document.addEventListener('DOMContentLoaded', syncCardsData);
 
+  // Global robust card resolver
+  window.resolveGameCard = function(name) {
+    if (!name) return null;
+    var pool = window.FMR_ST_POOL_V1 || [];
+    var st = pool.find(function(c) { return c && (c.name === name || (c.name && c.name.toLowerCase() === name.toLowerCase())); });
+    if (st) return Object.assign({}, st, { faceUp: true });
+    if (typeof DB !== 'undefined' && Array.isArray(DB)) {
+      var d = DB.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
+      if (d) return { name: d[0], level: d[1], type: d[2], attr: d[3], atk: d[4], def: d[5], pos: 'ATK', materials: [], faceUp: true };
+    }
+    if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+      var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase() === name.toLowerCase())); });
+      if (cd) {
+        if (cd.kind === 'SPELL' || cd.kind === 'TRAP' || cd.kind === 'EQUIP') {
+          return { name: cd.name, kind: cd.kind, value: cd.value || cd.name.toUpperCase().replace(/\s+/g, '_'), text: cd.text || cd.desc || '', faceUp: true };
+        } else {
+          return { name: cd.name, level: cd.level || 4, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, pos: 'ATK', materials: [], faceUp: true };
+        }
+      }
+    }
+    if (typeof mkST === 'function') {
+      var st2 = mkST(name);
+      if (st2) return st2;
+    }
+    if (typeof mk === 'function') {
+      var m2 = mk(name);
+      if (m2) return m2;
+    }
+    return null;
+  };
+
+  // Synchronize DUELISTS array
+  if (typeof DUELISTS !== 'undefined') {
+    var existingDuelistIds = DUELISTS.map(function(d){ return d.id; });
+    [
+      {id:'mako',name:'Mako Tsunami',stars:2,theme:'WATER · Océano · Mar',iconic:'The Legendary Fisherman',rare:'Fortress Whale',implemented:true},
+      {id:'kosaburo',name:'Kosaburo Kaiba',stars:4,theme:'Máquinas · Presión',iconic:'Exodia Necross',implemented:true},
+      {id:'seto',name:'Seto Kaiba',stars:4,theme:'Dragones · Poder',iconic:'Blue-Eyes White Dragon',rare:'Blue-Eyes Ultimate Dragon',implemented:true}
+    ].forEach(function(d) {
+      if (!existingDuelistIds.includes(d.id)) DUELISTS.push(d);
+    });
+  }
+
+  // Synchronize all character decks into STORY_DECKS immediately
+  if (typeof STORY_DECKS !== 'undefined' && window.CHARACTER_DECKS) {
+    Object.keys(window.CHARACTER_DECKS).forEach(function(k) {
+      if (window.CHARACTER_DECKS[k] && Array.isArray(window.CHARACTER_DECKS[k].cards)) {
+        STORY_DECKS[k] = window.CHARACTER_DECKS[k].cards.slice();
+      }
+    });
+    if (STORY_DECKS.kaiba) STORY_DECKS.seto = STORY_DECKS.kaiba.slice();
+    if (STORY_DECKS.kosaburo) STORY_DECKS.gozaburo = STORY_DECKS.kosaburo.slice();
+  }
+
   if (typeof window.mkST === 'function') {
     var origMkST = window.mkST;
     window.mkST = function(name) {
@@ -2546,16 +2600,19 @@ window.customShowMap = function() {
                 
                 let startDuelFn = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
                 if (startDuelFn) {
-                    window.lastDuelOpponent = n.char.toLowerCase();
+                    let charKey = n.char.toLowerCase();
+                    if (charKey === 'seto') charKey = 'kaiba';
+                    if (charKey === 'gozaburo') charKey = 'kosaburo';
+                    window.lastDuelOpponent = charKey;
                     
                     let introLines = [{ role: 'system', speaker: n.char.toUpperCase(), text: '¡Prepárate para el duelo!' }];
-                    if (n.char.toLowerCase() === 'tristan') {
+                    if (charKey === 'tristan') {
                         introLines = [{ role: 'system', speaker: 'TRISTAN_INTRO', text: '¡Bienvenido a tu primer duelo real! Veamos de qué estás hecho.' }];
-                    } else if (n.char.toLowerCase() === 'mako') {
+                    } else if (charKey === 'mako') {
                         introLines = [{ role: 'system', speaker: 'MAKO', text: '¡Siente la furia de las olas y el poder del gran océano! ¡Nadie derrota a Mako Tsunami en su propio elemento!' }];
-                    } else if (n.char.toLowerCase() === 'kosaburo') {
+                    } else if (charKey === 'kosaburo') {
                         introLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Yo soy Kosaburo Kaiba! El verdadero poder de Exodia yace en mi cementerio. ¡Contempla la fuerza imparable de Exodia Necross!' }];
-                    } else if (n.char.toLowerCase() === 'yugi') {
+                    } else if (charKey === 'yugi') {
                         introLines = [{ role: 'system', speaker: 'YUGI', text: '¡Has llegado al duelo supremo! El Rompecabezas del Milenio y el poder de los Dioses Egipcios decidirán el destino. ¡Es hora del Duelo!' }];
                     }
                     
@@ -2563,7 +2620,7 @@ window.customShowMap = function() {
                     window.renderCustomStoryDialog(introLines, 0, () => {
                         map.remove();
                         if (window.showDuelBoard) window.showDuelBoard(); 
-                        startDuelFn(n.char.toLowerCase());
+                        startDuelFn(charKey);
                         
                         if (window.FMRMusic302) {
                             window.FMRMusic302.start = function(){};
@@ -5889,17 +5946,148 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     });
   };
 
+  // Bulletproof beginStoryDuel override
+  window.beginStoryDuel = function(id) {
+    var rawId = String(id || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
+    var normId = rawId === 'seto' ? 'kaiba' : (rawId === 'gozaburo' ? 'kosaburo' : rawId);
+    
+    var s = (window.nativeAPI && window.nativeAPI.loadGame && window.nativeAPI.loadGame()) ||
+            (typeof loadGame === 'function' && loadGame()) ||
+            window.memorySave;
+            
+    if (!s) {
+      if (typeof toast === 'function') toast('No hay datos de partida. Inicia una nueva partida.');
+      return;
+    }
+    
+    if (window.showDuelBoard) window.showDuelBoard();
+    
+    window.storyOpponent = normId;
+    try { storyOpponent = normId; } catch(_) {}
+    window.storyDuelActive = true;
+    try { storyDuelActive = true; } catch(_) {}
+    window.storyDeckReady = false;
+    try { storyDeckReady = false; } catch(_) {}
+    window.duelHandled = false;
+    try { duelHandled = false; } catch(_) {}
+    window.lastDuelOpponent = normId;
+    
+    if (typeof hideShell === 'function') hideShell();
+    if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
+    
+    var duelistObj = (typeof DUELISTS !== 'undefined' && DUELISTS.find(function(x){ return x.id === normId || x.id === rawId; })) ||
+                     (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[normId] || window.CHARACTER_DECKS[rawId])) ||
+                     { name: normId.toUpperCase() };
+    var oppName = duelistObj.displayName || duelistObj.name || normId.toUpperCase();
+    
+    if (typeof showLoading === 'function') showLoading(true, 'Preparando ' + oppName + '...');
+    
+    try { document.getElementById('duelOver64')?.classList.remove('show'); } catch(_) {}
+    try { document.getElementById('deckOut67')?.classList.remove('show'); } catch(_) {}
+    if (typeof setDuelView === 'function') setDuelView('field');
+    
+    window.newGame();
+  };
+  if (!window.nativeAPI) window.nativeAPI = {};
+  window.nativeAPI.beginStoryDuel = window.beginStoryDuel;
+
   var origInstall = window.installStoryDecks;
   window.installStoryDecks = function() {
-    var opp = (window.storyOpponent || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
-    var sDeck = window['_serverDeck_' + opp];
-    if (sDeck && sDeck.length >= 40) {
+    var rawOpp = (window.storyOpponent || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
+    var opp = rawOpp === 'seto' ? 'kaiba' : (rawOpp === 'gozaburo' ? 'kosaburo' : rawOpp);
+    
+    var expectedEnemyDeck = (window['_serverDeck_' + opp]) ||
+                            (window['_serverDeck_' + rawOpp]) ||
+                            (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]) && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]).cards);
+
+    if (expectedEnemyDeck && Array.isArray(expectedEnemyDeck) && expectedEnemyDeck.length >= 40) {
       if (typeof STORY_DECKS !== 'undefined') {
-        STORY_DECKS[opp] = sDeck;
-        console.log('[Duel] Usando deck oficial de servidor para:', opp);
+        STORY_DECKS[opp] = expectedEnemyDeck.slice();
+        STORY_DECKS[rawOpp] = expectedEnemyDeck.slice();
+        console.log('[Duel] Usando deck oficial para ' + opp + ' (' + expectedEnemyDeck.length + ' cartas)');
       }
     }
-    if (origInstall) origInstall.apply(this, arguments);
+    
+    if (origInstall) {
+      try { origInstall.apply(this, arguments); } catch(err) { console.warn('[installStoryDecks origInstall warning]', err); }
+    }
+
+    // 1. Verificación y auto-reparación de la baraja del RIVAL
+    if (typeof game !== 'undefined' && game && expectedEnemyDeck && Array.isArray(expectedEnemyDeck) && expectedEnemyDeck.length >= 40) {
+      var needsFix = false;
+      var totalEnemyCards = (game.enemyDeck ? game.enemyDeck.length : 0) + (game.enemyHand ? game.enemyHand.length : 0);
+      if (totalEnemyCards < 40) {
+        needsFix = true;
+      } else if (opp !== 'tristan') {
+        var firstExpected = expectedEnemyDeck[0];
+        var hasExpected = (game.enemyDeck || []).concat(game.enemyHand || []).some(function(c) {
+          return c && (c.name === firstExpected || (c[0] && c[0] === firstExpected));
+        });
+        if (!hasExpected) needsFix = true;
+      }
+      if (needsFix) {
+        console.log('[installStoryDecks] Auto-instalando deck exacto de ' + opp + ' desde CHARACTER_DECKS.');
+        var cardResolver = window.resolveGameCard || function(n) { return { name: n, atk: 1500, def: 1200, pos: 'ATK', faceUp: true }; };
+        var builtCards = expectedEnemyDeck.map(cardResolver).filter(Boolean);
+        if (builtCards.length >= 40) {
+          for (var i = builtCards.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = builtCards[i]; builtCards[i] = builtCards[j]; builtCards[j] = tmp;
+          }
+          game.enemyDeck = builtCards.slice();
+          game.enemyHand = [];
+          for (var h = 0; h < 5; h++) {
+            if (game.enemyDeck.length > 0) game.enemyHand.push(game.enemyDeck.pop());
+          }
+        }
+      }
+    }
+
+    // 2. Verificación y auto-reparación de la baraja del JUGADOR
+    var sSave = (window.nativeAPI && window.nativeAPI.loadGame && window.nativeAPI.loadGame()) ||
+                (typeof loadGame === 'function' && loadGame()) ||
+                window.memorySave;
+    if (typeof game !== 'undefined' && game && sSave) {
+      var expectedPlayerDeck = (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40) ?
+                               sSave.decks[sSave.activeDeck] :
+                               (Array.isArray(sSave.deck) && sSave.deck.length === 40 ? sSave.deck : null);
+      if (expectedPlayerDeck) {
+        var pNeedsFix = false;
+        var totalPlayerCards = (game.deck ? game.deck.length : 0) + (game.hand ? game.hand.length : 0);
+        if (totalPlayerCards < 40) {
+          pNeedsFix = true;
+        } else {
+          var firstPCard = expectedPlayerDeck[0];
+          var playerHasFirst = (game.deck || []).concat(game.hand || []).some(function(c) {
+            return c && (c.name === firstPCard || (c[0] && c[0] === firstPCard));
+          });
+          if (!playerHasFirst) pNeedsFix = true;
+        }
+        if (pNeedsFix) {
+          console.log('[installStoryDecks] Auto-instalando deck del jugador desde save activo (' + (sSave.activeDeck || 'Principal') + ').');
+          var cardResolverP = window.resolveGameCard || function(n) { return { name: n, atk: 1500, def: 1200, pos: 'ATK', faceUp: true }; };
+          var builtP = expectedPlayerDeck.map(cardResolverP).filter(Boolean);
+          if (builtP.length >= 40) {
+            for (var pi = builtP.length - 1; pi > 0; pi--) {
+              var pj = Math.floor(Math.random() * (pi + 1));
+              var pTmp = builtP[pi]; builtP[pi] = builtP[pj]; builtP[pj] = pTmp;
+            }
+            game.deck = builtP.slice();
+            game.hand = [];
+            for (var ph = 0; ph < 5; ph++) {
+              if (game.deck.length > 0) game.hand.push(game.deck.pop());
+            }
+          }
+        }
+      }
+    }
+
+    window.storyDeckReady = true;
+    try { storyDeckReady = true; } catch(_) {}
+    window.duelHandled = false;
+    try { duelHandled = false; } catch(_) {}
+    if (typeof showLoading === 'function') showLoading(false);
+    if (typeof render === 'function') render();
 
     // Guaranteed God card in opening hand for Marik, Kaiba, and Yugi on Turn 1
     var yugiChosenGod = null;

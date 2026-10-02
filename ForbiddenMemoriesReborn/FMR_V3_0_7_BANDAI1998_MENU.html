@@ -8209,18 +8209,22 @@ const DUELISTS=[
  {id:'tristan',name:'Tristan',stars:1,theme:'Combate básico · Equipos',iconic:'Cyber Commander',rare:'Rare Metal Dragon',implemented:true},
  {id:'weevil',name:'Weevil',stars:2,theme:'Insectos · Control',iconic:'Perfectly Ultimate Great Moth',rare:'Insect Queen',implemented:true},
  {id:'mai',name:'Mai',stars:2,theme:'WIND · Signos · Equipos',iconic:'Harpie Lady',rare:"Harpie's Pet Dragon",implemented:true},
+ {id:'mako',name:'Mako Tsunami',stars:2,theme:'WATER · Océano · Mar',iconic:'The Legendary Fisherman',rare:'Fortress Whale',implemented:true},
  {id:'joey',name:'Joey',stars:2,theme:'Guerreros · Dragones · Fusión',iconic:'Red-Eyes Black Dragon',rare:'Thousand Dragon',implemented:true},
- {id:'bakura',name:'Bakura',stars:3,theme:'DARK · Cementerio',iconic:'Dark Necrofear'},
- {id:'odion',name:'Odion',stars:3,theme:'Trampas · Control',iconic:'Mystical Beast of Serket'},
- {id:'ishizu',name:'Ishizu',stars:3,theme:'Cementerio · Memorias',iconic:"Gravekeeper's Chief"},
- {id:'pegasus',name:'Pegasus',stars:3,theme:'Efectos · Control',iconic:'Bickuribox',rare:'Gate Guardian'},
- {id:'noah',name:'Noah',stars:4,theme:'Estrategia · Mundo virtual',iconic:'Shinato'},
- {id:'gozaburo',name:'Gozaburo Kaiba',stars:4,theme:'Máquinas · Presión',iconic:'Exodia Necross'},
- {id:'kaiba',name:'Kaiba',stars:4,theme:'Dragones · Poder',iconic:'Blue-Eyes White Dragon',rare:'Blue-Eyes Ultimate Dragon'},
- {id:'marik',name:'Marik',stars:5,theme:'DARK · Daño · Control',iconic:'Lava Golem',field:'Templo del Sol Oscuro'},
- {id:'yugi',name:'Yugi',stars:5,theme:'Spellcaster · Estrategia completa',iconic:'Dark Magician',field:'Círculo de los Magos'},
- {id:'atem',name:'Atem',stars:6,theme:'Maestría de Signos',iconic:'Dark Magician',field:'Santuario del Faraón'}
+ {id:'bakura',name:'Bakura',stars:3,theme:'DARK · Cementerio',iconic:'Dark Necrofear',implemented:true},
+ {id:'odion',name:'Odion',stars:3,theme:'Trampas · Control',iconic:'Mystical Beast of Serket',implemented:true},
+ {id:'ishizu',name:'Ishizu',stars:3,theme:'Cementerio · Memorias',iconic:"Gravekeeper's Chief",implemented:true},
+ {id:'pegasus',name:'Pegasus',stars:3,theme:'Efectos · Control',iconic:'Bickuribox',rare:'Gate Guardian',implemented:true},
+ {id:'noah',name:'Noah',stars:4,theme:'Estrategia · Mundo virtual',iconic:'Shinato',implemented:true},
+ {id:'kosaburo',name:'Kosaburo Kaiba',stars:4,theme:'Máquinas · Presión',iconic:'Exodia Necross',implemented:true},
+ {id:'gozaburo',name:'Kosaburo Kaiba',stars:4,theme:'Máquinas · Presión',iconic:'Exodia Necross',implemented:true},
+ {id:'kaiba',name:'Kaiba',stars:4,theme:'Dragones · Poder',iconic:'Blue-Eyes White Dragon',rare:'Blue-Eyes Ultimate Dragon',implemented:true},
+ {id:'seto',name:'Seto Kaiba',stars:4,theme:'Dragones · Poder',iconic:'Blue-Eyes White Dragon',rare:'Blue-Eyes Ultimate Dragon',implemented:true},
+ {id:'marik',name:'Marik',stars:5,theme:'DARK · Daño · Control',iconic:'Lava Golem',field:'Templo del Sol Oscuro',implemented:true},
+ {id:'yugi',name:'Yugi',stars:5,theme:'Spellcaster · Estrategia completa',iconic:'Dark Magician',field:'Círculo de los Magos',implemented:true},
+ {id:'atem',name:'Atem',stars:6,theme:'Maestría de Signos',iconic:'Dark Magician',field:'Santuario del Faraón',implemented:true}
 ];
+window.DUELISTS = DUELISTS;
 const LEGENDARIES=['Slifer the Sky Dragon','Obelisk the Tormentor','The Winged Dragon of Ra'];
 const SHOP=[
  {name:'Battle Ox',price:300,type:'MONSTRUO'}, {name:'Black Pendant',price:300,type:'EQUIPO'},
@@ -8304,10 +8308,11 @@ const TRISTAN_POOL=[
 ];
 const WEEVIL_POOL=['Basic Insect','Killer Needle','Man-Eater Bug','Hercules Beetle','Trap Hole','Waboku','Sakuretsu Armor','Black Pendant','Giant Soldier of Stone'];
 const MAI_POOL=['Harpie Lady','Cyber Harpie Lady','Harpie Lady Sisters','Winged Dragon, Guardian of the Fortress #1','Dragon Treasure','Horn of the Unicorn','Dust Tornado','Waboku','Negate Attack'];
+const MAKO_POOL=['The Legendary Fisherman','Fortress Whale','Amphibian Beast','Giant Red Seasnake','High Tide Gyojin','Umi','Steel Shell','Torrential Tribute','Tornado Wall'];
 const JOEY_POOL=['Baby Dragon','Time Wizard','Flame Swordsman','Masaki the Legendary Swordsman','Flame Manipulator','Battle Ox','Dragon Treasure','Axe of Despair','Trap Hole'];
 const STORY_DECKS={tristan:TRISTAN_DECK,weevil:WEEVIL_DECK,mai:MAI_DECK,joey:JOEY_DECK};
-const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,joey:JOEY_POOL};
-const STORY_UNLOCK_NEXT={tristan:'weevil',weevil:'mai',mai:'joey',joey:'bakura'};
+const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,mako:MAKO_POOL,joey:JOEY_POOL};
+const STORY_UNLOCK_NEXT={tristan:'weevil',weevil:'mai',mai:'mako',mako:'joey',joey:'pegasus',pegasus:'bakura',bakura:'noah',noah:'kosaburo',kosaburo:'ishizu',ishizu:'odion',odion:'marik',marik:'kaiba',kaiba:'yugi',yugi:'atem'};
 
 const PROLOGUE=[
  {speaker:'MEMORIA DESCONOCIDA',text:'Los recuerdos de antiguos duelistas han comenzado a despertar. Cada carta conserva una parte de un mundo que ya debería haber terminado.'},
@@ -8575,7 +8580,9 @@ function beginStoryDuel(id){
  // Allow duel even if deck isn't exactly 40 names - installStoryDecks will fallback to DEFAULT_DECK
  if(!s){toast('No hay datos de partida. Inicia una nueva partida.');return;}
  if(window.showDuelBoard) window.showDuelBoard();
- storyOpponent=id;storyDuelActive=true;window.storyDuelActive=true;storyDeckReady=false;duelHandled=false;hideShell();showLoading(true,'Preparando '+DUELISTS.find(x=>x.id===id).name+'...');
+ storyOpponent=id;storyDuelActive=true;window.storyDuelActive=true;storyDeckReady=false;duelHandled=false;hideShell();
+ const dObj=(typeof DUELISTS!=='undefined'&&DUELISTS.find(x=>x.id===id))||{name:String(id).toUpperCase()};
+ showLoading(true,'Preparando '+dObj.name+'...');
  try{document.getElementById('duelOver64')?.classList.remove('show');document.getElementById('deckOut67')?.classList.remove('show');}catch(_){}
  if(typeof setDuelView==='function')setDuelView('field');
  window.newGame();
@@ -8594,7 +8601,7 @@ function rankBonus(r){return {S:250,A:175,B:100,C:50}[r]||50;}
 function rareChance(pity){if(pity>=35)return 1;if(pity>=30)return .15;if(pity>=25)return .08;if(pity>=20)return .05;if(pity>=15)return .03;return .02;}
 function chooseUnique(pool,count,exclude=[]){const a=[...new Set(pool.filter(x=>!exclude.includes(x)&&copies(x)<maxCopies(x)))];shuffleLocal(a);return a.slice(0,count);}
 function generateStoryReward303(id){
- const s=loadGame(),d=DUELISTS.find(x=>x.id===id),pool=STORY_POOLS[id]||TRISTAN_POOL;if(!d)return {opts:[],guaranteed:null};
+ const s=loadGame(),d=DUELISTS.find(x=>x.id===id)||{id,name:String(id).toUpperCase(),stars:2},pool=STORY_POOLS[id]||TRISTAN_POOL;if(!s)return {opts:[],guaranteed:null};
  const key=id+'_rare';s.pity[key]=Number(s.pity[key]||0)+1;let guaranteed=null,rareOffer=false;
  if(d.rare&&s.pity[key]>=35&&copies(d.rare)<maxCopies(d.rare)){addCard(d.rare);guaranteed=d.rare;s.pity[key]=0;}
  else if(d.rare&&copies(d.rare)<maxCopies(d.rare)&&Math.random()<rareChance(s.pity[key]))rareOffer=true;
@@ -8611,13 +8618,13 @@ function finishStoryDuel(win){
  if(!storyDuelActive||duelHandled)return;duelHandled=true;storyDuelActive=false;window.storyDuelActive=false;storyDeckReady=false; if(window.hideDuelBoard) window.hideDuelBoard();
  try{document.getElementById('duelOver64')?.classList.remove('show');document.getElementById('deckOut67')?.classList.remove('show');}catch(_){}
  document.getElementById('campaignDuelHud3000').style.display='none'; if(window.hideDuelBoard) window.hideDuelBoard(); showShell();
- const s=loadGame(),id=storyOpponent,d=DUELISTS.find(x=>x.id===id);if(!s||!d)return showMain();
+ const s=loadGame(),id=storyOpponent,d=DUELISTS.find(x=>x.id===id)||{id,name:String(id).toUpperCase(),stars:2};if(!s)return showMain();
  if(!win){s.pm+=50;s.lastPlayed=Date.now();saveGame();content(`<div class="campPanel3000 rewardHero3000" style="max-width:650px;margin:5vh auto"><h2>DERROTA</h2><p>El Fragmento todavía permanece con ${esc(d.name)}.</p><div class="pmGain3000">+50 PM</div><p style="opacity:.7">Incluso una derrota recupera una pequeña cantidad de Memoria.</p><div class="campBtns3000"><button class="campBtn3000 primary" id="retry3000">REINTENTAR</button><button class="campBtn3000" id="map3000">MAPA</button></div></div>`);document.getElementById('retry3000').onclick=()=>showPreDuel(id,0);document.getElementById('map3000').onclick=showMap;return;}
  const first=!s.cleared.includes(id);s.wins[id]=Number(s.wins[id]||0)+1;if(first)s.cleared.push(id);const next=STORY_UNLOCK_NEXT[id];if(first&&next&&!s.unlocked.includes(next))s.unlocked.push(next);
  const rank=rankForLP(Number(game&&game.plp||0)),gain=50+150+rankBonus(rank)+(first?300:0);s.pm+=gain;s.lastPlayed=Date.now();const reward=generateStoryReward303(id);saveGame();showRewardScreen(id,rank,gain,first,reward);
 }
 function showRewardScreen(id,rank,gain,first,reward){
- const s=loadGame(),d=DUELISTS.find(x=>x.id===id);const rows=reward.opts.map((r,i)=>`<div class="reward3000 ${r.tier==='MUY RARA'?'rareGlow3000':r.tier==='ICÓNICA'?'iconicGlow3000':''}"><div><strong>${esc(r.name)}</strong><small>${esc(r.tier)} · ${esc(cardStats(r.name))}</small></div><button data-reward="${i}">ELEGIR ESTA CARTA</button></div>`).join('');
+ const s=loadGame(),d=DUELISTS.find(x=>x.id===id)||{id,name:String(id).toUpperCase(),stars:2};const rows=reward.opts.map((r,i)=>`<div class="reward3000 ${r.tier==='MUY RARA'?'rareGlow3000':r.tier==='ICÓNICA'?'iconicGlow3000':''}"><div><strong>${esc(r.name)}</strong><small>${esc(r.tier)} · ${esc(cardStats(r.name))}</small></div><button data-reward="${i}">ELEGIR ESTA CARTA</button></div>`).join('');
  content(`<div class="campPanel3000 rewardHero3000"><div style="font-size:14px;letter-spacing:.15em;color:#8cffaf;font-weight:950">VICTORIA · ${esc(d.name.toUpperCase())}</div><div class="rank3000">${rank}</div><div>RANGO DEL DUELO</div><div class="pmGain3000">+${gain} PM</div><small>Participación 50 · Victoria 150 · Rango ${rank} ${rankBonus(rank)}${first?' · Primera victoria 300':''}</small>${reward.guaranteed?`<div class="guaranteed3000">PROTECCI�N ACTIVADA · ${esc(reward.guaranteed)} se añadió automáticamente a tu Colección.</div>`:''}</div><div class="campPanel3000"><h3>ELIGE 1 RECOMPENSA</h3>${rows||'<div class="empty3000">No hay recompensas disponibles: alcanzaste el máximo de copias.</div>'}</div>`);
  document.querySelectorAll('[data-reward]').forEach(b=>b.onclick=()=>{const r=reward.opts[Number(b.dataset.reward)];if(!r)return;const got=addCard(r.name);if(!got)return toast('Ya tienes el máximo de copias.');if(r.tier==='MUY RARA')s.pity[id+'_rare']=0;saveGame();showPostReward(id,r.name,first);});
  if(!reward.opts.length)setTimeout(()=>showPostReward(id,null,first),300);
