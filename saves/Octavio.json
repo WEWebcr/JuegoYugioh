@@ -1,6 +1,6 @@
 {
   "name": "Octavio",
-  "email": "aplizaroctavio707@gmail.com",
+  "email": "alpizaroctavio707@gmail.com",
   "schema": 1,
   "world": 1,
   "pm": 3000,
@@ -98,7 +98,7 @@
     }
   ],
   "createdAt": 1790973344326,
-  "lastPlayed": 1790973358756,
+  "lastPlayed": 1790973722601,
   "rewardsHistory": [
     {
       "type": "DP",
@@ -122,8 +122,10 @@
   "passwordHash": "69a6b100074bc1e3c319a6c533277fdb873c9a44d896accc5c42230b4ce3b3ce",
   "aliases": [
     "octavio",
+    "alpizar",
+    "alpizaroctavio",
+    "alpizaroctavio707",
     "aplizar",
-    "aplizaroctavio",
-    "aplizaroctavio707"
+    "aplizaroctavio707@gmail.com"
   ]
 }

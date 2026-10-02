@@ -267,12 +267,12 @@ function ensureSeedUsers() {
       console.log('[Seed] Cuenta "josue" inyectada exitosamente con suscripción VIP activa.');
     }
 
-    const octavioExisting = findSaveByEmailOrName('octavio') || findSaveByEmailOrName('aplizar') || findSaveByEmailOrName('aplizaroctavio707@gmail.com');
+    const octavioExisting = findSaveByEmailOrName('octavio') || findSaveByEmailOrName('alpizar') || findSaveByEmailOrName('alpizaroctavio707@gmail.com') || findSaveByEmailOrName('aplizar');
     if (!octavioExisting) {
       const octavioSeed = {
         name: "Octavio",
-        email: "aplizaroctavio707@gmail.com",
-        aliases: ["octavio", "aplizar", "aplizaroctavio", "aplizaroctavio707"],
+        email: "alpizaroctavio707@gmail.com",
+        aliases: ["octavio", "alpizar", "alpizaroctavio", "alpizaroctavio707", "aplizar", "aplizaroctavio707@gmail.com"],
         passwordHash: "69a6b100074bc1e3c319a6c533277fdb873c9a44d896accc5c42230b4ce3b3ce", // Clave: 1234
         schema: 1,
         world: 1,
