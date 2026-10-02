@@ -8382,11 +8382,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     if (card) g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
 
-    // Robar 3 cartas
+    // Robar 3 cartas (sin descartar inmediatamente por límite; el límite solo aplica en End Phase)
     for (var d = 0; d < 3; d++) {
       if (g.deck && g.deck.length) g.hand.push(g.deck.pop());
     }
-    if (typeof enforceHandLimit === 'function') enforceHandLimit('player');
     if (window.playDrawSound) window.playDrawSound();
     if (typeof render === 'function') render();
 
@@ -8673,7 +8672,6 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       g.hand.splice(i, 1);
       g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
       for (var d = 0; d < 2; d++) { if (g.deck.length) g.hand.push(g.deck.pop()); }
-      if (typeof enforceHandLimit === 'function') enforceHandLimit('player');
       if (window.playDrawSound) window.playDrawSound();
       if (typeof render === 'function') render();
       duelToast('¡Pot of Greed activado! Robas 2 cartas.');
@@ -8750,7 +8748,6 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       g.playerBack[i] = null;
       g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
       for (var d = 0; d < 2; d++) { if (g.deck.length) g.hand.push(g.deck.pop()); }
-      if (typeof enforceHandLimit === 'function') enforceHandLimit('player');
       if (window.playDrawSound) window.playDrawSound();
       if (typeof render === 'function') render();
       duelToast('¡Pot of Greed activado! Robas 2 cartas.');
@@ -10076,6 +10073,40 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
       e.attackedTurn = game.turnNo;
       if (typeof cleanupOrphanedEquips === 'function') try { cleanupOrphanedEquips(); } catch(_) {}
+      if (typeof render === 'function') render();
+    }
+
+    // Regla Oficial de Límite de Mano: Descarte de End Phase del rival si supera 6 cartas en mano
+    if (Array.isArray(game.enemyHand) && game.enemyHand.length > 6) {
+      var toDiscardCount = game.enemyHand.length - 6;
+      var indexed = game.enemyHand.map(function(card, idx) {
+        var score = 1000;
+        if (card) {
+          if (!isST(card)) {
+            var a = Number(card.atk || card[4] || 0);
+            var d = Number(card.def || card[5] || 0);
+            score = Math.max(a, d);
+          } else {
+            score = 1500;
+          }
+        }
+        return { card: card, idx: idx, score: score };
+      });
+      // Descartar las cartas con menor puntuación/utilidad primero
+      indexed.sort(function(a, b) { return a.score - b.score; });
+      var indicesToDiscard = indexed.slice(0, toDiscardCount).map(function(x) { return x.idx; });
+      indicesToDiscard.sort(function(a, b) { return b - a; });
+
+      var discardedNames = [];
+      indicesToDiscard.forEach(function(i) {
+        var disc = game.enemyHand.splice(i, 1)[0];
+        if (disc) {
+          game.enemyGrave.push(disc);
+          discardedNames.push(disc.name || disc[0] || 'Carta');
+        }
+      });
+      if (typeof log === 'function') log('El rival descarta ' + discardedNames.join(', ') + ' al Cementerio por límite de mano en End Phase.');
+      if (typeof duelToast === 'function') duelToast('Rival descarta ' + discardedNames.length + ' carta(s) por límite de mano.');
       if (typeof render === 'function') render();
     }
 
@@ -11685,11 +11716,157 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
 
 
-  // Interceptor de End Turn para revertir efectos temporales (Change of Heart, etc.)
+  // =========================================================================
+  // SISTEMA OFICIAL DE LÍMITE DE MANO EN YU-GI-OH (MÁXIMO 6 AL FINAL DEL TURNO)
+  // Durante el turno, el jugador y el rival pueden robar/tener más de 6 cartas si
+  // los efectos de cartas lo permiten. Solo al finalizar el turno (End Phase) se
+  // debe descartar al Cementerio hasta tener exactamente 6 cartas.
+  // =========================================================================
+
+  window.promptEndPhaseDiscard = function(cardsToDiscard, onComplete) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g || !Array.isArray(g.hand) || g.hand.length <= 6 || cardsToDiscard <= 0) {
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
+
+    var existingOverlay = document.getElementById('endPhaseDiscardOverlay');
+    if (existingOverlay) existingOverlay.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'endPhaseDiscardOverlay';
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:999999;display:flex;justify-content:center;align-items:center;font-family:VT323, monospace;padding:12px;box-sizing:border-box;";
+
+    var box = document.createElement('div');
+    box.style.cssText = "width:560px;max-width:95vw;background:linear-gradient(145deg, #221414, #0f0a0a);border:3px solid #ff4444;border-radius:12px;padding:20px;box-shadow:0 0 40px rgba(255,50,50,0.4);display:flex;flex-direction:column;align-items:center;box-sizing:border-box;";
+    box.innerHTML = '<h3 style="color:#ff5555;font-size:26px;margin:0 0 6px;text-align:center;letter-spacing:1px;text-shadow:0 0 8px #ff2222;">LÍMITE DE MANO (END PHASE)</h3>' +
+      '<p style="color:#eee;font-size:16px;margin:0 0 14px;text-align:center;line-height:1.4;">Tienes <b>' + g.hand.length + '</b> cartas en mano.<br>Debes descartar <b style="color:#ff4444;font-size:18px;">' + cardsToDiscard + '</b> carta(s) al Cementerio hasta tener exactamente 6:</p>' +
+      '<div id="endPhaseHandList" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-height:50vh;overflow-y:auto;width:100%;padding:4px;box-sizing:border-box;"></div>' +
+      '<div style="margin-top:16px;display:flex;gap:15px;">' +
+        '<button id="btnConfirmEndPhaseDiscard" style="padding:10px 24px;background:#222;color:#888;border:2px solid #555;font-family:inherit;font-size:18px;cursor:not-allowed;border-radius:6px;transition:0.2s;" disabled>DESCARTAR AL CEMENTERIO (0/' + cardsToDiscard + ')</button>' +
+      '</div>';
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    var selectedIndices = [];
+    var list = document.getElementById('endPhaseHandList');
+    var btnConfirm = document.getElementById('btnConfirmEndPhaseDiscard');
+
+    g.hand.forEach(function(hCard, idx) {
+      var item = document.createElement('div');
+      item.style.cssText = "width:100px;padding:8px;background:#222;border:2px solid #555;border-radius:6px;text-align:center;cursor:pointer;color:#fff;transition:0.15s;box-sizing:border-box;";
+      var cName = hCard.name || hCard[0] || 'Carta';
+      var num = (window.CARD_MAPPINGS && window.CARD_MAPPINGS[cName]) || 0;
+      var imgSrc = (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) || '';
+      if (!imgSrc && window.CUSTOM_LOCAL_IMAGES) {
+        var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : (window.CARD_MAPPINGS || {});
+        var dNum = dict[cName] && dict[cName].num ? dict[cName].num : dict[cName];
+        if (dNum && window.CUSTOM_LOCAL_IMAGES[dNum]) imgSrc = window.CUSTOM_LOCAL_IMAGES[dNum];
+      }
+      var imgH = imgSrc ? '<img src="' + imgSrc + '" style="width:72px;height:92px;object-fit:cover;border-radius:4px;border:1px solid #ffcc00;" />' : '<div style="width:72px;height:92px;background:#333;margin:auto;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:24px;color:#888;">?</div>';
+      var statText = isST(hCard) ? (hCard.kind || 'MAGIA') : (hCard.atk != null ? (hCard.atk + '/' + (hCard.def || 0)) : (hCard[4] != null ? (hCard[4] + '/' + (hCard[5] || 0)) : ''));
+      item.innerHTML = imgH +
+        '<div style="font-size:12px;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:bold;">' + cName + '</div>' +
+        (statText ? '<div style="font-size:10px;color:#ffcc00;margin-top:2px;">' + statText + '</div>' : '');
+
+      item.onclick = function() {
+        if (window.playViolinClick) window.playViolinClick();
+        var pos = selectedIndices.indexOf(idx);
+        if (pos >= 0) {
+          selectedIndices.splice(pos, 1);
+          item.style.borderColor = '#555';
+          item.style.background = '#222';
+          item.style.boxShadow = 'none';
+        } else {
+          if (selectedIndices.length >= cardsToDiscard) return;
+          selectedIndices.push(idx);
+          item.style.borderColor = '#ff3333';
+          item.style.background = '#441111';
+          item.style.boxShadow = '0 0 10px #ff3333';
+        }
+        btnConfirm.textContent = 'DESCARTAR AL CEMENTERIO (' + selectedIndices.length + '/' + cardsToDiscard + ')';
+        if (selectedIndices.length === cardsToDiscard) {
+          btnConfirm.style.background = '#b30000';
+          btnConfirm.style.color = '#fff';
+          btnConfirm.style.borderColor = '#ff3333';
+          btnConfirm.style.cursor = 'pointer';
+          btnConfirm.style.boxShadow = '0 0 15px #ff2222';
+          btnConfirm.disabled = false;
+        } else {
+          btnConfirm.style.background = '#222';
+          btnConfirm.style.color = '#888';
+          btnConfirm.style.borderColor = '#555';
+          btnConfirm.style.cursor = 'not-allowed';
+          btnConfirm.style.boxShadow = 'none';
+          btnConfirm.disabled = true;
+        }
+      };
+      list.appendChild(item);
+    });
+
+    btnConfirm.onclick = function() {
+      if (selectedIndices.length !== cardsToDiscard) return;
+      overlay.remove();
+      selectedIndices.sort(function(a, b) { return b - a; });
+      var discardedNames = [];
+      selectedIndices.forEach(function(sIdx) {
+        var discarded = g.hand.splice(sIdx, 1)[0];
+        if (discarded) {
+          g.grave.push(isST(discarded) ? Object.assign({}, discarded, { set: false, faceUp: true }) : (window.mk ? window.mk(discarded.name || discarded[0]) : discarded));
+          discardedNames.push(discarded.name || discarded[0] || 'Carta');
+        }
+      });
+      if (window.playDestroySound) window.playDestroySound();
+      if (typeof render === 'function') render();
+      duelToast('Descartaste ' + discardedNames.length + ' carta(s) por límite de mano.');
+      if (typeof log === 'function') log('Límite de mano en End Phase: descartas ' + discardedNames.join(', ') + ' al Cementerio.');
+      if (typeof onComplete === 'function') onComplete();
+    };
+  };
+
+  // Override global enforceHandLimit para que no descarte durante el turno
+  window.enforceHandLimit = function(side, isEndPhase) {
+    if (!isEndPhase) return;
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+    var hand = side === 'enemy' ? g.enemyHand : g.hand;
+    var grave = side === 'enemy' ? g.enemyGrave : g.grave;
+    if (!hand || hand.length <= 6) return;
+    var toDiscard = hand.length - 6;
+    if (side === 'enemy') {
+      while (hand.length > 6) {
+        var c = hand.pop();
+        if (c) {
+          grave.push(isST(c) ? Object.assign({}, c, { faceUp: true, set: false }) : (window.mk ? window.mk(c.name || c[0]) : c));
+          if (typeof log === 'function') log('El rival descarta ' + (c.name || c[0]) + ' al Cementerio por límite de mano.');
+        }
+      }
+    } else {
+      if (typeof window.promptEndPhaseDiscard === 'function') {
+        window.promptEndPhaseDiscard(toDiscard);
+      }
+    }
+  };
+  try { enforceHandLimit = window.enforceHandLimit; } catch(_) {}
+
+  // Interceptor de End Turn para límite de mano en End Phase y revertir efectos temporales (Change of Heart, etc.)
   var origEndTurn = window.endTurn;
   window.endTurn = function() {
     var g = (typeof game !== 'undefined' && game) ? game : window.game;
-    if (g && Array.isArray(g.field)) {
+    if (!g || g.turn !== 'player') return;
+
+    // 1. REGLA OFICIAL: Si el jugador supera 6 cartas al final del turno, debe descartar interactivamente
+    if (Array.isArray(g.hand) && g.hand.length > 6) {
+      var needToDiscard = g.hand.length - 6;
+      window.promptEndPhaseDiscard(needToDiscard, function() {
+        // Al completar el descarte de la End Phase, continúa la transición de fin de turno
+        window.endTurn();
+      });
+      return;
+    }
+
+    // 2. Reversión de efectos temporales (Change of Heart)
+    if (Array.isArray(g.field)) {
       for (var fi = 0; fi < g.field.length; fi++) {
         var m = g.field[fi];
         if (m && m._changeOfHeartOriginalSide === 'enemy') {
@@ -11707,6 +11884,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       if (typeof render === 'function') render();
     }
+
     if (typeof origEndTurn === 'function') {
       return origEndTurn.apply(this, arguments);
     }
