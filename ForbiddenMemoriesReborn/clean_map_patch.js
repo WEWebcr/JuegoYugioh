@@ -1736,10 +1736,14 @@ window.customShowMain = function() {
             msg.textContent = 'Verificando con el servidor...';
             
             try {
+                let localSaveStr = origGet('FMR_SAVE_' + name) || origGet('FMR_REBORN_STORY_V3000');
+                let localSaveObj = null;
+                try { if (localSaveStr) localSaveObj = JSON.parse(localSaveStr); } catch(_) {}
+
                 let res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: name, password: pass })
+                    body: JSON.stringify({ name: name, password: pass, clientSave: localSaveObj })
                 });
                 let data = await res.json();
                 if (!res.ok || data.error) {
@@ -7879,44 +7883,224 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   }
   window.updateGuardianBattleHints = updateGuardianBattleHints;
 
-  // 6. Automatic Battle Trap Trigger in aiBattle
-  var prevAiBattleMaster = window.aiBattle;
+  // 6. MOTOR DE INTELIGENCIA ARTIFICIAL AGRESIVA Y FUSIONES (FMR MÁXIMO PODER)
+  window.aiHandSummonOrSet = function() {
+    if (!game || game.turn !== 'enemy' || !Array.isArray(game.enemyHand)) return;
+
+    // A. Colocar Trampas en la fila trasera
+    for (var h = game.enemyHand.length - 1; h >= 0; h--) {
+      var c = game.enemyHand[h];
+      if (c && (c.kind === 'TRAP' || c.type === 'Trap' || c.type === 'TRAP')) {
+        var backSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+        if (backSlot >= 0) {
+          game.enemyHand.splice(h, 1);
+          game.enemyBack[backSlot] = Object.assign({}, c, { set: true, readyTurn: game.turnNo });
+          if (typeof log === 'function') log('El rival coloca una Trampa boca abajo.');
+        }
+      }
+    }
+
+    var freeMonsterSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+    var fnFusion = typeof window.fusionResult === 'function' ? window.fusionResult : (typeof fusionResult === 'function' ? fusionResult : null);
+
+    // B. FUSIONES DESDE LA MANO (IA FMR Forbidden Memories)
+    if (freeMonsterSlot >= 0 && fnFusion && game.enemyHand.length >= 2) {
+      var bestFusion = null;
+      var bestAtk = -1;
+      var matIdxA = -1, matIdxB = -1;
+
+      for (var i = 0; i < game.enemyHand.length; i++) {
+        var cardA = game.enemyHand[i];
+        if (!cardA || isST(cardA)) continue;
+        var nameA = cardA.name || cardA[0];
+
+        for (var j = i + 1; j < game.enemyHand.length; j++) {
+          var cardB = game.enemyHand[j];
+          if (!cardB || isST(cardB)) continue;
+          var nameB = cardB.name || cardB[0];
+
+          var res = fnFusion([nameA, nameB]);
+          if (res) {
+            var tempMon = window.mk ? window.mk(res) : null;
+            var fAtk = (tempMon && tempMon.atk) || 2000;
+            if (fAtk > bestAtk) {
+              bestAtk = fAtk;
+              bestFusion = res;
+              matIdxA = i;
+              matIdxB = j;
+            }
+          }
+        }
+      }
+
+      if (bestFusion && matIdxA >= 0 && matIdxB >= 0) {
+        var idxs = [matIdxA, matIdxB].sort(function(a, b) { return b - a; });
+        idxs.forEach(function(idx) {
+          var m = game.enemyHand.splice(idx, 1)[0];
+          if (m) game.enemyGrave.push(Object.assign({}, m, { set: false, faceUp: true }));
+        });
+
+        var fusedCard = window.mk(bestFusion) || { name: bestFusion, atk: bestAtk, def: 1800, pos: 'ATK', faceUp: true };
+        fusedCard.pos = 'ATK';
+        fusedCard.faceUp = true;
+        game.enemy[freeMonsterSlot] = fusedCard;
+
+        if (window.playFusionSound) window.playFusionSound();
+        if (typeof log === 'function') log('¡FUSIÓN RIVAL! ' + (idxs.length) + ' cartas combinadas ➔ ' + bestFusion + ' (' + (fusedCard.atk || bestAtk) + ' ATK).');
+        if (typeof duelToast === 'function') duelToast('¡FUSIÓN RIVAL: ' + bestFusion.toUpperCase() + '!');
+        if (typeof render === 'function') render();
+        return;
+      }
+    }
+
+    // C. FUSIÓN CAMPO + MANO RIVAL
+    if (fnFusion && game.enemyHand.length >= 1) {
+      for (var f = 0; f < (game.enemy || []).length; f++) {
+        var fMon = game.enemy[f];
+        if (!fMon) continue;
+        var fName = fMon.name || fMon[0];
+
+        for (var h = 0; h < game.enemyHand.length; h++) {
+          var hCard = game.enemyHand[h];
+          if (!hCard || isST(hCard)) continue;
+          var hName = hCard.name || hCard[0];
+
+          var resF = fnFusion([fName, hName]);
+          if (resF) {
+            var evolved = window.mk(resF);
+            if (evolved && (evolved.atk || 0) >= (fMon.atk || 0)) {
+              game.enemyHand.splice(h, 1);
+              game.enemyGrave.push(fMon);
+              game.enemyGrave.push(hCard);
+              evolved.pos = 'ATK';
+              evolved.faceUp = true;
+              game.enemy[f] = evolved;
+              if (window.playFusionSound) window.playFusionSound();
+              if (typeof log === 'function') log('¡FUSIÓN CAMPO + MANO RIVAL! ' + fName + ' + ' + hName + ' ➔ ' + resF + ' (' + evolved.atk + ' ATK).');
+              if (typeof duelToast === 'function') duelToast('¡FUSIÓN RIVAL: ' + resF.toUpperCase() + '!');
+              if (typeof render === 'function') render();
+              return;
+            }
+          }
+        }
+      }
+    }
+
+    // D. EQUIPAR CARTAS DE MAGIA / EQUIPO
+    for (var h = game.enemyHand.length - 1; h >= 0; h--) {
+      var eq = game.enemyHand[h];
+      if (eq && (eq.kind === 'EQUIP' || eq.value === 'EQUIP' || (eq.name && (eq.name.includes('Pendant') || eq.name.includes('Treasure') || eq.name.includes('Unicorn'))))) {
+        var strongestTarget = null, sAtk = -1;
+        (game.enemy || []).forEach(function(mon) {
+          if (mon && (mon.atk || 0) > sAtk) {
+            sAtk = mon.atk || 0;
+            strongestTarget = mon;
+          }
+        });
+        if (strongestTarget) {
+          game.enemyHand.splice(h, 1);
+          var eqSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+          if (eqSlot >= 0) game.enemyBack[eqSlot] = Object.assign({}, eq, { set: false, faceUp: true });
+          else game.enemyGrave.push(eq);
+
+          var boost = 500;
+          strongestTarget.atk = (strongestTarget.atk || 0) + boost;
+          strongestTarget.equip = (strongestTarget.equip || 0) + boost;
+          if (typeof log === 'function') log('¡El rival activa ' + eq.name + ' y equipa a ' + strongestTarget.name + ' (+500 ATK)!');
+          if (typeof duelToast === 'function') duelToast('¡El rival equipó ' + eq.name + ' (+500 ATK)!');
+        }
+      }
+    }
+
+    // E. INVOCACIÓN NORMAL AGRESIVA (SIN OMITIR ALEATORIAMENTE)
+    var openSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+    if (openSlot >= 0 && game.enemyHand.length > 0) {
+      var monsters = game.enemyHand.filter(function(c) { return !isST(c); });
+      if (monsters.length > 0) {
+        monsters.sort(function(a, b) {
+          var aAtk = Number(a.atk || a[4] || 0);
+          var bAtk = Number(b.atk || b[4] || 0);
+          return bAtk - aAtk;
+        });
+        var best = monsters[0];
+        var idx = game.enemyHand.indexOf(best);
+        game.enemyHand.splice(idx, 1);
+        var summoned = window.mk(best.name || best[0]) || { name: best.name || best[0], atk: best.atk || best[4], def: best.def || best[5] };
+        summoned.pos = 'ATK';
+        summoned.faceUp = true;
+        game.enemy[openSlot] = summoned;
+        if (window.playSummonSound) window.playSummonSound();
+        if (typeof log === 'function') log('El rival invoca a ' + (summoned.name || 'un monstruo') + ' (' + (summoned.atk || 0) + ' ATK).');
+        if (typeof render === 'function') render();
+      }
+    }
+  };
+  try { aiHandSummonOrSet = window.aiHandSummonOrSet; } catch(_) {}
+
   window.aiBattle = function() {
-    if (game && game.turn === 'enemy') {
-      if (game._threateningRoarActive) {
-        if (game._threateningRoarTurn === game.turnNo) {
-          game._threateningRoarActive = false;
-          duelToast('Threatening Roar impide que el rival ataque este turno.');
-          return;
+    if (!game || game.turn !== 'enemy') return;
+
+    if (game.first === 'enemy' && game.firstTurn) {
+      if (typeof log === 'function') log('El rival inició el duelo y no puede atacar en su primer turno.');
+      return;
+    }
+
+    if (game._threateningRoarActive) {
+      if (game._threateningRoarTurn === game.turnNo) {
+        game._threateningRoarActive = false;
+        duelToast('Threatening Roar impide que el rival ataque este turno.');
+        return;
+      } else {
+        game._threateningRoarActive = false;
+      }
+    }
+
+    if (game._wabokuActiveThisTurn) {
+      if (game._wabokuActiveTurn === game.turnNo) {
+        (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
+        duelToast('Waboku evitó el daño y protegió a tus monstruos este turno.');
+        if (typeof log === 'function') log('Waboku protege tu campo: no hay daño ni destrucción.');
+        if (typeof render === 'function') render();
+        return;
+      } else {
+        game._wabokuActiveThisTurn = false;
+        game._wabokuActiveTurn = null;
+      }
+    }
+
+    var trapTriggeredThisTurn = false;
+
+    // Iterar sobre TODOS los monstruos del rival para atacar con todos
+    for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+      if (!game.enemy || game.elp <= 0 || game.plp <= 0) break;
+      var e = game.enemy[ei];
+      if (!e) continue;
+      if (e.attackedTurn === game.turnNo) continue;
+
+      var attackerIsGod = isEgyptianGod(e.name || e[0]);
+      var currentEffectiveAtk = typeof effectiveAtk === 'function' ? effectiveAtk(e) : (e.atk || 0);
+      var playerMonsters = (game.field || []).filter(Boolean);
+
+      // Si está en defensa pero no hay monstruos del jugador o tiene buen ATK, cambiar a ATAQUE
+      if (e.pos === 'DEF' && e.kind !== 'LINK') {
+        if (playerMonsters.length === 0 || currentEffectiveAtk >= 800) {
+          e.pos = 'ATK';
+          if (typeof log === 'function') log(e.name + ' cambia a posición de ATAQUE.');
         } else {
-          game._threateningRoarActive = false;
+          continue;
         }
       }
-      if (game._wabokuActiveThisTurn) {
-        if (game._wabokuActiveTurn === game.turnNo) {
-          (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
-          duelToast('Waboku evitó el daño y protegió a tus monstruos este turno.');
-          if (typeof log === 'function') log('Waboku protege tu campo: no hay daño ni destrucción.');
-          if (typeof render === 'function') render();
-          return;
-        } else {
-          game._wabokuActiveThisTurn = false;
-          game._wabokuActiveTurn = null;
-        }
-      }
 
-      var ei = (game.enemy || []).findIndex(function(c) { return c && (c.pos === 'ATK' || c.kind === 'LINK'); });
-      if (ei < 0) ei = (game.enemy || []).findIndex(Boolean);
+      if (e.pos !== 'ATK' && e.kind !== 'LINK') continue;
 
-      if (ei >= 0) {
-        var attacker = game.enemy[ei];
-        var attackerIsGod = isEgyptianGod(attacker.name || attacker[0]);
-
+      // VERIFICACIÓN DE TRAMPAS EN EL PRIMER ATAQUE
+      if (!trapTriggeredThisTurn) {
         // 0. Crush Card Virus
         var ccvIdx = (game.playerBack || []).findIndex(function(c) {
           return c && c.set && (c.value === 'CRUSH_CARD_VIRUS' || c.name === 'Crush Card Virus');
         });
         if (ccvIdx >= 0) {
+          trapTriggeredThisTurn = true;
           var trapCCV = game.playerBack[ccvIdx];
           game.playerBack[ccvIdx] = null;
           game.grave.push(Object.assign({}, trapCCV, { set: false, faceUp: true }));
@@ -7924,10 +8108,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           for (var ek = 0; ek < (game.enemy || []).length; ek++) {
             var em = game.enemy[ek];
             if (em) {
-              if (isEgyptianGod(em.name || em[0])) {
-                if (typeof log === 'function') log('\u00a1El Dios Egipcio ' + (em.name || 'Dios') + ' resiste la destrucci\u00f3n de Crush Card Virus!');
-                continue;
-              }
+              if (isEgyptianGod(em.name || em[0])) continue;
               game.enemyGrave.push(em);
               game.enemy[ek] = null;
               eDestroyed++;
@@ -7936,9 +8117,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           if (window.playDestroySound) window.playDestroySound();
           if (typeof render === 'function') render();
           if (typeof window.showTrap114 === 'function') window.showTrap114('Crush Card Virus', 'Destruye ' + eDestroyed + ' monstruos en el campo rival.');
-          duelToast('\u00a1Crush Card Virus activado! Destruye ' + eDestroyed + ' monstruo(s) en el campo rival.');
-          if (typeof log === 'function') log('\u00a1Crush Card Virus! Destruye todos los monstruos en el campo rival (' + eDestroyed + '). No afecta mano ni deck.');
-          if (!attackerIsGod) return;
+          duelToast('¡Crush Card Virus activado! Destruye ' + eDestroyed + ' monstruo(s) rivales.');
+          if (!attackerIsGod) break;
         }
 
         // 1. Negate Attack
@@ -7946,17 +8126,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           return c && c.set && (c.value === 'NEGATE_ATTACK' || c.name === 'Negate Attack');
         });
         if (negIdx >= 0) {
+          trapTriggeredThisTurn = true;
           if (attackerIsGod) {
-            duelToast('¡Negate Attack falla! ¡El ataque del Dios Egipcio no puede ser negado!');
-            if (typeof log === 'function') log('¡Negate Attack falla! El ataque supremo de ' + (attacker.name || 'Dios') + ' no puede ser negado.');
+            duelToast('¡Negate Attack falla contra Dios Egipcio!');
           } else {
             var trapN = game.playerBack[negIdx];
             game.playerBack[negIdx] = null;
             game.grave.push(Object.assign({}, trapN, { set: false, faceUp: true }));
             (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
             if (typeof render === 'function') render();
-            if (typeof window.showTrap114 === 'function') window.showTrap114('Negate Attack', 'El ataque fue negado y la Battle Phase rival terminó.');
-            duelToast('¡Negate Attack activado! El ataque fue negado y la Battle Phase rival terminó.');
+            duelToast('¡Negate Attack activado! Ataque negado y Battle Phase rival terminada.');
             if (typeof log === 'function') log('¡Negate Attack! Niega el ataque y termina la Battle Phase.');
             return;
           }
@@ -7967,6 +8146,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           return c && c.set && (c.value === 'WABOKU' || c.name === 'Waboku');
         });
         if (wabIdx >= 0) {
+          trapTriggeredThisTurn = true;
           var trapW = game.playerBack[wabIdx];
           game.playerBack[wabIdx] = null;
           game.grave.push(Object.assign({}, trapW, { set: false, faceUp: true }));
@@ -7974,9 +8154,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           game._wabokuActiveTurn = game.turnNo;
           (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
           if (typeof render === 'function') render();
-          if (typeof window.showTrap114 === 'function') window.showTrap114('Waboku', 'Tus monstruos y LP están protegidos este turno.');
-          duelToast('¡Waboku activado! Tus monstruos y LP están protegidos contra daño de batalla.');
-          if (typeof log === 'function') log('¡Waboku! No habrá daño ni destrucción por batalla este turno.');
+          duelToast('¡Waboku activado! No hay daño este turno.');
           return;
         }
 
@@ -7985,20 +8163,18 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           return c && c.set && (c.value === 'SAKURETSU_ARMOR' || c.name === 'Sakuretsu Armor');
         });
         if (sakIdx >= 0) {
+          trapTriggeredThisTurn = true;
           if (attackerIsGod) {
-            duelToast('¡Sakuretsu Armor falla! ¡El Dios Egipcio no puede ser destruido por Trampas!');
-            if (typeof log === 'function') log('¡Sakuretsu Armor no puede destruir al Dios Egipcio ' + (attacker.name || 'Dios') + '! Solo puede ser destruido por batalla.');
+            duelToast('¡Sakuretsu Armor falla contra Dios Egipcio!');
           } else {
             var trapS = game.playerBack[sakIdx];
             game.playerBack[sakIdx] = null;
             game.grave.push(Object.assign({}, trapS, { set: false, faceUp: true }));
             game.enemy[ei] = null;
-            game.enemyGrave.push(attacker);
+            game.enemyGrave.push(e);
             if (typeof render === 'function') render();
-            if (typeof window.showTrap114 === 'function') window.showTrap114('Sakuretsu Armor', (attacker.name || 'El atacante') + ' fue destruido.');
-            duelToast('¡Sakuretsu Armor activado! ' + (attacker.name || 'El atacante') + ' fue destruido.');
-            if (typeof log === 'function') log('¡Sakuretsu Armor! Destruye al atacante ' + (attacker.name || '') + '.');
-            return;
+            duelToast('¡Sakuretsu Armor destruyó a ' + (e.name || 'el atacante') + '!');
+            continue;
           }
         }
 
@@ -8007,19 +8183,19 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           return c && c.set && (c.value === 'MAGIC_CYLINDER' || c.name === 'Magic Cylinder');
         });
         if (cylIdx >= 0) {
+          trapTriggeredThisTurn = true;
           if (attackerIsGod) {
-            duelToast('¡Magic Cylinder falla! ¡El ataque del Dios Egipcio no puede ser negado!');
-            if (typeof log === 'function') log('¡Magic Cylinder no puede contener el poder de ' + (attacker.name || 'Dios') + '!');
+            duelToast('¡Magic Cylinder falla contra Dios Egipcio!');
           } else {
             var trapC = game.playerBack[cylIdx];
             game.playerBack[cylIdx] = null;
             game.grave.push(Object.assign({}, trapC, { set: false, faceUp: true }));
-            var dmg = Number(attacker.atk || 0);
-            game.elp = Math.max(0, game.elp - dmg);
-            (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
+            var dmgCyl = Number(currentEffectiveAtk || 0);
+            game.elp = Math.max(0, game.elp - dmgCyl);
+            e.attackedTurn = game.turnNo;
             if (typeof render === 'function') render();
-            duelToast('¡Magic Cylinder! Ataque negado y ' + dmg + ' de daño al rival.');
-            return;
+            duelToast('¡Magic Cylinder! Ataque negado y ' + dmgCyl + ' de daño al rival.');
+            continue;
           }
         }
 
@@ -8028,106 +8204,153 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           return c && c.set && (c.value === 'MIRROR_FORCE' || c.name === 'Mirror Force');
         });
         if (mirIdx >= 0) {
+          trapTriggeredThisTurn = true;
           var trapM = game.playerBack[mirIdx];
           game.playerBack[mirIdx] = null;
           game.grave.push(Object.assign({}, trapM, { set: false, faceUp: true }));
           var destroyedCount = 0;
           for (var k = 0; k < (game.enemy || []).length; k++) {
             if (game.enemy[k] && (game.enemy[k].pos !== 'DEF' || game.enemy[k].kind === 'LINK')) {
-              if (isEgyptianGod(game.enemy[k].name || game.enemy[k][0])) {
-                if (typeof log === 'function') log('¡El Dios Egipcio ' + (game.enemy[k].name || '') + ' resiste la destrucción de Mirror Force!');
-                continue; // IMMUNE!
-              }
+              if (isEgyptianGod(game.enemy[k].name || game.enemy[k][0])) continue;
               game.enemyGrave.push(game.enemy[k]);
               game.enemy[k] = null;
               destroyedCount++;
             }
           }
           if (typeof render === 'function') render();
-          if (typeof window.showTrap114 === 'function') window.showTrap114('Mirror Force', 'Se destruyeron ' + destroyedCount + ' monstruos atacantes.');
-          duelToast('¡Mirror Force activado! Se destruyeron ' + destroyedCount + ' monstruos atacantes.');
-          if (typeof log === 'function') log('¡Mirror Force! Destruye ' + destroyedCount + ' monstruos.');
-          if (!attackerIsGod) return;
+          duelToast('¡Mirror Force destruyó ' + destroyedCount + ' monstruos atacantes!');
+          if (!attackerIsGod) break;
         }
+      }
 
-        // Ultra-Aggressive Attack for Egyptian Gods (5000 ATK - never retreats to DEF)
-        if (attackerIsGod) {
-          var pi = (game.field || []).findIndex(Boolean);
-          if (pi < 0) {
-            // Direct Attack with God
-            game.plp = Math.max(0, game.plp - 5000);
-            if (typeof log === 'function') log('¡Ataque directo del temible ' + (attacker.name || 'Dios Egipcio') + '! ¡Pierdes 5000 LP!');
-            duelToast('¡ATAQUE DIRECTO DE ' + (attacker.name || 'DIOS EGIPCIO').toUpperCase() + '! (-5000 LP)');
-            if (window.playDestroySound) window.playDestroySound();
-          } else {
-            var pTarget = game.field[pi];
-            var pPow = (pTarget.pos === 'DEF' ? (pTarget.def || 0) : (pTarget.atk || 0)) + (pTarget.tempBoost || 0) + (pTarget.tempBoostDef || 0);
-            if (5000 >= pPow) {
-              var diff = pTarget.pos === 'DEF' ? 0 : (5000 - pPow);
-              if (diff > 0) game.plp = Math.max(0, game.plp - diff);
-              game.field[pi] = null;
-              if (Array.isArray(game.grave)) game.grave.push(pTarget);
-              if (typeof log === 'function') log('¡' + (attacker.name || 'Dios') + ' (5000 ATK) aniquila a ' + (pTarget.name || 'monstruo') + '!' + (diff > 0 ? ' Recibes ' + diff + ' de daño.' : ''));
-              duelToast('¡' + (attacker.name || 'Dios') + ' destruye a ' + (pTarget.name || 'monstruo') + '!');
-              if (window.playDestroySound) window.playDestroySound();
-            } else {
-              // Target has > 5000: Battle can destroy God!
-              var diffLoss = pPow - 5000;
-              game.elp = Math.max(0, game.elp - diffLoss);
-              game.enemy[ei] = null;
-              if (Array.isArray(game.enemyGrave)) game.enemyGrave.push(attacker);
-              if (typeof log === 'function') log('¡Batalla colosal! ' + (pTarget.name || 'Monstruo') + ' supera a ' + (attacker.name || 'Dios') + ' en combate. ¡El Dios es destruido por batalla!');
-              duelToast('¡El Dios Egipcio fue destruido por batalla!');
+      if (!game.enemy[ei]) continue;
+
+      // RESOLUCIÓN DE COMBATE
+      var remainingPlayerMonsters = (game.field || []).map(function(c, idx) { return c ? { c: c, idx: idx } : null; }).filter(Boolean);
+
+      // CASO DIRECTO: ¡EL JUGADOR NO TIENE MONSTRUOS EN EL CAMPO! ATAQUE DIRECTO
+      if (remainingPlayerMonsters.length === 0) {
+        var directDmg = currentEffectiveAtk;
+        game.plp = Math.max(0, game.plp - directDmg);
+        e.attackedTurn = game.turnNo;
+        if (typeof log === 'function') log('¡ATAQUE DIRECTO RIVAL! ' + e.name + ' causa ' + directDmg + ' LP de daño.');
+        duelToast('¡ATAQUE DIRECTO RIVAL! ' + e.name + ' (-' + directDmg + ' LP)');
+        if (window.playDestroySound) window.playDestroySound();
+        if (typeof render === 'function') render();
+        if (game.plp <= 0) break;
+        continue;
+      }
+
+      // CASO CON MONSTRUOS: BUSCAR MEJOR OBJETIVO
+      var bestTarget = null;
+      var maxLpDamage = -1;
+
+      for (var t = 0; t < remainingPlayerMonsters.length; t++) {
+        var targetObj = remainingPlayerMonsters[t];
+        var targetCard = targetObj.c;
+        var isSet = !!(targetCard.faceDownSet103 || targetCard.faceDown);
+        var tAtk = typeof effectiveAtk === 'function' ? effectiveAtk(targetCard) : (targetCard.atk || 0);
+        var tDef = (targetCard.def || 0) + (targetCard.tempDefense || 0) + (targetCard.tempBoostDef || 0);
+
+        if (!isSet && targetCard.pos === 'ATK') {
+          if (currentEffectiveAtk > tAtk) {
+            var diffDmg = currentEffectiveAtk - tAtk;
+            if (diffDmg > maxLpDamage) {
+              maxLpDamage = diffDmg;
+              bestTarget = targetObj;
             }
           }
-          attacker.attackedTurn = game.turnNo;
-          attacker.pos = 'ATK'; // NEVER switch to DEF!
-          if (typeof render === 'function') render();
-          return;
-        }
-      }
-    }
-
-    // Apply Guardian Signs bonus for AI battle against player monster
-    var cleanedAI_A = null, cleanedAI_D = null;
-    if (game && game.turn === 'enemy') {
-      var aiAttacker = (game.enemy || []).find(function(c) { return c && (c.pos === 'ATK' || c.kind === 'LINK'); });
-      if (!aiAttacker) aiAttacker = (game.enemy || []).find(Boolean);
-      var playerDefIdx = (game.field || []).findIndex(Boolean);
-      var playerDef = playerDefIdx >= 0 ? game.field[playerDefIdx] : null;
-
-      if (aiAttacker && playerDef) {
-        var aiRel = getSignCombatRelation(aiAttacker, playerDef);
-        var aiSign = getCardSign(aiAttacker), plSign = getCardSign(playerDef);
-        var aiSym = GUARDIAN_SYMBOLS[aiSign] || aiSign, plSym = GUARDIAN_SYMBOLS[plSign] || plSign;
-
-        if (aiRel === 'adv') {
-          aiAttacker.tempBoost = (aiAttacker.tempBoost || 0) + 500;
-          cleanedAI_A = { card: aiAttacker, field: 'tempBoost', amount: 500 };
-          if (typeof log === 'function') log('¡Signo Guardián Rival! ' + (aiAttacker.name || 'Rival') + ' [' + aiSym + '] > ' + (playerDef.name || 'Defensor') + ' [' + plSym + '] ➔ +500 ATK.');
-          if (typeof duelToast === 'function') duelToast('¡Desventaja de Signo! ' + (aiAttacker.name || 'Rival') + ' tiene ventaja: +500 ATK.');
-        } else if (aiRel === 'disadv') {
-          if (playerDef.pos === 'DEF') {
-            playerDef.tempBoostDef = (playerDef.tempBoostDef || 0) + 500;
-            cleanedAI_D = { card: playerDef, field: 'tempBoostDef', amount: 500 };
-            if (typeof log === 'function') log('¡Signo Guardián! ' + (playerDef.name || 'Defensor') + ' [' + plSym + '] > ' + (aiAttacker.name || 'Atacante') + ' [' + aiSym + '] ➔ +500 DEF.');
-            if (typeof duelToast === 'function') duelToast('¡Ventaja de Signo Guardián! ' + (playerDef.name || 'Defensor') + ' resiste con ventaja: +500 DEF.');
-          } else {
-            playerDef.tempBoost = (playerDef.tempBoost || 0) + 500;
-            cleanedAI_D = { card: playerDef, field: 'tempBoost', amount: 500 };
-            if (typeof log === 'function') log('¡Signo Guardián! ' + (playerDef.name || 'Defensor') + ' [' + plSym + '] > ' + (aiAttacker.name || 'Atacante') + ' [' + aiSym + '] ➔ +500 ATK.');
-            if (typeof duelToast === 'function') duelToast('¡Ventaja de Signo Guardián! ' + (playerDef.name || 'Defensor') + ' contrataca con ventaja: +500 ATK.');
+        } else {
+          if (isSet || currentEffectiveAtk > tDef) {
+            if (maxLpDamage < 0) {
+              bestTarget = targetObj;
+              maxLpDamage = 0;
+            }
           }
         }
       }
+
+      if (bestTarget) {
+        var pCard = bestTarget.c;
+        var pIdx = bestTarget.idx;
+
+        if (typeof triggerBattleTrap === 'function') triggerBattleTrap('player', pIdx);
+
+        var wasSet = !!(pCard.faceDownSet103 || pCard.faceDown);
+        if (wasSet) {
+          pCard.faceDown = false;
+          pCard.faceDownSet103 = false;
+          pCard.faceUp = true;
+          pCard.pos = 'DEF';
+          if (typeof log === 'function') log('El ataque revela a ' + (pCard.name || 'tu monstruo') + ' en DEFENSA.');
+        }
+
+        // Bonificaciones de Signos Guardianes
+        var aiSignBonus = 0, plSignBonus = 0;
+        if (typeof getSignCombatRelation === 'function') {
+          var rel = getSignCombatRelation(e, pCard);
+          if (rel === 'adv') aiSignBonus = 500;
+          else if (rel === 'disadv') plSignBonus = 500;
+        }
+
+        var finalAttackerAtk = currentEffectiveAtk + aiSignBonus;
+        var finalTargetAtk = (typeof effectiveAtk === 'function' ? effectiveAtk(pCard) : (pCard.atk || 0)) + plSignBonus;
+        var finalTargetDef = (pCard.def || 0) + (pCard.tempDefense || 0) + (pCard.tempBoostDef || 0) + plSignBonus;
+
+        if (pCard.pos === 'DEF' && pCard.kind !== 'LINK') {
+          if (finalAttackerAtk > finalTargetDef) {
+            game.field[pIdx] = null;
+            game.grave.push(pCard);
+            if (typeof log === 'function') log(e.name + ' (' + finalAttackerAtk + ' ATK) destruye a ' + pCard.name + ' (' + finalTargetDef + ' DEF).');
+            duelToast('¡Rival destruyó a tu ' + pCard.name + '!');
+            if (window.playDestroySound) window.playDestroySound();
+          } else if (finalAttackerAtk < finalTargetDef) {
+            var recoil = finalTargetDef - finalAttackerAtk;
+            game.elp = Math.max(0, game.elp - recoil);
+            if (typeof log === 'function') log(e.name + ' no supera la DEF de ' + pCard.name + '. El rival recibe ' + recoil + ' de daño.');
+            if (window.playLPGainSound) window.playLPGainSound();
+          } else {
+            if (typeof log === 'function') log('Empate con la DEF de ' + pCard.name + ': nadie es destruido.');
+          }
+        } else {
+          // Objetivo en ATAQUE
+          if (finalAttackerAtk > finalTargetAtk) {
+            var diff = finalAttackerAtk - finalTargetAtk;
+            game.plp = Math.max(0, game.plp - diff);
+            game.field[pIdx] = null;
+            game.grave.push(pCard);
+            if (typeof log === 'function') log(e.name + ' destruye a ' + pCard.name + '. Recibes ' + diff + ' LP de daño.');
+            duelToast('¡' + e.name + ' destruyó a ' + pCard.name + '! (-' + diff + ' LP)');
+            if (window.playDestroySound) window.playDestroySound();
+          } else if (finalAttackerAtk < finalTargetAtk) {
+            var recoilAtk = finalTargetAtk - finalAttackerAtk;
+            game.elp = Math.max(0, game.elp - recoilAtk);
+            game.enemy[ei] = null;
+            game.enemyGrave.push(e);
+            if (typeof log === 'function') log(e.name + ' es destruido al atacar a ' + pCard.name + '. El rival pierde ' + recoilAtk + ' LP.');
+            if (window.playDestroySound) window.playDestroySound();
+          } else {
+            game.enemy[ei] = null;
+            game.field[pIdx] = null;
+            game.enemyGrave.push(e);
+            game.grave.push(pCard);
+            if (typeof log === 'function') log('Empate de ATK entre ' + e.name + ' y ' + pCard.name + ': ambos destruidos.');
+            if (window.playDestroySound) window.playDestroySound();
+          }
+        }
+
+        e.attackedTurn = game.turnNo;
+        if (typeof render === 'function') render();
+      } else {
+        e.pos = 'DEF';
+        if (typeof log === 'function') log(e.name + ' adopta posición de DEFENSA.');
+        e.attackedTurn = game.turnNo;
+      }
     }
 
-    try {
-      if (prevAiBattleMaster) return prevAiBattleMaster.apply(this, arguments);
-    } finally {
-      if (cleanedAI_A) cleanedAI_A.card[cleanedAI_A.field] = Math.max(0, (cleanedAI_A.card[cleanedAI_A.field] || 0) - cleanedAI_A.amount);
-      if (cleanedAI_D) cleanedAI_D.card[cleanedAI_D.field] = Math.max(0, (cleanedAI_D.card[cleanedAI_D.field] || 0) - cleanedAI_D.amount);
-      setTimeout(updateGuardianBattleHints, 30);
+    if (typeof render === 'function') render();
+    if (game.plp <= 0 || game.elp <= 0) {
+      if (typeof log === 'function') log('Duelo terminado.');
     }
   };
   try { aiBattle = window.aiBattle; } catch(_) {}
@@ -8896,26 +9119,26 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       border-radius: 3px !important;
     }
 
-    /* Field Stats Banner */
+    /* Field Stats Banner - Ampliado y Visible */
     body.view-field #player .fieldStats,
     body.view-field #enemy .fieldStats,
     .fieldStats {
-      flex: 0 0 20px !important;
-      height: 20px !important;
-      min-height: 20px !important;
-      max-height: 20px !important;
+      flex: 0 0 28px !important;
+      height: 28px !important;
+      min-height: 28px !important;
+      max-height: 28px !important;
       width: 100% !important;
       display: flex !important;
       justify-content: space-around !important;
       align-items: center !important;
-      background: rgba(0, 0, 0, 0.9) !important;
-      border-top: 1px solid #5a4625 !important;
-      border-radius: 0 0 3px 3px !important;
-      font-size: 8px !important;
+      background: rgba(0, 0, 0, 0.94) !important;
+      border-top: 2px solid #d4af37 !important;
+      border-radius: 0 0 4px 4px !important;
+      font-size: 13.5px !important;
       font-weight: 900 !important;
-      padding: 0 2px !important;
+      padding: 0 4px !important;
       box-sizing: border-box !important;
-      letter-spacing: -0.2px !important;
+      letter-spacing: 0px !important;
       overflow: hidden !important;
     }
 
@@ -8923,6 +9146,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     body.view-field #enemy .fieldStats .atk,
     .fieldStats .atk {
       color: #ff5252 !important;
+      font-size: 13.5px !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 4px #000, 1px 1px 2px #000 !important;
       display: flex !important;
       align-items: center !important;
     }
@@ -8931,8 +9157,85 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     body.view-field #enemy .fieldStats .def,
     .fieldStats .def {
       color: #4da6ff !important;
+      font-size: 13.5px !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 4px #000, 1px 1px 2px #000 !important;
       display: flex !important;
       align-items: center !important;
+    }
+
+    /* Panel de Información de Cartas - Ampliado, legible y nítido */
+    #cardInfoPanel, .cardInfoPanel {
+      width: 250px !important;
+      min-width: 230px !important;
+      min-height: 180px !important;
+      background: rgba(14, 11, 7, 0.95) !important;
+      border: 2px solid #d4af37 !important;
+      border-radius: 10px !important;
+      padding: 12px !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(212, 175, 55, 0.15) !important;
+      z-index: 100 !important;
+    }
+
+    .cardInfoTitle {
+      font-size: 16px !important;
+      font-weight: bold !important;
+      color: #ffd700 !important;
+      letter-spacing: 2px !important;
+      border-bottom: 1.5px solid #d4af37 !important;
+      padding-bottom: 6px !important;
+      margin-bottom: 8px !important;
+      text-shadow: 1px 1px 2px #000 !important;
+      text-align: center !important;
+    }
+
+    .cardInfoBody, #cardInfoBody {
+      font-size: 14px !important;
+      line-height: 1.45 !important;
+      color: #f0f0f0 !important;
+    }
+
+    .infoName {
+      font-size: 16px !important;
+      font-weight: 900 !important;
+      color: #ffffff !important;
+      margin-bottom: 4px !important;
+      text-shadow: 1px 1px 2px #000 !important;
+    }
+
+    .infoStars {
+      font-size: 14px !important;
+      color: #ffd700 !important;
+      margin-bottom: 6px !important;
+    }
+
+    .infoGrid {
+      font-size: 13.5px !important;
+      gap: 5px 10px !important;
+      display: grid !important;
+      grid-template-columns: auto 1fr !important;
+    }
+
+    .infoGrid span {
+      color: #aaa !important;
+      font-weight: normal !important;
+    }
+
+    .infoGrid b {
+      color: #fff !important;
+      font-weight: bold !important;
+    }
+
+    .infoAtk {
+      color: #ff5252 !important;
+      font-size: 15px !important;
+      font-weight: 900 !important;
+    }
+
+    .infoDef {
+      color: #4da6ff !important;
+      font-size: 15px !important;
+      font-weight: 900 !important;
     }
 
     /* Defense Position on Field: card rotates horizontally with clear blue border */
@@ -9004,8 +9307,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       body.view-field #player .fieldStats,
       body.view-field #enemy .fieldStats,
       .fieldStats {
-        font-size: 7px !important;
-        height: 18px !important;
+        font-size: 11px !important;
+        height: 22px !important;
+      }
+      body.view-field #player .fieldStats .atk,
+      body.view-field #enemy .fieldStats .atk,
+      .fieldStats .atk {
+        font-size: 11px !important;
+      }
+      body.view-field #player .fieldStats .def,
+      body.view-field #enemy .fieldStats .def,
+      .fieldStats .def {
+        font-size: 11px !important;
+      }
+      #cardInfoPanel, .cardInfoPanel {
+        width: 95vw !important;
+        max-width: 95vw !important;
       }
     }
   `;

@@ -74,8 +74,97 @@ function readSave(name) {
   } catch (_) {}
   return null;
 }
+// ── Sincronización Automática con GitHub para Render ─────────────
+const GITHUB_REPO = process.env.GITHUB_REPO || 'WEWebcr/JuegoYugioh';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
+
+async function syncSaveToGitHub(data) {
+  if (!GITHUB_TOKEN || !data || !data.name) return;
+  const fileName = safeName(data.name) + '.json';
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/saves/${fileName}`;
+  const contentBase64 = Buffer.from(JSON.stringify(data, null, 2), 'utf8').toString('base64');
+  
+  try {
+    let sha = null;
+    try {
+      const getRes = await fetch(url, {
+        headers: {
+          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'YuGiOh-FMR-Server'
+        }
+      });
+      if (getRes.ok) {
+        const fileInfo = await getRes.json();
+        sha = fileInfo.sha;
+      }
+    } catch (_) {}
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'YuGiOh-FMR-Server',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `chore(save): auto-save player ${data.name} [skip ci]`,
+        content: contentBase64,
+        sha: sha || undefined
+      })
+    });
+
+    if (putRes.ok) {
+      console.log(`[GitHub Sync] Partida de "${data.name}" guardada en GitHub (${GITHUB_REPO})`);
+    } else {
+      const errTxt = await putRes.text();
+      console.warn(`[GitHub Sync] Error al guardar en GitHub:`, errTxt);
+    }
+  } catch (err) {
+    console.warn(`[GitHub Sync] Excepción al sincronizar con GitHub:`, err.message);
+  }
+}
+
+async function hydrateSavesFromGitHub() {
+  if (!GITHUB_TOKEN) {
+    console.log('[GitHub Sync] GITHUB_TOKEN no configurado en entorno. Usando almacenamiento local.');
+    return;
+  }
+  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/saves`;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'YuGiOh-FMR-Server'
+      }
+    });
+    if (!res.ok) return;
+    const items = await res.json();
+    if (Array.isArray(items)) {
+      for (const item of items) {
+        if (item.name && item.name.endsWith('.json') && item.download_url) {
+          const localFile = path.join(SAVES_DIR, item.name);
+          if (!fs.existsSync(localFile)) {
+            const downRes = await fetch(item.download_url);
+            if (downRes.ok) {
+              const fileData = await downRes.text();
+              fs.writeFileSync(localFile, fileData, 'utf8');
+              console.log(`[GitHub Sync] Save hidratado desde GitHub: ${item.name}`);
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[GitHub Sync] Error al hidratar saves desde GitHub:', err.message);
+  }
+}
+
 function writeSave(data) {
   fs.writeFileSync(savePath(data.name), JSON.stringify(data, null, 2), 'utf8');
+  syncSaveToGitHub(data);
 }
 function findSaveByEmailOrName(identifier) {
   if (!identifier) return null;
@@ -360,9 +449,20 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', (req, res) => {
   const identifier = req.body?.name || req.body?.identifier;
   const password = req.body?.password;
+  const clientSave = req.body?.clientSave;
   if (!identifier || !password) return res.status(400).json({ error: 'Nombre/correo y clave requeridos' });
 
-  const save = findSaveByEmailOrName(identifier);
+  let save = findSaveByEmailOrName(identifier);
+
+  // Auto-Restauración si Render reinició su contenedor y se perdió el archivo local
+  if (!save && clientSave && (clientSave.name === identifier || clientSave.email === identifier)) {
+    if (clientSave.passwordHash === hashPassword(password)) {
+      console.log('[Auto-Restore] Save restaurado desde el navegador del cliente para:', identifier);
+      writeSave(clientSave);
+      save = clientSave;
+    }
+  }
+
   if (!save) return res.status(404).json({ error: 'Cuenta no encontrada. Verifica el nombre o correo.' });
   if (save.passwordHash !== hashPassword(password)) return res.status(401).json({ error: 'Clave incorrecta' });
 
@@ -1065,4 +1165,5 @@ app.listen(PORT, () => {
   console.log('  Saves:  ' + path.join(ROOT, 'saves'));
   console.log('==========================================');
   console.log('');
+  hydrateSavesFromGitHub();
 });
