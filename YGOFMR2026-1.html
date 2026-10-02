@@ -10280,217 +10280,761 @@ window.customShowPrologue = function(i) {
     if(window.hideDuelBoard) window.hideDuelBoard(); window.customShowMap();
 };
 
+// ════════════════════════════════════════════════════════════════
+//  SISTEMA CENTRAL DE LOS 7 ARTÍCULOS DEL MILENIO
+// ════════════════════════════════════════════════════════════════
+window.getMillenniumItems = function(s) {
+    s = s || {};
+    const cleared = Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : [];
+    return [
+      {
+        id: 'key',
+        name: 'Llave del Milenio',
+        shortName: 'Llave',
+        bearer: 'Joey Wheeler / Shadi',
+        bearerId: 'joey',
+        power: 'Apertura de Almas y Mentes',
+        desc: 'Desbloquea el santuario interior de la mente humana para explorar sus pensamientos o purificarla.',
+        hint: 'Derrota a Joey Wheeler en la Campaña para recuperarla.',
+        unlocked: cleared.includes('joey'),
+        icon: '🔑',
+        grandpaQuote: 'La Llave del Milenio abre los pasadizos más recónditos del alma de un duelista.',
+        svgPath: `
+          <ellipse cx="50" cy="30" rx="17" ry="21" fill="none" stroke="url(#goldGrad)" stroke-width="5.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
+          <ellipse cx="50" cy="30" rx="8.5" ry="5.2" fill="#1a1408" stroke="#ffd700" stroke-width="1.2"/>
+          <circle cx="50" cy="30" r="2.4" fill="#ffd700"/>
+          <rect x="23" y="48" width="54" height="7.5" rx="3" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
+          <rect x="46" y="54" width="8" height="38" rx="2" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
+          <rect x="54" y="78" width="9" height="3.5" fill="url(#goldGrad)"/>
+          <rect x="54" y="86" width="7" height="3.5" fill="url(#goldGrad)"/>
+        `
+      },
+      {
+        id: 'eye',
+        name: 'Ojo del Milenio',
+        shortName: 'Ojo',
+        bearer: 'Maximillion Pegasus',
+        bearerId: 'pegasus',
+        power: 'Lectura Mental y Captura de Almas',
+        desc: 'Permite leer los pensamientos, ver las cartas en la mano del oponente y atrapar almas en cartas mágicas.',
+        hint: 'Derrota a Maximillion Pegasus en la Campaña para recuperarlo.',
+        unlocked: cleared.includes('pegasus'),
+        icon: '👁️',
+        grandpaQuote: 'Pegasus usó el Ojo del Milenio para atrapar mi alma en una cinta de video. ¡Un poder temible si cae en las manos equivocadas!',
+        svgPath: `
+          <circle cx="50" cy="50" r="36" fill="url(#eyeOrb)" stroke="#fff" stroke-width="2" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.8))"/>
+          <path d="M24,50 Q50,28 76,50 Q50,72 24,50 Z" fill="#1a1408" stroke="#ffd700" stroke-width="2.2"/>
+          <circle cx="50" cy="50" r="13" fill="url(#eyeOrb)" stroke="#ffe082" stroke-width="1.4"/>
+          <circle cx="50" cy="50" r="5.5" fill="#000"/>
+          <circle cx="48" cy="48" r="1.8" fill="#fff"/>
+        `
+      },
+      {
+        id: 'ring',
+        name: 'Sortija del Milenio',
+        shortName: 'Sortija',
+        bearer: 'Yami Bakura',
+        bearerId: 'bakura',
+        power: 'Detección Mística y Magia Oscura',
+        desc: 'Sus 5 agujas místicas apuntan hacia otros Artículos del Milenio o hacia personas con gran energía ancestral.',
+        hint: 'Derrota a Yami Bakura en la Campaña para recuperarla.',
+        unlocked: cleared.includes('bakura'),
+        icon: '💍',
+        grandpaQuote: 'La Sortija del Milenio... las almas atrapadas dentro de ella anhelan el poder de los Duelos de las Sombras.',
+        svgPath: `
+          <circle cx="50" cy="50" r="30" fill="none" stroke="url(#goldGrad)" stroke-width="4.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
+          <polygon points="50,30 36,54 64,54" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1.5"/>
+          <circle cx="50" cy="45" r="4.2" fill="#1a1408"/>
+          <circle cx="50" cy="45" r="2" fill="#ffd700"/>
+          <polygon points="50,14 47,3 53,3" fill="url(#goldGrad)"/>
+          <polygon points="80,40 92,36 89,42" fill="url(#goldGrad)"/>
+          <polygon points="72,74 83,83 77,86" fill="url(#goldGrad)"/>
+          <polygon points="28,74 17,83 23,86" fill="url(#goldGrad)"/>
+          <polygon points="20,40 8,36 11,42" fill="url(#goldGrad)"/>
+        `
+      },
+      {
+        id: 'necklace',
+        name: 'Collar del Milenio',
+        shortName: 'Collar',
+        bearer: 'Ishizu Ishtar',
+        bearerId: 'ishizu',
+        power: 'Clarividencia y Destino Sagrado',
+        desc: 'Otorga a su portador visiones certeras sobre los hilos del destino y el desenlace de los combates.',
+        hint: 'Derrota a Ishizu Ishtar en la Campaña para recuperarlo.',
+        unlocked: cleared.includes('ishizu'),
+        icon: '📿',
+        grandpaQuote: 'El Collar del Milenio revela visiones del futuro... pero un verdadero duelista puede forjar su propio destino.',
+        svgPath: `
+          <path d="M18,40 C18,72 82,72 82,40 C82,30 75,23 70,23 C60,44 40,44 30,23 C25,23 18,30 18,40 Z" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
+          <circle cx="50" cy="72" r="6.5" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1.4"/>
+          <circle cx="35" cy="68" r="4.5" fill="url(#goldGrad)"/>
+          <circle cx="65" cy="68" r="4.5" fill="url(#goldGrad)"/>
+          <ellipse cx="50" cy="55" rx="7.5" ry="4.2" fill="#1a1408" stroke="#ffe082" stroke-width="1"/>
+          <circle cx="50" cy="55" r="2" fill="#ffd700"/>
+        `
+      },
+      {
+        id: 'rod',
+        name: 'Cetro del Milenio',
+        shortName: 'Cetro',
+        bearer: 'Marik Ishtar',
+        bearerId: 'marik',
+        power: 'Control Mental y Mandato Oscuro',
+        desc: 'Permite doblegar la voluntad ajena a través de la hipnosis milenaria y canalizar monstruos oscuros.',
+        hint: 'Derrota a Marik Ishtar en la Campaña para recuperarlo.',
+        unlocked: cleared.includes('marik'),
+        icon: '🔱',
+        grandpaQuote: '¡El Cetro de Marik! Una reliquia peligrosa capaz de controlar la mente de duelistas inocentes.',
+        svgPath: `
+          <rect x="46" y="38" width="8" height="54" rx="3" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1.5"/>
+          <circle cx="50" cy="92" r="5" fill="url(#goldGrad)"/>
+          <line x1="46" y1="52" x2="54" y2="52" stroke="#4a3000" stroke-width="1.5"/>
+          <line x1="46" y1="68" x2="54" y2="68" stroke="#4a3000" stroke-width="1.5"/>
+          <path d="M50,12 C36,12 22,25 18,36 C31,34 43,38 50,42 C57,38 69,34 82,36 C78,25 64,12 50,12 Z" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
+          <ellipse cx="50" cy="25" rx="8.5" ry="5.2" fill="#1a1408" stroke="#ffe082" stroke-width="1"/>
+          <circle cx="50" cy="25" r="2.6" fill="#ffd700"/>
+        `
+      },
+      {
+        id: 'scale',
+        name: 'Balanza del Milenio',
+        shortName: 'Balanza',
+        bearer: 'Seto Kaiba / Karim',
+        bearerId: 'kaiba',
+        power: 'Juicio del Corazón y Fusión Primordial',
+        desc: 'Pesa la pureza del corazón contra la sagrada Pluma de Ma\'at y canaliza fusiones de monstruos primordiales.',
+        hint: 'Derrota a Seto Kaiba en la Campaña para recuperarla.',
+        unlocked: cleared.includes('kaiba') || cleared.includes('seto'),
+        icon: '⚖️',
+        grandpaQuote: 'La Balanza de Ma\'at juzga la pureza de los duelistas. En manos sabias, otorga un equilibrio absoluto en batalla.',
+        svgPath: `
+          <rect x="48" y="20" width="4" height="68" fill="url(#goldGrad)"/>
+          <polygon points="50,88 35,96 65,96" fill="url(#goldGrad)"/>
+          <circle cx="50" cy="22" r="9" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.4" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
+          <circle cx="50" cy="22" r="4.2" fill="#1a1408"/>
+          <circle cx="50" cy="22" r="1.8" fill="#ffd700"/>
+          <line x1="16" y1="36" x2="84" y2="36" stroke="url(#goldGrad)" stroke-width="3.8" stroke-linecap="round"/>
+          <line x1="22" y1="36" x2="16" y2="60" stroke="#ffd700" stroke-width="1.4"/>
+          <line x1="22" y1="36" x2="28" y2="60" stroke="#ffd700" stroke-width="1.4"/>
+          <path d="M12,60 Q22,70 32,60 Z" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
+          <line x1="78" y1="36" x2="72" y2="60" stroke="#ffd700" stroke-width="1.4"/>
+          <line x1="78" y1="36" x2="84" y2="60" stroke="#ffd700" stroke-width="1.4"/>
+          <path d="M68,60 Q78,70 88,60 Z" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
+        `
+      },
+      {
+        id: 'puzzle',
+        name: 'Rompecabezas del Milenio',
+        shortName: 'Rompecabezas',
+        bearer: 'Yugi Muto / Faraón Atem',
+        bearerId: 'yugi',
+        power: 'Justicia y Duelos de las Sombras',
+        desc: 'El artículo supremo. Alberga el espíritu ancestral del Faraón y otorga dominio sobre el destino en los Duelos de las Sombras.',
+        hint: 'Derrota a Yugi Muto en el Duelo Supremo de la Campaña para recuperarlo.',
+        unlocked: cleared.includes('yugi'),
+        icon: '🧩',
+        grandpaQuote: '¡El Rompecabezas del Milenio! Yugi tardó años en armarlo. Alberga el alma de un faraón sin nombre con una fuerza inquebrantable.',
+        svgPath: `
+          <polygon points="50,88 14,26 86,26" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.8" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
+          <circle cx="50" cy="18" r="8" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
+          <circle cx="50" cy="18" r="4.5" fill="#1a1408"/>
+          <line x1="25" y1="44" x2="75" y2="44" stroke="#684a08" stroke-width="1.8"/>
+          <line x1="34" y1="62" x2="66" y2="62" stroke="#684a08" stroke-width="1.8"/>
+          <line x1="43" y1="76" x2="57" y2="76" stroke="#684a08" stroke-width="1.8"/>
+          <ellipse cx="50" cy="36" rx="13" ry="7" fill="#1a1408" stroke="#ffd700" stroke-width="1.4"/>
+          <circle cx="50" cy="36" r="3.8" fill="url(#eyeGlow)"/>
+          <circle cx="50" cy="36" r="1.8" fill="#000"/>
+          <path d="M36,30 Q50,26 64,30" fill="none" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M45,43 L45,48" stroke="#ffd700" stroke-width="1.8"/>
+          <path d="M55,43 L58,48" stroke="#ffd700" stroke-width="1.8"/>
+        `
+      }
+    ];
+};
+
+// Pantalla de Celebración cuando se obtiene una Reliquia Sagrada
+window.showMillenniumItemCelebration = function(wonItem, charId, onDone) {
+    if (window.playCustomMusic) window.playCustomMusic('dueloterminado.mp3');
+    if (window.playViolinClick) window.playViolinClick();
+    
+    let modal = document.createElement('div');
+    modal.id = 'relic-celebration-modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:radial-gradient(circle at center, rgba(35,22,6,0.96) 0%, rgba(8,5,2,0.99) 100%); z-index:9999999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; box-sizing:border-box;';
+    
+    let aura = document.createElement('div');
+    aura.style.cssText = 'position:absolute; width:460px; height:460px; background:radial-gradient(circle, rgba(255,215,0,0.35) 0%, rgba(255,165,0,0.12) 45%, rgba(0,0,0,0) 75%); border-radius:50%; pointer-events:none;';
+    modal.appendChild(aura);
+    
+    let svgBox = document.createElement('div');
+    svgBox.style.cssText = 'width:130px; height:130px; margin-bottom:15px; display:flex; align-items:center; justify-content:center; filter:drop-shadow(0 0 20px #ffd700) drop-shadow(0 0 45px rgba(255,215,0,0.8)); z-index:2;';
+    svgBox.innerHTML = `
+      <svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+        <defs>
+          <linearGradient id="goldGradCelebration" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff8cc"/>
+            <stop offset="35%" stop-color="#ffd700"/>
+            <stop offset="75%" stop-color="#b8860b"/>
+            <stop offset="100%" stop-color="#704214"/>
+          </linearGradient>
+          <radialGradient id="eyeGlowCelebration" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="50%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#d4af37"/>
+          </radialGradient>
+          <radialGradient id="eyeOrbCelebration" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fff9d6"/>
+            <stop offset="30%" stop-color="#ffd700"/>
+            <stop offset="75%" stop-color="#996515"/>
+            <stop offset="100%" stop-color="#3d2600"/>
+          </radialGradient>
+        </defs>
+        ${wonItem.svgPath.replace(/url\(#goldGrad\)/g, 'url(#goldGradCelebration)').replace(/url\(#eyeGlow\)/g, 'url(#eyeGlowCelebration)').replace(/url\(#eyeOrb\)/g, 'url(#eyeOrbCelebration)')}
+      </svg>
+    `;
+    modal.appendChild(svgBox);
+    
+    let subtitle = document.createElement('div');
+    subtitle.style.cssText = 'font-family:VT323, monospace; font-size:24px; color:#ffd700; letter-spacing:3px; text-shadow:0 0 12px #ffd700; z-index:2; margin-bottom:6px;';
+    subtitle.textContent = '✨ ¡ARTÍCULO DEL MILENIO RECUPERADO! ✨';
+    modal.appendChild(subtitle);
+    
+    let title = document.createElement('div');
+    title.style.cssText = 'font-family:"Cinzel", serif, "Times New Roman"; font-size:32px; font-weight:900; color:#fff; letter-spacing:2px; text-shadow:0 0 25px rgba(255,215,0,0.8), 2px 2px 0 #000; z-index:2; margin-bottom:6px;';
+    title.textContent = wonItem.name.toUpperCase();
+    modal.appendChild(title);
+    
+    let bearerText = document.createElement('div');
+    bearerText.style.cssText = 'font-size:15px; color:#f0e68c; font-family:"Segoe UI", sans-serif; z-index:2; margin-bottom:12px;';
+    bearerText.textContent = `Entregado por ${wonItem.bearer} tras una gloriosa victoria`;
+    modal.appendChild(bearerText);
+    
+    let descBox = document.createElement('div');
+    descBox.style.cssText = 'max-width:540px; background:rgba(25,16,6,0.85); border:1.5px solid #b8860b; border-radius:10px; padding:12px 20px; color:#f5f5f5; font-size:14px; line-height:1.5; font-style:italic; font-family:"Segoe UI", sans-serif; z-index:2; margin-bottom:18px; box-shadow:0 4px 15px rgba(0,0,0,0.6);';
+    descBox.textContent = `"${wonItem.desc}"`;
+    modal.appendChild(descBox);
+    
+    let sStr = origGet('FMR_SAVE_' + window.activeAccount);
+    let s = {};
+    try { s = JSON.parse(sStr) || {}; } catch(_) {}
+    let allItems = window.getMillenniumItems(s);
+    let nowUnlocked = allItems.filter(x => x.unlocked).length;
+    
+    let counterPill = document.createElement('div');
+    counterPill.style.cssText = 'background:#3a2000; border:2px solid #ffd700; border-radius:24px; padding:6px 20px; color:#ffd700; font-family:VT323, monospace; font-size:20px; font-weight:bold; letter-spacing:2px; box-shadow:0 0 15px rgba(255,215,0,0.4); z-index:2; margin-bottom:20px;';
+    counterPill.textContent = `☥ RELIQUIAS RECUPERADAS: ${nowUnlocked} / 7`;
+    modal.appendChild(counterPill);
+    
+    let btnContinue = document.createElement('button');
+    btnContinue.className = 'campBtn3000 ps1-btn ps1-btn-green';
+    btnContinue.style.cssText = 'padding:12px 36px; font-size:20px; font-family:VT323, monospace; letter-spacing:2px; cursor:pointer; z-index:2; box-shadow:0 0 20px rgba(76,175,80,0.5);';
+    btnContinue.textContent = '☥ CONTINUAR AVENTURA';
+    btnContinue.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        modal.remove();
+        if (typeof onDone === 'function') onDone();
+    };
+    modal.appendChild(btnContinue);
+    
+    document.body.appendChild(modal);
+};
+
+// ════════════════════════════════════════════════════════════════
+//  NODOS Y RUTA DEL MAPA DE CAMPAÑA
+// ════════════════════════════════════════════════════════════════
 window.CUSTOM_NODES = [
-    { id: 'n1', left: '50%', top: '85%', label: 'TRISTAN', char: 'TRISTAN', req: [] },
-    { id: 'n2', left: '35%', top: '76%', label: 'WEEVIL', char: 'WEEVIL', req: ['tristan'] },
-    { id: 'n3', left: '65%', top: '68%', label: 'MAI', char: 'MAI', req: ['weevil'] },
-    { id: 'n3b', left: '35%', top: '60%', label: 'MAKO', char: 'MAKO', req: ['mai'] },
-    { id: 'n4', left: '50%', top: '52%', label: 'JOEY', char: 'JOEY', req: ['mako'] },
-    { id: 'n5', left: '30%', top: '44%', label: 'PEGASUS', char: 'PEGASUS', req: ['joey'] },
-    { id: 'n6', left: '70%', top: '44%', label: 'BAKURA', char: 'BAKURA', req: ['pegasus'] },
-    { id: 'n7', left: '50%', top: '36%', label: 'NOAH', char: 'NOAH', req: ['bakura'] },
-    { id: 'n7b', left: '50%', top: '29%', label: 'KOSABURO', char: 'KOSABURO', req: ['noah'] },
-    { id: 'n8', left: '35%', top: '22%', label: 'ISHIZU', char: 'ISHIZU', req: ['kosaburo'] },
-    { id: 'n9', left: '65%', top: '22%', label: 'ODION', char: 'ODION', req: ['ishizu'] },
-    { id: 'n10', left: '50%', top: '15%', label: 'MARIK', char: 'MARIK', req: ['odion'] },
-    { id: 'n11', left: '40%', top: '8%', label: 'KAIBA', char: 'SETO', req: ['marik'] },
-    { id: 'n12', left: '60%', top: '8%', label: 'YUGI', char: 'YUGI', req: ['kaiba'] },
-    { id: 'n13', left: '85%', top: '85%', label: 'SHOP', char: 'ABUELO', req: [] }, 
-    { id: 'n14', left: '50%', top: '2%', label: 'PUERTA', char: 'ATEM', req: ['bakura','noah','kosaburo','ishizu','pegasus','yugi','kaiba','joey','marik','odion','mako'] }
+    { id: 'n1', left: '50%', top: '86%', label: 'TRISTAN', char: 'TRISTAN', req: [] },
+    { id: 'n2', left: '34%', top: '78%', label: 'WEEVIL', char: 'WEEVIL', req: ['tristan'] },
+    { id: 'n3', left: '66%', top: '70%', label: 'MAI', char: 'MAI', req: ['weevil'] },
+    { id: 'n3b', left: '34%', top: '62%', label: 'MAKO', char: 'MAKO', req: ['mai'] },
+    { id: 'n4', left: '50%', top: '54%', label: 'JOEY', char: 'JOEY', req: ['mako'], itemKey: 'key', itemName: 'Llave del Milenio', itemIcon: '🔑' },
+    { id: 'n5', left: '26%', top: '46%', label: 'PEGASUS', char: 'PEGASUS', req: ['joey'], itemKey: 'eye', itemName: 'Ojo del Milenio', itemIcon: '👁️' },
+    { id: 'n6', left: '74%', top: '46%', label: 'BAKURA', char: 'BAKURA', req: ['pegasus'], itemKey: 'ring', itemName: 'Sortija del Milenio', itemIcon: '💍' },
+    { id: 'n7', left: '50%', top: '39%', label: 'NOAH', char: 'NOAH', req: ['bakura'] },
+    { id: 'n7b', left: '50%', top: '32%', label: 'KOSABURO', char: 'KOSABURO', req: ['noah'] },
+    { id: 'n8', left: '30%', top: '25%', label: 'ISHIZU', char: 'ISHIZU', req: ['kosaburo'], itemKey: 'necklace', itemName: 'Collar del Milenio', itemIcon: '📿' },
+    { id: 'n9', left: '70%', top: '25%', label: 'ODION', char: 'ODION', req: ['ishizu'] },
+    { id: 'n10', left: '50%', top: '18%', label: 'MARIK', char: 'MARIK', req: ['odion'], itemKey: 'rod', itemName: 'Cetro del Milenio', itemIcon: '🔱' },
+    { id: 'n11', left: '38%', top: '11%', label: 'KAIBA', char: 'SETO', req: ['marik'], itemKey: 'scale', itemName: 'Balanza del Milenio', itemIcon: '⚖️' },
+    { id: 'n12', left: '62%', top: '11%', label: 'YUGI', char: 'YUGI', req: ['kaiba'], itemKey: 'puzzle', itemName: 'Rompecabezas del Milenio', itemIcon: '🧩' },
+    { id: 'n13', left: '88%', top: '86%', label: 'TIENDA', char: 'ABUELO', req: [] }, 
+    { id: 'n14', left: '50%', top: '4%', label: 'PUERTA SAGRADA', char: 'ATEM', req: ['bakura','noah','kosaburo','ishizu','pegasus','yugi','kaiba','joey','marik','odion','mako'] }
 ];
 
 window.customShowMap = function() {
-    if(window.hideDuelBoard) window.hideDuelBoard();
-
+    if (window.hideDuelBoard) window.hideDuelBoard();
     if (window.nativeAPI && window.nativeAPI.showShell) window.nativeAPI.showShell();
     window.playCustomMusic('mapa.mp3');
     
     let camp = document.getElementById('campaign3000');
     if (camp) { camp.innerHTML = ''; camp.classList.add('hidden'); }
     
-    let map = document.createElement('div');
-    map.id = 'map-container-overlay';
-    map.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; background: url("ImagenesPersonajes/ruinas_fondo.jpg") center / cover, rgba(0,0,0,0.8); overflow: hidden;';
-    
-    const nodes = window.CUSTOM_NODES;
-
-    let cleared = [];
-    let unlocked = ['tristan'];
+    // Obtenemos estado actual del save
+    let s = {};
     try {
         let savedStr = origGet('FMR_SAVE_' + window.activeAccount);
-        if (savedStr) {
-            let saved = JSON.parse(savedStr);
-            if (saved && saved.cleared) cleared = saved.cleared; 
-            if (saved && saved.unlocked) unlocked = saved.unlocked;
-        }
+        if (savedStr) s = JSON.parse(savedStr) || {};
     } catch(e) {}
     
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15;';
+    let cleared = Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : [];
+    let curActiveDeck = (s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || [];
+    let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
     
-    for (let i = 0; i < 13; i++) {
-        let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', nodes[i].left); line.setAttribute('y1', nodes[i].top);
-        line.setAttribute('x2', nodes[i+1].left); line.setAttribute('y2', nodes[i+1].top);
-        line.setAttribute('stroke', '#a67c00'); line.setAttribute('stroke-width', '4'); line.setAttribute('stroke-dasharray', '8,8');
-        svg.appendChild(line);
+    const MILLENNIUM_ITEMS = window.getMillenniumItems(s);
+    const unlockedCount = MILLENNIUM_ITEMS.filter(it => it.unlocked).length;
+    
+    // Contenedor principal del Mapa con imagen de ruinas egipcias
+    let map = document.createElement('div');
+    map.id = 'map-container-overlay';
+    map.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: linear-gradient(180deg, rgba(8,5,2,0.72) 0%, rgba(18,12,5,0.84) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #0a0600; overflow:hidden; font-family:"Segoe UI", sans-serif;';
+    
+    // Inyección de estilos de animación para el mapa si no existen
+    if (!document.getElementById('custom-map-animations')) {
+        let st = document.createElement('style');
+        st.id = 'custom-map-animations';
+        st.textContent = `
+            @keyframes relicNodeGlow {
+                0%, 100% { box-shadow: 0 0 15px #ffd700, 0 0 30px rgba(255,215,0,0.5); border-color: #fff; }
+                50% { box-shadow: 0 0 25px #fff, 0 0 50px rgba(255,215,0,0.9); border-color: #ffd700; }
+            }
+            @keyframes relicBadgePulse {
+                0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px #ffd700); }
+                50% { transform: scale(1.08); filter: drop-shadow(0 0 10px #fff); }
+            }
+            @keyframes mapPathGlow {
+                0%, 100% { opacity: 0.85; stroke-width: 4; }
+                50% { opacity: 1; stroke-width: 5.5; }
+            }
+            .map-interactive-node {
+                transition: transform 0.22s ease, filter 0.22s ease;
+            }
+            .map-interactive-node:hover {
+                transform: translate(-50%, -50%) scale(1.15) !important;
+                z-index: 50 !important;
+            }
+            .map-top-action-btn {
+                background: linear-gradient(180deg, #2b1f0c 0%, #150f05 100%);
+                border: 1.5px solid #b8860b;
+                color: #f7e2a9;
+                font-family: VT323, monospace;
+                font-size: 15px;
+                padding: 4px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .map-top-action-btn:hover {
+                background: #ffd700;
+                color: #000;
+                border-color: #fff;
+                box-shadow: 0 0 12px rgba(255,215,0,0.7);
+            }
+        `;
+        document.head.appendChild(st);
     }
-    let finalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    finalLine.setAttribute('x1', nodes[13].left); finalLine.setAttribute('y1', nodes[13].top);
-    finalLine.setAttribute('x2', nodes[15].left); finalLine.setAttribute('y2', nodes[15].top);
-    finalLine.setAttribute('stroke', '#a67c00'); finalLine.setAttribute('stroke-width', '4'); finalLine.setAttribute('stroke-dasharray', '8,8');
-    svg.appendChild(finalLine);
+    
+    // ── 1. BARRA SUPERIOR HUD ESTILO KAME GAME ─────────────────────
+    let topBar = document.createElement('div');
+    topBar.id = 'map-top-bar';
+    topBar.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:62px; background:linear-gradient(180deg, rgba(10,6,2,0.96) 0%, rgba(22,14,5,0.92) 80%, rgba(22,14,5,0) 100%); border-bottom:2px solid #b8860b; box-shadow:0 4px 20px rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-sizing:border-box;';
+    
+    // 1.1 Left: Título y Logo
+    let brandWrap = document.createElement('div');
+    brandWrap.style.cssText = 'display:flex; align-items:center; gap:10px; cursor:pointer;';
+    brandWrap.innerHTML = `
+        <div style="font-size:26px; filter:drop-shadow(0 0 8px #ffd700); line-height:1;">☥</div>
+        <div>
+            <div style="font-family:'Cinzel', serif, 'Times New Roman'; font-size:15px; font-weight:900; color:#ffd700; letter-spacing:1.5px; text-shadow:0 2px 6px rgba(0,0,0,0.8);">CAMPAÑA · EL REINO DE LOS DUELOS</div>
+            <div style="font-size:10px; color:#d4af37; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">Ruta Sagrada hacia la Puerta del Nuevo Mundo</div>
+        </div>
+    `;
+    topBar.appendChild(brandWrap);
+    
+    // 1.2 Center: Mini Barra de los 7 Artículos del Milenio
+    let relicsBar = document.createElement('div');
+    relicsBar.style.cssText = 'display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.65); padding:4px 10px; border-radius:20px; border:1px solid #7c5a14;';
+    
+    MILLENNIUM_ITEMS.forEach(it => {
+        let relicChip = document.createElement('div');
+        relicChip.style.cssText = `display:flex; align-items:center; gap:4px; padding:3px 8px; border-radius:14px; cursor:pointer; transition:transform 0.18s ease; ${it.unlocked ? 'background:linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8)); border:1.5px solid #ffd700; box-shadow:0 0 8px rgba(255,215,0,0.4);' : 'background:rgba(20,15,5,0.7); border:1px solid #4a3610; opacity:0.55;'}`;
+        relicChip.title = it.unlocked ? `${it.name}: ¡RECUPERADO de ${it.bearer}!` : `${it.name}: Custodiado por ${it.bearer}. ¡Derrótalo para reclamarlo!`;
+        relicChip.innerHTML = `<span>${it.unlocked ? it.icon : '🔒'}</span><span style="font-size:11px; font-weight:bold; color:${it.unlocked ? '#ffd700' : '#887755'}; font-family:'Segoe UI', sans-serif;">${it.shortName}</span>`;
+        relicChip.onmouseover = () => { relicChip.style.transform = 'scale(1.1)'; };
+        relicChip.onmouseout = () => { relicChip.style.transform = 'scale(1)'; };
+        relicChip.onclick = () => {
+            if (window.playViolinClick) window.playViolinClick();
+            alert(`${it.icon} ${it.name.toUpperCase()}\n\nPortador Sagrado: ${it.bearer}\nPoder: ${it.power}\n\n"${it.desc}"\n\nEstado: ${it.unlocked ? '✅ RECUPERADO' : '🔒 BLOQUEADO (' + it.hint + ')'}`);
+        };
+        relicsBar.appendChild(relicChip);
+    });
+    topBar.appendChild(relicsBar);
+    
+    // 1.3 Right: Stats y Botones de Acción
+    let actionsWrap = document.createElement('div');
+    actionsWrap.style.cssText = 'display:flex; align-items:center; gap:10px;';
+    
+    // PM
+    let pmBadge = document.createElement('div');
+    pmBadge.style.cssText = 'background:#241904; border:1px solid #b8860b; border-radius:6px; padding:4px 10px; color:#ffd700; font-family:VT323, monospace; font-size:16px; font-weight:bold; letter-spacing:1px;';
+    pmBadge.textContent = `💰 PM: ${s.pm || 0}`;
+    actionsWrap.appendChild(pmBadge);
+    
+    // Deck Activo Pill
+    let deckBadge = document.createElement('div');
+    deckBadge.style.cssText = 'background:#142036; border:1px solid #3d6499; border-radius:6px; padding:4px 10px; color:#90caf9; font-family:VT323, monospace; font-size:15px; cursor:pointer;';
+    deckBadge.title = 'Haz clic para ir al Editor de Decks';
+    deckBadge.textContent = `🎴 DECK: ${s.activeDeck || 'Deck 1'} (${activeDeckCount}/40)`;
+    deckBadge.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        if (window.customShowDeckEditor) window.customShowDeckEditor();
+    };
+    actionsWrap.appendChild(deckBadge);
+    
+    // Milenio Counter Pill
+    let milenioBadge = document.createElement('div');
+    milenioBadge.style.cssText = 'background:#382200; border:1.5px solid #ffd700; border-radius:6px; padding:4px 12px; color:#ffd700; font-family:VT323, monospace; font-size:16px; font-weight:bold; box-shadow:0 0 10px rgba(255,215,0,0.3);';
+    milenioBadge.textContent = `✨ MILENIO: ${unlockedCount} / 7`;
+    actionsWrap.appendChild(milenioBadge);
+    
+    // Botón Tienda
+    let btnShop = document.createElement('button');
+    btnShop.className = 'map-top-action-btn';
+    btnShop.innerHTML = '<span>🏪</span><span>TIENDA</span>';
+    btnShop.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        if (window.openCustomShopMenu) window.openCustomShopMenu();
+    };
+    actionsWrap.appendChild(btnShop);
+    
+    // Botón Guardar
+    let btnSave = document.createElement('button');
+    btnSave.className = 'map-top-action-btn';
+    btnSave.innerHTML = '<span>💾</span><span>GUARDAR</span>';
+    btnSave.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        s.lastPlayed = Date.now();
+        if (window.persistUserSave) window.persistUserSave(s);
+        else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+        alert('💾 ¡Partida guardada exitosamente en el servidor y navegador!');
+    };
+    actionsWrap.appendChild(btnSave);
+    
+    // Botón Menú
+    let btnExit = document.createElement('button');
+    btnExit.className = 'map-top-action-btn';
+    btnExit.style.borderColor = '#993333';
+    btnExit.style.color = '#ff9999';
+    btnExit.innerHTML = '<span>🚪</span><span>MENÚ</span>';
+    btnExit.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        map.remove();
+        if (window.customShowMain) window.customShowMain();
+    };
+    actionsWrap.appendChild(btnExit);
+    
+    topBar.appendChild(actionsWrap);
+    map.appendChild(topBar);
+    
+    // ── 2. SVG CONEXIONES DE RUTA Y DEFINICIÓN DE GRADIENTES ────────
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:15;';
+    
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fff8cc"/>
+          <stop offset="35%" stop-color="#ffd700"/>
+          <stop offset="75%" stop-color="#b8860b"/>
+          <stop offset="100%" stop-color="#704214"/>
+        </linearGradient>
+        <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="50%" stop-color="#ffd700"/>
+          <stop offset="100%" stop-color="#d4af37"/>
+        </radialGradient>
+        <radialGradient id="eyeOrb" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#fff9d6"/>
+          <stop offset="30%" stop-color="#ffd700"/>
+          <stop offset="75%" stop-color="#996515"/>
+          <stop offset="100%" stop-color="#3d2600"/>
+        </radialGradient>
+      </defs>
+    `;
+    
+    const nodes = window.CUSTOM_NODES;
+    const MAP_EDGES = [
+        ['n1', 'n2'],
+        ['n2', 'n3'],
+        ['n3', 'n3b'],
+        ['n3b', 'n4'],
+        ['n4', 'n5'],
+        ['n5', 'n6'],
+        ['n6', 'n7'],
+        ['n7', 'n7b'],
+        ['n7b', 'n8'],
+        ['n8', 'n9'],
+        ['n9', 'n10'],
+        ['n10', 'n11'],
+        ['n11', 'n12'],
+        ['n12', 'n14'],
+        ['n1', 'n13']
+    ];
+    
+    MAP_EDGES.forEach(([fId, tId]) => {
+        let fNode = nodes.find(x => x.id === fId);
+        let tNode = nodes.find(x => x.id === tId);
+        if (!fNode || !tNode) return;
+        
+        let fChar = (fNode.char || '').toLowerCase();
+        if (fChar === 'seto') fChar = 'kaiba';
+        let isPathConquered = (fNode.id === 'n13') || cleared.includes(fChar);
+        
+        let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', fNode.left); line.setAttribute('y1', fNode.top);
+        line.setAttribute('x2', tNode.left); line.setAttribute('y2', tNode.top);
+        
+        if (isPathConquered) {
+            line.setAttribute('stroke', '#ffd700');
+            line.setAttribute('stroke-width', '4.5');
+            line.style.cssText = 'filter: drop-shadow(0 0 6px rgba(255,215,0,0.85)); animation: mapPathGlow 2.5s infinite ease-in-out;';
+        } else {
+            line.setAttribute('stroke', '#664a18');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('stroke-dasharray', '7,7');
+            line.setAttribute('opacity', '0.65');
+        }
+        svg.appendChild(line);
+    });
     map.appendChild(svg);
-
+    
+    // ── 3. RENDERIZADO DE NODOS DE PERSONAJES Y ARTÍCULOS ───────────
     nodes.forEach(n => {
         let btn = document.createElement('div');
-        btn.style.cssText = `position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; z-index: 16;`;
-        btn.style.left = n.left; btn.style.top = n.top;
+        btn.className = 'map-interactive-node';
+        btn.style.cssText = `position:absolute; transform:translate(-50%, -50%); display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; z-index:20; left:${n.left}; top:${n.top};`;
+        
+        let cid = (n.char || '').toLowerCase();
+        if (cid === 'seto') cid = 'kaiba';
         
         let isUnlocked = true;
-        if (n.char) {
-            let cid = n.char.toLowerCase();
-            if (cid === 'seto') cid = 'kaiba';
-            if (cid === 'abuelo') isUnlocked = true;
-            else if (cid === 'atem') isUnlocked = true;
-            else isUnlocked = n.req.every(r => cleared.includes(r.toLowerCase()));
+        if (cid === 'abuelo' || cid === 'atem') {
+            isUnlocked = true;
+        } else {
+            isUnlocked = n.req.every(r => cleared.includes(r.toLowerCase()));
         }
         
-        let isCleared = n.char && cleared.includes(n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase());
+        let isCleared = n.char && cleared.includes(cid);
+        let hasItem = !!n.itemKey;
+        let itemRecovered = hasItem && isCleared;
         
         let p = portraitMap[n.char];
         if (p) {
-            let filterStyle = isCleared ? 'filter: grayscale(100%) brightness(0.6);' : (!isUnlocked ? 'filter: brightness(0.4);' : '');
-            let hoverAction = (isCleared || !isUnlocked) ? '' : `onmouseover="this.style.transform='scale(1.1)'; window.playHoverSound();" onmouseout="this.style.transform='scale(1)'"`;
-            btn.style.cursor = (isCleared || !isUnlocked) ? 'not-allowed' : 'pointer';
+            let filterStyle = isCleared ? 'filter: brightness(0.7) contrast(0.95);' : (!isUnlocked ? 'filter: brightness(0.35) grayscale(100%);' : '');
+            let borderStyle = isCleared ? 'border: 3px solid #4caf50;' : (isUnlocked ? (hasItem ? 'border: 3px solid #ffd700; animation: relicNodeGlow 2s infinite ease-in-out;' : 'border: 3px solid #e4c06b;') : 'border: 3px solid #443315;');
             
-            let labelText = isCleared ? `<span style="color:#f54242">PASADO</span>` : (!isUnlocked ? '???' : n.label);
+            // 3.1 Insignia de Reliquia Flotante (para los 7 portadores)
+            let relicBadgeHtml = '';
+            if (hasItem) {
+                if (itemRecovered) {
+                    relicBadgeHtml = `
+                        <div style="position:absolute; top:-16px; background:linear-gradient(135deg, #1b4d2e, #2e7d32); color:#d4edda; border:1.5px solid #a3e9a4; border-radius:12px; padding:2px 7px; font-size:10px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.85); white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25;">
+                            <span>✨</span> <span>${n.itemIcon} RECUPERADO</span>
+                        </div>
+                    `;
+                } else if (isUnlocked) {
+                    relicBadgeHtml = `
+                        <div style="position:absolute; top:-18px; background:linear-gradient(135deg, #b8860b, #ffd700); color:#000; border:1.5px solid #fff; border-radius:12px; padding:2px 8px; font-size:10px; font-weight:900; box-shadow:0 0 12px rgba(255,215,0,0.9); white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25; animation:relicBadgePulse 1.8s infinite ease-in-out;">
+                            <span>${n.itemIcon}</span> <span>${n.itemName.toUpperCase()}</span>
+                        </div>
+                    `;
+                } else {
+                    relicBadgeHtml = `
+                        <div style="position:absolute; top:-14px; background:rgba(25,16,5,0.85); color:#b8860b; border:1px solid #7c5a14; border-radius:10px; padding:2px 6px; font-size:9px; white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25;">
+                            <span>🔒</span> <span>${n.itemName}</span>
+                        </div>
+                    `;
+                }
+            }
             
-            btn.innerHTML = `<div style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid #e4c06b; overflow: hidden; box-shadow: 0 0 15px #000; background: #000; transition: transform 0.2s; ${filterStyle}" ${hoverAction}>
-                <img src="ImagenesPersonajes/${p}" style="width: 100%; height: 100%; object-fit: cover; object-position: top;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png'">
-            </div><div style="background: rgba(0,0,0,0.8); border: 2px solid #a67c00; padding: 4px 8px; border-radius: 6px; color: #fff; font-size: 12px; font-family:VT323, monospace; text-shadow: 2px 2px 0px #000;">${labelText}</div>`;
+            // 3.2 Etiqueta inferior de estado
+            let labelText = isCleared ? `<span style="color:#a3e9a4">✓ ${n.label}</span>` : (!isUnlocked ? '???' : n.label);
+            if (n.id === 'n13') labelText = '🏪 TIENDA';
+            if (n.id === 'n14') labelText = unlockedCount >= 7 ? '🌌 NUEVO MUNDO' : `🔒 PUERTA (${unlockedCount}/7)`;
+            
+            btn.innerHTML = `
+                ${relicBadgeHtml}
+                <div style="width:70px; height:70px; border-radius:50%; ${borderStyle} overflow:hidden; box-shadow:0 0 16px rgba(0,0,0,0.8); background:#000; position:relative; ${filterStyle}">
+                    <img src="ImagenesPersonajes/${p}" style="width:100%; height:100%; object-fit:cover; object-position:top;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png'">
+                    ${isCleared ? '<div style="position:absolute; inset:0; background:rgba(46,125,50,0.22); pointer-events:none;"></div>' : ''}
+                </div>
+                <div style="background:rgba(8,5,2,0.9); border:1.5px solid ${isCleared ? '#2e7d32' : (isUnlocked ? '#d4af37' : '#554015')}; padding:3px 8px; border-radius:6px; color:${isCleared ? '#a3e9a4' : (isUnlocked ? '#fff' : '#887755')}; font-size:12px; font-family:VT323, monospace; letter-spacing:1px; text-shadow:2px 2px 0 #000; white-space:nowrap;">
+                    ${labelText}
+                </div>
+            `;
         }
         
+        btn.onmouseover = () => { if (window.playHoverSound) window.playHoverSound(); };
+        
+        // ── 3.3 Click Handler Interactivo ──
         btn.onclick = () => {
-            if (isCleared) return; // Cannot fight defeated characters
-            if (!isUnlocked) { window.playViolinClick(); return alert('Debes superar los duelos anteriores para desbloquear este camino.'); }
-                window.playViolinClick();
-                if (n.id === 'n13') {
-                    let shopDialog = [{ role: 'system', speaker: 'MOTO', text: '¡Bienvenido a mi tienda! ¿Deseas ver el inventario o ajustar tu deck?' }];
-                    window.playCustomMusic('dialogos.mp3');
-                    window.renderCustomStoryDialog(shopDialog, 0, () => {
-                        let choiceUI = document.createElement('div');
-                        choiceUI.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:999999;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:30px;';
-                        
-                        let question = document.createElement('div');
-                        question.textContent = '¿Entrar a la tienda?';
-                        question.style.cssText = 'color:#ffcc00;font-family:VT323,monospace;font-size:32px;text-shadow:4px 4px 0 #000;';
-                        
-                        let btnYes = document.createElement('button');
-                        btnYes.className = 'campBtn3000 ps1-btn ps1-btn-green';
-                        btnYes.textContent = 'SÍ';
-                        btnYes.style.fontSize = '24px';
-                        btnYes.onclick = () => {
-                            window.playViolinClick();
-                            choiceUI.remove();
-                            window.openCustomShopMenu();
-                        };
-                        
-                        let btnNo = document.createElement('button');
-                        btnNo.className = 'campBtn3000 ps1-btn ps1-btn-red';
-                        btnNo.textContent = 'NO';
-                        btnNo.style.fontSize = '24px';
-                        btnNo.onclick = () => {
-                            window.playViolinClick();
-                            choiceUI.remove();
-                            window.playCustomMusic('mapa.mp3');
-                        };
-                        
-                        let row = document.createElement('div');
-                        row.style.cssText = 'display:flex;gap:40px;';
-                        row.appendChild(btnYes);
-                        row.appendChild(btnNo);
-                        
-                        choiceUI.appendChild(question);
-                        choiceUI.appendChild(row);
-                        document.body.appendChild(choiceUI);
-                    });
+            if (window.playViolinClick) window.playViolinClick();
+            
+            // Caso Tienda
+            if (n.id === 'n13') {
+                if (window.openCustomShopMenu) window.openCustomShopMenu();
+                return;
+            }
+            
+            // Caso Puerta al Nuevo Mundo
+            if (n.id === 'n14') {
+                if (unlockedCount >= 7) {
+                    alert('🌌 ¡HAS REUNIDO LOS 7 ARTÍCULOS DEL MILENIO!\n\nEl Faraón Atem ha abierto las puertas del Nuevo Mundo. ¡El próximo capítulo comenzará muy pronto!');
+                } else {
+                    alert(`🔒 PUERTA SAGRADA DEL NUEVO MUNDO\n\nProgreso actual: ${unlockedCount} / 7 Artículos Recuperados.\n\nDebes derrotar a todos los portadores sagrados en la Campaña para quebrar el sello ancestral.`);
                 }
-                else if (n.id === 'n14') {
-                    let items = ['bakura','marik','ishizu','pegasus','yugi','kaiba','joey'];
-                    let missing = items.filter(x => !origGet('FMR_ITEM_GIVEN_' + x));
-                    if (missing.length === 0) { alert('¡Has reunido todos los Artículos del Milenio! El Nuevo Mundo se abrirá pronto.'); }
-                    else { alert('Aún te faltan Artículos del Milenio. Derrota a los portadores para conseguirlos.'); }
+                return;
+            }
+            
+            // Ya superado
+            if (isCleared) {
+                let rematchChoice = confirm(`Ya has derrotado a ${n.label} en la Campaña principal.\n\n¿Deseas retarlo nuevamente en el DUELO LIBRE para ganar más cartas y PM?`);
+                if (rematchChoice && window.openFreeDuelMenu) {
+                    window.openFreeDuelMenu();
                 }
-                else {
-                    let sCheckStr = origGet('FMR_SAVE_' + window.activeAccount);
-                    if (sCheckStr) {
-                        try {
-                            let sCheck = JSON.parse(sCheckStr);
-                            if (sCheck) {
-                                if (sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
-                                    sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
-                                    if (window.persistUserSave) window.persistUserSave(sCheck);
-                                }
-                                if (sCheck.deck && sCheck.deck.length !== 40) {
-                                    alert('⚠️ DECK ACTIVO NO VÁLIDO (' + sCheck.deck.length + '/40) ⚠️\n\nTu Deck Activo ("' + (sCheck.activeDeck || 'Principal') + '") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.');
-                                    return;
-                                }
-                            }
-                        } catch(e) {}
-                    }
-                    // Bypass EVERYTHING and call native start duel!
-                    let startDuelFn = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
-                    if (startDuelFn) {
-                        window.lastDuelOpponent = n.char.toLowerCase();
-                        
-                        // Add intro dialogues
-                        let introLines = [{ role: 'system', speaker: n.char.toUpperCase(), text: '¡Prepárate para el duelo!' }];
-                        if (n.char.toLowerCase() === 'tristan') {
-                            introLines = [{ role: 'system', speaker: 'TRISTAN_INTRO', text: '¡Bienvenido a tu primer duelo real! Veamos de qué estás hecho.' }];
-                        } else if (n.char.toLowerCase() === 'mako') {
-                            introLines = [{ role: 'system', speaker: 'MAKO', text: '¡Siente la furia de las olas y el poder del gran océano! ¡Nadie derrota a Mako Tsunami en su propio elemento!' }];
-                        } else if (n.char.toLowerCase() === 'kosaburo') {
-                            introLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Yo soy Kosaburo Kaiba! El verdadero poder de Exodia yace en mi cementerio. ¡Contempla la fuerza imparable de Exodia Necross!' }];
-                        } else if (n.char.toLowerCase() === 'yugi') {
-                            introLines = [{ role: 'system', speaker: 'YUGI', text: '¡Has llegado al duelo supremo! El Rompecabezas del Milenio y el poder de los Dioses Egipcios decidirán el destino. ¡Es hora del Duelo!' }];
+                return;
+            }
+            
+            // Bloqueado
+            if (!isUnlocked) {
+                alert('🔒 CAMINO BLOQUEADO\n\nDebes superar los duelos anteriores para abrir este sendero en el Reino de los Duelistas.');
+                return;
+            }
+            
+            // Verificar Deck Activo de 40 cartas
+            let sCheckStr = origGet('FMR_SAVE_' + window.activeAccount);
+            if (sCheckStr) {
+                try {
+                    let sCheck = JSON.parse(sCheckStr);
+                    if (sCheck) {
+                        if (sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
+                            sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
+                            if (window.persistUserSave) window.persistUserSave(sCheck);
                         }
-                        
-                        window.playCustomMusic('dialogos.mp3');
-                        window.renderCustomStoryDialog(introLines, 0, () => {
-                            map.remove();
-                            if(window.showDuelBoard) window.showDuelBoard(); 
-                            startDuelFn(n.char.toLowerCase());
-                            
-                            // Disable native music and play minijefes.mp3
-                            if (window.FMRMusic302) {
-                                window.FMRMusic302.start = function(){};
-                                window.FMRMusic302.stop = function(){};
-                            }
-                            window.playCustomMusic(window.getDuelMusic(n.char));
-                        });
-                    } else {
-                        alert("API nativa no cargada.");
+                        if (sCheck.deck && sCheck.deck.length !== 40) {
+                            alert(`⚠️ DECK ACTIVO NO VÁLIDO (${sCheck.deck.length}/40) ⚠️\n\nTu Deck Activo ("${sCheck.activeDeck || 'Principal'}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
+                            if (window.customShowDeckEditor) window.customShowDeckEditor();
+                            return;
+                        }
                     }
+                } catch(_) {}
+            }
+            
+            // ── MODAL INTERACTIVO DE ENCUENTRO ("DESAFÍO DE DUELISTA") ──
+            let modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:9999999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);';
+            
+            let card = document.createElement('div');
+            card.style.cssText = 'background:linear-gradient(180deg, #241604 0%, #120b02 100%); border:2px solid #ffd700; border-radius:14px; padding:24px 30px; width:440px; max-width:90vw; text-align:center; box-shadow:0 0 35px rgba(0,0,0,0.9), 0 0 20px rgba(255,215,0,0.25); display:flex; flex-direction:column; align-items:center; gap:12px;';
+            
+            let modalHeader = document.createElement('div');
+            modalHeader.style.cssText = 'font-family:VT323, monospace; font-size:22px; color:#ffd700; letter-spacing:2px;';
+            modalHeader.textContent = '⚔️ DESAFÍO DE DUELISTA DE CAMPAÑA ⚔️';
+            card.appendChild(modalHeader);
+            
+            let imgWrap = document.createElement('div');
+            imgWrap.style.cssText = 'width:90px; height:90px; border-radius:50%; border:3px solid #ffd700; overflow:hidden; box-shadow:0 0 20px rgba(255,215,0,0.4); margin:6px 0;';
+            imgWrap.innerHTML = `<img src="ImagenesPersonajes/${p}" style="width:100%; height:100%; object-fit:cover; object-position:top;">`;
+            card.appendChild(imgWrap);
+            
+            let nameTag = document.createElement('div');
+            nameTag.style.cssText = 'font-family:"Cinzel", serif, "Times New Roman"; font-size:24px; font-weight:900; color:#fff; letter-spacing:1px;';
+            nameTag.textContent = n.label;
+            card.appendChild(nameTag);
+            
+            // Relic warning if this character has an item
+            if (hasItem) {
+                let relicBox = document.createElement('div');
+                relicBox.style.cssText = 'width:100%; background:linear-gradient(135deg, rgba(212,175,55,0.25), rgba(30,18,4,0.9)); border:1.5px solid #ffd700; border-radius:8px; padding:10px 14px; box-sizing:border-box; box-shadow:0 0 15px rgba(255,215,0,0.25);';
+                relicBox.innerHTML = `
+                    <div style="color:#ffd700; font-size:12px; font-weight:bold; letter-spacing:1.5px;">⚡ CUSTODIA UN ARTÍCULO DEL MILENIO ⚡</div>
+                    <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0;">${n.itemIcon} ${n.itemName}</div>
+                    <div style="color:#a3e9a4; font-size:12px; font-weight:bold;">¡Al derrotar a este duelista, reclamarás su reliquia sagrada!</div>
+                `;
+                card.appendChild(relicBox);
+            } else {
+                let infoBox = document.createElement('div');
+                infoBox.style.cssText = 'font-size:13px; color:#c7a76d; font-family:"Segoe UI", sans-serif;';
+                infoBox.textContent = 'Duelo Oficial de Campaña · Baraja de 40 Cartas · Recompensa: PM + Cartas de Victoria';
+                card.appendChild(infoBox);
+            }
+            
+            let btnRow = document.createElement('div');
+            btnRow.style.cssText = 'display:flex; gap:16px; width:100%; justify-content:center; margin-top:8px;';
+            
+            let btnStart = document.createElement('button');
+            btnStart.className = 'campBtn3000 ps1-btn ps1-btn-green';
+            btnStart.style.cssText = 'padding:10px 24px; font-size:18px; font-family:VT323, monospace; letter-spacing:1.5px;';
+            btnStart.textContent = '⚔️ INICIAR COMBATE';
+            btnStart.onclick = () => {
+                if (window.playViolinClick) window.playViolinClick();
+                modal.remove();
+                
+                let startDuelFn = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
+                if (startDuelFn) {
+                    window.lastDuelOpponent = n.char.toLowerCase();
+                    
+                    let introLines = [{ role: 'system', speaker: n.char.toUpperCase(), text: '¡Prepárate para el duelo!' }];
+                    if (n.char.toLowerCase() === 'tristan') {
+                        introLines = [{ role: 'system', speaker: 'TRISTAN_INTRO', text: '¡Bienvenido a tu primer duelo real! Veamos de qué estás hecho.' }];
+                    } else if (n.char.toLowerCase() === 'mako') {
+                        introLines = [{ role: 'system', speaker: 'MAKO', text: '¡Siente la furia de las olas y el poder del gran océano! ¡Nadie derrota a Mako Tsunami en su propio elemento!' }];
+                    } else if (n.char.toLowerCase() === 'kosaburo') {
+                        introLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Yo soy Kosaburo Kaiba! El verdadero poder de Exodia yace en mi cementerio. ¡Contempla la fuerza imparable de Exodia Necross!' }];
+                    } else if (n.char.toLowerCase() === 'yugi') {
+                        introLines = [{ role: 'system', speaker: 'YUGI', text: '¡Has llegado al duelo supremo! El Rompecabezas del Milenio y el poder de los Dioses Egipcios decidirán el destino. ¡Es hora del Duelo!' }];
+                    }
+                    
+                    window.playCustomMusic('dialogos.mp3');
+                    window.renderCustomStoryDialog(introLines, 0, () => {
+                        map.remove();
+                        if (window.showDuelBoard) window.showDuelBoard(); 
+                        startDuelFn(n.char.toLowerCase());
+                        
+                        if (window.FMRMusic302) {
+                            window.FMRMusic302.start = function(){};
+                            window.FMRMusic302.stop = function(){};
+                        }
+                        window.playCustomMusic(window.getDuelMusic(n.char));
+                    });
+                } else {
+                    alert('API nativa no cargada.');
                 }
             };
+            btnRow.appendChild(btnStart);
+            
+            let btnCancel = document.createElement('button');
+            btnCancel.className = 'campBtn3000 ps1-btn ps1-btn-red';
+            btnCancel.style.cssText = 'padding:10px 24px; font-size:18px; font-family:VT323, monospace; letter-spacing:1.5px;';
+            btnCancel.textContent = '✖️ CANCELAR';
+            btnCancel.onclick = () => {
+                if (window.playViolinClick) window.playViolinClick();
+                modal.remove();
+            };
+            btnRow.appendChild(btnCancel);
+            
+            card.appendChild(btnRow);
+            modal.appendChild(card);
+            document.body.appendChild(modal);
+        };
+        
         map.appendChild(btn);
     });
     
-    let exitBtn = document.createElement('button');
-    exitBtn.textContent = 'VOLVER AL MENÚ';
-    exitBtn.style.cssText = 'position: absolute; bottom: 30px; right: 30px; z-index: 20; background: rgba(0,0,0,0.8); border: 3px solid #c4a04d; color: #fceea4; padding: 15px 30px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family:VT323, monospace; font-size:12px;';
-    exitBtn.onmouseover = window.playHoverSound;
-    exitBtn.onclick = () => { 
-        window.playViolinClick();
-        map.remove(); 
-        window.customShowMain();
-    };
-    map.appendChild(exitBtn);
-    
     document.body.appendChild(map);
 };
-
 window.openFreeDuelMenu = function() {
     let mapOverlay = document.getElementById('map-container-overlay');
     if (mapOverlay) mapOverlay.style.display = 'none';
@@ -11234,157 +11778,8 @@ window.openCustomShopMenu = function() {
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
 
     // 7 Artículos del Milenio Data & Unlocking Logic
-    const MILLENNIUM_ITEMS = [
-      {
-        id: 'puzzle',
-        name: 'Rompecabezas del Milenio',
-        shortName: 'Rompecabezas',
-        bearer: 'Faraón Atem / Yugi Muto',
-        power: 'Justicia y Duelos de las Sombras',
-        desc: 'El artículo supremo. Alberga el espíritu ancestral del Faraón y otorga dominio sobre el destino en los Duelos de las Sombras.',
-        hint: 'En tu posesión como el duelista elegido.',
-        unlocked: true,
-        grandpaQuote: '¡El Rompecabezas del Milenio! Yugi tardó años en armarlo. Alberga el alma de un faraón sin nombre con una fuerza inquebrantable.',
-        svgPath: `
-          <polygon points="50,88 14,26 86,26" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.8" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
-          <circle cx="50" cy="18" r="8" fill="none" stroke="url(#goldGrad)" stroke-width="3"/>
-          <circle cx="50" cy="18" r="4.5" fill="#1a1408"/>
-          <line x1="25" y1="44" x2="75" y2="44" stroke="#684a08" stroke-width="1.8"/>
-          <line x1="34" y1="62" x2="66" y2="62" stroke="#684a08" stroke-width="1.8"/>
-          <line x1="43" y1="76" x2="57" y2="76" stroke="#684a08" stroke-width="1.8"/>
-          <ellipse cx="50" cy="36" rx="13" ry="7" fill="#1a1408" stroke="#ffd700" stroke-width="1.4"/>
-          <circle cx="50" cy="36" r="3.8" fill="url(#eyeGlow)"/>
-          <circle cx="50" cy="36" r="1.8" fill="#000"/>
-          <path d="M36,30 Q50,26 64,30" fill="none" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M45,43 L45,48" stroke="#ffd700" stroke-width="1.8"/>
-          <path d="M55,43 L58,48" stroke="#ffd700" stroke-width="1.8"/>
-        `
-      },
-      {
-        id: 'eye',
-        name: 'Ojo del Milenio',
-        shortName: 'Ojo',
-        bearer: 'Maximillion Pegasus',
-        power: 'Lectura Mental y Captura de Almas',
-        desc: 'Permite leer los pensamientos, ver las cartas en la mano del oponente y atrapar almas en cartas mágicas.',
-        hint: 'Derrota a Maximillion Pegasus en la Campaña para recuperarlo.',
-        unlocked: s.cleared.includes('pegasus'),
-        grandpaQuote: 'Pegasus usó el Ojo del Milenio para atrapar mi alma en una cinta de video. ¡Un poder temible si cae en las manos equivocadas!',
-        svgPath: `
-          <circle cx="50" cy="50" r="36" fill="url(#eyeOrb)" stroke="#fff" stroke-width="2" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.8))"/>
-          <path d="M24,50 Q50,28 76,50 Q50,72 24,50 Z" fill="#1a1408" stroke="#ffd700" stroke-width="2.2"/>
-          <circle cx="50" cy="50" r="13" fill="url(#eyeOrb)" stroke="#ffe082" stroke-width="1.4"/>
-          <circle cx="50" cy="50" r="5.5" fill="#000"/>
-          <circle cx="48" cy="48" r="1.8" fill="#fff"/>
-        `
-      },
-      {
-        id: 'ring',
-        name: 'Sortija del Milenio',
-        shortName: 'Sortija',
-        bearer: 'Yami Bakura',
-        power: 'Detección Mística y Magia Oscura',
-        desc: 'Sus 5 agujas místicas apuntan hacia otros Artículos del Milenio o hacia personas con gran energía ancestral.',
-        hint: 'Derrota a Yami Bakura en la Campaña para recuperarla.',
-        unlocked: s.cleared.includes('bakura'),
-        grandpaQuote: 'La Sortija del Milenio... las almas atrapadas dentro de ella anhelan el poder de los Duelos de las Sombras.',
-        svgPath: `
-          <circle cx="50" cy="50" r="30" fill="none" stroke="url(#goldGrad)" stroke-width="4.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
-          <polygon points="50,30 36,54 64,54" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1.5"/>
-          <circle cx="50" cy="45" r="4.2" fill="#1a1408"/>
-          <circle cx="50" cy="45" r="2" fill="#ffd700"/>
-          <polygon points="50,14 47,3 53,3" fill="url(#goldGrad)"/>
-          <polygon points="80,40 92,36 89,42" fill="url(#goldGrad)"/>
-          <polygon points="72,74 83,83 77,86" fill="url(#goldGrad)"/>
-          <polygon points="28,74 17,83 23,86" fill="url(#goldGrad)"/>
-          <polygon points="20,40 8,36 11,42" fill="url(#goldGrad)"/>
-        `
-      },
-      {
-        id: 'rod',
-        name: 'Cetro del Milenio',
-        shortName: 'Cetro',
-        bearer: 'Marik Ishtar',
-        power: 'Control Mental y Mandato Oscuro',
-        desc: 'Permite doblegar la voluntad ajena a través de la hipnosis milenaria y canalizar monstruos oscuros.',
-        hint: 'Derrota a Marik Ishtar en la Campaña para recuperarlo.',
-        unlocked: s.cleared.includes('marik'),
-        grandpaQuote: '¡El Cetro de Marik! Una reliquia peligrosa capaz de controlar la mente de duelistas inocentes.',
-        svgPath: `
-          <rect x="46" y="38" width="8" height="54" rx="3" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1.5"/>
-          <circle cx="50" cy="92" r="5" fill="url(#goldGrad)"/>
-          <line x1="46" y1="52" x2="54" y2="52" stroke="#4a3000" stroke-width="1.5"/>
-          <line x1="46" y1="68" x2="54" y2="68" stroke="#4a3000" stroke-width="1.5"/>
-          <path d="M50,12 C36,12 22,25 18,36 C31,34 43,38 50,42 C57,38 69,34 82,36 C78,25 64,12 50,12 Z" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
-          <ellipse cx="50" cy="25" rx="8.5" ry="5.2" fill="#1a1408" stroke="#ffe082" stroke-width="1"/>
-          <circle cx="50" cy="25" r="2.6" fill="#ffd700"/>
-        `
-      },
-      {
-        id: 'necklace',
-        name: 'Collar del Milenio',
-        shortName: 'Collar',
-        bearer: 'Ishizu Ishtar',
-        power: 'Clarividencia y Destino Sagrado',
-        desc: 'Otorga a su portador visiones certeras sobre los hilos del destino y el desenlace de los combates.',
-        hint: 'Derrota a Ishizu Ishtar en la Campaña para recuperarlo.',
-        unlocked: s.cleared.includes('ishizu'),
-        grandpaQuote: 'El Collar del Milenio revela visiones del futuro... pero un verdadero duelista puede forjar su propio destino.',
-        svgPath: `
-          <path d="M18,40 C18,72 82,72 82,40 C82,30 75,23 70,23 C60,44 40,44 30,23 C25,23 18,30 18,40 Z" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
-          <circle cx="50" cy="72" r="6.5" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1.4"/>
-          <circle cx="35" cy="68" r="4.5" fill="url(#goldGrad)"/>
-          <circle cx="65" cy="68" r="4.5" fill="url(#goldGrad)"/>
-          <ellipse cx="50" cy="55" rx="7.5" ry="4.2" fill="#1a1408" stroke="#ffe082" stroke-width="1"/>
-          <circle cx="50" cy="55" r="2" fill="#ffd700"/>
-        `
-      },
-      {
-        id: 'key',
-        name: 'Llave del Milenio',
-        shortName: 'Llave',
-        bearer: 'Shadi',
-        power: 'Apertura de Almas y Mentes',
-        desc: 'Desbloquea el santuario interior de la mente humana para explorar sus pensamientos o purificarla.',
-        hint: 'Avanza en los templos de la Campaña para recuperarla.',
-        unlocked: s.cleared.includes('odion') || s.cleared.includes('mako') || (s.cleared && s.cleared.length >= 3),
-        grandpaQuote: 'Shadi custodiaba la Llave del Milenio. Permite penetrar en las estancias más recónditas del alma de las personas.',
-        svgPath: `
-          <ellipse cx="50" cy="30" rx="17" ry="21" fill="none" stroke="url(#goldGrad)" stroke-width="5.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
-          <ellipse cx="50" cy="30" rx="8.5" ry="5.2" fill="#1a1408" stroke="#ffd700" stroke-width="1.2"/>
-          <circle cx="50" cy="30" r="2.4" fill="#ffd700"/>
-          <rect x="23" y="48" width="54" height="7.5" rx="3" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
-          <rect x="46" y="54" width="8" height="38" rx="2" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
-          <rect x="54" y="78" width="9" height="3.5" fill="url(#goldGrad)"/>
-          <rect x="54" y="86" width="7" height="3.5" fill="url(#goldGrad)"/>
-        `
-      },
-      {
-        id: 'scale',
-        name: 'Balanza del Milenio',
-        shortName: 'Balanza',
-        bearer: 'Karim / Shadi',
-        power: 'Juicio del Corazón y Fusión Primordial',
-        desc: 'Pesa la pureza del corazón contra la sagrada Pluma de Ma\'at y canaliza fusiones de monstruos primordiales.',
-        hint: 'Derrota a Seto Kaiba o Kosaburo Kaiba para recuperarla.',
-        unlocked: s.cleared.includes('kosaburo') || s.cleared.includes('kaiba') || (s.cleared && s.cleared.length >= 5),
-        grandpaQuote: 'La Balanza de Ma\'at juzga la pureza de los duelistas. En manos sabias, otorga un equilibrio absoluto en batalla.',
-        svgPath: `
-          <rect x="48" y="20" width="4" height="68" fill="url(#goldGrad)"/>
-          <polygon points="50,88 35,96 65,96" fill="url(#goldGrad)"/>
-          <circle cx="50" cy="22" r="9" fill="url(#goldGrad)" stroke="#fff" stroke-width="1.4" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.8))"/>
-          <circle cx="50" cy="22" r="4.2" fill="#1a1408"/>
-          <circle cx="50" cy="22" r="1.8" fill="#ffd700"/>
-          <line x1="16" y1="36" x2="84" y2="36" stroke="url(#goldGrad)" stroke-width="3.8" stroke-linecap="round"/>
-          <line x1="22" y1="36" x2="16" y2="60" stroke="#ffd700" stroke-width="1.4"/>
-          <line x1="22" y1="36" x2="28" y2="60" stroke="#ffd700" stroke-width="1.4"/>
-          <path d="M12,60 Q22,70 32,60 Z" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
-          <line x1="78" y1="36" x2="72" y2="60" stroke="#ffd700" stroke-width="1.4"/>
-          <line x1="78" y1="36" x2="84" y2="60" stroke="#ffd700" stroke-width="1.4"/>
-          <path d="M68,60 Q78,70 88,60 Z" fill="url(#goldGrad)" stroke="#4a3000" stroke-width="1"/>
-        `
-      }
-    ];
+    const MILLENNIUM_ITEMS = window.getMillenniumItems(s);
+
 
     let unlockedCount = MILLENNIUM_ITEMS.filter(it => it.unlocked).length;
 
@@ -11950,14 +12345,82 @@ window.customFinishStoryDuel = function(win) {
         }
         
         let winLines = [{ role: 'system', speaker: id.toUpperCase(), text: '¡Increíble! Has demostrado tu valía como duelista.' }];
-        if (id === 'tristan') winLines = [{ role: 'system', speaker: 'TRISTAN_INTRO', text: 'Vaya... no esperaba que fueras tan fuerte. ¡Adelante, el camino es tuyo!' }];
-        else if (id === 'mako') winLines = [{ role: 'system', speaker: 'MAKO', text: '¡Increíble navegación! Has domado las aguas más salvajes. Tienes el espíritu de un verdadero guerrero del mar.' }];
-        else if (id === 'kosaburo') winLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Maldición...! ¿Cómo has podido superar la fuerza infinita de Exodia Necross...?' }];
+        if (id === 'tristan') {
+            winLines = [{ role: 'system', speaker: 'TRISTAN_INTRO', text: 'Vaya... no esperaba que fueras tan fuerte. ¡Adelante, el camino de los duelistas es tuyo!' }];
+        } else if (id === 'weevil') {
+            winLines = [{ role: 'system', speaker: 'WEEVIL', text: '¡Maldición! Mis insectos perfectos fueron aplastados. Mai es la siguiente, buena suerte intentando descifrar su estrategia de viento.' }];
+        } else if (id === 'mai') {
+            winLines = [{ role: 'system', speaker: 'MAI', text: 'Bien jugado. Tienes un instinto excelente para el duelo. Joey está esperando para enfrentarte en la costa. ¡Demuéstrale lo que has aprendido!' }];
+        } else if (id === 'mako') {
+            winLines = [{ role: 'system', speaker: 'MAKO', text: '¡Increíble navegación! Has domado las aguas más salvajes. Tienes el espíritu de un verdadero guerrero del mar.' }];
+        } else if (id === 'joey') {
+            winLines = [
+                { role: 'system', speaker: 'JOEY', text: '¡Guau! Me diste una buena paliza. Tus fusiones y combos son impresionantes.' },
+                { role: 'system', speaker: 'JOEY', text: '¡Oye! Casi lo olvido. Toma esto, es la Llave del Milenio. ¡Te servirá para abrir la Puerta del Nuevo Mundo cuando reúnas los demás artículos!' }
+            ];
+        } else if (id === 'pegasus') {
+            winLines = [
+                { role: 'system', speaker: 'PEGASUS', text: '¡Oh, boy! Mi magia del Reino de los Duelistas no pudo con tu asombrosa baraja.' },
+                { role: 'system', speaker: 'PEGASUS', text: '¡Maravilloso! Toma mi Ojo del Milenio como premio sagrado. Sin duda lo vas a necesitar para cruzar al Nuevo Mundo.' }
+            ];
+        } else if (id === 'bakura') {
+            winLines = [
+                { role: 'system', speaker: 'BAKURA', text: 'Ja, ja, ja... Así que pudiste sobrevivir a las sombras del cementerio. Eres un duelista extraordinario.' },
+                { role: 'system', speaker: 'BAKURA', text: 'Llévate la Sortija del Milenio. Sus agujas místicas te guiarán directo hacia las demás reliquias.' }
+            ];
+        } else if (id === 'noah') {
+            winLines = [{ role: 'system', speaker: 'NOAH', text: 'Imposible... Mis cálculos virtuales fallaron contra ti. Los duelos tienen corazón... Avanza y enfréntate a la familia Kaiba.' }];
+        } else if (id === 'kosaburo') {
+            winLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Maldición...! ¿Cómo has podido superar la fuerza infinita de Exodia Necross...?' }];
+        } else if (id === 'ishizu') {
+            winLines = [
+                { role: 'system', speaker: 'ISHIZU', text: 'Mi visión del futuro fue alterada por tu determinación... El destino se doblega ante tu espíritu.' },
+                { role: 'system', speaker: 'ISHIZU', text: 'Te entrego el Collar del Milenio. Las puertas sagradas del Nuevo Mundo te esperan cuando llegue el momento.' }
+            ];
+        } else if (id === 'odion') {
+            winLines = [{ role: 'system', speaker: 'ODION', text: 'Has demostrado ser digno al atravesar mi defensa de trampas. Sigue adelante, el Amo Marik te está esperando.' }];
+        } else if (id === 'marik') {
+            winLines = [
+                { role: 'system', speaker: 'MARIK', text: 'La oscuridad de Ra no pudo incinerarte... Reconozco mi derrota en este Duelo de las Sombras.' },
+                { role: 'system', speaker: 'MARIK', text: 'Llévate el Cetro del Milenio. El Nuevo Mundo está casi a tu alcance... pero Atem te espera.' }
+            ];
+        } else if (id === 'kaiba' || id === 'seto') {
+            winLines = [
+                { role: 'system', speaker: 'SETO', text: 'Hmph. Has mejorado desde la última vez, lo admito. Pero mi Dragón Blanco de Ojos Azules volverá a desafiarte.' },
+                { role: 'system', speaker: 'SETO', text: 'Aquí tienes la Balanza del Milenio. No dejes que nadie se interponga en tu camino al Nuevo Mundo.' }
+            ];
+        } else if (id === 'yugi') {
+            winLines = [
+                { role: 'system', speaker: 'YUGI', text: '¡Ese fue un duelo supremo y legendario! Me enseñaste el verdadero significado de confiar en el Corazón de las Cartas.' },
+                { role: 'system', speaker: 'YUGI', text: 'Eres digno de portar el Rompecabezas del Milenio. ¡Ahora tienes los 7 Artículos Sagrados para abrir la Puerta del Nuevo Mundo!' }
+            ];
+        }
         
         // Show 3-card reward choice screen for the defeated character
         window.showCustomDuelRewardChoice(id, rank, gain, () => {
             window.playCustomMusic('dialogos.mp3');
-            window.renderCustomStoryDialog(winLines, 0, () => window.customShowMap());
+            window.renderCustomStoryDialog(winLines, 0, () => {
+                // Check if this defeated opponent carries a Millennium Item
+                const allItems = window.getMillenniumItems ? window.getMillenniumItems(s) : [];
+                const wonItem = allItems.find(it => {
+                    const b = (it.bearerId || '').toLowerCase();
+                    return b === id.toLowerCase() || (b === 'kaiba' && id.toLowerCase() === 'seto');
+                });
+                
+                const claimKey = 'FMR_ITEM_CLAIMED_' + id.toLowerCase();
+                const alreadyClaimed = origGet(claimKey);
+                
+                if (wonItem && !alreadyClaimed) {
+                    origSet(claimKey, '1');
+                    if (window.showMillenniumItemCelebration) {
+                        window.showMillenniumItemCelebration(wonItem, id, () => window.customShowMap());
+                    } else {
+                        window.customShowMap();
+                    }
+                } else {
+                    window.customShowMap();
+                }
+            });
         });
     }
 };
