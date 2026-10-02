@@ -8517,7 +8517,9 @@ function buildDeck(names){return names.map(rawCard).filter(Boolean);}
 function shuffleLocal(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function showLoading(show,text){const d=document.getElementById('campaignLoad3000');if(!d)return;d.style.display=show?'flex':'none';const t=document.getElementById('campaignLoadText3000');if(t&&text)t.textContent=text;}
 function installStoryDecks(){
- if(!storyDuelActive||!storyOpponent||typeof game==='undefined'||!game||storyDeckReady)return;
+ if((!storyDuelActive && !window.storyDuelActive)||(!storyOpponent && !window.storyOpponent)||typeof game==='undefined'||!game)return;
+ if(!storyOpponent && window.storyOpponent) storyOpponent = window.storyOpponent;
+ if(!storyDuelActive && window.storyDuelActive) storyDuelActive = true;
  const s=loadGame();if(!s)return;
 
  // ���� Card builder: works without depending on rawCard/FMR_ST_POOL_V1 ����
@@ -8660,13 +8662,13 @@ function showFusions(){ if(window.customShowFusions) window.customShowFusions();
 /* La IA no puede comenzar antes de que el Deck de historia reemplace al Deck de pruebas. */
 const prevEnemyTurn3000=window.enemyTurn50;
 if(typeof prevEnemyTurn3000==='function'){
- window.enemyTurn50=function(){if(storyDuelActive&&!storyDeckReady){setTimeout(()=>window.enemyTurn50(),150);return;}return prevEnemyTurn3000.apply(this,arguments);};
+ window.enemyTurn50=function(){if((storyDuelActive||window.storyDuelActive)&&!(storyDeckReady||window.storyDeckReady)){setTimeout(()=>window.enemyTurn50(),150);return;}return prevEnemyTurn3000.apply(this,arguments);};
  try{enemyTurn50=window.enemyTurn50;}catch(_){}
 }
 /* Cualquier reinicio dentro de un duelo de historia vuelve a colocar los Decks correctos. */
 const prevNew3000=window.newGame;
 if(typeof prevNew3000==='function'){
- window.newGame=function(){const wasReady=storyDeckReady;storyDeckReady=false;duelHandled=false;const r=prevNew3000.apply(this,arguments);if(storyDuelActive&&!wasReady){setTimeout(installStoryDecks,1380);}else if(wasReady){storyDeckReady=true;}return r;};
+ window.newGame=function(){const wasReady=(storyDeckReady||window.storyDeckReady);storyDeckReady=false;window.storyDeckReady=false;duelHandled=false;window.duelHandled=false;const r=prevNew3000.apply(this,arguments);if((storyDuelActive||window.storyDuelActive)&&!wasReady){setTimeout(installStoryDecks,1380);}else if(wasReady){storyDeckReady=true;window.storyDeckReady=true;}return r;};
  try{newGame=window.newGame;}catch(_){}
 }
 /* Deck Out informa explícitamente el resultado al controlador de campaña. */
@@ -8706,6 +8708,12 @@ try { if (typeof finishStoryDuel !== 'undefined') window.nativeAPI.finishStoryDu
 if (!window.nativeAPI.finishStoryDuel && typeof window.finishStoryDuel === 'function') window.nativeAPI.finishStoryDuel = window.finishStoryDuel;
 try { window.nativeAPI.setMemorySave = function(ns) { memorySave = ns; }; } catch(e){}
 try { window.nativeAPI.getMemorySave = function() { return memorySave; }; } catch(e){}
+try { window.nativeAPI.setStoryDuelActive = function(v) { storyDuelActive = v; window.storyDuelActive = v; }; } catch(e){}
+try { window.nativeAPI.setStoryOpponent = function(v) { storyOpponent = v; window.storyOpponent = v; }; } catch(e){}
+try { window.nativeAPI.setStoryDeckReady = function(v) { storyDeckReady = v; window.storyDeckReady = v; }; } catch(e){}
+try { window.nativeAPI.getStoryDuelActive = function() { return storyDuelActive; }; } catch(e){}
+try { window.nativeAPI.getStoryOpponent = function() { return storyOpponent; }; } catch(e){}
+try { window.nativeAPI.installStoryDecks = installStoryDecks; } catch(e){}
 try { window.MASTER40 = MASTER40; } catch(e){}
 try { window.CARDS109 = CARDS109; } catch(e){}
 try { window.CARD_FILES = CARD_FILES; } catch(e){}
@@ -14930,47 +14938,34 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     });
   };
 
-  // Bulletproof beginStoryDuel override
+  var origBeginStoryDuel = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
   window.beginStoryDuel = function(id) {
     var rawId = String(id || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
     var normId = rawId === 'seto' ? 'kaiba' : (rawId === 'gozaburo' ? 'kosaburo' : rawId);
     
-    var s = (window.nativeAPI && window.nativeAPI.loadGame && window.nativeAPI.loadGame()) ||
-            (typeof loadGame === 'function' && loadGame()) ||
-            window.memorySave;
-            
-    if (!s) {
-      if (typeof toast === 'function') toast('No hay datos de partida. Inicia una nueva partida.');
-      return;
+    window.lastDuelOpponent = normId;
+    window.storyOpponent = normId;
+    window.storyDuelActive = true;
+    window.storyDeckReady = false;
+    window.duelHandled = false;
+    
+    if (window.nativeAPI && window.nativeAPI.setStoryOpponent) window.nativeAPI.setStoryOpponent(normId);
+    if (window.nativeAPI && window.nativeAPI.setStoryDuelActive) window.nativeAPI.setStoryDuelActive(true);
+    if (window.nativeAPI && window.nativeAPI.setStoryDeckReady) window.nativeAPI.setStoryDeckReady(false);
+    
+    var res;
+    if (typeof origBeginStoryDuel === 'function') {
+      res = origBeginStoryDuel(normId);
     }
     
-    if (window.showDuelBoard) window.showDuelBoard();
+    // Safety fallback: ensure installStoryDecks triggers even if timers get interrupted
+    setTimeout(function() {
+      if (!window.storyDeckReady && window.storyDuelActive) {
+        if (typeof window.installStoryDecks === 'function') window.installStoryDecks();
+      }
+    }, 1450);
     
-    window.storyOpponent = normId;
-    try { storyOpponent = normId; } catch(_) {}
-    window.storyDuelActive = true;
-    try { storyDuelActive = true; } catch(_) {}
-    window.storyDeckReady = false;
-    try { storyDeckReady = false; } catch(_) {}
-    window.duelHandled = false;
-    try { duelHandled = false; } catch(_) {}
-    window.lastDuelOpponent = normId;
-    
-    if (typeof hideShell === 'function') hideShell();
-    if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
-    
-    var duelistObj = (typeof DUELISTS !== 'undefined' && DUELISTS.find(function(x){ return x.id === normId || x.id === rawId; })) ||
-                     (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[normId] || window.CHARACTER_DECKS[rawId])) ||
-                     { name: normId.toUpperCase() };
-    var oppName = duelistObj.displayName || duelistObj.name || normId.toUpperCase();
-    
-    if (typeof showLoading === 'function') showLoading(true, 'Preparando ' + oppName + '...');
-    
-    try { document.getElementById('duelOver64')?.classList.remove('show'); } catch(_) {}
-    try { document.getElementById('deckOut67')?.classList.remove('show'); } catch(_) {}
-    if (typeof setDuelView === 'function') setDuelView('field');
-    
-    window.newGame();
+    return res;
   };
   if (!window.nativeAPI) window.nativeAPI = {};
   window.nativeAPI.beginStoryDuel = window.beginStoryDuel;

@@ -8517,7 +8517,9 @@ function buildDeck(names){return names.map(rawCard).filter(Boolean);}
 function shuffleLocal(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function showLoading(show,text){const d=document.getElementById('campaignLoad3000');if(!d)return;d.style.display=show?'flex':'none';const t=document.getElementById('campaignLoadText3000');if(t&&text)t.textContent=text;}
 function installStoryDecks(){
- if(!storyDuelActive||!storyOpponent||typeof game==='undefined'||!game||storyDeckReady)return;
+ if((!storyDuelActive && !window.storyDuelActive)||(!storyOpponent && !window.storyOpponent)||typeof game==='undefined'||!game)return;
+ if(!storyOpponent && window.storyOpponent) storyOpponent = window.storyOpponent;
+ if(!storyDuelActive && window.storyDuelActive) storyDuelActive = true;
  const s=loadGame();if(!s)return;
 
  // ���� Card builder: works without depending on rawCard/FMR_ST_POOL_V1 ����
@@ -8660,13 +8662,13 @@ function showFusions(){ if(window.customShowFusions) window.customShowFusions();
 /* La IA no puede comenzar antes de que el Deck de historia reemplace al Deck de pruebas. */
 const prevEnemyTurn3000=window.enemyTurn50;
 if(typeof prevEnemyTurn3000==='function'){
- window.enemyTurn50=function(){if(storyDuelActive&&!storyDeckReady){setTimeout(()=>window.enemyTurn50(),150);return;}return prevEnemyTurn3000.apply(this,arguments);};
+ window.enemyTurn50=function(){if((storyDuelActive||window.storyDuelActive)&&!(storyDeckReady||window.storyDeckReady)){setTimeout(()=>window.enemyTurn50(),150);return;}return prevEnemyTurn3000.apply(this,arguments);};
  try{enemyTurn50=window.enemyTurn50;}catch(_){}
 }
 /* Cualquier reinicio dentro de un duelo de historia vuelve a colocar los Decks correctos. */
 const prevNew3000=window.newGame;
 if(typeof prevNew3000==='function'){
- window.newGame=function(){const wasReady=storyDeckReady;storyDeckReady=false;duelHandled=false;const r=prevNew3000.apply(this,arguments);if(storyDuelActive&&!wasReady){setTimeout(installStoryDecks,1380);}else if(wasReady){storyDeckReady=true;}return r;};
+ window.newGame=function(){const wasReady=(storyDeckReady||window.storyDeckReady);storyDeckReady=false;window.storyDeckReady=false;duelHandled=false;window.duelHandled=false;const r=prevNew3000.apply(this,arguments);if((storyDuelActive||window.storyDuelActive)&&!wasReady){setTimeout(installStoryDecks,1380);}else if(wasReady){storyDeckReady=true;window.storyDeckReady=true;}return r;};
  try{newGame=window.newGame;}catch(_){}
 }
 /* Deck Out informa explícitamente el resultado al controlador de campaña. */

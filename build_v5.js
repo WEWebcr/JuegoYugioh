@@ -35,6 +35,12 @@ try { if (typeof finishStoryDuel !== 'undefined') window.nativeAPI.finishStoryDu
 if (!window.nativeAPI.finishStoryDuel && typeof window.finishStoryDuel === 'function') window.nativeAPI.finishStoryDuel = window.finishStoryDuel;
 try { window.nativeAPI.setMemorySave = function(ns) { memorySave = ns; }; } catch(e){}
 try { window.nativeAPI.getMemorySave = function() { return memorySave; }; } catch(e){}
+try { window.nativeAPI.setStoryDuelActive = function(v) { storyDuelActive = v; window.storyDuelActive = v; }; } catch(e){}
+try { window.nativeAPI.setStoryOpponent = function(v) { storyOpponent = v; window.storyOpponent = v; }; } catch(e){}
+try { window.nativeAPI.setStoryDeckReady = function(v) { storyDeckReady = v; window.storyDeckReady = v; }; } catch(e){}
+try { window.nativeAPI.getStoryDuelActive = function() { return storyDuelActive; }; } catch(e){}
+try { window.nativeAPI.getStoryOpponent = function() { return storyOpponent; }; } catch(e){}
+try { window.nativeAPI.installStoryDecks = installStoryDecks; } catch(e){}
 try { window.MASTER40 = MASTER40; } catch(e){}
 try { window.CARDS109 = CARDS109; } catch(e){}
 try { window.CARD_FILES = CARD_FILES; } catch(e){}
