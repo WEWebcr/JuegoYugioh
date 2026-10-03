@@ -267,28 +267,98 @@ textarea{resize:vertical;min-height:60px}
   <div class="deck-area">
     <div class="card">
       <div class="deck-counter err" id="deckCounter">0 / 40-60 cartas</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <input id="deckListSearch" placeholder="Buscar carta en este deck..." oninput="renderDeck()" style="flex:1;">
-        <select id="deckListKindFilter" onchange="renderDeck()" style="width:130px;">
-          <option value="">Todos</option>
+      <input id="deckListSearch" placeholder="Buscar carta en este deck..." oninput="renderDeck()" style="width:100%;margin-bottom:8px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+        <select id="deckListKindFilter" onchange="renderDeck()" style="width:100%;font-size:.78rem;padding:6px 4px;">
+          <option value="">Categoría: Todas</option>
           <option value="MONSTER">Monstruos</option>
           <option value="SPELL">Magias</option>
           <option value="TRAP">Trampas</option>
           <option value="EQUIP">Equipo</option>
+        </select>
+        <select id="deckListAttrFilter" onchange="renderDeck()" style="width:100%;font-size:.78rem;padding:6px 4px;">
+          <option value="">Atributo: Todos</option>
+          <option value="DARK">DARK</option>
+          <option value="DIVINE">DIVINE</option>
+          <option value="EARTH">EARTH</option>
+          <option value="FIRE">FIRE</option>
+          <option value="LIGHT">LIGHT</option>
+          <option value="WATER">WATER</option>
+          <option value="WIND">WIND</option>
+        </select>
+        <select id="deckListTypeFilter" onchange="renderDeck()" style="width:100%;font-size:.78rem;padding:6px 4px;">
+          <option value="">Tipo: Todos</option>
+          <option value="Aqua">Aqua</option>
+          <option value="Beast">Beast</option>
+          <option value="Beast-Warrior">Beast-Warrior</option>
+          <option value="Dinosaur">Dinosaur</option>
+          <option value="Divine-Beast">Divine-Beast</option>
+          <option value="Dragon">Dragon</option>
+          <option value="Fairy">Fairy</option>
+          <option value="Fiend">Fiend</option>
+          <option value="Fish">Fish</option>
+          <option value="Insect">Insect</option>
+          <option value="Machine">Machine</option>
+          <option value="Plant">Plant</option>
+          <option value="Pyro">Pyro</option>
+          <option value="Reptile">Reptile</option>
+          <option value="Rock">Rock</option>
+          <option value="Sea Serpent">Sea Serpent</option>
+          <option value="Spellcaster">Spellcaster</option>
+          <option value="Thunder">Thunder</option>
+          <option value="Warrior">Warrior</option>
+          <option value="Winged Beast">Winged Beast</option>
+          <option value="Zombie">Zombie</option>
         </select>
       </div>
       <div id="deckSlots" style="max-height:500px;overflow-y:auto;padding-right:4px;"></div>
     </div>
     <div class="card">
       <h2>AGREGAR CARTA AL DECK</h2>
-      <input id="deckSearch" placeholder="Buscar carta..." oninput="renderDeckCatalog()" style="width:100%;margin-bottom:10px">
-      <select id="deckKindFilter" onchange="renderDeckCatalog()" style="width:100%;margin-bottom:10px">
-        <option value="">Todos los tipos</option>
-        <option value="MONSTER">MONSTER</option>
-        <option value="SPELL">SPELL</option>
-        <option value="TRAP">TRAP</option>
-        <option value="EQUIP">EQUIP</option>
-      </select>
+      <input id="deckSearch" placeholder="Buscar carta en catálogo..." oninput="renderDeckCatalog()" style="width:100%;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
+        <select id="deckKindFilter" onchange="renderDeckCatalog()" style="width:100%;font-size:.78rem;padding:6px 4px;">
+          <option value="">Categoría: Todas</option>
+          <option value="MONSTER">Monstruos</option>
+          <option value="SPELL">Magias</option>
+          <option value="TRAP">Trampas</option>
+          <option value="EQUIP">Equipo</option>
+        </select>
+        <select id="deckAttrFilter" onchange="renderDeckCatalog()" style="width:100%;font-size:.78rem;padding:6px 4px;">
+          <option value="">Atributo: Todos</option>
+          <option value="DARK">DARK</option>
+          <option value="DIVINE">DIVINE</option>
+          <option value="EARTH">EARTH</option>
+          <option value="FIRE">FIRE</option>
+          <option value="LIGHT">LIGHT</option>
+          <option value="WATER">WATER</option>
+          <option value="WIND">WIND</option>
+        </select>
+        <select id="deckTypeFilter" onchange="renderDeckCatalog()" style="width:100%;font-size:.78rem;padding:6px 4px;">
+          <option value="">Tipo: Todos</option>
+          <option value="Aqua">Aqua</option>
+          <option value="Beast">Beast</option>
+          <option value="Beast-Warrior">Beast-Warrior</option>
+          <option value="Dinosaur">Dinosaur</option>
+          <option value="Divine-Beast">Divine-Beast</option>
+          <option value="Dragon">Dragon</option>
+          <option value="Fairy">Fairy</option>
+          <option value="Fiend">Fiend</option>
+          <option value="Fish">Fish</option>
+          <option value="Insect">Insect</option>
+          <option value="Machine">Machine</option>
+          <option value="Plant">Plant</option>
+          <option value="Pyro">Pyro</option>
+          <option value="Reptile">Reptile</option>
+          <option value="Rock">Rock</option>
+          <option value="Sea Serpent">Sea Serpent</option>
+          <option value="Spellcaster">Spellcaster</option>
+          <option value="Thunder">Thunder</option>
+          <option value="Warrior">Warrior</option>
+          <option value="Winged Beast">Winged Beast</option>
+          <option value="Zombie">Zombie</option>
+        </select>
+      </div>
       <div id="deckCatalog" style="max-height:500px;overflow-y:auto"></div>
     </div>
   </div>
@@ -724,6 +794,8 @@ function renderDeck() {
 
   var q = (document.getElementById('deckListSearch') ? document.getElementById('deckListSearch').value : '').toLowerCase().trim();
   var kFilter = (document.getElementById('deckListKindFilter') ? document.getElementById('deckListKindFilter').value : '').trim();
+  var attrFilter = (document.getElementById('deckListAttrFilter') ? document.getElementById('deckListAttrFilter').value : '').trim();
+  var typeFilter = (document.getElementById('deckListTypeFilter') ? document.getElementById('deckListTypeFilter').value : '').trim();
 
   var mCount = 0, sCount = 0, tCount = 0;
   var items = [];
@@ -732,6 +804,8 @@ function renderDeck() {
     var name = currentDeck[i];
     var c = getCardInfo(name);
     var kind = c ? (c.kind || 'MONSTER') : 'MONSTER';
+    var attr = c ? (c.attr || '') : '';
+    var type = c ? (c.type || '') : '';
 
     if (kind === 'MONSTER') mCount++;
     else if (kind === 'SPELL' || kind === 'EQUIP') sCount++;
@@ -739,6 +813,8 @@ function renderDeck() {
 
     if (q && !name.toLowerCase().includes(q)) continue;
     if (kFilter && kind !== kFilter) continue;
+    if (attrFilter && (!attr || attr.toLowerCase() !== attrFilter.toLowerCase())) continue;
+    if (typeFilter && (!type || type.toLowerCase() !== typeFilter.toLowerCase())) continue;
 
     var kindBadge = '';
     var statsHtml = '';
@@ -749,7 +825,11 @@ function renderDeck() {
         var atkVal = (c.atk != null ? c.atk : 0);
         var defVal = (c.def != null ? c.def : 0);
         var lvText = c.level ? '<span style="color:#aaa;font-weight:normal;margin-right:4px;">★' + c.level + '</span>' : '';
-        statsHtml = '<span class="stats stats-monster">' + lvText + 'ATK:' + atkVal + ' DEF:' + defVal + '</span>';
+        var metaPart = [];
+        if (c.attr) metaPart.push(c.attr);
+        if (c.type) metaPart.push(c.type);
+        var metaStr = metaPart.length ? '<span style="color:#7ee787;font-size:.7rem;font-weight:normal;margin-right:6px;opacity:.9;">[' + metaPart.join(' • ') + ']</span>' : '';
+        statsHtml = '<span class="stats stats-monster">' + metaStr + lvText + 'ATK:' + atkVal + ' DEF:' + defVal + '</span>';
       } else if (kind === 'SPELL') {
         kindBadge = '<span class="card-kind kind-SPELL" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;">MAGIA</span>';
         statsHtml = '<span class="stats stats-spell">🔮 Magia' + (c.value ? ' (' + c.value + ')' : '') + '</span>';
@@ -785,7 +865,7 @@ function renderDeck() {
     );
   }
 
-  var filterNotice = (q || kFilter) ? ' (mostrando ' + items.length + ')' : '';
+  var filterNotice = (q || kFilter || attrFilter || typeFilter) ? ' (mostrando ' + items.length + ')' : '';
   counter.innerHTML = n + ' / 40-60 cartas' + filterNotice + ' ' +
     '<span style="font-size:.8rem;font-weight:normal;color:#aaa;margin-left:8px;">(' +
       '<span style="color:#ff8888;">⚔ ' + mCount + ' Monstruos</span> • ' +
@@ -798,15 +878,29 @@ function renderDeck() {
 }
 
 function renderDeckCatalog() {
-  var q = (document.getElementById('deckSearch').value||'').toLowerCase();
-  var k = document.getElementById('deckKindFilter').value;
+  var q = (document.getElementById('deckSearch').value||'').toLowerCase().trim();
+  var k = (document.getElementById('deckKindFilter').value||'').trim();
+  var attrFilter = (document.getElementById('deckAttrFilter') ? document.getElementById('deckAttrFilter').value : '').trim();
+  var typeFilter = (document.getElementById('deckTypeFilter') ? document.getElementById('deckTypeFilter').value : '').trim();
+
   var el = document.getElementById('deckCatalog');
-  var filtered = allCards.filter(function(c){ return (!q||c.name.toLowerCase().includes(q))&&(!k||c.kind===k); });
+  var filtered = allCards.filter(function(c){
+    if (q && !c.name.toLowerCase().includes(q)) return false;
+    if (k && c.kind !== k) return false;
+    if (attrFilter && (!c.attr || c.attr.toLowerCase() !== attrFilter.toLowerCase())) return false;
+    if (typeFilter && (!c.type || c.type.toLowerCase() !== typeFilter.toLowerCase())) return false;
+    return true;
+  });
+
   el.innerHTML = filtered.map(function(c){
     var esc = c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     var statsText = '';
     if (c.kind === 'MONSTER') {
-      statsText = (c.level ? '★Lv' + c.level + ' ' : '') + 'ATK:' + (c.atk != null ? c.atk : 0) + ' DEF:' + (c.def != null ? c.def : 0);
+      var metaPart = [];
+      if (c.attr) metaPart.push('[' + c.attr + ']');
+      if (c.type) metaPart.push(c.type);
+      var metaStr = metaPart.length ? '<span style="color:#7ee787;margin-right:6px;">' + metaPart.join(' ') + '</span>' : '';
+      statsText = (c.level ? '★Lv' + c.level + ' ' : '') + metaStr + 'ATK:' + (c.atk != null ? c.atk : 0) + ' DEF:' + (c.def != null ? c.def : 0);
     } else if (c.kind === 'SPELL') {
       statsText = '🔮 Carta Mágica' + (c.value ? ' (' + c.value + ')' : '');
     } else if (c.kind === 'TRAP') {
