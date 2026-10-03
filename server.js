@@ -14,6 +14,7 @@ const fs      = require('fs');
 const path    = require('path');
 const crypto  = require('crypto');
 const nodemailer = require('nodemailer');
+const db         = require('./db.js');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -55,24 +56,10 @@ function safeName(n) {
   return String(n).replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 32);
 }
 function savePath(name) {
-  return path.join(ROOT, 'saves', safeName(name) + '.json');
+  return db.savePath(name);
 }
-function readSave(name) {
-  if (!name) return null;
-  const p = savePath(name);
-  if (fs.existsSync(p)) {
-    try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
-  }
-  // Fallback insensible a mayusculas/minusculas (crucial para entornos Linux como Render)
-  try {
-    const target = safeName(name).toLowerCase() + '.json';
-    const files = fs.readdirSync(SAVES_DIR);
-    const match = files.find(f => f.toLowerCase() === target);
-    if (match) {
-      return JSON.parse(fs.readFileSync(path.join(SAVES_DIR, match), 'utf8'));
-    }
-  } catch (_) {}
-  return null;
+async function readSave(name) {
+  return await db.getSave(name);
 }
 // ── Sincronización Automática con GitHub para Render ─────────────
 const GITHUB_REPO = process.env.GITHUB_REPO || 'WEWebcr/JuegoYugioh';
@@ -162,42 +149,17 @@ async function hydrateSavesFromGitHub() {
   }
 }
 
-function writeSave(data) {
-  fs.writeFileSync(savePath(data.name), JSON.stringify(data, null, 2), 'utf8');
-  syncSaveToGitHub(data);
+async function writeSave(data) {
+  return await db.saveUser(data, syncSaveToGitHub);
 }
-function findSaveByEmailOrName(identifier) {
-  if (!identifier) return null;
-  const clean = String(identifier).trim();
-  // 1. Busqueda directa por nombre de archivo
-  const byName = readSave(clean);
-  if (byName) return byName;
-
-  // 2. Busqueda en saves por correo o nombre ignorando mayusculas
-  const dir = path.join(ROOT, 'saves');
-  try {
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-    const lower = clean.toLowerCase();
-    for (const f of files) {
-      try {
-        const d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-        if (d && (
-          (d.email && d.email.toLowerCase() === lower) ||
-          (d.name && d.name.toLowerCase() === lower) ||
-          (Array.isArray(d.aliases) && d.aliases.some(a => String(a).toLowerCase() === lower))
-        )) {
-          return d;
-        }
-      } catch (_) {}
-    }
-  } catch (_) {}
-  return null;
+async function findSaveByEmailOrName(identifier) {
+  return await db.findSave(identifier);
 }
 
 // ── Inyeccion / Seeding de Cuentas Preconfiguradas (e.g. Render Deployment) ──
-function ensureSeedUsers() {
+async function ensureSeedUsers() {
   try {
-    const josueExisting = findSaveByEmailOrName('josue') || findSaveByEmailOrName('joavce@hotmail.com');
+    const josueExisting = await findSaveByEmailOrName('josue') || await findSaveByEmailOrName('joavce@hotmail.com');
     if (!josueExisting) {
       const josueSeed = {
         name: "josue",
@@ -263,11 +225,11 @@ function ensureSeedUsers() {
           }
         ]
       };
-      fs.writeFileSync(path.join(SAVES_DIR, 'Josue.json'), JSON.stringify(josueSeed, null, 2), 'utf8');
+      await writeSave(josueSeed);
       console.log('[Seed] Cuenta "josue" inyectada exitosamente con suscripción VIP activa.');
     }
 
-    const octavioExisting = findSaveByEmailOrName('octavio') || findSaveByEmailOrName('alpizar') || findSaveByEmailOrName('alpizaroctavio707@gmail.com') || findSaveByEmailOrName('aplizar');
+    const octavioExisting = await findSaveByEmailOrName('octavio') || await findSaveByEmailOrName('alpizar') || await findSaveByEmailOrName('alpizaroctavio707@gmail.com') || await findSaveByEmailOrName('aplizar');
     if (!octavioExisting) {
       const octavioSeed = {
         name: "Octavio",
@@ -318,7 +280,7 @@ function ensureSeedUsers() {
           }
         ]
       };
-      fs.writeFileSync(path.join(SAVES_DIR, 'Octavio.json'), JSON.stringify(octavioSeed, null, 2), 'utf8');
+      await writeSave(octavioSeed);
       console.log('[Seed] Cuenta "Octavio" inyectada exitosamente con suscripción VIP activa.');
     }
   } catch (err) {
@@ -436,10 +398,10 @@ app.post('/api/register', async (req, res) => {
 
   const cleanEmail = email.toLowerCase().trim();
 
-  const existingName = readSave(name);
+  const existingName = await readSave(name);
   if (existingName) return res.status(409).json({ error: 'Ya existe una cuenta con ese nombre de jugador' });
 
-  const existingEmail = findSaveByEmailOrName(cleanEmail);
+  const existingEmail = await findSaveByEmailOrName(cleanEmail);
   if (existingEmail) return res.status(409).json({ error: 'Ya existe una cuenta registrada con este correo electrónico.' });
 
   const DEFAULT_DECK = [
@@ -481,7 +443,7 @@ app.post('/api/register', async (req, res) => {
   };
 
   try {
-    writeSave(save);
+    await await writeSave(save);
 
     // Enviar correo de bienvenida (no bloqueante)
     try {
@@ -515,19 +477,19 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Login  POST /api/login  { name / identifier, password } (puede ser nombre de duelista o correo)
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
   const identifier = req.body?.name || req.body?.identifier;
   const password = req.body?.password;
   const clientSave = req.body?.clientSave;
   if (!identifier || !password) return res.status(400).json({ error: 'Nombre/correo y clave requeridos' });
 
-  let save = findSaveByEmailOrName(identifier);
+  let save = await findSaveByEmailOrName(identifier);
 
   // Auto-Restauración si Render reinició su contenedor y se perdió el archivo local
   if (!save && clientSave && (clientSave.name === identifier || clientSave.email === identifier)) {
     if (clientSave.passwordHash === hashPassword(password)) {
       console.log('[Auto-Restore] Save restaurado desde el navegador del cliente para:', identifier);
-      writeSave(clientSave);
+      await writeSave(clientSave);
       save = clientSave;
     }
   }
@@ -559,7 +521,7 @@ app.post('/api/forgot-password', async (req, res) => {
   const identifier = req.body?.identifier || req.body?.email || req.body?.name;
   if (!identifier) return res.status(400).json({ error: 'Ingresa tu nombre de jugador o correo electrónico.' });
 
-  const save = findSaveByEmailOrName(identifier);
+  const save = await findSaveByEmailOrName(identifier);
   if (!save) {
     return res.status(404).json({ error: 'No se encontró ninguna cuenta asociada a este nombre o correo.' });
   }
@@ -605,7 +567,7 @@ app.post('/api/forgot-password', async (req, res) => {
 });
 
 // Restablecer clave con codigo  POST /api/reset-password  { identifier / email / name, code, newPassword }
-app.post('/api/reset-password', (req, res) => {
+app.post('/api/reset-password', async (req, res) => {
   const identifier = req.body?.identifier || req.body?.email || req.body?.name;
   const { code, newPassword } = req.body || {};
   if (!identifier || !code || !newPassword) {
@@ -636,10 +598,10 @@ app.post('/api/reset-password', (req, res) => {
 });
 
 // Cambiar clave  POST /api/changePassword  { name, oldPassword, newPassword }
-app.post('/api/changePassword', (req, res) => {
+app.post('/api/changePassword', async (req, res) => {
   const { name, oldPassword, newPassword } = req.body || {};
   if (!name || !oldPassword || !newPassword) return res.status(400).json({ error: 'Datos incompletos' });
-  const save = readSave(name);
+  const save = await readSave(name);
   if (!save) return res.status(404).json({ error: 'Cuenta no encontrada' });
   if (save.passwordHash !== hashPassword(oldPassword)) return res.status(401).json({ error: 'Clave actual incorrecta' });
   if (String(newPassword).length < 4) return res.status(400).json({ error: 'La nueva clave debe tener al menos 4 caracteres' });
@@ -653,23 +615,27 @@ app.post('/api/changePassword', (req, res) => {
 // ════════════════════════════════════════════════════════════════
 
 // Listar partidas (solo info publica para admin)  GET /api/saves
-app.get('/api/saves', requireAdmin, (req, res) => {
-  const dir = path.join(ROOT, 'saves');
+app.get('/api/saves', requireAdmin, async (req, res) => {
   try {
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json')).map(f => {
-      try {
-        const d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-        return { name: d.name, world: d.world, lastPlayed: d.lastPlayed, wins: d.wins, file: f };
-      } catch { return null; }
-    }).filter(Boolean);
-    res.json(files);
-  } catch { res.json([]); }
+    const users = await db.getAllUsers();
+    const list = users.map(d => ({
+      name: d.name,
+      email: d.email,
+      world: d.world,
+      lastPlayed: d.lastPlayed,
+      wins: d.wins,
+      file: (d.name || 'save') + '.json'
+    }));
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Forzar o verificar inyección de Josue  ALL /api/seed-josue
-app.all('/api/seed-josue', (req, res) => {
-  ensureSeedUsers();
-  const user = findSaveByEmailOrName('josue');
+app.all('/api/seed-josue', async (req, res) => {
+  await ensureSeedUsers();
+  const user = await findSaveByEmailOrName('josue');
   res.json({
     ok: true,
     message: 'Usuario "josue" verificado e inyectado con éxito en el servidor.',
@@ -683,11 +649,11 @@ app.all('/api/seed-josue', (req, res) => {
 });
 
 // Guardar partida  POST /api/save  { name, password, ...saveData }
-app.post('/api/save', (req, res) => {
+app.post('/api/save', async (req, res) => {
   const { name, password, ...data } = req.body || {};
   if (!name || !password) return res.status(400).json({ error: 'Auth requerida (name + password)' });
 
-  const existing = readSave(name);
+  const existing = await readSave(name);
   if (!existing) return res.status(404).json({ error: 'Cuenta no encontrada. Registrate primero.' });
   if (existing.passwordHash !== hashPassword(password)) return res.status(401).json({ error: 'Clave incorrecta' });
 
@@ -702,13 +668,17 @@ app.post('/api/save', (req, res) => {
 
   // Mantener passwordHash existente, actualizar el resto
   const updated = { ...existing, ...data, name, passwordHash: existing.passwordHash, lastPlayed: Date.now() };
-  try { writeSave(updated); res.json({ ok: true, subscription: subStatus }); }
-  catch (e) { res.status(500).json({ error: e.message }); }
+  try {
+    await writeSave(updated);
+    res.json({ ok: true, subscription: subStatus });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Consultar estado de suscripción de un usuario  GET /api/subscription/status/:name
-app.get('/api/subscription/status/:name', (req, res) => {
-  const save = readSave(req.params.name);
+app.get('/api/subscription/status/:name', async (req, res) => {
+  const save = await readSave(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
   const status = computeSubscriptionStatus(save);
   res.json({ ok: true, name: save.name, subscription: status });
@@ -719,7 +689,7 @@ app.post('/api/subscription/notify-payment', async (req, res) => {
   const { name, phone, reference, notes } = req.body || {};
   if (!name) return res.status(400).json({ error: 'Nombre de usuario requerido' });
 
-  const save = readSave(name);
+  const save = await readSave(name);
   const userEmail = (save && save.email) ? save.email : 'No especificado';
   const nowStr = new Date().toLocaleString('es-CR', { timeZone: 'America/Costa_Rica' });
 
@@ -768,19 +738,21 @@ app.post('/api/subscription/notify-payment', async (req, res) => {
 
 // Cargar partida  GET /api/load/:name  (sin contrasena, solo datos publicos del juego)
 // La verificacion de identidad se hace en el cliente (sessionStorage)
-app.get('/api/load/:name', (req, res) => {
-  const save = readSave(req.params.name);
+app.get('/api/load/:name', async (req, res) => {
+  const save = await readSave(req.params.name);
   if (!save) return res.status(404).json({ error: 'Partida no encontrada' });
   const { passwordHash, ...publicSave } = save;
   res.json(publicSave);
 });
 
 // Eliminar partida (admin)  DELETE /api/saves/:name
-app.delete('/api/saves/:name', requireAdmin, (req, res) => {
-  const file = savePath(req.params.name);
-  if (!fs.existsSync(file)) return res.status(404).json({ error: 'No encontrado' });
-  try { fs.unlinkSync(file); res.json({ ok: true }); }
-  catch (e) { res.status(500).json({ error: e.message }); }
+app.delete('/api/saves/:name', requireAdmin, async (req, res) => {
+  try {
+    await db.deleteUser(req.params.name);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ════════════════════════════════════════════════════════════════
@@ -898,15 +870,12 @@ app.post('/api/upload-image', requireAdmin, (req, res) => {
 // ════════════════════════════════════════════════════════════════
 
 // Listar todos los usuarios con su progreso y estado  GET /api/admin/users
-app.get('/api/admin/users', requireAdmin, (req, res) => {
-  const dir = path.join(ROOT, 'saves');
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
-    if (!fs.existsSync(dir)) return res.json([]);
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const allUsers = await db.getAllUsers();
     const now = Date.now();
-    const users = files.map(f => {
+    const users = allUsers.map(d => {
       try {
-        const d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
         if (!d || !d.name) return null;
         
         let totalWins = 0;
@@ -962,8 +931,8 @@ app.get('/api/admin/users', requireAdmin, (req, res) => {
 });
 
 // Otorgar DP (+Regalia o ajuste)  POST /api/admin/user/:name/grant-dp
-app.post('/api/admin/user/:name/grant-dp', requireAdmin, (req, res) => {
-  const save = readSave(req.params.name);
+app.post('/api/admin/user/:name/grant-dp', requireAdmin, async (req, res) => {
+  const save = await readSave(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
 
   const { amount, mode, reason } = req.body || {};
@@ -992,8 +961,8 @@ app.post('/api/admin/user/:name/grant-dp', requireAdmin, (req, res) => {
 });
 
 // Regalar Carta(s) a un usuario  POST /api/admin/user/:name/grant-card
-app.post('/api/admin/user/:name/grant-card', requireAdmin, (req, res) => {
-  const save = readSave(req.params.name);
+app.post('/api/admin/user/:name/grant-card', requireAdmin, async (req, res) => {
+  const save = await readSave(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
 
   const { cardName, count, reason } = req.body || {};
@@ -1018,29 +987,26 @@ app.post('/api/admin/user/:name/grant-card', requireAdmin, (req, res) => {
 });
 
 // Regalía Masiva / Programada  POST /api/admin/broadcast-reward
-app.post('/api/admin/broadcast-reward', requireAdmin, (req, res) => {
+app.post('/api/admin/broadcast-reward', requireAdmin, async (req, res) => {
   const { dpAmount, cardName, filter, reason } = req.body || {};
   const dpNum = parseInt(dpAmount) || 0;
   const now = Date.now();
 
-  const dir = path.join(ROOT, 'saves');
   try {
-    const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
+    const allUsers = await db.getAllUsers();
     let count = 0;
 
-    files.forEach(f => {
+    for (const save of allUsers) {
       try {
-        const filePath = path.join(dir, f);
-        const save = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-        if (!save || !save.name) return;
+        if (!save || !save.name) continue;
 
         // Filtros de aplicacion
         if (filter === 'active24h') {
           const diff = (now - (save.lastPlayed || 0)) / (1000 * 60 * 60);
-          if (diff > 24) return;
+          if (diff > 24) continue;
         } else if (filter === 'progressM1') {
           const cleared = Array.isArray(save.cleared) ? save.cleared.length : 0;
-          if (cleared < 3) return;
+          if (cleared < 3) continue;
         }
 
         let modified = false;
@@ -1063,11 +1029,11 @@ app.post('/api/admin/broadcast-reward', requireAdmin, (req, res) => {
             reason: reason || 'Regalía Global del Servidor',
             date: now
           });
-          fs.writeFileSync(filePath, JSON.stringify(save, null, 2), 'utf8');
+          await writeSave(save);
           count++;
         }
       } catch (_) {}
-    });
+    }
 
     res.json({ ok: true, affectedCount: count, dpAmount: dpNum, cardName, reason });
   } catch (err) {
@@ -1077,7 +1043,7 @@ app.post('/api/admin/broadcast-reward', requireAdmin, (req, res) => {
 
 // Activar / Modificar Suscripción  POST /api/admin/user/:name/subscription
 app.post('/api/admin/user/:name/subscription', requireAdmin, async (req, res) => {
-  const save = readSave(req.params.name);
+  const save = await readSave(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
 
   const { action, months, customDate, reason } = req.body || {};
@@ -1223,8 +1189,19 @@ app.post('/api/deck/:character', requireAdmin, (req, res) => {
 });
 
 
+
+// ── Estado de Base de Datos  GET /api/db-status ────────────────────
+app.get('/api/db-status', async (req, res) => {
+  try {
+    const status = await db.getDbStatus();
+    res.json(status);
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ── Start ────────────────────────────────────────────────────────
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log('');
   console.log('==========================================');
   console.log('  Forbidden Memories Reborn - Servidor');
@@ -1234,5 +1211,7 @@ app.listen(PORT, () => {
   console.log('  Saves:  ' + path.join(ROOT, 'saves'));
   console.log('==========================================');
   console.log('');
-  hydrateSavesFromGitHub();
+  await hydrateSavesFromGitHub();
+  await db.initDatabase();
+  await ensureSeedUsers();
 });
