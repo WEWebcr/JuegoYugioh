@@ -16153,12 +16153,93 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(Object.assign({}, saveObj, { name: name, password: pass }))
     }).then(function(r) {
-      if (r.ok) console.log('[Server Save] Partida guardada en servidor para:', name);
+      if (r.ok) return r.json();
+    }).then(function(data) {
+      if (data && data.ok) {
+        console.log('[Server Save] Partida sincronizada con éxito para:', name);
+        if (data.collection && window.memorySave) {
+          var hasNew = false;
+          window.memorySave.collection = window.memorySave.collection || {};
+          for (var cn in data.collection) {
+            var sVal = data.collection[cn];
+            var mVal = window.memorySave.collection[cn] || 0;
+            if (sVal > mVal) {
+              window.memorySave.collection[cn] = sVal;
+              hasNew = true;
+            }
+          }
+          if (data.pm !== undefined && data.pm > (window.memorySave.pm || 0)) {
+            window.memorySave.pm = data.pm;
+            hasNew = true;
+          }
+          if (data.rewardsHistory) {
+            window.memorySave.rewardsHistory = data.rewardsHistory;
+          }
+          if (hasNew) {
+            try {
+              var sStr = JSON.stringify(window.memorySave);
+              prevSetItem.call(localStorage, 'FMR_REBORN_STORY_V3000', sStr);
+              if (name) prevSetItem.call(localStorage, 'FMR_SAVE_' + name, sStr);
+            } catch(_) {}
+            if (typeof window.duelToast === 'function') {
+              window.duelToast('🎁 ¡Has recibido nuevas cartas / recompensas en tu Baúl!');
+            }
+          }
+        }
+      }
     }).catch(function(e) {
       console.warn('[Server Save] Error al guardar en servidor:', e);
     });
   }
   window.sendServerSave = sendServerSave;
+
+  function syncLatestFromServer() {
+    var name = window.activeAccount;
+    var pass = window.currentPassword;
+    if (!name || !pass) {
+      try {
+        var sess = JSON.parse(sessionStorage.getItem('FMR_SESSION') || '{}');
+        name = name || sess.name;
+        pass = pass || sess.password;
+      } catch(_) {}
+    }
+    if (!name || !pass) return;
+
+    fetch('/api/load/' + encodeURIComponent(name))
+      .then(function(r) { if (r.ok) return r.json(); })
+      .then(function(serverSave) {
+        if (serverSave && serverSave.collection && window.memorySave) {
+          var added = 0;
+          window.memorySave.collection = window.memorySave.collection || {};
+          for (var c in serverSave.collection) {
+            var sc = serverSave.collection[c];
+            var mc = window.memorySave.collection[c] || 0;
+            if (sc > mc) {
+              window.memorySave.collection[c] = sc;
+              added++;
+            }
+          }
+          if (serverSave.pm !== undefined && serverSave.pm > (window.memorySave.pm || 0)) {
+            window.memorySave.pm = serverSave.pm;
+            added++;
+          }
+          if (serverSave.rewardsHistory) {
+            window.memorySave.rewardsHistory = serverSave.rewardsHistory;
+          }
+          if (added > 0) {
+            try {
+              var raw = JSON.stringify(window.memorySave);
+              prevSetItem.call(localStorage, 'FMR_REBORN_STORY_V3000', raw);
+              prevSetItem.call(localStorage, 'FMR_SAVE_' + name, raw);
+            } catch(_) {}
+            if (typeof window.duelToast === 'function') {
+              window.duelToast('🎁 ¡Se actualizaron tus cartas y recompensas del servidor!');
+            }
+          }
+        }
+      }).catch(function(_) {});
+  }
+  window.syncLatestFromServer = syncLatestFromServer;
 
   var prevSaveGame = window.saveGame;
   window.saveGame = function() {
@@ -16185,6 +16266,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       window.currentPassword = savedSession.password;
     }
   } catch(_) {}
+
+  // Sincronización al volver a enfocar la ventana o periódicamente cada 30 segundos
+  if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) syncLatestFromServer();
+    });
+    setInterval(syncLatestFromServer, 30000);
+  }
 
   window.preloadServerDecks();
 })();

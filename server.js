@@ -663,11 +663,47 @@ app.post('/api/save', async (req, res) => {
     });
   }
 
-  // Mantener passwordHash existente, actualizar el resto
-  const updated = { ...existing, ...data, name, passwordHash: existing.passwordHash, lastPlayed: Date.now() };
+  // 1. Fusión inteligente de colección: NUNCA perder cartas otorgadas por admin ni compras
+  const mergedCollection = Object.assign({}, existing.collection || {});
+  if (data.collection && typeof data.collection === 'object') {
+    for (const [card, count] of Object.entries(data.collection)) {
+      mergedCollection[card] = Math.max(mergedCollection[card] || 0, parseInt(count) || 0);
+    }
+  }
+
+  // 2. Fusión de historial de recompensas
+  const mergedRewards = Array.isArray(existing.rewardsHistory) ? [...existing.rewardsHistory] : [];
+  if (Array.isArray(data.rewardsHistory)) {
+    data.rewardsHistory.forEach(r => {
+      if (r && !mergedRewards.some(x => x.date === r.date && x.type === r.type && (x.card === r.card || x.amount === r.amount))) {
+        mergedRewards.push(r);
+      }
+    });
+  }
+
+  // 3. Balance de DP: mantener el mayor entre cliente y servidor (para no borrar regalos de DP del admin)
+  const newPm = Math.max(existing.pm || 0, parseInt(data.pm) || 0);
+
+  const updated = {
+    ...existing,
+    ...data,
+    name: existing.name || name,
+    passwordHash: existing.passwordHash,
+    collection: mergedCollection,
+    rewardsHistory: mergedRewards,
+    pm: newPm,
+    lastPlayed: Date.now()
+  };
+
   try {
     await writeSave(updated);
-    res.json({ ok: true, subscription: subStatus });
+    res.json({
+      ok: true,
+      subscription: subStatus,
+      collection: mergedCollection,
+      pm: newPm,
+      rewardsHistory: mergedRewards
+    });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -929,7 +965,7 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
 
 // Otorgar DP (+Regalia o ajuste)  POST /api/admin/user/:name/grant-dp
 app.post('/api/admin/user/:name/grant-dp', requireAdmin, async (req, res) => {
-  const save = await readSave(req.params.name);
+  const save = await readSave(req.params.name) || await findSaveByEmailOrName(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
 
   const { amount, mode, reason } = req.body || {};
@@ -953,13 +989,13 @@ app.post('/api/admin/user/:name/grant-dp', requireAdmin, async (req, res) => {
     date: Date.now()
   });
 
-  writeSave(save);
+  await writeSave(save);
   res.json({ ok: true, name: save.name, prevPm: prev, newPm: save.pm, reason });
 });
 
 // Regalar Carta(s) a un usuario  POST /api/admin/user/:name/grant-card
 app.post('/api/admin/user/:name/grant-card', requireAdmin, async (req, res) => {
-  const save = await readSave(req.params.name);
+  const save = await readSave(req.params.name) || await findSaveByEmailOrName(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
 
   const { cardName, count, reason } = req.body || {};
@@ -979,7 +1015,7 @@ app.post('/api/admin/user/:name/grant-card', requireAdmin, async (req, res) => {
     date: Date.now()
   });
 
-  writeSave(save);
+  await writeSave(save);
   res.json({ ok: true, name: save.name, card: cardName, count: qty, totalNow: save.collection[cardName] });
 });
 
@@ -1040,7 +1076,7 @@ app.post('/api/admin/broadcast-reward', requireAdmin, async (req, res) => {
 
 // Activar / Modificar Suscripción  POST /api/admin/user/:name/subscription
 app.post('/api/admin/user/:name/subscription', requireAdmin, async (req, res) => {
-  const save = await readSave(req.params.name);
+  const save = await readSave(req.params.name) || await findSaveByEmailOrName(req.params.name);
   if (!save) return res.status(404).json({ error: 'Usuario no encontrado' });
 
   const { action, months, customDate, reason } = req.body || {};
@@ -1070,7 +1106,7 @@ app.post('/api/admin/user/:name/subscription', requireAdmin, async (req, res) =>
     grantedBy: req.adminUser || 'admin'
   });
 
-  writeSave(save);
+  await writeSave(save);
 
   const newStatus = computeSubscriptionStatus(save);
 
