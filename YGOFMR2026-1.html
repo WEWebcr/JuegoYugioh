@@ -9213,6 +9213,10 @@ window.persistUserSave = function(s) {
     if (!s) return;
     try {
         window.activeAccount = localStorage.getItem('FMR_ACTIVE_ACCOUNT') || window.activeAccount || null;
+        if (window.activeAccount) {
+            try { localStorage.setItem('FMR_ACTIVE_ACCOUNT', window.activeAccount); } catch(_) {}
+        }
+        window.memorySave = s;
         let json = JSON.stringify(s);
         if (window.activeAccount) {
             origSet('FMR_SAVE_' + window.activeAccount, json);
@@ -10993,7 +10997,10 @@ window.customShowMain = function() {
                 let actualName = (save && save.name) || name;
                 window.activeAccount = actualName;
                 window.currentPassword = pass;
-                try { sessionStorage.setItem('FMR_SESSION', JSON.stringify({ name: actualName, password: pass })); } catch(_) {}
+                try { 
+                    localStorage.setItem('FMR_ACTIVE_ACCOUNT', actualName);
+                    sessionStorage.setItem('FMR_SESSION', JSON.stringify({ name: actualName, password: pass })); 
+                } catch(_) {}
                 
                 window.memorySave = save;
                 origSet('FMR_REBORN_STORY_V3000', JSON.stringify(save));
@@ -11333,8 +11340,10 @@ window.customShowMap = function() {
     // Obtenemos estado actual del save
     let s = {};
     try {
-        let savedStr = origGet('FMR_SAVE_' + window.activeAccount);
+        let activeUser = window.activeAccount || localStorage.getItem('FMR_ACTIVE_ACCOUNT') || '';
+        let savedStr = (activeUser ? origGet('FMR_SAVE_' + activeUser) : null) || origGet('FMR_REBORN_STORY_V3000');
         if (savedStr) s = JSON.parse(savedStr) || {};
+        else if (window.memorySave) s = window.memorySave;
     } catch(e) {}
     
     let cleared = Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : [];
@@ -11812,6 +11821,7 @@ window.customShowMap = function() {
             btnStart.style.cssText = 'padding:10px 24px; font-size:18px; font-family:VT323, monospace; letter-spacing:1.5px;';
             btnStart.textContent = '⚔️ INICIAR COMBATE';
             btnStart.onclick = () => {
+                window.isFreeDuelMode = false;
                 if (window.playViolinClick) window.playViolinClick();
                 modal.remove();
                 
@@ -13609,6 +13619,9 @@ window.customFinishStoryDuel = function(win) {
         if (!(s.cleared || []).includes(id)) s.cleared.push(id);
         if (!s.unlocked) s.unlocked = [];
         if (!s.unlocked.includes(id)) s.unlocked.push(id);
+        const storyNextMap = { tristan: 'weevil', weevil: 'mai', mai: 'mako', mako: 'joey', joey: 'pegasus', pegasus: 'bakura', bakura: 'noah', noah: 'kosaburo', kosaburo: 'ishizu', ishizu: 'odion', odion: 'marik', marik: 'kaiba', kaiba: 'yugi', yugi: 'atem' };
+        const nextOpp = storyNextMap[id] || (typeof STORY_UNLOCK_NEXT !== 'undefined' && STORY_UNLOCK_NEXT[id]);
+        if (nextOpp && !s.unlocked.includes(nextOpp)) s.unlocked.push(nextOpp);
         
         let rank = 'B';
         if (typeof game !== 'undefined' && game && game.plp !== undefined) {
@@ -16157,15 +16170,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }).then(function(data) {
       if (data && data.ok) {
         console.log('[Server Save] Partida sincronizada con éxito para:', name);
-        if (data.collection && window.memorySave) {
+        if (data && window.memorySave) {
           var hasNew = false;
           window.memorySave.collection = window.memorySave.collection || {};
-          for (var cn in data.collection) {
-            var sVal = data.collection[cn];
-            var mVal = window.memorySave.collection[cn] || 0;
-            if (sVal > mVal) {
-              window.memorySave.collection[cn] = sVal;
-              hasNew = true;
+          if (data.collection) {
+            for (var cn in data.collection) {
+              var sVal = data.collection[cn];
+              var mVal = window.memorySave.collection[cn] || 0;
+              if (sVal > mVal) {
+                window.memorySave.collection[cn] = sVal;
+                hasNew = true;
+              }
             }
           }
           if (data.pm !== undefined && data.pm > (window.memorySave.pm || 0)) {
@@ -16175,15 +16190,43 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           if (data.rewardsHistory) {
             window.memorySave.rewardsHistory = data.rewardsHistory;
           }
+          if (data.cleared && Array.isArray(data.cleared)) {
+            window.memorySave.cleared = window.memorySave.cleared || [];
+            for (var cIdx = 0; cIdx < data.cleared.length; cIdx++) {
+              var cOpp = data.cleared[cIdx];
+              if (!window.memorySave.cleared.includes(cOpp)) {
+                window.memorySave.cleared.push(cOpp);
+                hasNew = true;
+              }
+            }
+          }
+          if (data.unlocked && Array.isArray(data.unlocked)) {
+            window.memorySave.unlocked = window.memorySave.unlocked || [];
+            for (var uIdx = 0; uIdx < data.unlocked.length; uIdx++) {
+              var uOpp = data.unlocked[uIdx];
+              if (!window.memorySave.unlocked.includes(uOpp)) {
+                window.memorySave.unlocked.push(uOpp);
+                hasNew = true;
+              }
+            }
+          }
+          if (data.wins && typeof data.wins === 'object') {
+            window.memorySave.wins = window.memorySave.wins || {};
+            for (var wKey in data.wins) {
+              var wServer = data.wins[wKey] || 0;
+              var wLocal = window.memorySave.wins[wKey] || 0;
+              if (wServer > wLocal) {
+                window.memorySave.wins[wKey] = wServer;
+                hasNew = true;
+              }
+            }
+          }
           if (hasNew) {
             try {
               var sStr = JSON.stringify(window.memorySave);
               prevSetItem.call(localStorage, 'FMR_REBORN_STORY_V3000', sStr);
               if (name) prevSetItem.call(localStorage, 'FMR_SAVE_' + name, sStr);
             } catch(_) {}
-            if (typeof window.duelToast === 'function') {
-              window.duelToast('🎁 ¡Has recibido nuevas cartas / recompensas en tu Baúl!');
-            }
           }
         }
       }
@@ -16208,34 +16251,74 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     fetch('/api/load/' + encodeURIComponent(name))
       .then(function(r) { if (r.ok) return r.json(); })
       .then(function(serverSave) {
-        if (serverSave && serverSave.collection && window.memorySave) {
-          var added = 0;
-          window.memorySave.collection = window.memorySave.collection || {};
+        if (!serverSave) return;
+        var saveToUpdate = window.memorySave;
+        if (!saveToUpdate) {
+          try {
+            var rawStr = prevGetItem ? prevGetItem.call(localStorage, 'FMR_SAVE_' + name) : localStorage.getItem('FMR_SAVE_' + name);
+            if (rawStr) saveToUpdate = JSON.parse(rawStr);
+          } catch(_) {}
+        }
+        if (!saveToUpdate) saveToUpdate = {};
+
+        var added = 0;
+        if (serverSave.collection) {
+          saveToUpdate.collection = saveToUpdate.collection || {};
           for (var c in serverSave.collection) {
             var sc = serverSave.collection[c];
-            var mc = window.memorySave.collection[c] || 0;
+            var mc = saveToUpdate.collection[c] || 0;
             if (sc > mc) {
-              window.memorySave.collection[c] = sc;
+              saveToUpdate.collection[c] = sc;
               added++;
             }
           }
-          if (serverSave.pm !== undefined && serverSave.pm > (window.memorySave.pm || 0)) {
-            window.memorySave.pm = serverSave.pm;
-            added++;
-          }
-          if (serverSave.rewardsHistory) {
-            window.memorySave.rewardsHistory = serverSave.rewardsHistory;
-          }
-          if (added > 0) {
-            try {
-              var raw = JSON.stringify(window.memorySave);
-              prevSetItem.call(localStorage, 'FMR_REBORN_STORY_V3000', raw);
-              prevSetItem.call(localStorage, 'FMR_SAVE_' + name, raw);
-            } catch(_) {}
-            if (typeof window.duelToast === 'function') {
-              window.duelToast('🎁 ¡Se actualizaron tus cartas y recompensas del servidor!');
+        }
+        if (serverSave.pm !== undefined && serverSave.pm > (saveToUpdate.pm || 0)) {
+          saveToUpdate.pm = serverSave.pm;
+          added++;
+        }
+        if (serverSave.rewardsHistory) {
+          saveToUpdate.rewardsHistory = serverSave.rewardsHistory;
+        }
+        if (serverSave.cleared && Array.isArray(serverSave.cleared)) {
+          saveToUpdate.cleared = saveToUpdate.cleared || [];
+          for (var i = 0; i < serverSave.cleared.length; i++) {
+            var clr = serverSave.cleared[i];
+            if (!saveToUpdate.cleared.includes(clr)) {
+              saveToUpdate.cleared.push(clr);
+              added++;
             }
           }
+        }
+        if (serverSave.unlocked && Array.isArray(serverSave.unlocked)) {
+          saveToUpdate.unlocked = saveToUpdate.unlocked || [];
+          for (var j = 0; j < serverSave.unlocked.length; j++) {
+            var unl = serverSave.unlocked[j];
+            if (!saveToUpdate.unlocked.includes(unl)) {
+              saveToUpdate.unlocked.push(unl);
+              added++;
+            }
+          }
+        }
+        if (serverSave.wins && typeof serverSave.wins === 'object') {
+          saveToUpdate.wins = saveToUpdate.wins || {};
+          for (var w in serverSave.wins) {
+            var sw = serverSave.wins[w] || 0;
+            var lw = saveToUpdate.wins[w] || 0;
+            if (sw > lw) {
+              saveToUpdate.wins[w] = sw;
+              added++;
+            }
+          }
+        }
+        if (added > 0) {
+          window.memorySave = saveToUpdate;
+          try {
+            var raw = JSON.stringify(saveToUpdate);
+            prevSetItem.call(localStorage, 'FMR_REBORN_STORY_V3000', raw);
+            prevSetItem.call(localStorage, 'FMR_SAVE_' + name, raw);
+          } catch(_) {}
+          console.log('[Sync] Progreso actualizado desde el servidor:', name);
         }
       }).catch(function(_) {});
   }

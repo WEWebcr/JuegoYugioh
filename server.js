@@ -684,6 +684,16 @@ app.post('/api/save', async (req, res) => {
   // 3. Balance de DP: mantener el mayor entre cliente y servidor (para no borrar regalos de DP del admin)
   const newPm = Math.max(existing.pm || 0, parseInt(data.pm) || 0);
 
+  // 4. Fusión de progreso de campaña (cleared, unlocked, wins): NUNCA perder rivales superados ni desbloqueados
+  const mergedCleared = Array.from(new Set([...(existing.cleared || []), ...(Array.isArray(data.cleared) ? data.cleared : [])]));
+  const mergedUnlocked = Array.from(new Set([...(existing.unlocked || []), ...(Array.isArray(data.unlocked) ? data.unlocked : [])]));
+  const mergedWins = Object.assign({}, existing.wins || {});
+  if (data.wins && typeof data.wins === 'object') {
+    for (const [char, count] of Object.entries(data.wins)) {
+      mergedWins[char] = Math.max(mergedWins[char] || 0, parseInt(count) || 0);
+    }
+  }
+
   const updated = {
     ...existing,
     ...data,
@@ -691,6 +701,9 @@ app.post('/api/save', async (req, res) => {
     passwordHash: existing.passwordHash,
     collection: mergedCollection,
     rewardsHistory: mergedRewards,
+    cleared: mergedCleared,
+    unlocked: mergedUnlocked,
+    wins: mergedWins,
     pm: newPm,
     lastPlayed: Date.now()
   };
@@ -701,6 +714,9 @@ app.post('/api/save', async (req, res) => {
       ok: true,
       subscription: subStatus,
       collection: mergedCollection,
+      cleared: mergedCleared,
+      unlocked: mergedUnlocked,
+      wins: mergedWins,
       pm: newPm,
       rewardsHistory: mergedRewards
     });
