@@ -10591,7 +10591,7 @@ window.renderCustomStoryDialog = function(lines, index, onFinish, btnText) {
     else if (line.speaker === 'SETO' || line.speaker === 'KAIBA') nameOverride = 'SETO KAIBA';
     else if (line.speaker === 'MOTO' || line.speaker === 'ABUELO') nameOverride = 'SR. MOTO';
     
-    d.style.cssText = `position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: url('ImagenesPersonajes/${pFilename}') center top / contain no-repeat, #000; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; cursor:pointer;`;
+    d.style.cssText = `position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: url('ImagenesPersonajes/${pFilename}?v=20261003b') center top / contain no-repeat, #000; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; cursor:pointer;`;
     
     let darkOverlay = document.createElement('div');
     darkOverlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.9) 100%); pointer-events:none;';
