@@ -9726,10 +9726,32 @@ duelScaleStyle.textContent = `
 document.head.appendChild(duelScaleStyle);
 
 const portraitMap = {
-    'MOTO': 'abueloYugi.jpg', 'TRISTAN_INTRO': 'DialogoSetoKaiba.png', 'TRISTAN': 'Tristan.jpg', 'WEEVIL': 'Weevil.jpeg', 'MAI': 'Mai.jpeg',
+    'MOTO': 'abueloYugi.jpg', 'TRISTAN_INTRO': 'Tristan.jpg', 'TRISTAN': 'Tristan.jpg', 'WEEVIL': 'Weevil.jpeg', 'MAI': 'Mai.jpeg',
     'JOEY': 'Joey.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'BAKURA': 'Bakura.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg',
-    'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg', 'KOSABURO': 'Kosaburo_Kaiba.jpeg', 'MAKO': 'mako.jpg', 'SETO': 'SetoKaiba.jpeg', 'YUGI': 'YugiMoTo.jpeg',
+    'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg', 'KOSABURO': 'Kosaburo_Kaiba.jpeg', 'MAKO': 'mako.jpg', 'SETO': 'SetoKaiba.jpeg', 'KAIBA': 'DialogoSetoKaiba.png', 'YUGI': 'YugiMoTo.jpeg',
     'ABUELO': 'abueloYugi.jpg', 'ATEM': 'DialogoFaraom.png'
+};
+
+const dialogPortraitMap = {
+    'TRISTAN_INTRO': 'Tristan.jpg',
+    'TRISTAN': 'Tristan.jpg',
+    'SETO': 'DialogoSetoKaiba.png',
+    'KAIBA': 'DialogoSetoKaiba.png',
+    'YUGI': 'DialogoFaraom.png',
+    'ATEM': 'DialogoFaraom.png',
+    'JOEY': 'DialogoJoe.png',
+    'MARIK': 'DialogoMarik.png',
+    'WEEVIL': 'Weevil.jpeg',
+    'MAI': 'Mai.jpeg',
+    'MAKO': 'mako.jpg',
+    'PEGASUS': 'Pegasus.jpeg',
+    'BAKURA': 'Bakura.jpeg',
+    'NOAH': 'NoahKaiba.jpeg',
+    'KOSABURO': 'Kosaburo_Kaiba.jpeg',
+    'ISHIZU': 'Ishuzu.jpeg',
+    'ODION': 'Odion.jpeg',
+    'MOTO': 'abueloYugi.jpg',
+    'ABUELO': 'abueloYugi.jpg'
 };
 
 const introDialog = [
@@ -10563,8 +10585,11 @@ window.renderCustomStoryDialog = function(lines, index, onFinish, btnText) {
     let d = document.createElement('div');
     d.id = 'custom-dialog-fullscreen';
     
-    let pFilename = portraitMap[line.speaker] || portraitMap['ATEM'];
-    let nameOverride = pFilename === 'DialogoSetoKaiba.png' ? 'TRISTAN' : line.speaker;
+    let pFilename = (typeof dialogPortraitMap !== 'undefined' && dialogPortraitMap[line.speaker]) || portraitMap[line.speaker] || 'DialogoFaraom.png';
+    let nameOverride = line.speaker;
+    if (line.speaker === 'TRISTAN_INTRO') nameOverride = 'TRISTAN';
+    else if (line.speaker === 'SETO' || line.speaker === 'KAIBA') nameOverride = 'SETO KAIBA';
+    else if (line.speaker === 'MOTO' || line.speaker === 'ABUELO') nameOverride = 'SR. MOTO';
     
     d.style.cssText = `position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: url('ImagenesPersonajes/${pFilename}') center top / contain no-repeat, #000; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; cursor:pointer;`;
     
@@ -16619,13 +16644,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   window.aiHandSummonOrSet = function() {
     if (typeof game === 'undefined' || !game || game.turn !== 'enemy') return;
     var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
-    var isGodBoss = (opp === 'marik' || opp === 'kaiba' || opp === 'yugi');
+    var isGodBoss = (opp === 'marik' || opp === 'kaiba' || opp === 'seto' || opp === 'yugi');
     var hand = Array.isArray(game.enemyHand) ? game.enemyHand : [];
 
     // Ensure God card in hand for God Bosses on turn 1
     var godMap = {
       'marik': 'The Winged Dragon of Ra',
       'kaiba': 'Obelisk the Tormentor',
+      'seto': 'Obelisk the Tormentor',
       'yugi': window._yugiSelectedGod || 'Slifer the Sky Dragon'
     };
     if (isGodBoss && godMap[opp] && (game.turnNo === 1 || !hand.some(function(c) { return c && isEgyptianGod(c.name || c[0]); }))) {
@@ -16650,31 +16676,39 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     var godIdx = hand.findIndex(function(c) { return c && isEgyptianGod(c.name || c[0]); });
 
-    // Check if we can tribute 3 monsters for God
-    if (godIdx >= 0) {
-      var enemyMons = [];
-      for (var i = 0; i < (game.enemy || []).length; i++) {
-        if (game.enemy[i]) enemyMons.push(i);
-      }
-      if (enemyMons.length >= 3) {
-        var t1 = enemyMons[0], t2 = enemyMons[1], t3 = enemyMons[2];
-        var m1 = game.enemy[t1], m2 = game.enemy[t2], m3 = game.enemy[t3];
-        if (Array.isArray(game.enemyGrave)) {
-          game.enemyGrave.push(m1, m2, m3);
+    // Invocación de Dios Egipcio SIN tributos para Yugi, Kaiba y Marik (3 tributos solo para el jugador)
+    if (godIdx >= 0 && isGodBoss) {
+      var targetSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+      if (targetSlot < 0) {
+        var minAtk = 999999, weakestSlot = -1;
+        for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+          var em = game.enemy[ei];
+          if (em && !isEgyptianGod(em.name || em[0])) {
+            var emAtk = Number(em.atk || em[4] || 0);
+            if (emAtk < minAtk) { minAtk = emAtk; weakestSlot = ei; }
+          }
         }
-        game.enemy[t1] = null; game.enemy[t2] = null; game.enemy[t3] = null;
+        if (weakestSlot >= 0) {
+          if (Array.isArray(game.enemyGrave)) game.enemyGrave.push(game.enemy[weakestSlot]);
+          game.enemy[weakestSlot] = null;
+          targetSlot = weakestSlot;
+        }
+      }
+
+      if (targetSlot >= 0) {
         var godCard = hand.splice(godIdx, 1)[0];
         var summoned = typeof mk === 'function' ? mk(godCard.name || godCard[0]) : null;
         if (!summoned) summoned = Object.assign({}, godCard, { atk: 5000, def: 5000, pos: 'ATK', faceUp: true });
         summoned.atk = 5000; summoned.def = 5000; summoned.pos = 'ATK'; summoned.faceUp = true;
-        game.enemy[t1] = summoned;
+        game.enemy[targetSlot] = summoned;
 
         var summonDialogue = {
-          'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende con 5000 ATK!',
+          'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende al campo de batalla con 5000 ATK!',
           'kaiba': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
+          'seto': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
           'yugi': '¡El lazo con los dioses antiguos despierta! ¡' + (summoned.name || 'Dios Egipcio') + ' desciende al campo de batalla con 5000 ATK!'
         };
-        var msg = summonDialogue[opp] || ('¡El rival tributa 3 monstruos para invocar al Dios Egipcio ' + summoned.name + ' (5000 ATK / 5000 DEF)!');
+        var msg = summonDialogue[opp] || ('¡' + opp.toUpperCase() + ' invoca al Dios Egipcio ' + summoned.name + ' (5000 ATK / 5000 DEF) sin necesidad de tributos!');
         if (typeof log === 'function') log(msg);
         duelToast(msg);
         game._aiPlan108 = null;
@@ -16744,31 +16778,24 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             game.enemy[freeSlot] = mObj;
             if (typeof log === 'function') log(opp.toUpperCase() + ' invoca en ATAQUE a ' + (mObj.name || 'un monstruo') + '.');
 
-            // Re-check: Did this summon complete 3 tributes with God in hand?
+            // Re-check: Did this summon leave God in hand for God Bosses?
             godIdx = hand.findIndex(function(c) { return c && isEgyptianGod(c.name || c[0]); });
-            if (godIdx >= 0) {
-              var countMons = [];
-              for (var ci = 0; ci < (game.enemy || []).length; ci++) {
-                if (game.enemy[ci]) countMons.push(ci);
-              }
-              if (countMons.length >= 3) {
-                var c1 = countMons[0], c2 = countMons[1], c3 = countMons[2];
-                if (Array.isArray(game.enemyGrave)) {
-                  game.enemyGrave.push(game.enemy[c1], game.enemy[c2], game.enemy[c3]);
-                }
-                game.enemy[c1] = null; game.enemy[c2] = null; game.enemy[c3] = null;
+            if (godIdx >= 0 && isGodBoss) {
+              var targetSlot2 = (game.enemy || []).findIndex(function(x) { return !x; });
+              if (targetSlot2 >= 0) {
                 var gCard = hand.splice(godIdx, 1)[0];
                 var gSummoned = typeof mk === 'function' ? mk(gCard.name || gCard[0]) : null;
                 if (!gSummoned) gSummoned = Object.assign({}, gCard, { atk: 5000, def: 5000, pos: 'ATK', faceUp: true });
                 gSummoned.atk = 5000; gSummoned.def = 5000; gSummoned.pos = 'ATK'; gSummoned.faceUp = true;
-                game.enemy[c1] = gSummoned;
+                game.enemy[targetSlot2] = gSummoned;
 
                 var summonDialogue2 = {
-                  'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende con 5000 ATK!',
+                  'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende al campo de batalla con 5000 ATK!',
                   'kaiba': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
+                  'seto': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
                   'yugi': '¡El lazo con los dioses antiguos despierta! ¡' + (gSummoned.name || 'Dios Egipcio') + ' desciende al campo de batalla con 5000 ATK!'
                 };
-                var msg2 = summonDialogue2[opp] || ('¡El rival tributa 3 monstruos para invocar al Dios Egipcio ' + gSummoned.name + ' (5000 ATK / 5000 DEF)!');
+                var msg2 = summonDialogue2[opp] || ('¡' + opp.toUpperCase() + ' invoca al Dios Egipcio ' + gSummoned.name + ' (5000 ATK / 5000 DEF) sin necesidad de tributos!');
                 if (typeof log === 'function') log(msg2);
                 duelToast(msg2);
               }
@@ -18911,14 +18938,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!game || game.turn !== 'enemy' || !Array.isArray(game.enemyHand)) return;
 
     var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
-    var isGodBoss = (opp === 'marik' || opp === 'kaiba' || opp === 'yugi');
+    var isGodBoss = (opp === 'marik' || opp === 'kaiba' || opp === 'seto' || opp === 'yugi');
     var hand = game.enemyHand;
 
-    // A0. Invocación de Dios Egipcio por 3 tributos si es un Jefe Divino
+    // A0. Invocación de Dios Egipcio SIN tributos para Yugi, Kaiba y Marik (3 tributos solo para el jugador)
     if (isGodBoss) {
       var godMap = {
         'marik': 'The Winged Dragon of Ra',
         'kaiba': 'Obelisk the Tormentor',
+        'seto': 'Obelisk the Tormentor',
         'yugi': window._yugiSelectedGod || 'Slifer the Sky Dragon'
       };
       var targetGodName = godMap[opp];
@@ -18943,25 +18971,35 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
       var godIdx = hand.findIndex(function(c) { return c && isEgyptianGod(c.name || c[0]); });
       if (godIdx >= 0) {
-        var enemyMons = [];
-        for (var ei = 0; ei < (game.enemy || []).length; ei++) {
-          if (game.enemy[ei]) enemyMons.push(ei);
+        var targetSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (targetSlot < 0) {
+          var minAtk = 999999, weakestIdx = -1;
+          for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+            var em = game.enemy[ei];
+            if (em && !isEgyptianGod(em.name || em[0])) {
+              var emAtk = Number(em.atk || em[4] || 0);
+              if (emAtk < minAtk) { minAtk = emAtk; weakestIdx = ei; }
+            }
+          }
+          if (weakestIdx >= 0) {
+            if (Array.isArray(game.enemyGrave)) game.enemyGrave.push(game.enemy[weakestIdx]);
+            game.enemy[weakestIdx] = null;
+            targetSlot = weakestIdx;
+          }
         }
-        if (enemyMons.length >= 3) {
-          var t1 = enemyMons[0], t2 = enemyMons[1], t3 = enemyMons[2];
-          var m1 = game.enemy[t1], m2 = game.enemy[t2], m3 = game.enemy[t3];
-          if (Array.isArray(game.enemyGrave)) game.enemyGrave.push(m1, m2, m3);
-          game.enemy[t1] = null; game.enemy[t2] = null; game.enemy[t3] = null;
+
+        if (targetSlot >= 0) {
           var godCard = hand.splice(godIdx, 1)[0];
           var summonedGod = (typeof window.mk === 'function' ? window.mk(godCard.name || godCard[0]) : null) || Object.assign({}, godCard, { atk: 5000, def: 5000, pos: 'ATK', faceUp: true });
           summonedGod.atk = 5000; summonedGod.def = 5000; summonedGod.pos = 'ATK'; summonedGod.faceUp = true;
-          game.enemy[t1] = summonedGod;
+          game.enemy[targetSlot] = summonedGod;
           var summonDialogue = {
-            'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende con 5000 ATK!',
+            'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende al campo de batalla con 5000 ATK!',
             'kaiba': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
-            'yugi': '¡El lazo con los dioses antiguos despierta! ¡' + (summonedGod.name || 'Dios Egipcio') + ' desciende al campo con 5000 ATK!'
+            'seto': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
+            'yugi': '¡El lazo con los dioses antiguos despierta! ¡' + (summonedGod.name || 'Dios Egipcio') + ' desciende al campo de batalla con 5000 ATK!'
           };
-          var msg = summonDialogue[opp] || ('¡El rival tributa 3 monstruos para invocar al Dios Egipcio ' + summonedGod.name + ' (5000 ATK / 5000 DEF)!');
+          var msg = summonDialogue[opp] || ('¡' + opp.toUpperCase() + ' invoca al Dios Egipcio ' + summonedGod.name + ' (5000 ATK / 5000 DEF) sin necesidad de tributos!');
           if (typeof log === 'function') log(msg);
           duelToast(msg);
           game._aiPlan108 = null;
@@ -19167,6 +19205,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (!c || isST(c)) return false;
         var cName = c.name || c[0] || '';
         if (typeof isEgyptianGod === 'function' && isEgyptianGod(cName)) {
+          if (isGodBoss) return true; // Yugi, Kaiba y Marik no necesitan tributos
           var tributesAvailable = (game.enemy || []).filter(Boolean).length;
           if (tributesAvailable < 3) return false;
         }
