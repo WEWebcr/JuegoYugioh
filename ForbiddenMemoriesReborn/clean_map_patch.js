@@ -1658,11 +1658,11 @@ window.renderPS1Keyboard = function(onComplete) {
                     return;
                 }
                 overlay.remove();
-                onComplete(currentName, pass, email);
+                onComplete(currentName, pass, email, data && data.save);
             } catch(e) {
                 // Modo offline si no hay red
                 overlay.remove();
-                onComplete(currentName, pass, email);
+                onComplete(currentName, pass, email, null);
             }
         }
         
@@ -1707,24 +1707,63 @@ window.customShowMain = function() {
     btnNew.onmouseover = window.playHoverSound;
     btnNew.onclick = () => {
         window.playViolinClick();
-        renderPS1Keyboard(async (name, pass, email) => {
+        renderPS1Keyboard(async (name, pass, email, serverSave) => {
             window.activeAccount = name;
             window.currentPassword = pass;
-            try { sessionStorage.setItem('FMR_SESSION', JSON.stringify({ name: name, email: email, password: pass })); } catch(_) {}
+            try {
+                localStorage.setItem('FMR_ACTIVE_ACCOUNT', name);
+                sessionStorage.setItem('FMR_SESSION', JSON.stringify({ name: name, email: email, password: pass }));
+            } catch(_) {}
             
-            let ms = window.nativeAPI.freshState(name);
+            let ms = serverSave || (window.nativeAPI && window.nativeAPI.freshState ? window.nativeAPI.freshState(name) : null);
+            if (!ms && typeof freshState === 'function') ms = freshState(name);
+            if (!ms) {
+                let defDeck = (typeof window.generateForbiddenMemoriesStarterDeck === 'function') ? window.generateForbiddenMemoriesStarterDeck() : [];
+                let coll = {};
+                defDeck.forEach(c => coll[c] = (coll[c] || 0) + 1);
+                ms = {
+                    schema: 1,
+                    name: name,
+                    email: email,
+                    pm: 0,
+                    world: 1,
+                    unlocked: ['tristan'],
+                    cleared: [],
+                    wins: {},
+                    losses: {},
+                    collection: coll,
+                    deck: [...defDeck],
+                    decks: { "Deck 1": [...defDeck] },
+                    activeDeck: "Deck 1",
+                    legendary: {},
+                    pity: {},
+                    fusions: [],
+                    createdAt: Date.now(),
+                    lastPlayed: Date.now()
+                };
+            }
+            ms.name = name;
             ms.email = email;
+            if (!ms.decks || Object.keys(ms.decks).length === 0) {
+                ms.decks = { "Deck 1": [...(ms.deck || [])] };
+            }
+            if (!ms.activeDeck) ms.activeDeck = "Deck 1";
+            
             window.memorySave = ms;
             origSet('FMR_REBORN_STORY_V3000', JSON.stringify(ms));
+            origSet('FMR_SAVE_' + name, JSON.stringify(ms));
+            if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(ms);
             
-            // Guardar inicial en servidor
-            try {
-                await fetch('/api/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(Object.assign({}, ms, { name: name, email: email, password: pass }))
-                });
-            } catch(_) {}
+            // Solo si no vino del servidor (ej. offline), guardar inicial en servidor
+            if (!serverSave) {
+                try {
+                    await fetch('/api/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(Object.assign({}, ms, { name: name, email: email, password: pass }))
+                    });
+                } catch(_) {}
+            }
             
             if (typeof window.preloadServerDecks === 'function') window.preloadServerDecks();
             
@@ -4776,14 +4815,7 @@ window.customShowDeckEditor = function() {
     let s = JSON.parse(sStr);
     
     const generatedDeck = (typeof window.generateForbiddenMemoriesStarterDeck === 'function') ? window.generateForbiddenMemoriesStarterDeck() : null;
-    const DEF = generatedDeck || window.DEFAULT_DECK || [
-      'Celtic Guardian','Celtic Guardian','Beaver Warrior','Beaver Warrior','Battle Ox','Battle Ox','Mystical Elf','Mystical Elf',
-      'Feral Imp','Feral Imp','Winged Dragon, Guardian of the Fortress #1','Winged Dragon, Guardian of the Fortress #1',
-      'Petit Dragon','Petit Dragon','Baby Dragon','Baby Dragon','Giant Soldier of Stone','Giant Soldier of Stone','Man-Eater Bug','Man-Eater Bug',
-      'Silver Fang','Silver Fang','Flame Manipulator','Flame Manipulator',
-      'Black Pendant','Black Pendant','Dragon Treasure','Dragon Treasure','Horn of the Unicorn','Horn of the Unicorn',
-      'Waboku','Waboku','Trap Hole','Trap Hole','Dust Tornado','Dust Tornado','Sakuretsu Armor','Sakuretsu Armor','Renace al Monstruo','Negate Attack'
-    ];
+    const DEF = (generatedDeck && generatedDeck.length === 40) ? generatedDeck : (window.DEFAULT_DECK || []);
     
     s.collection = s.collection || {};
     s.decks = s.decks || {};
