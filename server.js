@@ -1216,6 +1216,8 @@ app.post('/api/deck/:character', requireAdmin, (req, res) => {
   if (data.cards.length < 40 || data.cards.length > 60) return res.status(400).json({ error: 'El deck debe tener entre 40 y 60 cartas. Tiene: ' + data.cards.length });
   const file = path.join(ROOT, 'data', 'decks', char + '.json');
   try {
+    const dir = path.dirname(file);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }

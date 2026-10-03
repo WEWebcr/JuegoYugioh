@@ -65,9 +65,10 @@ textarea{resize:vertical;min-height:60px}
 .saves-table th{background:#1a1a30;color:#ffd700;padding:10px 12px;text-align:left;border-bottom:2px solid #8b6914;font-size:.8rem;letter-spacing:.5px}
 .saves-table td{padding:10px 12px;border-bottom:1px solid #222;font-size:.85rem;vertical-align:middle}
 .saves-table tr:hover td{background:#1a1a30}
-.msg{padding:10px 14px;border-radius:4px;margin-top:10px;font-size:.85rem;display:none}
-.msg.ok{background:#1a3a1a;color:#88ff88;border:1px solid #3a6a3a;display:block}
-.msg.err{background:#3a1a1a;color:#ff8888;border:1px solid #6a3a3a;display:block}
+.msg{padding:12px 16px;border-radius:6px;margin:12px 0;font-size:.9rem;font-weight:600;display:none;box-shadow:0 3px 10px rgba(0,0,0,.5);animation:fadeInMsg .2s ease-in-out}
+@keyframes fadeInMsg{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.msg.ok{background:#153d1d;color:#7ee787;border:1.5px solid #238636;display:block}
+.msg.err{background:#3d1518;color:#ff7b72;border:1.5px solid #da3633;display:block}
 .flex{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
 .deck-area{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
 @media(max-width:960px){.deck-area{grid-template-columns:1fr}}
@@ -261,7 +262,7 @@ textarea{resize:vertical;min-height:60px}
         <option value="yugi">Yami Yugi</option>
       </select>
     </div>
-    <button class="btn btn-gold" onclick="saveDeck()" style="margin-top:20px">GUARDAR DECK</button>
+    <button class="btn btn-gold" id="btnSaveDeck" onclick="saveDeck()" style="margin-top:20px">GUARDAR DECK</button>
   </div>
   <div id="deckMsg" class="msg"></div>
   <div class="deck-area">
@@ -756,10 +757,16 @@ async function saveCard() {
   }
 }
 
-function showMsg(id,text,type) {
-  var el=document.getElementById(id);
-  el.textContent=text; el.className='msg '+type;
-  setTimeout(function(){ el.style.display='none'; },4000);
+function showMsg(id, text, type) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'msg ' + (type || 'ok');
+  el.style.display = 'block';
+  if (el._msgTimer) clearTimeout(el._msgTimer);
+  el._msgTimer = setTimeout(function() {
+    el.style.display = 'none';
+  }, 6000);
 }
 
 // ── DECKS DE PERSONAJES ───────────────────────────────────────────
@@ -936,19 +943,63 @@ function addToDeck(name) {
 function removeFromDeck(idx) { currentDeck.splice(idx,1); renderDeck(); }
 
 async function saveDeck() {
-  if(currentDeck.length<40 || currentDeck.length>60){
-    showMsg('deckMsg','El deck debe tener entre 40 y 60 cartas (actual: '+currentDeck.length+')','err');
+  var btn = document.getElementById('btnSaveDeck');
+  var charSelect = document.getElementById('charSelect');
+  var char = charSelect ? charSelect.value : '';
+  var charName = (charSelect && charSelect.options[charSelect.selectedIndex]) 
+    ? charSelect.options[charSelect.selectedIndex].text 
+    : (char || 'personaje');
+
+  if (!char) {
+    showMsg('deckMsg', 'Selecciona un personaje válido.', 'err');
     return;
   }
-  var char = document.getElementById('charSelect').value;
-  var r = await fetch('/api/deck/'+char, {
-    method:'POST',
-    headers: adminHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({ character: char, displayName: char, world: 1, cards: currentDeck })
-  });
-  var d = await r.json();
-  if(d.ok) showMsg('deckMsg','Deck guardado correctamente','ok');
-  else showMsg('deckMsg','Error: '+d.error,'err');
+
+  if (currentDeck.length < 40 || currentDeck.length > 60) {
+    showMsg('deckMsg', 'El deck de ' + charName + ' debe tener entre 40 y 60 cartas (actual: ' + currentDeck.length + ')', 'err');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+  }
+
+  try {
+    var r = await fetch('/api/deck/' + encodeURIComponent(char), {
+      method: 'POST',
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ character: char, displayName: charName, world: 1, cards: currentDeck })
+    });
+
+    if (r.status === 401) {
+      if (btn) { btn.disabled = false; btn.textContent = 'GUARDAR DECK'; }
+      showMsg('deckMsg', 'Error: Sesión de administrador no autorizada o expirada. Inicia sesión nuevamente.', 'err');
+      var loginModal = document.getElementById('loginModal');
+      if (loginModal) loginModal.style.display = 'flex';
+      return;
+    }
+
+    var d = await r.json();
+    if (d && d.ok) {
+      showMsg('deckMsg', '✓ ¡Deck de ' + charName + ' guardado con éxito (' + currentDeck.length + ' cartas)!', 'ok');
+      if (btn) {
+        btn.textContent = '✓ ¡GUARDADO!';
+        btn.style.background = '#28a745';
+        setTimeout(function() {
+          btn.disabled = false;
+          btn.textContent = 'GUARDAR DECK';
+          btn.style.background = '';
+        }, 2500);
+      }
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = 'GUARDAR DECK'; }
+      showMsg('deckMsg', 'Error al guardar: ' + ((d && d.error) || 'Respuesta inválida del servidor'), 'err');
+    }
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = 'GUARDAR DECK'; }
+    showMsg('deckMsg', 'Error de conexión: ' + (err && err.message ? err.message : err), 'err');
+  }
 }
 
 // ── PARTIDAS GUARDADAS ───────────────────────────────────────────
