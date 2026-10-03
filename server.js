@@ -909,7 +909,7 @@ app.get('/api/admin/users', requireAdmin, async (req, res) => {
           createdAt: d.createdAt || null,
           lastPlayed: lastPlayedMs,
           isActive24h: diffHours <= 24,
-          file: f,
+          file: (d.name || 'save') + '.json',
           trialEndsAt: sub.trialEndsAt,
           subscriptionEndsAt: sub.subscriptionEndsAt,
           isSubscriptionActive: sub.isActive,
