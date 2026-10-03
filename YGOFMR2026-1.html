@@ -17783,6 +17783,261 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof log === 'function') log('Limiter Removal: duplica el ATK de tus monstruos Tipo Máquina (' + boosted + ').');
   };
 
+  // Identification helpers
+  function isHeavyStorm(c) {
+    if (!c) return false;
+    var v = String(c.value || '').toUpperCase();
+    var n = String(c.name || '').trim().toLowerCase();
+    return v === 'HEAVY_STORM' || v === 'HEAVY_STORM_EN' || n === 'heavy storm' || n === 'tormenta pesada' || n.includes('heavy storm') || n.includes('tormenta pesada');
+  }
+  window.isHeavyStorm = isHeavyStorm;
+
+  function isFeatherDuster(c) {
+    if (!c) return false;
+    var v = String(c.value || '').toUpperCase();
+    var n = String(c.name || '').trim().toLowerCase();
+    return v === 'FEATHER_DUSTER' || n === "harpie's feather duster" || n === 'plumero de arpia' || n === 'plumero de la arpia' || n.includes('feather duster') || n.includes('plumero');
+  }
+  window.isFeatherDuster = isFeatherDuster;
+
+  function isRaigeki(c) {
+    if (!c) return false;
+    var v = String(c.value || '').toUpperCase();
+    var n = String(c.name || '').trim().toLowerCase();
+    return v === 'RAIGEKI' || n === 'raigeki';
+  }
+  window.isRaigeki = isRaigeki;
+
+  function isDarkHole(c) {
+    if (!c) return false;
+    var v = String(c.value || '').toUpperCase();
+    var n = String(c.name || '').trim().toLowerCase();
+    return v === 'DARK_HOLE' || n === 'dark hole' || n === 'agujero oscuro';
+  }
+  window.isDarkHole = isDarkHole;
+
+  // Bulletproof Backrow destruction
+  function destroyBackrowSide(side) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return 0;
+    var back = (side === 'player') ? g.playerBack : g.enemyBack;
+    var grave = (side === 'player') ? g.grave : g.enemyGrave;
+    if (!Array.isArray(back)) return 0;
+    if (!Array.isArray(grave)) {
+      if (side === 'player') { g.grave = []; grave = g.grave; }
+      else { g.enemyGrave = []; grave = g.enemyGrave; }
+    }
+
+    var count = 0;
+    for (var i = 0; i < back.length; i++) {
+      var c = back[i];
+      if (!c) continue;
+      back[i] = null;
+
+      // Handle equip card stat detachment
+      if (c.kind === 'EQUIP' || c.type === 'EQUIP' || c.equipToken109 || c._targetMonster || c._appliedAtk109) {
+        if (c._targetMonster) {
+          if (c._appliedAtk109) c._targetMonster.equip = Math.max(0, (c._targetMonster.equip || 0) - c._appliedAtk109);
+          if (c._appliedDef109) c._targetMonster.tempBoostDef = Math.max(0, (c._targetMonster.tempBoostDef || 0) - c._appliedDef109);
+          if (Array.isArray(c._targetMonster.equippedCards)) {
+            var eqIdx = c._targetMonster.equippedCards.indexOf(c.name);
+            if (eqIdx >= 0) c._targetMonster.equippedCards.splice(eqIdx, 1);
+          }
+        }
+        var fieldMons = (side === 'player') ? (g.field || []).concat(g.linkZones || []) : (g.enemy || []).concat(g.enemyLinkZones || []);
+        fieldMons.forEach(function(m) {
+          if (m && c.equipToken109 && m._equipToken109 === c.equipToken109) {
+            if (c._appliedAtk109) m.equip = Math.max(0, (m.equip || 0) - c._appliedAtk109);
+            if (c._appliedDef109) m.tempBoostDef = Math.max(0, (m.tempBoostDef || 0) - c._appliedDef109);
+            if (Array.isArray(m.equippedCards)) {
+              var mIdx = m.equippedCards.indexOf(c.name);
+              if (mIdx >= 0) m.equippedCards.splice(mIdx, 1);
+            }
+          }
+        });
+      }
+
+      // Black Pendant graveyard effect (500 LP burn)
+      if (c.value === 'BLACK_PENDANT' || (c.name && c.name.toLowerCase() === 'black pendant')) {
+        if (side === 'player') {
+          g.elp = Math.max(0, Number(g.elp || 0) - 500);
+          if (typeof log === 'function') log('Black Pendant va al Cementerio: el rival pierde 500 LP.');
+        } else {
+          g.plp = Math.max(0, Number(g.plp || 0) - 500);
+          if (typeof log === 'function') log('Black Pendant rival va al Cementerio: pierdes 500 LP.');
+        }
+      }
+
+      // Swords cancellation
+      if (c.value === 'SWORDS' || (c.name && c.name.toLowerCase().includes('swords of revealing light'))) {
+        c.turns109 = 0;
+      }
+      if (typeof isConcealingSwords === 'function' && isConcealingSwords(c)) {
+        c.turnsLeft = 0;
+      }
+
+      c.set = false;
+      c.faceUp = true;
+      grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      count++;
+    }
+
+    if (typeof cleanupOrphanedEquips === 'function') {
+      try { cleanupOrphanedEquips(); } catch (_) {}
+    }
+
+    return count;
+  }
+  window.destroyBackrowSide = destroyBackrowSide;
+  window.destroyBackrow109 = destroyBackrowSide;
+
+  // Bulletproof Monsters destruction
+  function destroyMonstersSide(side) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return 0;
+    var field = (side === 'player') ? g.field : g.enemy;
+    var grave = (side === 'player') ? g.grave : g.enemyGrave;
+    var links = (side === 'player') ? g.linkZones : g.enemyLinkZones;
+    if (!Array.isArray(field)) return 0;
+    if (!Array.isArray(grave)) {
+      if (side === 'player') { g.grave = []; grave = g.grave; }
+      else { g.enemyGrave = []; grave = g.enemyGrave; }
+    }
+
+    var count = 0;
+    for (var i = 0; i < field.length; i++) {
+      var m = field[i];
+      if (!m) continue;
+      field[i] = null;
+      m.faceDown = false;
+      m.faceDownSet103 = false;
+      m.faceUp = true;
+      grave.push(m);
+      count++;
+    }
+
+    if (Array.isArray(links)) {
+      for (var li = 0; li < links.length; li++) {
+        var lm = links[li];
+        if (!lm) continue;
+        links[li] = null;
+        lm.faceDown = false;
+        lm.faceUp = true;
+        grave.push(lm);
+        count++;
+      }
+    }
+
+    if (typeof cleanupOrphanedEquips === 'function') {
+      try { cleanupOrphanedEquips(); } catch (_) {}
+    }
+
+    return count;
+  }
+  window.destroyMonstersSide = destroyMonstersSide;
+  window.destroyAllMonsters109 = destroyMonstersSide;
+
+  // Card Resolvers
+  window.resolveHeavyStorm = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+
+    var card = null;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) {
+      if (!Array.isArray(g.grave)) g.grave = [];
+      g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+    }
+
+    var nPlayer = destroyBackrowSide('player');
+    var nEnemy = destroyBackrowSide('enemy');
+    var total = nPlayer + nEnemy;
+
+    if (window.playDestroySound) window.playDestroySound();
+    if (typeof render === 'function') render();
+    duelToast('¡Heavy Storm destruyó ' + total + ' carta(s) de Magia/Trampa en el Campo!');
+    if (typeof log === 'function') log('Tormenta Pesada destruye ' + total + ' Magias/Trampas en todo el Campo (Tus cartas: ' + nPlayer + ', Rival: ' + nEnemy + ').');
+  };
+
+  window.resolveFeatherDuster = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+
+    var card = null;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) {
+      if (!Array.isArray(g.grave)) g.grave = [];
+      g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+    }
+
+    var nEnemy = destroyBackrowSide('enemy');
+
+    if (window.playDestroySound) window.playDestroySound();
+    if (typeof render === 'function') render();
+    duelToast("¡Harpie's Feather Duster destruyó " + nEnemy + " carta(s) de Magia/Trampa del rival!");
+    if (typeof log === 'function') log("Harpie's Feather Duster destruye " + nEnemy + ' carta(s) de la zona de Magia/Trampa rival.');
+  };
+
+  window.resolveRaigeki = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+
+    var card = null;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) {
+      if (!Array.isArray(g.grave)) g.grave = [];
+      g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+    }
+
+    var nEnemy = destroyMonstersSide('enemy');
+
+    if (window.playDestroySound) window.playDestroySound();
+    if (typeof render === 'function') render();
+    duelToast('¡Raigeki destruyó ' + nEnemy + ' monstruo(s) del rival!');
+    if (typeof log === 'function') log('Raigeki destruye ' + nEnemy + ' monstruo(s) del rival.');
+  };
+
+  window.resolveDarkHole = function(fromBackIndex, fromHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+
+    var card = null;
+    if (fromBackIndex != null && g.playerBack) {
+      card = g.playerBack[fromBackIndex];
+      g.playerBack[fromBackIndex] = null;
+    } else if (fromHandIndex != null && g.hand) {
+      card = g.hand.splice(fromHandIndex, 1)[0];
+    }
+    if (card) {
+      if (!Array.isArray(g.grave)) g.grave = [];
+      g.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+    }
+
+    var nPlayer = destroyMonstersSide('player');
+    var nEnemy = destroyMonstersSide('enemy');
+    var total = nPlayer + nEnemy;
+
+    if (window.playDestroySound) window.playDestroySound();
+    if (typeof render === 'function') render();
+    duelToast('¡Dark Hole destruyó ' + total + ' monstruo(s) en el Campo!');
+    if (typeof log === 'function') log('Dark Hole destruye ' + total + ' monstruo(s) en el Campo (Tus monstruos: ' + nPlayer + ', Rival: ' + nEnemy + ').');
+  };
+
   // 5. activateSTFromHand & activateSetCard
   var prevActivateHand = window.activateSTFromHand;
   window.activateSTFromHand = function(i) {
@@ -17851,6 +18106,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     if (isLimiterRemoval(c)) {
       window.resolveLimiterRemoval(null, i);
+      return;
+    }
+    if (isHeavyStorm(c)) {
+      window.resolveHeavyStorm(null, i);
+      return;
+    }
+    if (isFeatherDuster(c)) {
+      window.resolveFeatherDuster(null, i);
+      return;
+    }
+    if (isRaigeki(c)) {
+      window.resolveRaigeki(null, i);
+      return;
+    }
+    if (isDarkHole(c)) {
+      window.resolveDarkHole(null, i);
       return;
     }
     if (prevActivateHand) return prevActivateHand.apply(this, arguments);
@@ -17933,52 +18204,26 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
 
     // 5. Raigeki estando SET:
-    if (val === 'RAIGEKI' || cName === 'Raigeki') {
-      g.playerBack[i] = null;
-      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
-      var n = (typeof destroyAllMonsters109 === 'function') ? destroyAllMonsters109('enemy') : 0;
-      if (typeof render === 'function') render();
-      if (window.playDestroySound) window.playDestroySound();
-      duelToast('¡Raigeki destruyó ' + n + ' monstruo(s) del rival!');
-      if (typeof log === 'function') log('Raigeki destruye ' + n + ' monstruo(s) del rival.');
+    if (isRaigeki(c)) {
+      window.resolveRaigeki(i, null);
       return;
     }
 
     // 6. Dark Hole estando SET:
-    if (val === 'DARK_HOLE' || cName === 'Dark Hole') {
-      g.playerBack[i] = null;
-      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
-      var a = (typeof destroyAllMonsters109 === 'function') ? destroyAllMonsters109('player') : 0;
-      var b = (typeof destroyAllMonsters109 === 'function') ? destroyAllMonsters109('enemy') : 0;
-      if (typeof render === 'function') render();
-      if (window.playDestroySound) window.playDestroySound();
-      duelToast('¡Dark Hole destruyó ' + (a+b) + ' monstruo(s) en el Campo!');
-      if (typeof log === 'function') log('Dark Hole destruye ' + (a+b) + ' monstruo(s) en el Campo.');
+    if (isDarkHole(c)) {
+      window.resolveDarkHole(i, null);
       return;
     }
 
-    // 7. Harpie\'s Feather Duster estando SET:
-    if (val === 'FEATHER_DUSTER' || cName === "Harpie's Feather Duster") {
-      g.playerBack[i] = null;
-      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
-      var n = (typeof destroyBackrow109 === 'function') ? destroyBackrow109('enemy') : 0;
-      if (typeof render === 'function') render();
-      if (window.playDestroySound) window.playDestroySound();
-      duelToast("¡Harpie's Feather Duster destruyó " + n + " carta(s) de Magia/Trampa rival!");
-      if (typeof log === 'function') log("Harpie's Feather Duster destruye " + n + ' carta(s) de la zona de Magia/Trampa rival.');
+    // 7. Harpie's Feather Duster estando SET:
+    if (isFeatherDuster(c)) {
+      window.resolveFeatherDuster(i, null);
       return;
     }
 
     // 8. Heavy Storm / Tormenta Pesada estando SET:
-    if (val === 'HEAVY_STORM' || val === 'HEAVY_STORM_EN' || cName === 'Tormenta Pesada' || cName === 'Heavy Storm') {
-      g.playerBack[i] = null;
-      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
-      var n1 = (typeof destroyBackrow109 === 'function') ? destroyBackrow109('player') : 0;
-      var n2 = (typeof destroyBackrow109 === 'function') ? destroyBackrow109('enemy') : 0;
-      if (typeof render === 'function') render();
-      if (window.playDestroySound) window.playDestroySound();
-      duelToast('¡Tormenta Pesada destruyó ' + (n1+n2) + ' Magias/Trampas en el Campo!');
-      if (typeof log === 'function') log('Tormenta Pesada destruye ' + (n1+n2) + ' Magias/Trampas en todo el Campo.');
+    if (isHeavyStorm(c)) {
+      window.resolveHeavyStorm(i, null);
       return;
     }
 
