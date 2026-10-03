@@ -9595,9 +9595,89 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     return false;
   };
 
-  // 6. MOTOR DE INTELIGENCIA ARTIFICIAL AGRESIVA Y FUSIONES (FMR MÁXIMO PODER)
+  // Helper to reliably get monster ATK and DEF regardless of object format
+  function getCardStats(c) {
+    if (!c) return { atk: 0, def: 0, name: '' };
+    var name = typeof c === 'string' ? c : (c.name || c[0] || '');
+    var atk = c.atk !== undefined ? Number(c.atk) : (c[4] !== undefined ? Number(c[4]) : null);
+    var def = c.def !== undefined ? Number(c.def) : (c[5] !== undefined ? Number(c[5]) : null);
+    if (atk === null || def === null || isNaN(atk) || isNaN(def)) {
+      var cd = null;
+      if (typeof window.resolveGameCard === 'function') cd = window.resolveGameCard(name);
+      else if (typeof window.mk === 'function') cd = window.mk(name);
+      if (cd) {
+        if (atk === null || isNaN(atk)) atk = Number(cd.atk || 0);
+        if (def === null || isNaN(def)) def = Number(cd.def || 0);
+      }
+    }
+    return { atk: atk || 0, def: def || 0, name: name };
+  }
+  window.getCardStats = getCardStats;
+
+  // 6. MOTOR DE INTELIGENCIA ARTIFICIAL INTELIGENTE, PRUDENTE Y AGRESIVA (FMR MÁXIMO PODER)
   window.aiHandSummonOrSet = function() {
     if (!game || game.turn !== 'enemy' || !Array.isArray(game.enemyHand)) return;
+
+    var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+    var isGodBoss = (opp === 'marik' || opp === 'kaiba' || opp === 'yugi');
+    var hand = game.enemyHand;
+
+    // A0. Invocación de Dios Egipcio por 3 tributos si es un Jefe Divino
+    if (isGodBoss) {
+      var godMap = {
+        'marik': 'The Winged Dragon of Ra',
+        'kaiba': 'Obelisk the Tormentor',
+        'yugi': window._yugiSelectedGod || 'Slifer the Sky Dragon'
+      };
+      var targetGodName = godMap[opp];
+      if (targetGodName && (game.turnNo === 1 || !hand.some(function(c) { return c && isEgyptianGod(c.name || c[0]); }))) {
+        var hasGodInHand = hand.some(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
+        var hasGodOnField = (game.enemy || []).some(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
+        if (!hasGodInHand && !hasGodOnField) {
+          var dIdx = (game.enemyDeck || []).findIndex(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
+          var swapC = hand[0];
+          if (dIdx >= 0) {
+            var gCard = game.enemyDeck.splice(dIdx, 1)[0];
+            hand[0] = gCard;
+            if (swapC) game.enemyDeck.push(swapC);
+          } else {
+            var gCard = (typeof window.mk === 'function' ? window.mk(targetGodName) : null) || { name: targetGodName, atk: 5000, def: 5000, pos: 'ATK', faceUp: true };
+            gCard.atk = 5000; gCard.def = 5000; gCard.pos = 'ATK'; gCard.faceUp = true;
+            hand[0] = gCard;
+            if (swapC && Array.isArray(game.enemyDeck)) game.enemyDeck.push(swapC);
+          }
+        }
+      }
+
+      var godIdx = hand.findIndex(function(c) { return c && isEgyptianGod(c.name || c[0]); });
+      if (godIdx >= 0) {
+        var enemyMons = [];
+        for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+          if (game.enemy[ei]) enemyMons.push(ei);
+        }
+        if (enemyMons.length >= 3) {
+          var t1 = enemyMons[0], t2 = enemyMons[1], t3 = enemyMons[2];
+          var m1 = game.enemy[t1], m2 = game.enemy[t2], m3 = game.enemy[t3];
+          if (Array.isArray(game.enemyGrave)) game.enemyGrave.push(m1, m2, m3);
+          game.enemy[t1] = null; game.enemy[t2] = null; game.enemy[t3] = null;
+          var godCard = hand.splice(godIdx, 1)[0];
+          var summonedGod = (typeof window.mk === 'function' ? window.mk(godCard.name || godCard[0]) : null) || Object.assign({}, godCard, { atk: 5000, def: 5000, pos: 'ATK', faceUp: true });
+          summonedGod.atk = 5000; summonedGod.def = 5000; summonedGod.pos = 'ATK'; summonedGod.faceUp = true;
+          game.enemy[t1] = summonedGod;
+          var summonDialogue = {
+            'marik': '¡Jajajaja! ¡Siente la furia divina! ¡El Dragón Alado de Ra desciende con 5000 ATK!',
+            'kaiba': '¡Ríndete! ¡Nadie puede desafiar mi poder absoluto! ¡Obelisk the Tormentor destruirá todo con 5000 ATK!',
+            'yugi': '¡El lazo con los dioses antiguos despierta! ¡' + (summonedGod.name || 'Dios Egipcio') + ' desciende al campo con 5000 ATK!'
+          };
+          var msg = summonDialogue[opp] || ('¡El rival tributa 3 monstruos para invocar al Dios Egipcio ' + summonedGod.name + ' (5000 ATK / 5000 DEF)!');
+          if (typeof log === 'function') log(msg);
+          duelToast(msg);
+          game._aiPlan108 = null;
+          if (typeof render === 'function') render();
+          return;
+        }
+      }
+    }
 
     // A. Colocar Trampas en la fila trasera
     for (var h = game.enemyHand.length - 1; h >= 0; h--) {
@@ -9788,38 +9868,78 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // E. INVOCACIÓN NORMAL AGRESIVA (SIN OMITIR ALEATORIAMENTE)
+    // E. INVOCACIÓN NORMAL INTELIGENTE, PRUDENTE Y AGRESIVA
     var openSlot = (game.enemy || []).findIndex(function(x) { return !x; });
     if (openSlot >= 0 && game.enemyHand.length > 0) {
-      var monsters = game.enemyHand.filter(function(c) { return !isST(c); });
+      var monsters = game.enemyHand.filter(function(c) {
+        if (!c || isST(c)) return false;
+        var cName = c.name || c[0] || '';
+        if (typeof isEgyptianGod === 'function' && isEgyptianGod(cName)) {
+          var tributesAvailable = (game.enemy || []).filter(Boolean).length;
+          if (tributesAvailable < 3) return false;
+        }
+        return true;
+      });
+
       if (monsters.length > 0) {
+        // Ordenar por ATK real descendente
         monsters.sort(function(a, b) {
-          var aAtk = Number(a.atk || a[4] || 0);
-          var bAtk = Number(b.atk || b[4] || 0);
-          return bAtk - aAtk;
+          var aStats = getCardStats(a);
+          var bStats = getCardStats(b);
+          return (bStats.atk || 0) - (aStats.atk || 0);
         });
+
         var best = monsters[0];
         var idx = game.enemyHand.indexOf(best);
         game.enemyHand.splice(idx, 1);
-        var summoned = window.mk(best.name || best[0]) || { name: best.name || best[0], atk: best.atk || best[4], def: best.def || best[5] };
+
+        var summoned = (typeof window.mk === 'function' ? window.mk(best.name || best[0]) : null) || {
+          name: best.name || best[0],
+          atk: best.atk || best[4] || 0,
+          def: best.def || best[5] || 0,
+          pos: 'ATK',
+          faceUp: true
+        };
+
+        var bestStats = getCardStats(summoned);
+        var sAtk = Number(bestStats.atk || 0);
+        var sDef = Number(bestStats.def || 0);
+
+        // Evaluar amenazas del jugador para decidir posición
+        var playerMonsters = (game.field || []).filter(Boolean);
         var playerMaxAtk = 0;
-        (game.field || []).forEach(function(pm) {
-          if (pm) {
-            var patk = typeof effectiveAtk === 'function' ? effectiveAtk(pm) : (pm.atk || 0);
-            if (patk > playerMaxAtk) playerMaxAtk = patk;
-          }
+        var canBeatAnyTarget = false;
+
+        playerMonsters.forEach(function(pm) {
+          var patk = typeof effectiveAtk === 'function' ? effectiveAtk(pm) : (pm.atk || 0);
+          if (patk > playerMaxAtk) playerMaxAtk = patk;
+          if (pm.pos === 'ATK' && sAtk > patk) canBeatAnyTarget = true;
+          else if (pm.pos === 'DEF' && sAtk > Number(pm.def || pm.tempDefense || 0)) canBeatAnyTarget = true;
         });
-        var sAtk = Number(summoned.atk || 0);
-        var sDef = Number(summoned.def || 0);
-        if (sDef > sAtk && (sDef >= 1800 || (playerMaxAtk > sAtk && sDef >= 1400))) {
-          summoned.pos = 'DEF';
+
+        if (playerMonsters.length === 0) {
+          // Campo jugador vacío: atacar directamente a menos que sea extremadamente débil
+          if (sAtk >= 1000 || sAtk >= sDef) {
+            summoned.pos = 'ATK';
+          } else {
+            summoned.pos = 'DEF';
+          }
         } else {
-          summoned.pos = 'ATK';
+          // El jugador tiene monstruos en campo:
+          // Si el monstruo invocado supera al más fuerte o puede destruir al menos a uno:
+          if (sAtk >= playerMaxAtk || canBeatAnyTarget) {
+            summoned.pos = 'ATK'; // Agresivo: busca combate
+          } else {
+            // Prudente: El jugador tiene monstruos superiores (ej. Crimson Sunbird 3000 ATK > sAtk)
+            // ¡NUNCA exponer un monstruo débil en ATAQUE ante atacantes superiores!
+            summoned.pos = 'DEF';
+          }
         }
+
         summoned.faceUp = true;
         game.enemy[openSlot] = summoned;
         if (window.playSummonSound) window.playSummonSound();
-        if (typeof log === 'function') log('El rival invoca a ' + (summoned.name || 'un monstruo') + ' (' + (summoned.atk || 0) + ' ATK).');
+        if (typeof log === 'function') log('El rival invoca a ' + (summoned.name || 'un monstruo') + ' en ' + (summoned.pos === 'ATK' ? 'ATAQUE' : 'DEFENSA') + ' (' + sAtk + ' ATK / ' + sDef + ' DEF).');
         if (typeof render === 'function') render();
         if (typeof window.checkSummonTraps === 'function') window.checkSummonTraps(summoned, 'enemy', openSlot);
       }
@@ -10208,16 +10328,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
 
       // SI NO HAY NINGÚN OBJETIVO FAVORABLE:
-      // El monstruo rival es más débil que los monstruos del jugador.
-      // Debe ser PRUDENTE: NO ATACAR y si su DEF es favorable o está en peligro, ponerse en DEFENSA.
+      // El monstruo rival es más débil que los monstruos del jugador o no puede destruir a ninguno favorablemente.
+      // Debe ser PRUDENTE: NO ATACAR y ponerse en DEFENSA para evitar recibir daño a los LP.
       if (favorableTargets.length === 0) {
         if (!playerHasConcealing && e.kind !== 'LINK') {
-          var eDef = Number(e.def || 0);
-          if (e.pos !== 'DEF' && (eDef >= currentEffectiveAtk || eDef >= 1400)) {
+          if (e.pos !== 'DEF') {
             e.pos = 'DEF';
             if (typeof log === 'function') log(e.name + ' adopta una postura defensiva prudente ante monstruos superiores.');
           } else {
-            if (typeof log === 'function') log(e.name + ' evalúa el campo con prudencia y prefiere no atacar.');
+            if (typeof log === 'function') log(e.name + ' evalúa el campo con prudencia y se mantiene en defensa.');
           }
         } else {
           if (typeof log === 'function') log(e.name + ' evalúa el campo con prudencia y prefiere no atacar.');
