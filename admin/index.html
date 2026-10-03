@@ -44,9 +44,20 @@ textarea{resize:vertical;min-height:60px}
 .kind-SPELL{background:#1a3a1a;color:#88ff88}
 .kind-TRAP{background:#2a1a4a;color:#aa88ff}
 .kind-EQUIP{background:#3a2a1a;color:#ffcc88}
-.deck-slot{display:flex;align-items:center;justify-content:space-between;background:#1a1a2a;border:1px solid #333;border-radius:4px;padding:6px 10px;margin-bottom:4px;font-size:.82rem}
-.deck-slot .name{color:#e8d5a3}
-.deck-slot .remove{background:none;border:none;color:#ff4444;cursor:pointer;font-size:1rem;padding:0 4px}
+.kind-FUSION{background:#3a1a4a;color:#d888ff}
+.deck-slot{display:flex;align-items:center;justify-content:space-between;background:#1a1a2a;border:1px solid #333;border-radius:6px;padding:6px 10px;margin-bottom:5px;font-size:.82rem;gap:8px;transition:background .15s}
+.deck-slot:hover{background:#222238;border-color:#555}
+.deck-slot .slot-main{display:flex;align-items:center;gap:8px;min-width:0;flex:1;overflow:hidden;}
+.deck-slot .slot-info{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.deck-slot .name{color:#e8d5a3;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.deck-slot .stats{font-size:.75rem;font-weight:600;white-space:nowrap;}
+.deck-slot .stats-monster{color:#ffb84d;}
+.deck-slot .stats-spell{color:#88ff88;}
+.deck-slot .stats-trap{color:#c299ff;}
+.deck-slot .stats-equip{color:#ffcc88;}
+.deck-slot .stats-fusion{color:#ea80fc;}
+.deck-slot .remove{background:none;border:none;color:#ff5555;cursor:pointer;font-size:1.1rem;padding:0 4px;line-height:1;border-radius:3px;}
+.deck-slot .remove:hover{background:rgba(255,85,85,.2);color:#ff8888;}
 .deck-counter{color:#ffd700;font-weight:bold;font-size:.9rem;margin-bottom:8px}
 .deck-counter.ok{color:#44ff88}
 .deck-counter.err{color:#ff4444}
@@ -256,7 +267,17 @@ textarea{resize:vertical;min-height:60px}
   <div class="deck-area">
     <div class="card">
       <div class="deck-counter err" id="deckCounter">0 / 40-60 cartas</div>
-      <div id="deckSlots" style="max-height:550px;overflow-y:auto;padding-right:4px;"></div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <input id="deckListSearch" placeholder="Buscar carta en este deck..." oninput="renderDeck()" style="flex:1;">
+        <select id="deckListKindFilter" onchange="renderDeck()" style="width:130px;">
+          <option value="">Todos</option>
+          <option value="MONSTER">Monstruos</option>
+          <option value="SPELL">Magias</option>
+          <option value="TRAP">Trampas</option>
+          <option value="EQUIP">Equipo</option>
+        </select>
+      </div>
+      <div id="deckSlots" style="max-height:500px;overflow-y:auto;padding-right:4px;"></div>
     </div>
     <div class="card">
       <h2>AGREGAR CARTA AL DECK</h2>
@@ -672,11 +693,26 @@ function showMsg(id,text,type) {
 }
 
 // ── DECKS DE PERSONAJES ───────────────────────────────────────────
+function getCardInfo(name) {
+  if (!name || !allCards || !allCards.length) return null;
+  var clean = String(name).trim().toLowerCase();
+  var card = allCards.find(function(c) {
+    return c && (c.name || '').trim().toLowerCase() === clean;
+  });
+  if (card) return card;
+  return allCards.find(function(c) {
+    return c && (c.name || '').replace(/[^a-z0-9]/gi, '').toLowerCase() === clean.replace(/[^a-z0-9]/gi, '');
+  }) || null;
+}
+
 async function loadCharDeck() {
   var char = document.getElementById('charSelect').value;
   var r = await fetch('/api/deck/'+char);
   var d = await r.json();
   currentDeck = Array.isArray(d.cards) ? d.cards.slice() : [];
+  if (!allCards || !allCards.length) {
+    await loadAllCards();
+  }
   renderDeck();
   renderDeckCatalog();
 }
@@ -685,11 +721,80 @@ function renderDeck() {
   var el = document.getElementById('deckSlots');
   var counter = document.getElementById('deckCounter');
   var n = currentDeck.length;
-  counter.textContent = n+' / 40-60 cartas';
-  counter.className = 'deck-counter '+((n>=40&&n<=60)?'ok':'err');
-  el.innerHTML = currentDeck.map(function(name,i){
-    return '<div class="deck-slot"><span class="name">'+name+'</span><button class="remove" onclick="removeFromDeck('+i+')">✕</button></div>';
-  }).join('');
+
+  var q = (document.getElementById('deckListSearch') ? document.getElementById('deckListSearch').value : '').toLowerCase().trim();
+  var kFilter = (document.getElementById('deckListKindFilter') ? document.getElementById('deckListKindFilter').value : '').trim();
+
+  var mCount = 0, sCount = 0, tCount = 0;
+  var items = [];
+
+  for (var i = 0; i < currentDeck.length; i++) {
+    var name = currentDeck[i];
+    var c = getCardInfo(name);
+    var kind = c ? (c.kind || 'MONSTER') : 'MONSTER';
+
+    if (kind === 'MONSTER') mCount++;
+    else if (kind === 'SPELL' || kind === 'EQUIP') sCount++;
+    else if (kind === 'TRAP') tCount++;
+
+    if (q && !name.toLowerCase().includes(q)) continue;
+    if (kFilter && kind !== kFilter) continue;
+
+    var kindBadge = '';
+    var statsHtml = '';
+
+    if (c) {
+      if (kind === 'MONSTER') {
+        kindBadge = '<span class="card-kind kind-MONSTER" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;">MONSTER</span>';
+        var atkVal = (c.atk != null ? c.atk : 0);
+        var defVal = (c.def != null ? c.def : 0);
+        var lvText = c.level ? '<span style="color:#aaa;font-weight:normal;margin-right:4px;">★' + c.level + '</span>' : '';
+        statsHtml = '<span class="stats stats-monster">' + lvText + 'ATK:' + atkVal + ' DEF:' + defVal + '</span>';
+      } else if (kind === 'SPELL') {
+        kindBadge = '<span class="card-kind kind-SPELL" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;">MAGIA</span>';
+        statsHtml = '<span class="stats stats-spell">🔮 Magia' + (c.value ? ' (' + c.value + ')' : '') + '</span>';
+      } else if (kind === 'TRAP') {
+        kindBadge = '<span class="card-kind kind-TRAP" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;">TRAMPA</span>';
+        statsHtml = '<span class="stats stats-trap">⚡ Trampa' + (c.value ? ' (' + c.value + ')' : '') + '</span>';
+      } else if (kind === 'EQUIP') {
+        kindBadge = '<span class="card-kind kind-EQUIP" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;">EQUIPO</span>';
+        statsHtml = '<span class="stats stats-equip">🗡 Magia Equipo</span>';
+      } else if (kind === 'FUSION') {
+        kindBadge = '<span class="card-kind kind-FUSION" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;">FUSIÓN</span>';
+        statsHtml = '<span class="stats stats-fusion">🌀 Fusión ATK:' + (c.atk || 0) + ' DEF:' + (c.def || 0) + '</span>';
+      } else {
+        kindBadge = '<span class="card-kind" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;background:#333;color:#ccc;">CARTA</span>';
+        statsHtml = '';
+      }
+    } else {
+      kindBadge = '<span class="card-kind" style="margin-bottom:0;font-size:.68rem;padding:2px 6px;background:#333;color:#ccc;">CARTA</span>';
+      statsHtml = '';
+    }
+
+    items.push(
+      '<div class="deck-slot">' +
+        '<div class="slot-main">' +
+          kindBadge +
+          '<span class="name" title="' + name + '">' + name + '</span>' +
+        '</div>' +
+        '<div class="slot-info">' +
+          statsHtml +
+          '<button class="remove" onclick="removeFromDeck(' + i + ')" title="Quitar del deck">✕</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  var filterNotice = (q || kFilter) ? ' (mostrando ' + items.length + ')' : '';
+  counter.innerHTML = n + ' / 40-60 cartas' + filterNotice + ' ' +
+    '<span style="font-size:.8rem;font-weight:normal;color:#aaa;margin-left:8px;">(' +
+      '<span style="color:#ff8888;">⚔ ' + mCount + ' Monstruos</span> • ' +
+      '<span style="color:#88ff88;">🔮 ' + sCount + ' Magias</span> • ' +
+      '<span style="color:#aa88ff;">⚡ ' + tCount + ' Trampas</span>' +
+    ')</span>';
+  counter.className = 'deck-counter ' + ((n >= 40 && n <= 60) ? 'ok' : 'err');
+
+  el.innerHTML = items.join('') || '<div style="color:#666;text-align:center;padding:20px;">' + (currentDeck.length ? 'Ninguna carta coincide con el filtro' : 'El deck está vacío') + '</div>';
 }
 
 function renderDeckCatalog() {
@@ -699,10 +804,29 @@ function renderDeckCatalog() {
   var filtered = allCards.filter(function(c){ return (!q||c.name.toLowerCase().includes(q))&&(!k||c.kind===k); });
   el.innerHTML = filtered.map(function(c){
     var esc = c.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var statsText = '';
+    if (c.kind === 'MONSTER') {
+      statsText = (c.level ? '★Lv' + c.level + ' ' : '') + 'ATK:' + (c.atk != null ? c.atk : 0) + ' DEF:' + (c.def != null ? c.def : 0);
+    } else if (c.kind === 'SPELL') {
+      statsText = '🔮 Carta Mágica' + (c.value ? ' (' + c.value + ')' : '');
+    } else if (c.kind === 'TRAP') {
+      statsText = '⚡ Carta Trampa' + (c.value ? ' (' + c.value + ')' : '');
+    } else if (c.kind === 'EQUIP') {
+      statsText = '🗡 Magia de Equipo' + (c.value ? ' (' + c.value + ')' : '');
+    } else if (c.kind === 'FUSION') {
+      statsText = '🌀 Carta Fusión ATK:' + (c.atk || 0) + ' DEF:' + (c.def || 0);
+    }
+
+    var kindBadgeText = c.kind;
+    if (c.kind === 'SPELL') kindBadgeText = 'MAGIA';
+    else if (c.kind === 'TRAP') kindBadgeText = 'TRAMPA';
+    else if (c.kind === 'EQUIP') kindBadgeText = 'EQUIPO';
+    else if (c.kind === 'FUSION') kindBadgeText = 'FUSIÓN';
+
     return '<div class="card-item" onclick="addToDeck(\''+esc+'\')">' +
-      '<span class="card-kind kind-'+c.kind+'">'+c.kind+'</span>' +
+      '<span class="card-kind kind-'+c.kind+'">'+kindBadgeText+'</span>' +
       '<div class="card-name">'+c.name+'</div>' +
-      '<div class="card-stats">'+(c.kind==='MONSTER'?'Lv'+c.level+' ATK:'+c.atk+' DEF:'+c.def:'')+'</div>' +
+      '<div class="card-stats">'+statsText+'</div>' +
       '</div>';
   }).join('');
 }
