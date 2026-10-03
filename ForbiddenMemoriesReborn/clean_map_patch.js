@@ -4657,13 +4657,113 @@ window.customFinishStoryDuel = function(win) {
 
 // endObserver removed to allow native finishStoryDuel hook to take over
 
+
+  // Generador dinámico de Barajas Iniciales estilo Yu-Gi-Oh! Forbidden Memories (PS1)
+  window.generateForbiddenMemoriesStarterDeck = function(customCatalog) {
+    var catalog = (Array.isArray(customCatalog) && customCatalog.length > 0) ? customCatalog : (window.CARDS_DATA || []);
+    if (!catalog || catalog.length === 0) return null;
+    var deck = [];
+    var cardCounts = {};
+
+    function addCard(name) {
+      if (!name) return false;
+      if ((cardCounts[name] || 0) >= 2) return false; // Máximo 2 copias por carta
+      deck.push(name);
+      cardCounts[name] = (cardCounts[name] || 0) + 1;
+      return true;
+    }
+
+    function pickRandom(pool, count, maxTries) {
+      if (!pool || pool.length === 0) return;
+      var added = 0;
+      var tries = 0;
+      var limit = maxTries || 150;
+      while (added < count && tries < limit) {
+        tries++;
+        var pick = pool[Math.floor(Math.random() * pool.length)];
+        var name = pick.name || pick[0];
+        if (addCard(name)) {
+          added++;
+        }
+      }
+    }
+
+    var mainCards = catalog.filter(function(c) {
+      var k = c.kind || c.type || '';
+      return k !== 'FUSION' && k !== 'LINK' && c.type !== 'Divine-Beast';
+    });
+
+    // 1. As / Jefe
+    var acePool = mainCards.filter(function(c) {
+      return c.kind === 'MONSTER' &&
+        (c.level >= 5 && c.level <= 7) &&
+        (((c.atk || 0) >= 1600 && (c.atk || 0) <= 2500) || (c.def || 0) >= 2000);
+    });
+    pickRandom(acePool, 1);
+
+    // 2. Fuertes Nivel 4
+    var strongL4Pool = mainCards.filter(function(c) {
+      return c.kind === 'MONSTER' &&
+        (c.level <= 4) &&
+        (((c.atk || 0) >= 1200 && (c.atk || 0) <= 1600) || ((c.def || 0) >= 1800 && (c.def || 0) <= 2100));
+    });
+    pickRandom(strongL4Pool, 3);
+
+    // 3. Materiales de fusión
+    var dragons = mainCards.filter(function(c) { return c.kind === 'MONSTER' && (c.type === 'Dragon' || (c.name && c.name.toLowerCase().indexOf('dragon') >= 0)) && ((c.atk || 0) <= 1500 || c.level <= 4); });
+    var thunderMachine = mainCards.filter(function(c) { return c.kind === 'MONSTER' && (c.type === 'Thunder' || c.type === 'Machine') && ((c.atk || 0) <= 1400 || c.level <= 4); });
+    var warriors = mainCards.filter(function(c) { return c.kind === 'MONSTER' && c.type === 'Warrior' && ((c.atk || 0) <= 1400 || c.level <= 4); });
+    var pyros = mainCards.filter(function(c) { return c.kind === 'MONSTER' && (c.type === 'Pyro' || c.attr === 'FIRE') && ((c.atk || 0) <= 1400 || c.level <= 4); });
+    var beasts = mainCards.filter(function(c) { return c.kind === 'MONSTER' && (c.type === 'Beast' || c.type === 'Beast-Warrior') && ((c.atk || 0) <= 1400 || c.level <= 4); });
+    var spellcastersFiends = mainCards.filter(function(c) { return c.kind === 'MONSTER' && (c.type === 'Spellcaster' || c.type === 'Fiend') && ((c.atk || 0) <= 1400 || c.level <= 4); });
+    var others = mainCards.filter(function(c) { return c.kind === 'MONSTER' && ['Plant', 'Insect', 'Aqua', 'Zombie', 'Rock', 'Fish', 'Fairy', 'Winged Beast'].indexOf(c.type) >= 0 && ((c.atk || 0) <= 1400 || c.level <= 4); });
+    var anyLowMonster = mainCards.filter(function(c) { return c.kind === 'MONSTER' && (c.level <= 4 || (c.atk || 0) <= 1400); });
+
+    pickRandom(dragons, 3);
+    pickRandom(thunderMachine, 3);
+    pickRandom(warriors, 3);
+    pickRandom(pyros, 3);
+    pickRandom(beasts, 3);
+    pickRandom(spellcastersFiends, 3);
+    pickRandom(others, 3);
+    pickRandom(anyLowMonster, 28 - deck.length);
+
+    // 4. Mágicas / Equipos
+    var excludedSpells = ['Raigeki', 'Dark Hole', "Harpie's Feather Duster", 'Heavy Storm'];
+    var spellPool = mainCards.filter(function(c) {
+      return (c.kind === 'SPELL' || c.kind === 'EQUIP') && excludedSpells.indexOf(c.name) < 0;
+    });
+    pickRandom(spellPool, 6);
+
+    // 5. Trampas
+    var excludedTraps = ['Mirror Force', 'Crush Card Virus'];
+    var trapPool = mainCards.filter(function(c) {
+      return c.kind === 'TRAP' && excludedTraps.indexOf(c.name) < 0;
+    });
+    pickRandom(trapPool, 6);
+
+    while (deck.length < 40) {
+      pickRandom(anyLowMonster, 1, 200);
+    }
+
+    for (var i = deck.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = deck[i];
+      deck[i] = deck[j];
+      deck[j] = temp;
+    }
+
+    return deck.slice(0, 40);
+  };
+
 window.customShowDeckEditor = function() {
     let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
     let sStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
     if (!sStr) return;
     let s = JSON.parse(sStr);
     
-    const DEF = window.DEFAULT_DECK || [
+    const generatedDeck = (typeof window.generateForbiddenMemoriesStarterDeck === 'function') ? window.generateForbiddenMemoriesStarterDeck() : null;
+    const DEF = generatedDeck || window.DEFAULT_DECK || [
       'Celtic Guardian','Celtic Guardian','Beaver Warrior','Beaver Warrior','Battle Ox','Battle Ox','Mystical Elf','Mystical Elf',
       'Feral Imp','Feral Imp','Winged Dragon, Guardian of the Fortress #1','Winged Dragon, Guardian of the Fortress #1',
       'Petit Dragon','Petit Dragon','Baby Dragon','Baby Dragon','Giant Soldier of Stone','Giant Soldier of Stone','Man-Eater Bug','Man-Eater Bug',

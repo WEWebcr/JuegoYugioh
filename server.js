@@ -15,6 +15,7 @@ const path    = require('path');
 const crypto  = require('crypto');
 const nodemailer = require('nodemailer');
 const db         = require('./db.js');
+const { generateForbiddenMemoriesStarterDeck } = require('./starter_deck.js');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -404,18 +405,10 @@ app.post('/api/register', async (req, res) => {
   const existingEmail = await findSaveByEmailOrName(cleanEmail);
   if (existingEmail) return res.status(409).json({ error: 'Ya existe una cuenta registrada con este correo electrónico.' });
 
-  const DEFAULT_DECK = [
-    'Celtic Guardian','Celtic Guardian','Beaver Warrior','Beaver Warrior','Battle Ox','Battle Ox','Mystical Elf','Mystical Elf',
-    'Feral Imp','Feral Imp','Winged Dragon, Guardian of the Fortress #1','Winged Dragon, Guardian of the Fortress #1',
-    'Petit Dragon','Petit Dragon','Baby Dragon','Baby Dragon','Giant Soldier of Stone','Giant Soldier of Stone','Man-Eater Bug','Man-Eater Bug',
-    'Silver Fang','Silver Fang','Flame Manipulator','Flame Manipulator',
-    'Black Pendant','Black Pendant','Dragon Treasure','Dragon Treasure','Horn of the Unicorn','Horn of the Unicorn',
-    'Waboku','Waboku','Trap Hole','Trap Hole','Dust Tornado','Dust Tornado','Sakuretsu Armor','Sakuretsu Armor','Renace al Monstruo','Negate Attack'
-  ];
-
-  // Crear save fresco con deck inicial
+  // Generar Baraja Inicial Dinámica estilo Yu-Gi-Oh! Forbidden Memories (PS1)
+  const starterDeck = generateForbiddenMemoriesStarterDeck();
   const starterCollection = {};
-  DEFAULT_DECK.forEach(n => starterCollection[n] = (starterCollection[n] || 0) + 1);
+  starterDeck.forEach(n => starterCollection[n] = (starterCollection[n] || 0) + 1);
 
   const save = {
     name:         name,
@@ -429,7 +422,11 @@ app.post('/api/register', async (req, res) => {
     wins:         {},
     losses:       {},
     collection:   starterCollection,
-    deck:         [...DEFAULT_DECK],
+    deck:         [...starterDeck],
+    decks: {
+      "Deck 1": [...starterDeck]
+    },
+    activeDeck:   "Deck 1",
     legendary:    {},
     pity:         {},
     fusions:      [],
@@ -443,7 +440,7 @@ app.post('/api/register', async (req, res) => {
   };
 
   try {
-    await await writeSave(save);
+    await writeSave(save);
 
     // Enviar correo de bienvenida (no bloqueante)
     try {
