@@ -13678,6 +13678,7 @@ window.customFinishStoryDuel = function(win) {
             game.fieldBoost = null;
             game.activeField = null;
         }
+        if (typeof window.updateFieldBoardTheme === 'function') window.updateFieldBoardTheme(null);
     }
     if (window.nativeAPI.showShell) window.nativeAPI.showShell();
     
@@ -16056,7 +16057,96 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     });
   };
 
-  // On-screen visual badge for active duel field
+  // Inject CSS rules for duel field themes (Villa, Yami, Montaña)
+  function fmrInjectFieldThemeStyles() {
+    if (document.getElementById('fmrFieldBoardStyle')) return;
+    var style = document.createElement('style');
+    style.id = 'fmrFieldBoardStyle';
+    style.textContent = [
+      '/* Villa (Pueblo Secreto de los Magos) */',
+      '.board.field-theme-village {',
+      '  background: linear-gradient(rgba(14, 10, 6, 0.45), rgba(18, 14, 9, 0.68)), url("ImagenesPersonajes/villa.jpg") center center / cover no-repeat !important;',
+      '  border-color: #ba68c8 !important;',
+      '  box-shadow: 0 0 28px rgba(186, 104, 200, 0.5), inset 0 0 60px rgba(0, 0, 0, 0.75) !important;',
+      '  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;',
+      '}',
+      '.board.field-theme-village .zone {',
+      '  border-color: rgba(186, 104, 200, 0.55) !important;',
+      '  background: linear-gradient(145deg, rgba(30, 20, 35, 0.4), rgba(186, 104, 200, 0.1)) !important;',
+      '}',
+      '#duelBoardWrapper.field-theme-village {',
+      '  background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.82)), url("ImagenesPersonajes/villa.jpg") center center / cover no-repeat fixed !important;',
+      '}',
+      '',
+      '/* Yami (Campo Sombrío) */',
+      '.board.field-theme-yami {',
+      '  background: linear-gradient(rgba(14, 6, 22, 0.5), rgba(8, 3, 16, 0.75)), url("ImagenesPersonajes/yami.jpg") center center / cover no-repeat !important;',
+      '  border-color: #9c27b0 !important;',
+      '  box-shadow: 0 0 30px rgba(156, 39, 176, 0.55), inset 0 0 60px rgba(0, 0, 0, 0.8) !important;',
+      '  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;',
+      '}',
+      '.board.field-theme-yami .zone {',
+      '  border-color: rgba(156, 39, 176, 0.55) !important;',
+      '  background: linear-gradient(145deg, rgba(20, 8, 30, 0.45), rgba(156, 39, 176, 0.12)) !important;',
+      '}',
+      '#duelBoardWrapper.field-theme-yami {',
+      '  background: linear-gradient(rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.86)), url("ImagenesPersonajes/yami.jpg") center center / cover no-repeat fixed !important;',
+      '}',
+      '',
+      '/* Montaña */',
+      '.board.field-theme-mountain {',
+      '  background: linear-gradient(rgba(10, 16, 26, 0.45), rgba(8, 12, 20, 0.7)), url("ImagenesPersonajes/montana.jpg") center center / cover no-repeat !important;',
+      '  border-color: #4a90e2 !important;',
+      '  box-shadow: 0 0 30px rgba(74, 144, 226, 0.55), inset 0 0 60px rgba(0, 0, 0, 0.75) !important;',
+      '  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;',
+      '}',
+      '.board.field-theme-mountain .zone {',
+      '  border-color: rgba(74, 144, 226, 0.55) !important;',
+      '  background: linear-gradient(145deg, rgba(12, 22, 38, 0.45), rgba(74, 144, 226, 0.12)) !important;',
+      '}',
+      '#duelBoardWrapper.field-theme-mountain {',
+      '  background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.82)), url("ImagenesPersonajes/montana.jpg") center center / cover no-repeat fixed !important;',
+      '}'
+    ].join('\n');
+    document.head.appendChild(style);
+  }
+  window.fmrInjectFieldThemeStyles = fmrInjectFieldThemeStyles;
+
+  // Dynamic board visual transformer for active duel field
+  window.updateFieldBoardTheme = function(fb) {
+    if (typeof fmrInjectFieldThemeStyles === 'function') fmrInjectFieldThemeStyles();
+    var board = document.querySelector('.board');
+    var wrapper = document.getElementById('duelBoardWrapper');
+    var body = document.body;
+
+    var themeClasses = ['field-theme-village', 'field-theme-yami', 'field-theme-mountain'];
+    var removeClasses = function(el) {
+      if (!el) return;
+      themeClasses.forEach(function(cls) { el.classList.remove(cls); });
+    };
+
+    removeClasses(body);
+    removeClasses(board);
+    removeClasses(wrapper);
+
+    var targetTheme = null;
+    var norm = String(fb || '').toUpperCase().trim();
+    if (norm === 'SPELLCASTER_VILLAGE' || norm === 'VILLA' || norm === 'VILLAGE' || norm.includes('MAGO') || norm.includes('PUEBLO')) {
+      targetTheme = 'field-theme-village';
+    } else if (norm === 'YAMI' || norm.includes('SOMB')) {
+      targetTheme = 'field-theme-yami';
+    } else if (norm === 'MOUNTAIN' || norm === 'MONTANA' || norm === 'MONTAÑA') {
+      targetTheme = 'field-theme-mountain';
+    }
+
+    if (targetTheme) {
+      if (body) body.classList.add(targetTheme);
+      if (board) board.classList.add(targetTheme);
+      if (wrapper) wrapper.classList.add(targetTheme);
+    }
+  };
+
+  // On-screen visual badge and board theme for active duel field
   window.updateFieldIndicator = function() {
     var badge = document.getElementById('fmrActiveFieldBadge');
     if (!badge) {
@@ -16073,9 +16163,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     if (typeof game === 'undefined' || !game || !game.fieldBoost) {
       badge.style.display = 'none';
+      if (typeof window.updateFieldBoardTheme === 'function') window.updateFieldBoardTheme(null);
       return;
     }
     var fb = game.fieldBoost;
+    if (typeof window.updateFieldBoardTheme === 'function') window.updateFieldBoardTheme(fb);
+
     if (fb === 'SPELLCASTER_VILLAGE') {
       badge.style.display = 'block';
       badge.innerHTML = '🔮 CAMPO ACTIVO: <span style="color:#d4a5ff;">PUEBLO SECRETO DE LOS MAGOS</span> <span style="font-size:11px;color:#bbb;margin-left:6px;">(+500 ATK/DEF Magos)</span>';
@@ -16093,6 +16186,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       badge.style.boxShadow = '0 0 12px rgba(156,39,176,0.4)';
     } else {
       badge.style.display = 'none';
+      if (typeof window.updateFieldBoardTheme === 'function') window.updateFieldBoardTheme(null);
     }
   };
 
@@ -18321,6 +18415,46 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       window.promptEquipTarget(c, { type: 'hand', index: i });
       return;
     }
+    // Intercept FIELD spells desde la mano
+    var nUpperHand = (cName || '').toUpperCase();
+    var vUpperHand = (val || '').toUpperCase();
+    if (vUpperHand === 'FIELD_MOUNTAIN' || nUpperHand === 'MONTAÑA' || nUpperHand === 'MONTANA' || nUpperHand === 'MOUNTAIN') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'MOUNTAIN';
+      g.activeField = 'Montaña';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('⛰️ ¡Campo activo: Montaña! Dragón, Trueno y Bestia Alada reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('⛰️ ¡Campo activo: Montaña! Dragón, Trueno y Bestia Alada reciben +500 ATK y +500 DEF.');
+      return;
+    }
+    if (vUpperHand === 'FIELD_YAMI' || nUpperHand === 'YAMI') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'YAMI';
+      g.activeField = 'Yami';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🌑 ¡Campo activo: Yami! Demonios y Magos reciben +500 ATK/DEF (Hadas -400).');
+      if (typeof log === 'function') log('🌑 ¡Campo activo: Yami! Demonios y Magos reciben +500 ATK y +500 DEF (Hadas -400).');
+      return;
+    }
+    if (vUpperHand === 'FIELD_VILLAGE' || vUpperHand === 'SPELLCASTER_VILLAGE' || nUpperHand.includes('PUEBLO SECRETO') || nUpperHand.includes('VILLA')) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'SPELLCASTER_VILLAGE';
+      g.activeField = 'Pueblo Secreto de los Magos';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🔮 ¡Campo activo: Pueblo Secreto de los Magos! Magos reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('🔮 ¡Campo activo: Pueblo Secreto de los Magos! Magos reciben +500 ATK y +500 DEF.');
+      return;
+    }
+
     // Intercept Swords of Concealing Light desde la mano
     if (isConcealingSwords(c)) {
       var slot = (g.playerBack || []).findIndex(function(x) { return !x; });
@@ -18442,6 +18576,46 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof render === 'function') render();
       duelToast('¡Pot of Greed activado! Robas 2 cartas.');
       if (typeof log === 'function') log('Pot of Greed activado: robas 2 cartas.');
+      return;
+    }
+
+    // Intercept FIELD spells estando SET:
+    var nUpperSet = (cName || '').toUpperCase();
+    var vUpperSet = (val || '').toUpperCase();
+    if (vUpperSet === 'FIELD_MOUNTAIN' || nUpperSet === 'MONTAÑA' || nUpperSet === 'MONTANA' || nUpperSet === 'MOUNTAIN') {
+      g.playerBack[i] = null;
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'MOUNTAIN';
+      g.activeField = 'Montaña';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('⛰️ ¡Campo activo: Montaña! Dragón, Trueno y Bestia Alada reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('⛰️ ¡Campo activo: Montaña! Dragón, Trueno y Bestia Alada reciben +500 ATK y +500 DEF.');
+      return;
+    }
+    if (vUpperSet === 'FIELD_YAMI' || nUpperSet === 'YAMI') {
+      g.playerBack[i] = null;
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'YAMI';
+      g.activeField = 'Yami';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🌑 ¡Campo activo: Yami! Demonios y Magos reciben +500 ATK/DEF (Hadas -400).');
+      if (typeof log === 'function') log('🌑 ¡Campo activo: Yami! Demonios y Magos reciben +500 ATK y +500 DEF (Hadas -400).');
+      return;
+    }
+    if (vUpperSet === 'FIELD_VILLAGE' || vUpperSet === 'SPELLCASTER_VILLAGE' || nUpperSet.includes('PUEBLO SECRETO') || nUpperSet.includes('VILLA')) {
+      g.playerBack[i] = null;
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'SPELLCASTER_VILLAGE';
+      g.activeField = 'Pueblo Secreto de los Magos';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🔮 ¡Campo activo: Pueblo Secreto de los Magos! Magos reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('🔮 ¡Campo activo: Pueblo Secreto de los Magos! Magos reciben +500 ATK y +500 DEF.');
       return;
     }
 
