@@ -2742,7 +2742,7 @@
     "tier": "DEMONIO"
   },
   {
-    "id": 386,
+    "id": 738,
     "name": "Holding Arms",
     "kind": "MONSTER",
     "type": "Fiend",
@@ -2750,10 +2750,8 @@
     "level": 4,
     "atk": 500,
     "def": 1200,
-    "text": "If this card is Normal or Special Summoned: Target 1 face-up monster your opponent controls; while this card is face-up on the field, that face-up monster cannot attack, also its effects are negated. While that face-up monster is on the field, this card cannot be destroyed by battle or card effects.",
-    "image": "imagenescartas/Mundo1/316.jpg",
-    "sign1": "LUNA",
-    "sign2": "PLUTON"
+    "price": 10000,
+    "image": "imagenescartas/Mundo1/738.jpg"
   },
   {
     "id": 387,
@@ -2868,7 +2866,7 @@
     "tier": "ACUÁTICO"
   },
   {
-    "id": 394,
+    "id": 746,
     "name": "Magical Reflect Slime",
     "kind": "MONSTER",
     "type": "Aqua",
@@ -2876,10 +2874,8 @@
     "level": 3,
     "atk": 700,
     "def": 1200,
-    "text": "This card is treated as a Normal Monster while face-up on the field or in the Graveyard. While this card is face-up on the field, you can Normal Summon it to have it be treated as an Effect Monster with this effect:\n● Your opponent takes all Battle Damage that you would have taken from a battle involving this card.",
-    "image": "imagenescartas/Mundo1/324.jpg",
-    "sign1": "NEPTUNO",
-    "sign2": "LUNA"
+    "price": 12000,
+    "image": "imagenescartas/Mundo1/746.jpg"
   },
   {
     "id": 410,
@@ -5741,5 +5737,185 @@
     "price": 27000,
     "text": "Una entidad misteriosa dividida entre la luz radiante y la oscuridad absoluta.",
     "image": "imagenescartas/Mundo1/720.jpg"
+  },
+  {
+    "id": 730,
+    "name": "Bowganian",
+    "kind": "MONSTER",
+    "type": "Machine",
+    "attr": "DARK",
+    "level": 3,
+    "atk": 1300,
+    "def": 1000,
+    "price": 15000,
+    "image": "imagenescartas/Mundo1/730.jpg"
+  },
+  {
+    "id": 731,
+    "name": "Byser Shock",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 5,
+    "atk": 800,
+    "def": 600,
+    "price": 10000,
+    "image": "imagenescartas/Mundo1/731.jpg"
+  },
+  {
+    "id": 732,
+    "name": "Dark Jeroid",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 4,
+    "atk": 1200,
+    "def": 1500,
+    "price": 18000,
+    "image": "imagenescartas/Mundo1/732.jpg"
+  },
+  {
+    "id": 733,
+    "name": "Gil Garth",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 4,
+    "atk": 1800,
+    "def": 1200,
+    "price": 25000,
+    "image": "imagenescartas/Mundo1/733.jpg"
+  },
+  {
+    "id": 734,
+    "name": "Granadora",
+    "kind": "MONSTER",
+    "type": "Reptile",
+    "attr": "WATER",
+    "level": 4,
+    "atk": 1900,
+    "def": 700,
+    "price": 22000,
+    "image": "imagenescartas/Mundo1/734.jpg"
+  },
+  {
+    "id": 735,
+    "name": "Grand Tiki Elder",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 4,
+    "atk": 1500,
+    "def": 800,
+    "price": 12000,
+    "image": "imagenescartas/Mundo1/735.jpg"
+  },
+  {
+    "id": 736,
+    "name": "Guardian Slime",
+    "kind": "MONSTER",
+    "type": "Aqua",
+    "attr": "WATER",
+    "level": 10,
+    "atk": 0,
+    "def": 0,
+    "price": 30000,
+    "image": "imagenescartas/Mundo1/736.jpg"
+  },
+  {
+    "id": 737,
+    "name": "Helpoemer",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 5,
+    "atk": 2000,
+    "def": 1400,
+    "price": 28000,
+    "image": "imagenescartas/Mundo1/737.jpg"
+  },
+  {
+    "id": 739,
+    "name": "Holding Legs",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 4,
+    "atk": 800,
+    "def": 600,
+    "price": 10000,
+    "image": "imagenescartas/Mundo1/739.jpg"
+  },
+  {
+    "id": 740,
+    "name": "Humanoid Slime",
+    "kind": "MONSTER",
+    "type": "Aqua",
+    "attr": "WATER",
+    "level": 4,
+    "atk": 800,
+    "def": 2000,
+    "price": 19000,
+    "image": "imagenescartas/Mundo1/740.jpg"
+  },
+  {
+    "id": 741,
+    "name": "Juragedo",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 4,
+    "atk": 1700,
+    "def": 1300,
+    "price": 20000,
+    "image": "imagenescartas/Mundo1/741.jpg"
+  },
+  {
+    "id": 742,
+    "name": "Lava Golem",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "FIRE",
+    "level": 8,
+    "atk": 3000,
+    "def": 2500,
+    "price": 50000,
+    "image": "imagenescartas/Mundo1/742.jpg"
+  },
+  {
+    "id": 743,
+    "name": "Legendary Fiend",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 5,
+    "atk": 1500,
+    "def": 1800,
+    "price": 18000,
+    "image": "imagenescartas/Mundo1/743.jpg"
+  },
+  {
+    "id": 744,
+    "name": "Lekunga",
+    "kind": "MONSTER",
+    "type": "Plant",
+    "attr": "WATER",
+    "level": 4,
+    "atk": 1700,
+    "def": 500,
+    "price": 14000,
+    "image": "imagenescartas/Mundo1/744.jpg"
+  },
+  {
+    "id": 745,
+    "name": "Lord Poison",
+    "kind": "MONSTER",
+    "type": "Plant",
+    "attr": "WATER",
+    "level": 4,
+    "atk": 1500,
+    "def": 1000,
+    "price": 14000,
+    "image": "imagenescartas/Mundo1/745.jpg"
   }
 ]
