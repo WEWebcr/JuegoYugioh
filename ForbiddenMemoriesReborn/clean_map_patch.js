@@ -2980,6 +2980,25 @@ window.CUSTOM_NODES = [
     { id: 'n14', left: '50%', top: '4%', label: 'PUERTA SAGRADA', char: 'ATEM', req: ['bakura','noah','kosaburo','ishizu','pegasus','yugi','kaiba','joey','marik','odion','mako'] }
 ];
 
+const MAP_EDGES = [
+    ['n1', 'n2'],
+    ['n2', 'n3'],
+    ['n3', 'n3b'],
+    ['n3b', 'n4'],
+    ['n4', 'n5'],
+    ['n5', 'n6'],
+    ['n6', 'n7'],
+    ['n7', 'n7b'],
+    ['n7b', 'n8'],
+    ['n8', 'n9'],
+    ['n9', 'n10'],
+    ['n10', 'n11'],
+    ['n11', 'n12'],
+    ['n11', 'n14'],
+    ['n12', 'n14'],
+    ['n1', 'n13']
+];
+
 // ════════════════════════════════════════════════════════════════
 //  NODOS Y RUTA DEL MAPA MUNDO 2: ACADEMIA DE DUELOS (GX)
 // ════════════════════════════════════════════════════════════════
@@ -3636,10 +3655,10 @@ window.openFreeDuelMenu = function() {
     let cleared = [];
     let wins = {};
     let losses = {};
+    let saved = null;
     try {
         let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
         let savedStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
-        let saved = null;
         if (savedStr) {
             saved = JSON.parse(savedStr);
             if (saved && saved.cleared) cleared = saved.cleared.map(x => String(x).toLowerCase()); 
