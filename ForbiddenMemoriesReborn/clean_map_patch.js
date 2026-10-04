@@ -3034,6 +3034,49 @@ const OPPONENT_NAMES = {
 };
 
 const POWERFUL_SHOP_CARDS = [
+    // --- CATÁLOGO ECONÓMICO PARA FUSIONES CLÁSICAS Y PRINCIPIANTES (100 - 500 PM) ---
+    // DRAGONES
+    { name: 'Baby Dragon', price: 150, tier: 'DRAGÓN BÁSICO', desc: 'Dragón principiante ideal para fusiones con Trueno y Guerrero (ATK 700 / DEF 700).' },
+    { name: 'Petit Dragon', price: 150, tier: 'DRAGÓN BÁSICO', desc: 'Pequeño dragón con alas veloces para fusiones tempranas (ATK 700 / DEF 700).' },
+    { name: 'One-Eyed White Dragon', price: 300, tier: 'DRAGÓN COMBATE', desc: 'Dragón blanco de combate (ATK 1300 / DEF 1000).' },
+    { name: 'Winged Dragon, Guardian of the Fortress #1', price: 450, tier: 'DRAGÓN ALADO', desc: 'Dragón guardián defensor de fortalezas (ATK 1400 / DEF 1200).' },
+    { name: 'Koumori Dragon', price: 500, tier: 'DRAGÓN OSCURO', desc: 'Dragón murciélago sombrío (ATK 1500 / DEF 1200).' },
+
+    // TRUENO (THUNDER)
+    { name: 'Kaminarikozou', price: 150, tier: 'TRUENO FUSIÓN', desc: 'Espíritu eléctrico. ¡Fusiónalo con cualquier Dragón para crear al Dragón Trueno Bicéfalo! (ATK 700 / DEF 600).' },
+    { name: 'Lala Li-Oon', price: 150, tier: 'TRUENO FUSIÓN', desc: 'Criatura de nubes de tormenta para fusiones eléctricas (ATK 600 / DEF 600).' },
+    { name: 'Mega Thunderball', price: 200, tier: 'TRUENO FUSIÓN', desc: 'Esfera rodante de alto voltaje (ATK 750 / DEF 600).' },
+    { name: 'Electric Lizard', price: 300, tier: 'TRUENO COMBATE', desc: 'Reptil electrificado (ATK 850 / DEF 800).' },
+    { name: 'Tripwire Beast', price: 400, tier: 'TRUENO COMBATE', desc: 'Bestia eléctrica de gran impacto (ATK 1200 / DEF 1300).' },
+
+    // AGUA (AQUA / FISH)
+    { name: 'Frog the Jam', price: 150, tier: 'AGUA BÁSICA', desc: 'Rana anfibia para fusiones acuáticas (ATK 700 / DEF 500).' },
+    { name: 'Root Water', price: 250, tier: 'AGUA COMBATE', desc: 'Anfibio azul de las profundidades marinas (ATK 1000 / DEF 1000).' },
+    { name: 'Enchanting Mermaid', price: 350, tier: 'AGUA HECHICERA', desc: 'Sirena marina para fusiones con roca y guerrero (ATK 1200 / DEF 900).' },
+    { name: 'Water Omotics', price: 400, tier: 'AGUA DONCELLA', desc: 'Doncella de agua (ATK 1400 / DEF 1200).' },
+    { name: 'Amazon of the Seas', price: 450, tier: 'AGUA GUERRERA', desc: 'Guerrera de los mares (ATK 1300 / DEF 1400).' },
+
+    // GUERRERO (WARRIOR)
+    { name: 'Kagemusha of the Blue Flame', price: 200, tier: 'GUERRERO SOMBRA', desc: 'Guerrero sombra de la llama azul (ATK 800 / DEF 400).' },
+    { name: 'Exiled Force', price: 300, tier: 'GUERRERO TÁCTICO', desc: 'Tropa guerrera de asalto (ATK 1000 / DEF 1000).' },
+    { name: 'Masaki the Legendary Swordsman', price: 300, tier: 'GUERRERO ESPADA', desc: 'Espadachín legendario de mil batallas (ATK 1100 / DEF 1100).' },
+    { name: 'Beaver Warrior', price: 350, tier: 'GUERRERO BESTIA', desc: 'Guerrero leal con gran defensa (ATK 1200 / DEF 1500).' },
+    { name: 'Celtic Guardian', price: 450, tier: 'GUERRERO ÉLITE', desc: 'Elfo guerrero clásico con rápida espada (ATK 1400 / DEF 1200).' },
+
+    // PIEDRA (ROCK)
+    { name: 'Dissolverock', price: 200, tier: 'ROCA LAVA', desc: 'Roca fundida. ¡Fusiónala con Hadas/Femeninas para crear a Mystical Sand de 2100 ATK! (ATK 900 / DEF 1000).' },
+    { name: 'Stone Armadiller', price: 250, tier: 'ROCA BLINDADA', desc: 'Armadillo de piedra impenetrable (ATK 1000 / DEF 1200).' },
+    { name: 'Stone Ghost', price: 350, tier: 'ROCA ESPECTRAL', desc: 'Espíritu ancestral de piedra (ATK 1200 / DEF 1000).' },
+    { name: 'Sand Stone', price: 450, tier: 'ROCA DESIERTO', desc: 'Guardián rocoso del desierto (ATK 1300 / DEF 1600).' },
+    { name: 'Giant Soldier of Stone', price: 500, tier: 'ROCA COLOSAL', desc: 'Guardián legendario de roca sólida con 2000 DEF (ATK 1300 / DEF 2000).' },
+
+    // "LAIDY" / FEMENINAS / HADAS
+    { name: 'Dancing Elf', price: 100, tier: 'HADA DANZANTE', desc: 'Hada elemental femenina para fusiones mágicas tempranas (ATK 300 / DEF 200).' },
+    { name: 'Key Mace', price: 150, tier: 'HADA SAGRADA', desc: 'Pequeña hada bondadosa con maza dorada (ATK 400 / DEF 800).' },
+    { name: 'Lunar Queen Elzaim', price: 250, tier: 'REINA LUNAR', desc: 'Hechicera lunar que bendice el campo (ATK 750 / DEF 1100).' },
+    { name: 'Harpie Lady', price: 450, tier: 'ARPÍA ALADA', desc: 'Dama alada clásica de veloces ataques (ATK 1300 / DEF 1400).' },
+    { name: 'Mystical Elf', price: 500, tier: 'ELFA MÍSTICA', desc: 'Sacerdotisa mística con monumental defensa de 2000 DEF (ATK 800 / DEF 2000).' },
+
     // --- MONSTRUOS NEUTROS DE ALTO PODER (SIN DIOSES NI CARTAS ICÓNICAS) ---
     { name: 'Gate Guardian', price: 70000, tier: 'LEVIATÁN', desc: 'Guardián del laberinto legendario con 3750 ATK / 3400 DEF. Poder aplastante en combate.' },
     { name: 'Cosmo Queen', price: 60000, tier: 'REINA CÓSMICA', desc: 'Reina soberana del cosmos con 2900 ATK / 2450 DEF.' },
@@ -3236,6 +3279,32 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     let cardPool = [];
     if (oppDeck && Array.isArray(oppDeck.cards)) {
         cardPool = [...new Set(oppDeck.cards)];
+    }
+    const ELIMINATED_UNKNOWN_ST = new Set([
+      'Spiritual Energy Settle Machine', 'Orb of Yasaka', 'Mirror of Yata', 'Cyclon Laser', 'Cestus of Dagla',
+      'Left Arm Offering', 'Jam Breeding Machine', 'Dark Sanctuary', 'Spirit Message "A"', 'Spirit Message "I"',
+      'Spirit Message "L"', 'Spirit Message "N"', 'Dark Spirit\'s Mastery', 'The Dark Door', 'Card of Safe Return',
+      'Multiplication of Ants', 'Insect Imitation', 'Insect Neglect', 'Insect Barrier', 'Jade Insect Whistle',
+      'Cybernetic Fusion Support', 'Cybernetic Zone', 'Amazoness Fighting Spirit', 'Amazoness Heirloom',
+      'Amazoness Spellcaster', 'Triangle Ecstasy Spark', 'Chaos Greed', 'The Claw of Hermos', 'The Fang of Critias',
+      'Contract with Exodia', 'Hydro Pressure Cannon', 'Rage of Kairyu-Shin', 'Fury of Kairyu-Shin', 'Steel Shell',
+      'Apophis the Swamp Deity', 'Embodiment of Apophis', 'Exchange of Despair and Hope', 'Exchange of the Spirit',
+      'Gravekeeper\'s Trap', 'Muko', 'Curse of Anubis', 'Statue of the Wicked', 'Sentence of Doom', 'Destiny Board',
+      'Dark Spirit of the Silent', 'Zoma the Spirit', 'Coffin Seller', 'Dark Spell Regeneration', 'Fiend\'s Hand Mirror',
+      'Hidden Soldiers', 'Jam Defender', 'Metal Reflect Slime', 'Relieve Monster', 'Rope of Life', 'Legacy of Yata-Garasu',
+      'Blast Held by a Tribute', 'Blast Held by Destiny', 'Abyss-strom', 'Aegis of the Ocean Dragon Lord', 'Shattered Axe',
+      'Spiritual Water Art - Aoi', 'Tornado Wall', 'Amazoness Archers', 'Amazoness Willpower', 'Hysteric Party',
+      'Trap Hole of Spikes', 'Toon Defense', 'Soul Rope', 'Obliterate!!!', 'Tyrant Wing', 'Card of Demise', 'Ring of Defense',
+      'Shrink', 'Soul Exchange', 'The Flute of Summoning Dragon', 'White Dragon Ritual', 'Dragon\'s Rage',
+      'Interdimensional Matter Transporter', 'Shadow Spell', 'Dark Magic Curtain', 'Fiend\'s Sanctuary', 'Magic Formula',
+      'Thousand Knives', 'Black Illusion', 'Dark Renewal', 'Painful Choice', 'Remove Trap', 'A Legendary Ocean',
+      'Dark-Piercing Light', 'Salvage', 'Umi', 'Drop Off', 'Fairy Box', 'Gamble', 'Graverobber', 'Kunai with Chain',
+      'Magical Arm Shield', 'Metalmorph', 'Skull Dice', 'Jar of Greed', 'Toon Table of Contents', 'Toon World',
+      'Ultimate Offering', 'DNA Surgery', 'Cost Down', 'Shine Palace', 'Snatch Steal', 'Card of Sanctity', 'Temple of the Kings'
+    ]);
+    window.ELIMINATED_UNKNOWN_ST = ELIMINATED_UNKNOWN_ST;
+    if (cardPool.length > 0) {
+        cardPool = cardPool.filter(c => !ELIMINATED_UNKNOWN_ST.has(c));
     }
     if (cardPool.length === 0) {
         cardPool = ['Dark Magician', 'Blue-Eyes White Dragon', 'Summoned Skull', 'Red-Eyes Black Dragon', 'Celtic Guardian'];
@@ -9304,6 +9373,115 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof log === 'function') log('Dark Hole destruye ' + total + ' monstruo(s) en el Campo (Tus monstruos: ' + nPlayer + ', Rival: ' + nEnemy + ').');
   };
 
+  function isMST(c) {
+    if (!c) return false;
+    var n = (c.name || '').toLowerCase();
+    var v = (c.value || '').toLowerCase();
+    return n.includes('mystical space typhoon') || n.includes('tifón') || v === 'mst' || v === 'mystical_space_typhoon';
+  }
+  window.isMST = isMST;
+
+  function isFissure(c) {
+    if (!c) return false;
+    var n = (c.name || '').toLowerCase();
+    var v = (c.value || '').toLowerCase();
+    return n === 'fissure' || n.includes('fisura') || v === 'fissure';
+  }
+  window.isFissure = isFissure;
+
+  window.resolveMysticalSpaceTyphoon = function(backIndex, handIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+    var targets = (g.enemyBack || []).map(function(x, idx) {
+      return x ? { card: x, index: idx } : null;
+    }).filter(Boolean);
+
+    if (!targets.length) {
+      duelToast('Mystical Space Typhoon: El rival no tiene cartas en su zona de Magia/Trampa.');
+      return;
+    }
+
+    var overlay = document.createElement('div');
+    overlay.id = 'mstChoiceOverlay';
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999;display:flex;justify-content:center;align-items:center;font-family:VT323, monospace;";
+    var box = document.createElement('div');
+    box.style.cssText = "width:420px;padding:25px;background:rgba(10,20,30,0.95);border:3px solid #64b5f6;border-radius:8px;text-align:center;box-shadow:0 0 30px #000;";
+    box.innerHTML = '<h3 style="color:#64b5f6;font-size:24px;margin:0 0 15px;">MYSTICAL SPACE TYPHOON</h3><p style="color:#fff;font-size:16px;margin:0 0 15px;">Elige qué carta Mágica/Trampa rival destruir:</p><div id="mstTargets" style="display:flex;flex-direction:column;gap:10px;"></div><button id="mstCancel" style="margin-top:15px;padding:8px 20px;background:#660000;color:#fff;border:2px solid #ff0000;font-family:inherit;font-size:16px;cursor:pointer;">CANCELAR</button>';
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    document.getElementById('mstCancel').onclick = function() { overlay.remove(); };
+
+    var container = document.getElementById('mstTargets');
+    targets.forEach(function(t) {
+      var btn = document.createElement('button');
+      btn.style.cssText = "padding:12px;background:#222;color:#64b5f6;border:2px solid #555;font-family:inherit;font-size:18px;cursor:pointer;";
+      btn.textContent = t.card.set ? ('[SET] Carta Boca Abajo (Zona ' + (t.index + 1) + ')') : (t.card.name + ' (Zona ' + (t.index + 1) + ')');
+      btn.onclick = function() {
+        overlay.remove();
+        var targetCard = g.enemyBack[t.index];
+        g.enemyBack[t.index] = null;
+        g.enemyGrave.push(Object.assign({}, targetCard, { set: false, faceUp: true }));
+
+        if (handIndex !== null && handIndex !== undefined) {
+          var c = g.hand.splice(handIndex, 1)[0];
+          if (c) g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+        } else if (backIndex !== null && backIndex !== undefined) {
+          var c = g.playerBack[backIndex];
+          g.playerBack[backIndex] = null;
+          if (c) g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+        }
+        g.selected = [];
+        if (window.playDestroySound) window.playDestroySound();
+        if (typeof render === 'function') render();
+        var destroyedName = targetCard.set ? 'la carta boca abajo' : targetCard.name;
+        duelToast('¡Mystical Space Typhoon destruyó ' + destroyedName + '!');
+        if (typeof log === 'function') log('Mystical Space Typhoon destruye ' + destroyedName + ' en la zona de Magia/Trampa rival.');
+      };
+      container.appendChild(btn);
+    });
+  };
+
+  window.resolveFissure = function(backIndex, handIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) return;
+    var oppMonsters = [];
+    ['enemy', 'enemyLinkZones'].forEach(function(zoneKey) {
+      (g[zoneKey] || []).forEach(function(m, idx) {
+        if (m && !m.faceDownSet103 && !m.faceDown) {
+          oppMonsters.push({
+            zone: zoneKey,
+            index: idx,
+            card: m,
+            atk: (typeof effectiveAtk === 'function' ? effectiveAtk(m) : m.atk) || 0
+          });
+        }
+      });
+    });
+    if (!oppMonsters.length) {
+      duelToast('Fissure: El rival no tiene monstruos boca arriba en el campo.');
+      return;
+    }
+    oppMonsters.sort(function(a, b) { return a.atk - b.atk; });
+    var target = oppMonsters[0];
+    var mCard = g[target.zone][target.index];
+    g[target.zone][target.index] = null;
+    g.enemyGrave.push(mCard);
+
+    if (handIndex !== null && handIndex !== undefined) {
+      var c = g.hand.splice(handIndex, 1)[0];
+      if (c) g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+    } else if (backIndex !== null && backIndex !== undefined) {
+      var c = g.playerBack[backIndex];
+      g.playerBack[backIndex] = null;
+      if (c) g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+    }
+    if (window.playDestroySound) window.playDestroySound();
+    if (typeof render === 'function') render();
+    duelToast('¡Fissure destruyó a ' + (mCard.name || 'el monstruo rival') + ' (ATK: ' + target.atk + ')!');
+    if (typeof log === 'function') log('Fissure destruye a ' + (mCard.name || 'el monstruo rival') + ' por tener el menor ATK (' + target.atk + ').');
+  };
+
   // 5. activateSTFromHand & activateSetCard
   var prevActivateHand = window.activateSTFromHand;
   window.activateSTFromHand = function(i) {
@@ -9428,6 +9606,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     if (isDarkHole(c)) {
       window.resolveDarkHole(null, i);
+      return;
+    }
+    if (isMST(c)) {
+      window.resolveMysticalSpaceTyphoon(null, i);
+      return;
+    }
+    if (isFissure(c)) {
+      window.resolveFissure(null, i);
       return;
     }
     if (prevActivateHand) return prevActivateHand.apply(this, arguments);
@@ -9570,6 +9756,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     // 8. Heavy Storm / Tormenta Pesada estando SET:
     if (isHeavyStorm(c)) {
       window.resolveHeavyStorm(i, null);
+      return;
+    }
+
+    // 8b. Mystical Space Typhoon y Fissure estando SET:
+    if (isMST(c)) {
+      window.resolveMysticalSpaceTyphoon(i, null);
+      return;
+    }
+    if (isFissure(c)) {
+      window.resolveFissure(i, null);
       return;
     }
 

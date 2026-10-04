@@ -8,8 +8,10 @@
     "level": 3,
     "atk": 700,
     "def": 700,
-    "text": "Aunque no es fuerte, este pequeño dragon promete convertirse en un poderoso aliado.",
-    "image": "imagenescartas/Mundo1/028.jpg"
+    "text": "Dragón pequeño de gran agilidad para fusiones con Trueno y Guerrero.",
+    "image": "imagenescartas/Mundo1/028.jpg",
+    "price": 150,
+    "tier": "DRAGÓN BÁSICO"
   },
   {
     "id": 2,
@@ -44,8 +46,10 @@
     "level": 4,
     "atk": 1000,
     "def": 1000,
-    "text": "Tributa esta carta para destruir 1 monstruo en el Campo.",
-    "image": "imagenescartas/Mundo1/003.jpg"
+    "text": "Tropa guerrera de asalto.",
+    "image": "imagenescartas/Mundo1/003.jpg",
+    "price": 300,
+    "tier": "GUERRERO TÁCTICO"
   },
   {
     "id": 5,
@@ -212,8 +216,10 @@
     "level": 4,
     "atk": 1400,
     "def": 1200,
-    "text": "Un guerrero elfico que custodia el bosque sagrado.",
-    "image": "imagenescartas/Mundo1/007.jpg"
+    "text": "Elfo guerrero clásico con rápida espada.",
+    "image": "imagenescartas/Mundo1/007.jpg",
+    "price": 450,
+    "tier": "GUERRERO ÉLITE"
   },
   {
     "id": 19,
@@ -224,8 +230,10 @@
     "level": 4,
     "atk": 1200,
     "def": 1500,
-    "text": "Un castor guerrero que protege su territorio.",
-    "image": "imagenescartas/Mundo1/008.jpg"
+    "text": "Guerrero leal con gran defensa.",
+    "image": "imagenescartas/Mundo1/008.jpg",
+    "price": 350,
+    "tier": "GUERRERO BESTIA"
   },
   {
     "id": 20,
@@ -248,8 +256,10 @@
     "level": 4,
     "atk": 800,
     "def": 2000,
-    "text": "Un elfo mistico cuya alta DEF protege al duelista.",
-    "image": "imagenescartas/Mundo1/012.jpg"
+    "text": "Sacerdotisa mística con monumental defensa de 2000 DEF.",
+    "image": "imagenescartas/Mundo1/012.jpg",
+    "price": 500,
+    "tier": "ELFA MÍSTICA"
   },
   {
     "id": 22,
@@ -272,8 +282,10 @@
     "level": 4,
     "atk": 1400,
     "def": 1200,
-    "text": "Un dragon alado que vigila la fortaleza.",
-    "image": "imagenescartas/Mundo1/014.jpg"
+    "text": "Dragón guardián defensor de fortalezas.",
+    "image": "imagenescartas/Mundo1/014.jpg",
+    "price": 450,
+    "tier": "DRAGÓN ALADO"
   },
   {
     "id": 24,
@@ -284,8 +296,10 @@
     "level": 2,
     "atk": 700,
     "def": 600,
-    "text": "Un pequeño dragon que crece en poder.",
-    "image": "imagenescartas/Mundo1/026.jpg"
+    "text": "Pequeño dragón con alas veloces para fusiones tempranas.",
+    "image": "imagenescartas/Mundo1/026.jpg",
+    "price": 150,
+    "tier": "DRAGÓN BÁSICO"
   },
   {
     "id": 25,
@@ -296,8 +310,10 @@
     "level": 3,
     "atk": 1300,
     "def": 2000,
-    "text": "Un gigante de piedra cuya defensa es legendaria.",
-    "image": "imagenescartas/Mundo1/031.jpg"
+    "text": "Guardián legendario de roca sólida con 2000 DEF.",
+    "image": "imagenescartas/Mundo1/031.jpg",
+    "price": 500,
+    "tier": "ROCA COLOSAL"
   },
   {
     "id": 26,
@@ -506,20 +522,6 @@
     "text": "Destruye 1 Magia, Trampa o Equipo del rival."
   },
   {
-    "id": 221,
-    "name": "Cybernetic Fusion Support",
-    "kind": "SPELL",
-    "value": "CYBER_FUSION_SUPPORT",
-    "text": "Invoca por Fusion 1 Monstruo de Fusion de Maquina desde tu Deck Extra."
-  },
-  {
-    "id": 222,
-    "name": "Cybernetic Zone",
-    "kind": "SPELL",
-    "value": "CYBERNETIC_ZONE",
-    "text": "Destierra 1 Monstruo de Maquina; al final del turno invocalo por Fusion."
-  },
-  {
     "id": 223,
     "name": "Fusion Weapon",
     "kind": "EQUIP",
@@ -553,13 +555,6 @@
     "kind": "SPELL",
     "value": "SCAPEGOAT",
     "text": "Invoca hasta 4 Tokens de Ovejas en Posicion de Defensa."
-  },
-  {
-    "id": 228,
-    "name": "Threatening Roar",
-    "kind": "TRAP",
-    "value": "THREATENING_ROAR",
-    "text": "El rival no puede declarar un ataque este turno."
   },
   {
     "id": 229,
@@ -818,7 +813,10 @@
     "def": 900,
     "kind": "FUSION",
     "desc": "Fusión: Female + Fish",
-    "image": "imagenescartas/Mundo1/131.jpg"
+    "image": "imagenescartas/Mundo1/131.jpg",
+    "price": 350,
+    "tier": "AGUA HECHICERA",
+    "text": "Sirena marina para fusiones con roca y guerrero."
   },
   {
     "id": 132,
@@ -830,7 +828,10 @@
     "def": 1400,
     "kind": "FUSION",
     "desc": "Fusión: Female + Fish",
-    "image": "imagenescartas/Mundo1/132.jpg"
+    "image": "imagenescartas/Mundo1/132.jpg",
+    "price": 450,
+    "tier": "AGUA GUERRERA",
+    "text": "Guerrera de los mares."
   },
   {
     "id": 133,
@@ -902,7 +903,10 @@
     "def": 1000,
     "kind": "FUSION",
     "desc": "Fusión: Zombie + Rock",
-    "image": "imagenescartas/Mundo1/138.jpg"
+    "image": "imagenescartas/Mundo1/138.jpg",
+    "price": 350,
+    "tier": "ROCA ESPECTRAL",
+    "text": "Espíritu ancestral de piedra."
   },
   {
     "id": 139,
@@ -1010,7 +1014,10 @@
     "def": 1300,
     "kind": "FUSION",
     "desc": "Fusión: Beast + Thunder",
-    "image": "imagenescartas/Mundo1/147.jpg"
+    "image": "imagenescartas/Mundo1/147.jpg",
+    "price": 400,
+    "tier": "TRUENO COMBATE",
+    "text": "Bestia eléctrica de gran impacto."
   },
   {
     "id": 148,
@@ -1154,7 +1161,10 @@
     "def": 1000,
     "kind": "MONSTER",
     "desc": "Fusión: Pyro + Rock",
-    "image": "imagenescartas/Mundo1/159.jpg"
+    "image": "imagenescartas/Mundo1/159.jpg",
+    "price": 200,
+    "tier": "ROCA LAVA",
+    "text": "Roca fundida. ¡Fusiónala con Hadas/Femeninas para crear a Mystical Sand!"
   },
   {
     "id": 160,
@@ -1495,118 +1505,6 @@
     "sign2": "SATURNO"
   },
   {
-    "id": 249,
-    "name": "Gaia Power",
-    "kind": "SPELL",
-    "type": "Field",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "All EARTH monsters gain 500 ATK and lose 400 DEF.",
-    "image": "imagenescartas/Mundo1/184.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 250,
-    "name": "Insect Armor with Laser Cannon",
-    "kind": "SPELL",
-    "type": "Equip",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Equip only to an Insect monster. It gains 700 ATK.",
-    "image": "imagenescartas/Mundo1/185.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 251,
-    "name": "Insect Barrier",
-    "kind": "SPELL",
-    "type": "Continuous",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Insect-Type monsters your opponent controls cannot declare an attack.",
-    "image": "imagenescartas/Mundo1/186.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 252,
-    "name": "Insect Imitation",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Tribute 1 monster. Special Summon 1 Insect-Type monster from your Deck whose Level is 1 higher than the Tributed monster's.",
-    "image": "imagenescartas/Mundo1/187.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 253,
-    "name": "Insect Neglect",
-    "kind": "SPELL",
-    "type": "Continuous",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "When your opponent's monster declares an attack: You can banish 1 Insect monster from your GY; negate the attack.",
-    "image": "imagenescartas/Mundo1/188.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 254,
-    "name": "Jade Insect Whistle",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Your opponent selects 1 Insect-Type Monster from their Deck. After shuffling the Deck, place the card on top of the Deck.",
-    "image": "imagenescartas/Mundo1/189.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 255,
-    "name": "Multiplication of Ants",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Tribute 1 Insect-Type Monster on your side of the field. Special Summon 2 \"Army Ant Tokens\" (Insect-Type/EARTH/Level 4/ATK 500/DEF 1200) on your side of the field. The tokens cannot be used as a Tribute for a Tribute Summon.",
-    "image": "imagenescartas/Mundo1/190.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
-    "id": 256,
-    "name": "DNA Surgery",
-    "kind": "TRAP",
-    "type": "Continuous",
-    "attr": "EARTH",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Activate this card by declaring 1 Monster Type. All face-up monsters on the field become that Type.",
-    "image": "imagenescartas/Mundo1/191.jpg",
-    "sign1": "URANO",
-    "sign2": "MARTE"
-  },
-  {
     "id": 257,
     "name": "Perfectly Ultimate Great Moth",
     "kind": "MONSTER",
@@ -1831,174 +1729,6 @@
     "sign2": "VENUS"
   },
   {
-    "id": 273,
-    "name": "Amazoness Fighting Spirit",
-    "kind": "SPELL",
-    "type": "Continuous",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "If an \"Amazoness\" monster attacks a monster with higher ATK, the attacking monster gains 1000 ATK during damage calculation only.",
-    "image": "imagenescartas/Mundo1/207.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 274,
-    "name": "Amazoness Heirloom",
-    "kind": "SPELL",
-    "type": "Equip",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Equip only to an \"Amazoness\" monster. Once per turn, that monster cannot be destroyed by battle. After damage calculation, if the equipped monster attacks a monster: Destroy the attacked monster.",
-    "image": "imagenescartas/Mundo1/208.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 275,
-    "name": "Amazoness Spellcaster",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Target 1 \"Amazoness\" monster you control and 1 face-up monster your opponent controls; switch the original ATK of those targets until the end of this turn.",
-    "image": "imagenescartas/Mundo1/209.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 276,
-    "name": "Cyber Shield",
-    "kind": "SPELL",
-    "type": "Equip",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Equip only to \"Harpie Lady\" or \"Harpie Lady Sisters\". It gains 500 ATK.",
-    "image": "imagenescartas/Mundo1/210.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 277,
-    "name": "Elegant Egotist",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "If \"Harpie Lady\" is on the field: Special Summon 1 \"Harpie Lady\" or \"Harpie Lady Sisters\" from your hand or Deck.",
-    "image": "imagenescartas/Mundo1/211.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 278,
-    "name": "Harpie Lady Phoenix Formation",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "If you control 3 or more \"Harpie Lady\" and/or \"Harpie Lady Sisters\": Target as many monsters your opponent controls as possible, but not more than the total number of \"Harpie Lady\" and \"Harpie Lady Sisters\" you control; destroy those targets, and if you do, inflict damage to your opponent equal to the highest original ATK among those destroyed monsters (your choice, if tied). You cannot Special Summon monsters from the Main Deck or Extra Deck, nor conduct your Battle Phase, the turn you activate this card.",
-    "image": "imagenescartas/Mundo1/212.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 279,
-    "name": "Harpies' Hunting Ground",
-    "kind": "SPELL",
-    "type": "Field",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "All Winged Beast monsters gain 200 ATK/DEF. If any \"Harpie Lady\" or \"Harpie Lady Sisters\" is Normal or Special Summoned: The player who conducted the Summon targets 1 Spell/Trap on the field; that player destroys that target.",
-    "image": "imagenescartas/Mundo1/213.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 280,
-    "name": "Triangle Ecstasy Spark",
-    "kind": "SPELL",
-    "type": "Normal",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Until the end of this turn, the ATK of all \"Harpie Lady Sisters\" currently on the field becomes 2700, your opponent cannot activate any Trap Cards, also negate all your opponent's Trap effects on the field.",
-    "image": "imagenescartas/Mundo1/214.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 281,
-    "name": "Amazoness Archers",
-    "kind": "TRAP",
-    "type": "Normal",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "When an opponent's monster declares an attack, while you control an \"Amazoness\" monster: Change all monsters your opponent currently controls to face-up Attack Position (Flip Effects are not activated), they lose 500 ATK, also they must attack this turn, if able.",
-    "image": "imagenescartas/Mundo1/215.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 282,
-    "name": "Amazoness Willpower",
-    "kind": "TRAP",
-    "type": "Continuous",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Select 1 \"Amazoness\" monster in your Graveyard and Special Summon it in Attack Position. It cannot change its battle position and must attack if able. When this card is removed from the field, destroy that monster. When that monster is destroyed, destroy this card.",
-    "image": "imagenescartas/Mundo1/216.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 283,
-    "name": "Hysteric Party",
-    "kind": "TRAP",
-    "type": "Continuous",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Activate this card by discarding 1 card; Special Summon as many copies of \"Harpie Lady\" as possible from your Graveyard. When this face-up card leaves the field, destroy those monsters.",
-    "image": "imagenescartas/Mundo1/217.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
-    "id": 284,
-    "name": "Mirror Wall",
-    "kind": "TRAP",
-    "type": "Continuous",
-    "attr": "WIND",
-    "level": 4,
-    "atk": 0,
-    "def": 0,
-    "text": "Each of your opponent's monsters that conducted an attack while this card was face-up on the field has its ATK halved as long as this card remains on the field. During each of your Standby Phases, pay 2000 LP or destroy this card.",
-    "image": "imagenescartas/Mundo1/218.jpg",
-    "sign1": "MERCURIO",
-    "sign2": "VENUS"
-  },
-  {
     "id": 285,
     "name": "Harpie's Pet Dragon",
     "kind": "MONSTER",
@@ -2179,142 +1909,6 @@
     "image": "imagenescartas/Mundo1/231.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
-  },
-  {
-    "id": 298,
-    "name": "Chaos Greed",
-    "kind": "SPELL",
-    "value": "CHAOS_GREED",
-    "text": "You can only activate this card if 4 or more of your cards are currently removed from play and there are no cards in your Graveyard. Draw 2 cards from your Deck.",
-    "image": "imagenescartas/Mundo1/232.jpg"
-  },
-  {
-    "id": 299,
-    "name": "Foolish Burial",
-    "kind": "SPELL",
-    "value": "FOOLISH_BURIAL",
-    "text": "Send 1 monster from your Deck to the GY.",
-    "image": "imagenescartas/Mundo1/233.jpg"
-  },
-  {
-    "id": 300,
-    "name": "Giant Trunade",
-    "kind": "SPELL",
-    "value": "GIANT_TRUNADE",
-    "text": "Return all Spell and Trap Cards on the field to the hand.",
-    "image": "imagenescartas/Mundo1/234.jpg"
-  },
-  {
-    "id": 301,
-    "name": "Lightning Blade",
-    "kind": "SPELL",
-    "value": "LIGHTNING_BLADE",
-    "text": "Equip only to a Warrior-Type monster. It gains 800 ATK. All WATER monsters lose 500 ATK.",
-    "image": "imagenescartas/Mundo1/235.jpg"
-  },
-  {
-    "id": 302,
-    "name": "Premature Burial",
-    "kind": "SPELL",
-    "value": "PREMATURE_BURIAL",
-    "text": "Activate this card by paying 800 LP, then target 1 monster in your Graveyard; Special Summon that target in Attack Position and equip it with this card. When this card is destroyed, destroy the equipped monster.",
-    "image": "imagenescartas/Mundo1/236.jpg"
-  },
-  {
-    "id": 303,
-    "name": "Riryoku",
-    "kind": "SPELL",
-    "value": "RIRYOKU",
-    "text": "Target 2 face-up monsters on the field; halve the ATK of 1 monster, and if you do, add that lost ATK to the other monster. These effects last until the end of this turn.",
-    "image": "imagenescartas/Mundo1/237.jpg"
-  },
-  {
-    "id": 304,
-    "name": "The Claw of Hermos",
-    "kind": "SPELL",
-    "value": "THE_CLAW_OF_HERMOS",
-    "text": "(This card is also always treated as \"Legendary Dragon Hermos\".)\r\nSend 1 monster from your hand or field to the GY, of the Type that is listed on a Fusion Monster that can only be Special Summoned with \"The Claw of Hermos\" (if that card is Set, reveal it), then Special Summon that Fusion Monster from your Extra Deck. You can only activate 1 \"The Claw of Hermos\" per turn.",
-    "image": "imagenescartas/Mundo1/238.jpg"
-  },
-  {
-    "id": 305,
-    "name": "Bottomless Trap Hole",
-    "kind": "TRAP",
-    "value": "BOTTOMLESS_TRAP_HOLE",
-    "text": "When your opponent Summons a monster(s) with 1500 or more ATK: Destroy that monster(s) with 1500 or more ATK, and if you do, banish it.",
-    "image": "imagenescartas/Mundo1/239.jpg"
-  },
-  {
-    "id": 306,
-    "name": "Drop Off",
-    "kind": "TRAP",
-    "value": "DROP_OFF",
-    "text": "When your opponent draws for their normal draw in their Draw Phase: Your opponent discards 1 card they just drew.",
-    "image": "imagenescartas/Mundo1/240.jpg"
-  },
-  {
-    "id": 307,
-    "name": "Fairy Box",
-    "kind": "TRAP",
-    "value": "FAIRY_BOX",
-    "text": "When your opponent's monster declares an attack: Toss a coin and call it. If you call it right, the attacking monster's ATK becomes 0 until the end of the Battle Phase. During each of your Standby Phases, pay 500 Life Points or destroy this card.",
-    "image": "imagenescartas/Mundo1/241.jpg"
-  },
-  {
-    "id": 308,
-    "name": "Gamble",
-    "kind": "TRAP",
-    "value": "GAMBLE",
-    "text": "You can only activate this card when your opponent's hand is 6 or more cards and your hand is 2 or less. Toss a coin and call heads or tails. If you call it right, draw until your hand has 5 cards. If you call it wrong, skip your next turn.",
-    "image": "imagenescartas/Mundo1/242.jpg"
-  },
-  {
-    "id": 309,
-    "name": "Graverobber",
-    "kind": "TRAP",
-    "value": "GRAVEROBBER",
-    "text": "Select 1 Spell Card from your opponent's Graveyard. You can use it as your hand until the end of the turn. If you use it, you take 2000 points of damage.",
-    "image": "imagenescartas/Mundo1/243.jpg"
-  },
-  {
-    "id": 310,
-    "name": "Kunai with Chain",
-    "kind": "TRAP",
-    "value": "KUNAI_WITH_CHAIN",
-    "text": "Activate 1 or both of these effects (simultaneously).\n● When an opponent's monster declares an attack: Target the attacking monster; change that target to Defense Position.\n● Target 1 face-up monster you control; equip this card to that target. It gains 500 ATK.",
-    "image": "imagenescartas/Mundo1/244.jpg"
-  },
-  {
-    "id": 311,
-    "name": "Magical Arm Shield",
-    "kind": "TRAP",
-    "value": "MAGICAL_ARM_SHIELD",
-    "text": "When your opponent declares an attack while you control a monster: Target 1 face-up monster your opponent controls, except the attacking monster; take control of that target until the end of the Battle Phase, and if you do, it is attacked instead, and you proceed to damage calculation.",
-    "image": "imagenescartas/Mundo1/245.jpg"
-  },
-  {
-    "id": 312,
-    "name": "Metalmorph",
-    "kind": "TRAP",
-    "value": "METALMORPH",
-    "text": "Target 1 face-up monster on the field; equip this card to that target. It gains 300 ATK/DEF. If it attacks, it gains ATK equal to half the ATK of the attack target, during damage calculation only.",
-    "image": "imagenescartas/Mundo1/246.jpg"
-  },
-  {
-    "id": 313,
-    "name": "Skull Dice",
-    "kind": "TRAP",
-    "value": "SKULL_DICE",
-    "text": "Roll a six-sided die. All monsters your opponent currently controls lose ATK/DEF equal to the result x 100, until the end of this turn.",
-    "image": "imagenescartas/Mundo1/247.jpg"
-  },
-  {
-    "id": 314,
-    "name": "Trap Hole of Spikes",
-    "kind": "TRAP",
-    "value": "TRAP_HOLE_OF_SPIKES",
-    "text": "When an opponent's monster that was Normal or Special Summoned this turn declares an attack: Destroy that attacking monster, and if you do, inflict damage to your opponent equal to half the original ATK of that monster.",
-    "image": "imagenescartas/Mundo1/248.jpg"
   },
   {
     "id": 315,
@@ -2563,92 +2157,12 @@
     "sign2": "PLUTON"
   },
   {
-    "id": 333,
-    "name": "Card of Sanctity",
-    "kind": "SPELL",
-    "value": "CARD_OF_SANCTITY",
-    "text": "Banish all other cards you control and in your hand (min. 1 from each); draw until you have 2 cards in your hand.",
-    "image": "imagenescartas/Mundo1/263.jpg"
-  },
-  {
-    "id": 334,
-    "name": "Cost Down",
-    "kind": "SPELL",
-    "value": "COST_DOWN",
-    "text": "Discard 1 card; for the rest of this turn, reduce the Levels of all monsters in your hand by 2 (even after they are Summoned).",
-    "image": "imagenescartas/Mundo1/264.jpg"
-  },
-  {
     "id": 335,
     "name": "Fissure",
     "kind": "SPELL",
     "value": "FISSURE",
     "text": "Destroy the 1 face-up monster your opponent controls that has the lowest ATK (your choice, if tied).",
     "image": "imagenescartas/Mundo1/265.jpg"
-  },
-  {
-    "id": 336,
-    "name": "Shine Palace",
-    "kind": "SPELL",
-    "value": "SHINE_PALACE",
-    "text": "Equip only to a LIGHT monster. It gains 700 ATK.",
-    "image": "imagenescartas/Mundo1/266.jpg"
-  },
-  {
-    "id": 337,
-    "name": "Snatch Steal",
-    "kind": "SPELL",
-    "value": "SNATCH_STEAL",
-    "text": "Equip only to a monster your opponent controls. Take control of the equipped monster. During each of your opponent's Standby Phases: They gain 1000 Life Points.",
-    "image": "imagenescartas/Mundo1/267.jpg"
-  },
-  {
-    "id": 338,
-    "name": "Toon Table of Contents",
-    "kind": "SPELL",
-    "value": "TOON_TABLE_OF_CONTENTS",
-    "text": "Add 1 \"Toon\" card from your Deck to your hand.",
-    "image": "imagenescartas/Mundo1/268.jpg"
-  },
-  {
-    "id": 339,
-    "name": "Toon World",
-    "kind": "SPELL",
-    "value": "TOON_WORLD",
-    "text": "Activate this card by paying 1000 LP.",
-    "image": "imagenescartas/Mundo1/269.jpg"
-  },
-  {
-    "id": 340,
-    "name": "Jar of Greed",
-    "kind": "TRAP",
-    "value": "JAR_OF_GREED",
-    "text": "Draw 1 card.",
-    "image": "imagenescartas/Mundo1/270.jpg"
-  },
-  {
-    "id": 341,
-    "name": "Solemn Judgment",
-    "kind": "TRAP",
-    "value": "SOLEMN_JUDGMENT",
-    "text": "When a monster(s) would be Summoned, OR a Spell/Trap Card is activated: Pay half your LP; negate the Summon or activation, and if you do, destroy that card.",
-    "image": "imagenescartas/Mundo1/271.jpg"
-  },
-  {
-    "id": 342,
-    "name": "Toon Defense",
-    "kind": "TRAP",
-    "value": "TOON_DEFENSE",
-    "text": "When an opponent's monster declares an attack targeting a face-up Level 4 or lower Toon Monster you control: You can make the attack a direct attack instead.",
-    "image": "imagenescartas/Mundo1/272.jpg"
-  },
-  {
-    "id": 343,
-    "name": "Ultimate Offering",
-    "kind": "TRAP",
-    "value": "ULTIMATE_OFFERING",
-    "text": "During your Main Phase or your opponent's Battle Phase: You can pay 500 Life Points; immediately after this effect resolves, Normal Summon/Set 1 monster.",
-    "image": "imagenescartas/Mundo1/273.jpg"
   },
   {
     "id": 344,
@@ -2897,30 +2411,6 @@
     "image": "imagenescartas/Mundo1/291.jpg"
   },
   {
-    "id": 362,
-    "name": "Dark Sanctuary",
-    "kind": "SPELL",
-    "value": "DARK_SANCTUARY",
-    "text": "If a \"Spirit Message\" card would be placed on your field with \"Destiny Board\", you can Special Summon it as a Normal Monster (Fiend/DARK/Level 1/ATK 0/DEF 0) instead, and if you do, it is unaffected by card effects, except \"Destiny Board\", and cannot be targeted for attacks, but does not prevent your opponent from attacking you directly. When an opponent's monster declares an attack: Toss a coin and if the result is heads, negate the attack, and if you do, inflict damage to your opponent equal to half the current ATK of that opponent's monster.",
-    "image": "imagenescartas/Mundo1/292.jpg"
-  },
-  {
-    "id": 363,
-    "name": "Dark Spirit's Mastery",
-    "kind": "SPELL",
-    "value": "DARK_SPIRIT_S_MASTERY",
-    "text": "Discard 1 card; add 1 \"Destiny Board\" or 1 Level 8 Fiend monster from your Deck or GY to your hand. You can banish this card from your GY, except the turn this card was sent to the GY; place any number of \"Destiny Board\" and/or \"Spirit Message\" cards with different names from your hand or GY on the bottom of the Deck in any order, then draw the same number of cards. You can only use each effect of \"Dark Spirit's Mastery\" once per turn.",
-    "image": "imagenescartas/Mundo1/293.jpg"
-  },
-  {
-    "id": 364,
-    "name": "Exchange",
-    "kind": "SPELL",
-    "value": "EXCHANGE",
-    "text": "Both players reveal their hands and add 1 card from each other's hand to their hand.",
-    "image": "imagenescartas/Mundo1/294.jpg"
-  },
-  {
     "id": 365,
     "name": "Mage Power",
     "kind": "EQUIP",
@@ -2935,86 +2425,6 @@
     "value": "MYSTICAL_SPACE_TYPHOON",
     "text": "Target 1 Spell/Trap on the field; destroy that target.",
     "image": "imagenescartas/Mundo1/296.jpg"
-  },
-  {
-    "id": 367,
-    "name": "Spirit Message \"A\"",
-    "kind": "SPELL",
-    "value": "SPIRIT_MESSAGE_A_",
-    "text": "This card can only be placed on the field by the effect of \"Destiny Board\".",
-    "image": "imagenescartas/Mundo1/297.jpg"
-  },
-  {
-    "id": 368,
-    "name": "Spirit Message \"I\"",
-    "kind": "SPELL",
-    "value": "SPIRIT_MESSAGE_I_",
-    "text": "This card can only be placed on the field by the effect of \"Destiny Board\".",
-    "image": "imagenescartas/Mundo1/298.jpg"
-  },
-  {
-    "id": 369,
-    "name": "Spirit Message \"L\"",
-    "kind": "SPELL",
-    "value": "SPIRIT_MESSAGE_L_",
-    "text": "This card can only be placed on the field by the effect of \"Destiny Board\".",
-    "image": "imagenescartas/Mundo1/299.jpg"
-  },
-  {
-    "id": 370,
-    "name": "Spirit Message \"N\"",
-    "kind": "SPELL",
-    "value": "SPIRIT_MESSAGE_N_",
-    "text": "This card can only be placed on the field by the effect of \"Destiny Board\".",
-    "image": "imagenescartas/Mundo1/300.jpg"
-  },
-  {
-    "id": 371,
-    "name": "The Dark Door",
-    "kind": "SPELL",
-    "value": "THE_DARK_DOOR",
-    "text": "Only 1 monster can attack during each Battle Phase.",
-    "image": "imagenescartas/Mundo1/301.jpg"
-  },
-  {
-    "id": 372,
-    "name": "The Shallow Grave",
-    "kind": "SPELL",
-    "value": "THE_SHALLOW_GRAVE",
-    "text": "Each player targets 1 monster in their own GY; each player Special Summons the target from their GY in face-down Defense Position.",
-    "image": "imagenescartas/Mundo1/302.jpg"
-  },
-  {
-    "id": 373,
-    "name": "Dark Spirit of the Silent",
-    "kind": "TRAP",
-    "value": "DARK_SPIRIT_OF_THE_SILENT",
-    "text": "Activate only when an opponent's monster declares an attack. Negate that attack, and select another face-up monster your opponent controls. That monster attacks instead. (If it is in face-up Defense Position, change it to Attack Position.)",
-    "image": "imagenescartas/Mundo1/303.jpg"
-  },
-  {
-    "id": 374,
-    "name": "Destiny Board",
-    "kind": "TRAP",
-    "value": "DESTINY_BOARD",
-    "text": "When this card and all 4 \"Spirit Message\" cards with different names are placed on your field, you win the Duel. Once per turn, during your opponent's End Phase: Place 1 \"Spirit Message\" card from your hand or Deck in your Spell & Trap Zone face-up, in the proper order of \"I\", \"N\", \"A\", and \"L\". When any \"Spirit Message\" card or \"Destiny Board\" you control leaves the field, send all \"Spirit Message\" cards and \"Destiny Board\" you control to the Graveyard.",
-    "image": "imagenescartas/Mundo1/304.jpg"
-  },
-  {
-    "id": 375,
-    "name": "Sentence of Doom",
-    "kind": "TRAP",
-    "value": "SENTENCE_OF_DOOM",
-    "text": "You can target any number of your Fiend monsters that are banished or in your GY, up to the number of \"Destiny Board\" and/or \"Spirit Message\" cards you control; add them to your hand. You can send this card from your Spell & Trap Zone to the GY; place 1 \"Spirit Message\" card from your hand, Deck, or GY in your Spell & Trap Zone. (This is treated as being placed by the effect of \"Destiny Board\".) You can only use 1 \"Sentence of Doom\" effect per turn, and only once that turn.",
-    "image": "imagenescartas/Mundo1/305.jpg"
-  },
-  {
-    "id": 376,
-    "name": "Zoma the Spirit",
-    "kind": "TRAP",
-    "value": "ZOMA_THE_SPIRIT",
-    "text": "Special Summon this card in Defense Position as an Effect Monster (Zombie/DARK/Level 4/ATK 1800/DEF 500). (This card is also still a Trap.) If this card Summoned this way is destroyed by battle: Inflict damage to your opponent equal to the ATK of the monster that destroyed it.",
-    "image": "imagenescartas/Mundo1/306.jpg"
   },
   {
     "id": 377,
@@ -3269,126 +2679,6 @@
     "sign2": "LUNA"
   },
   {
-    "id": 395,
-    "name": "Card of Safe Return",
-    "kind": "SPELL",
-    "value": "CARD_OF_SAFE_RETURN",
-    "text": "When a monster is Special Summoned from your Graveyard, you can draw 1 card.",
-    "image": "imagenescartas/Mundo1/325.jpg"
-  },
-  {
-    "id": 396,
-    "name": "Jam Breeding Machine",
-    "kind": "SPELL",
-    "value": "JAM_BREEDING_MACHINE",
-    "text": "During each of your Standby Phases: Special Summon 1 \"Slime Token\" (Aqua-Type/WATER/LEVEL 1/ATK 500/DEF 500) in Attack Position. You cannot Summon any monsters, except \"Slime Tokens\" (but you can Set).",
-    "image": "imagenescartas/Mundo1/326.jpg"
-  },
-  {
-    "id": 397,
-    "name": "Left Arm Offering",
-    "kind": "SPELL",
-    "value": "LEFT_ARM_OFFERING",
-    "text": "If you have 2 or more other cards in your hand: Banish your entire hand; add 1 Spell from your Deck to your hand. You cannot Set Spells/Traps during the turn you activate this card.",
-    "image": "imagenescartas/Mundo1/327.jpg"
-  },
-  {
-    "id": 398,
-    "name": "Machine Duplication",
-    "kind": "SPELL",
-    "value": "MACHINE_DUPLICATION",
-    "text": "Target 1 Machine monster you control with 500 or less ATK; Special Summon up to 2 monsters from your Deck with the same name as that face-up monster.",
-    "image": "imagenescartas/Mundo1/328.jpg"
-  },
-  {
-    "id": 399,
-    "name": "Magical Stone Excavation",
-    "kind": "SPELL",
-    "value": "MAGICAL_STONE_EXCAVATION",
-    "text": "Discard 2 cards, then target 1 Spell in your GY; add it to your hand.",
-    "image": "imagenescartas/Mundo1/329.jpg"
-  },
-  {
-    "id": 400,
-    "name": "Nightmare's Steelcage",
-    "kind": "SPELL",
-    "value": "NIGHTMARE_S_STEELCAGE",
-    "text": "This card remains on the field for 2 of your opponent's turns. While this card is face-up on the field, no monsters can attack.",
-    "image": "imagenescartas/Mundo1/330.jpg"
-  },
-  {
-    "id": 401,
-    "name": "Coffin Seller",
-    "kind": "TRAP",
-    "value": "COFFIN_SELLER",
-    "text": "Each time a monster(s) is sent to your opponent's GY: Inflict 300 damage to your opponent.",
-    "image": "imagenescartas/Mundo1/331.jpg"
-  },
-  {
-    "id": 402,
-    "name": "Dark Spell Regeneration",
-    "kind": "TRAP",
-    "value": "DARK_SPELL_REGENERATION",
-    "text": "When an opponent's monster declares an attack: Target 1 Spell in your opponent's GY; Set it to your field. You can banish this card from your GY and send 1 \"Monster Reborn\" from your hand or Set on your field to the GY; Special Summon 1 \"The Winged Dragon of Ra\" from your GY ignoring its Summoning conditions, then you can send 1 monster your opponent controls to the GY, also send that Special Summoned monster to the GY during the End Phase.",
-    "image": "imagenescartas/Mundo1/332.jpg"
-  },
-  {
-    "id": 403,
-    "name": "Fiend's Hand Mirror",
-    "kind": "TRAP",
-    "value": "FIEND_S_HAND_MIRROR",
-    "text": "Switch the opponent's Spell Card effect that targets 1 Spell or Trap Card to another correct target.",
-    "image": "imagenescartas/Mundo1/333.jpg"
-  },
-  {
-    "id": 404,
-    "name": "Hidden Soldiers",
-    "kind": "TRAP",
-    "value": "HIDDEN_SOLDIERS",
-    "text": "When your opponent Normal or Flip Summons a monster: Special Summon 1 Level 4 or lower DARK monster from your hand.",
-    "image": "imagenescartas/Mundo1/334.jpg"
-  },
-  {
-    "id": 405,
-    "name": "Jam Defender",
-    "kind": "TRAP",
-    "value": "JAM_DEFENDER",
-    "text": "When an opponent's monster declares an attack on a monster you control: You can target 1 \"Revival Jam\" you control; switch the attack target to that target.",
-    "image": "imagenescartas/Mundo1/335.jpg"
-  },
-  {
-    "id": 406,
-    "name": "Metal Reflect Slime",
-    "kind": "TRAP",
-    "value": "METAL_REFLECT_SLIME",
-    "text": "Special Summon this card in Defense Position as an Effect Monster (Aqua/WATER/Level 10/ATK 0/DEF 3000). (This card is also still a Trap.) This card cannot attack.",
-    "image": "imagenescartas/Mundo1/336.jpg"
-  },
-  {
-    "id": 407,
-    "name": "Nightmare Wheel",
-    "kind": "TRAP",
-    "value": "NIGHTMARE_WHEEL",
-    "text": "Activate this card by targeting 1 monster your opponent controls; it cannot attack or change its battle position. When it leaves the field, destroy this card. Once per turn, during your Standby Phase: Inflict 500 damage to your opponent. That monster must be on the field to activate and to resolve this effect.",
-    "image": "imagenescartas/Mundo1/337.jpg"
-  },
-  {
-    "id": 408,
-    "name": "Relieve Monster",
-    "kind": "TRAP",
-    "value": "RELIEVE_MONSTER",
-    "text": "When an opponent's monster declares an attack: Target 1 monster you control; return that target to the hand, then Special Summon 1 Level 4 monster from your hand.",
-    "image": "imagenescartas/Mundo1/338.jpg"
-  },
-  {
-    "id": 409,
-    "name": "Rope of Life",
-    "kind": "TRAP",
-    "value": "ROPE_OF_LIFE",
-    "text": "When a monster(s) is destroyed by battle and sent to your GY: Discard your entire hand (min.1), then target 1 of those monsters; Special Summon it, and if you do, it gains 800 ATK.",
-    "image": "imagenescartas/Mundo1/339.jpg"
-  },
-  {
     "id": 410,
     "name": "Egyptian God Slime",
     "level": 10,
@@ -3641,86 +2931,6 @@
     "sign2": "LUNA"
   },
   {
-    "id": 428,
-    "name": "Cyclon Laser",
-    "kind": "SPELL",
-    "value": "CYCLON_LASER",
-    "text": "You can only equip this card to \"Gradius\". Increase the ATK of \"Gradius\" by 300 points. When the equipped \"Gradius\" attacks with an ATK that is higher than the DEF of a Defense Position monster, inflict the difference as Battle Damage to your opponent's Life Points.",
-    "image": "imagenescartas/Mundo1/358.jpg"
-  },
-  {
-    "id": 429,
-    "name": "Mirror of Yata",
-    "kind": "SPELL",
-    "value": "MIRROR_OF_YATA",
-    "text": "Equip only to a Spirit monster. The equipped monster does not have to have its effect that returns it to the hand activated. If it would be destroyed by battle, destroy this card instead.",
-    "image": "imagenescartas/Mundo1/359.jpg"
-  },
-  {
-    "id": 430,
-    "name": "Orb of Yasaka",
-    "kind": "SPELL",
-    "value": "ORB_OF_YASAKA",
-    "text": "Equip only to a Spirit monster. When it destroys an opponent's monster by battle and sends it to the Graveyard, gain Life Points equal to that monster's original ATK. When the equipped monster you control is returned to the hand and this card is sent to the Graveyard, return this card to your hand.",
-    "image": "imagenescartas/Mundo1/360.jpg"
-  },
-  {
-    "id": 431,
-    "name": "Sebek's Blessing",
-    "kind": "SPELL",
-    "value": "SEBEK_S_BLESSING",
-    "text": "If your monster inflicts battle damage to your opponent by a direct attack: Gain the same amount of LP.",
-    "image": "imagenescartas/Mundo1/361.jpg"
-  },
-  {
-    "id": 432,
-    "name": "Spiritual Energy Settle Machine",
-    "kind": "SPELL",
-    "value": "SPIRITUAL_ENERGY_SETTLE_MACHINE",
-    "text": "As long as this card remains face-up on the field, all Spirit monsters remain face-up on the field and do not return to their owners' hands during the End Phase even if they are Normal Summoned or flipped face-up. Discard 1 card from your hand during each of your End Phases. If you do not, destroy this card. When this card is removed from the field, all face-up Spirit monsters return to the owners' hands.",
-    "image": "imagenescartas/Mundo1/362.jpg"
-  },
-  {
-    "id": 433,
-    "name": "Spiritual Entanglement",
-    "kind": "SPELL",
-    "value": "SPIRITUAL_ENTANGLEMENT",
-    "text": "Target 1 face-up monster your opponent controls; banish it until the End Phase. You can only activate 1 \"Spiritual Entanglement\" per turn.",
-    "image": "imagenescartas/Mundo1/363.jpg"
-  },
-  {
-    "id": 434,
-    "name": "Spring of Rebirth",
-    "kind": "SPELL",
-    "value": "SPRING_OF_REBIRTH",
-    "text": "Increase your Life Points by 500 points every time monsters return from the field to the owner's hand.",
-    "image": "imagenescartas/Mundo1/364.jpg"
-  },
-  {
-    "id": 435,
-    "name": "Sword of Kusanagi",
-    "kind": "SPELL",
-    "value": "SWORD_OF_KUSANAGI",
-    "text": "Equip only to a Spirit monster. During battle, when it attacks a Defense Position monster whose DEF is lower than the ATK of the equipped monster, inflict the difference as Battle Damage to your opponent. When the equipped monster you control is returned to the hand and this card is sent to the Graveyard, return this card to your hand.",
-    "image": "imagenescartas/Mundo1/365.jpg"
-  },
-  {
-    "id": 436,
-    "name": "Tribute to the Doomed",
-    "kind": "SPELL",
-    "value": "TRIBUTE_TO_THE_DOOMED",
-    "text": "Discard 1 card, then target 1 monster on the field; destroy it.",
-    "image": "imagenescartas/Mundo1/366.jpg"
-  },
-  {
-    "id": 437,
-    "name": "Legacy of Yata-Garasu",
-    "kind": "TRAP",
-    "value": "LEGACY_OF_YATA_GARASU",
-    "text": "Activate 1 of these effects:\n● Draw 1 card.\n● Activate only if your opponent controls a face-up Spirit monster. Draw 2 cards.",
-    "image": "imagenescartas/Mundo1/367.jpg"
-  },
-  {
     "id": 438,
     "name": "Agido",
     "kind": "MONSTER",
@@ -3931,86 +3141,6 @@
     "sign2": "SOL"
   },
   {
-    "id": 453,
-    "name": "Cestus of Dagla",
-    "kind": "SPELL",
-    "value": "CESTUS_OF_DAGLA",
-    "text": "Equip only to a Fairy-Type monster. It gains 500 ATK. If it inflicts battle damage to your opponent: Gain LP equal to the damage inflicted.",
-    "image": "imagenescartas/Mundo1/383.jpg"
-  },
-  {
-    "id": 454,
-    "name": "Dragged Down into the Grave",
-    "kind": "SPELL",
-    "value": "DRAGGED_DOWN_INTO_THE_GRAVE",
-    "text": "Both players reveal their hands, each chooses 1 card from their opponent's hand, then you discard the chosen cards from both players' hands, then both players draw 1 card.",
-    "image": "imagenescartas/Mundo1/384.jpg"
-  },
-  {
-    "id": 455,
-    "name": "Gold Sarcophagus",
-    "kind": "SPELL",
-    "value": "GOLD_SARCOPHAGUS",
-    "text": "Banish 1 card from your Deck, face-up. During your second Standby Phase after this card's activation, add that card to the hand.",
-    "image": "imagenescartas/Mundo1/385.jpg"
-  },
-  {
-    "id": 456,
-    "name": "Spell Reproduction",
-    "kind": "SPELL",
-    "value": "SPELL_REPRODUCTION",
-    "text": "Send 2 Spells from your hand to the GY, then target 1 Spell in your GY; add it to your hand.",
-    "image": "imagenescartas/Mundo1/386.jpg"
-  },
-  {
-    "id": 457,
-    "name": "Blast Held by a Tribute",
-    "kind": "TRAP",
-    "value": "BLAST_HELD_BY_A_TRIBUTE",
-    "text": "When an opponent's monster that was Tribute Summoned declares an attack: Destroy as many face-up Attack Position monsters they control as possible, and if you do, inflict 1000 damage to your opponent.",
-    "image": "imagenescartas/Mundo1/387.jpg"
-  },
-  {
-    "id": 458,
-    "name": "Blast Held by Destiny",
-    "kind": "TRAP",
-    "value": "BLAST_HELD_BY_DESTINY",
-    "text": "When an opponent's monster declares an attack: Destroy the 1 monster your opponent controls with the highest ATK (your choice, if tied), and if you do, inflict damage to your opponent equal to its original ATK, then if \"Exchange of the Spirit\" is not in your GY, you take damage equal to the damage they took. If this card is sent from the hand or Deck to the GY: You can target 1 Level 4 EARTH Fairy monster in your GY; add it to your hand. You can only use each effect of \"Blast Held by Destiny\" once per turn.",
-    "image": "imagenescartas/Mundo1/388.jpg"
-  },
-  {
-    "id": 459,
-    "name": "Exchange of Despair and Hope",
-    "kind": "TRAP",
-    "value": "EXCHANGE_OF_DESPAIR_AND_HOPE",
-    "text": "If you control 3 or more EARTH Fairy monsters: Send as many monsters from the field to the GY as possible (min. 1), then each player can Special Summon monsters from their opponent's GY to their own field, up to the number of monsters sent to their opponent's GY by this effect, then, if a monster was Special Summoned by this effect and \"Exchange of the Spirit\" is in your GY, you can Set 1 Trap directly from your Deck. It can be activated this turn. You can only activate 1 \"Exchange of Despair and Hope\" per turn.",
-    "image": "imagenescartas/Mundo1/389.jpg"
-  },
-  {
-    "id": 460,
-    "name": "Exchange of the Spirit",
-    "kind": "TRAP",
-    "value": "EXCHANGE_OF_THE_SPIRIT",
-    "text": "If both players have 15 or more cards in their Graveyards: Pay 1000 LP; each player swaps the cards in their Graveyard with the cards in their Deck, then shuffles their Deck. You can only activate 1 \"Exchange of the Spirit\" per Duel.",
-    "image": "imagenescartas/Mundo1/390.jpg"
-  },
-  {
-    "id": 461,
-    "name": "Gravekeeper's Trap",
-    "kind": "TRAP",
-    "value": "GRAVEKEEPER_S_TRAP",
-    "text": "While \"Exchange of the Spirit\" is in your GY, your opponent cannot activate the effects of cards in the GY, or Special Summon monsters from the GY. You can only use each of the following effects of \"Gravekeeper's Trap\" once per turn. During the Main Phase: You can discard 1 card; add 1 \"Gravekeeper's\" or EARTH Fairy monster from your Deck to your hand. During your opponent's Draw Phase, before their normal draw, if this card is already face-up on the field: Declare 1 card name; look at the card(s) drawn for their normal draw, and if it was the declared card, send it to the GY.",
-    "image": "imagenescartas/Mundo1/391.jpg"
-  },
-  {
-    "id": 462,
-    "name": "Muko",
-    "kind": "TRAP",
-    "value": "MUKO",
-    "text": "Activate only when an effect of drawing card(s) is activated. Both players see the cards drawn by the effect and discard them all to the Graveyard.",
-    "image": "imagenescartas/Mundo1/392.jpg"
-  },
-  {
     "id": 463,
     "name": "A Man with Wdjat",
     "kind": "MONSTER",
@@ -4177,86 +3307,6 @@
     "image": "imagenescartas/Mundo1/404.jpg",
     "sign1": "LUNA",
     "sign2": "SATURNO"
-  },
-  {
-    "id": 475,
-    "name": "Temple of the Kings",
-    "kind": "SPELL",
-    "value": "TEMPLE_OF_THE_KINGS",
-    "text": "You can activate 1 Trap Card the turn it was Set. You can send 1 \"Mystical Beast of Serket\" in your Monster Zone and this card you control to the Graveyard; Special Summon 1 monster from your hand or Deck, or 1 Fusion Monster from your Extra Deck. You can only use each effect of \"Temple of the Kings\" once per turn.",
-    "image": "imagenescartas/Mundo1/405.jpg"
-  },
-  {
-    "id": 476,
-    "name": "Apophis the Swamp Deity",
-    "kind": "TRAP",
-    "value": "APOPHIS_THE_SWAMP_DEITY",
-    "text": "During the Main Phase: Special Summon this card as a Normal Monster (Reptile/EARTH/Level 6/ATK 2000/DEF 2200) (this card is also still a Trap), then, you can negate the effects of face-up cards your opponent controls, up to the number of other Continuous Traps you control, until the end of this turn.",
-    "image": "imagenescartas/Mundo1/406.jpg"
-  },
-  {
-    "id": 477,
-    "name": "Call of the Haunted",
-    "kind": "TRAP",
-    "value": "CALL_OF_THE_HAUNTED",
-    "text": "Activate this card by targeting 1 monster in your GY; Special Summon that target in Attack Position. When this card leaves the field, destroy that monster. When that monster is destroyed, destroy this card.",
-    "image": "imagenescartas/Mundo1/407.jpg"
-  },
-  {
-    "id": 478,
-    "name": "Curse of Anubis",
-    "kind": "TRAP",
-    "value": "CURSE_OF_ANUBIS",
-    "text": "Change all Effect Monsters on the field to Defense Position. Until the end of this turn, the original DEF of those monsters becomes 0, also their battle positions cannot be changed.",
-    "image": "imagenescartas/Mundo1/408.jpg"
-  },
-  {
-    "id": 479,
-    "name": "Embodiment of Apophis",
-    "kind": "TRAP",
-    "value": "EMBODIMENT_OF_APOPHIS",
-    "text": "During either player's Main Phase: Special Summon this card as a Normal Monster (Reptile-Type/EARTH/Level 4/ATK 1600/DEF 1800). (This card is also still a Trap Card.)",
-    "image": "imagenescartas/Mundo1/409.jpg"
-  },
-  {
-    "id": 480,
-    "name": "Judgment of Anubis",
-    "kind": "TRAP",
-    "value": "JUDGMENT_OF_ANUBIS",
-    "text": "When your opponent activates a Spell Card that would destroy a Spell/Trap Card(s) on the field: Discard 1 card; negate the activation, and if you do, destroy it, then you can destroy 1 face-up monster your opponent controls, and if you do that, inflict damage to your opponent equal to the destroyed monster's ATK on the field.",
-    "image": "imagenescartas/Mundo1/410.jpg"
-  },
-  {
-    "id": 481,
-    "name": "Magic Jammer",
-    "kind": "TRAP",
-    "value": "MAGIC_JAMMER",
-    "text": "When a Spell Card is activated: Discard 1 card; negate the activation, and if you do, destroy it.",
-    "image": "imagenescartas/Mundo1/411.jpg"
-  },
-  {
-    "id": 482,
-    "name": "Ordeal of a Traveler",
-    "kind": "TRAP",
-    "value": "ORDEAL_OF_A_TRAVELER",
-    "text": "When an opponent's monster declares an attack: Your opponent chooses 1 random card in your hand and calls the type of the card (Monster, Spell, or Trap), and if they call it wrong, return the attacking monster to the hand.",
-    "image": "imagenescartas/Mundo1/412.jpg"
-  },
-  {
-    "id": 483,
-    "name": "Raigeki Break",
-    "kind": "TRAP",
-    "value": "RAIGEKI_BREAK",
-    "text": "Discard 1 card, then target 1 card on the field; destroy it.",
-    "image": "imagenescartas/Mundo1/413.jpg"
-  },
-  {
-    "id": 484,
-    "name": "Statue of the Wicked",
-    "kind": "TRAP",
-    "value": "STATUE_OF_THE_WICKED",
-    "text": "When this face-down card is destroyed and sent to the Graveyard, Special Summon 1 \"Wicked Token\" (Fiend-Type/DARK/Level 4/ATK 1000/DEF 1000) on your side of the field.",
-    "image": "imagenescartas/Mundo1/414.jpg"
   },
   {
     "id": 485,
@@ -4512,116 +3562,12 @@
     "sign2": "PLUTON"
   },
   {
-    "id": 503,
-    "name": "Card of Demise",
-    "kind": "SPELL",
-    "value": "CARD_OF_DEMISE",
-    "text": "Draw until you have 3 cards in your hand, also for the rest of this turn after this card resolves, your opponent takes no damage. During the End Phase of this turn, send your entire hand to the GY. You can only activate 1 \"Card of Demise\" per turn. You cannot Special Summon during the turn you activate this card.",
-    "image": "imagenescartas/Mundo1/433.jpg"
-  },
-  {
-    "id": 504,
-    "name": "Enemy Controller",
-    "kind": "SPELL",
-    "value": "ENEMY_CONTROLLER",
-    "text": "Activate 1 of these effects.\n● Target 1 face-up monster your opponent controls; change that target's battle position.\n● Tribute 1 monster, then target 1 face-up monster your opponent controls; take control of that target until the End Phase.",
-    "image": "imagenescartas/Mundo1/434.jpg"
-  },
-  {
-    "id": 505,
-    "name": "Ring of Defense",
-    "kind": "SPELL",
-    "value": "RING_OF_DEFENSE",
-    "text": "When a Trap effect that inflicts damage is activated: Make that effect damage 0.",
-    "image": "imagenescartas/Mundo1/435.jpg"
-  },
-  {
-    "id": 506,
-    "name": "Shrink",
-    "kind": "SPELL",
-    "value": "SHRINK",
-    "text": "Target 1 face-up monster on the field; its original ATK becomes halved until the end of this turn.",
-    "image": "imagenescartas/Mundo1/436.jpg"
-  },
-  {
-    "id": 507,
-    "name": "Soul Exchange",
-    "kind": "SPELL",
-    "value": "SOUL_EXCHANGE",
-    "text": "Target 1 monster your opponent controls; this turn, if you Tribute a monster, you must Tribute that target, as if you controlled it. You cannot conduct your Battle Phase the turn you activate this card.",
-    "image": "imagenescartas/Mundo1/437.jpg"
-  },
-  {
-    "id": 508,
-    "name": "The Fang of Critias",
-    "kind": "SPELL",
-    "value": "THE_FANG_OF_CRITIAS",
-    "text": "(This card is also always treated as \"Legendary Dragon Critias\".)\r\nSend 1 Trap from your hand or field to the GY, that is listed on a Fusion Monster that can only be Special Summoned with \"The Fang of Critias\" (if that card is Set, reveal it), then Special Summon that Fusion Monster from your Extra Deck. You can only activate 1 \"The Fang of Critias\" per turn.",
-    "image": "imagenescartas/Mundo1/438.jpg"
-  },
-  {
-    "id": 509,
-    "name": "The Flute of Summoning Dragon",
-    "kind": "SPELL",
-    "value": "THE_FLUTE_OF_SUMMONING_DRAGON",
-    "text": "Special Summon up to 2 Dragon monsters from your hand. \"Lord of D.\" must be on the field to activate and to resolve this effect.",
-    "image": "imagenescartas/Mundo1/439.jpg"
-  },
-  {
-    "id": 510,
-    "name": "White Dragon Ritual",
-    "kind": "SPELL",
-    "value": "WHITE_DRAGON_RITUAL",
-    "text": "This card is used to Ritual Summon \"Paladin of White Dragon\". You must also Tribute monsters from your hand or field whose total Levels equal 4 or more.",
-    "image": "imagenescartas/Mundo1/440.jpg"
-  },
-  {
     "id": 511,
     "name": "Crush Card Virus",
     "kind": "TRAP",
     "value": "CRUSH_CARD_VIRUS",
     "text": "Tribute 1 DARK monster with 1000 or less ATK; your opponent takes no damage until the end of the next turn after this card resolves, also, you look at your opponent's hand and all monsters they control, and if you do, destroy the monsters among them with 1500 or more ATK, then your opponent can destroy up to 3 monsters with 1500 or more ATK in their Deck.",
     "image": "imagenescartas/Mundo1/441.jpg"
-  },
-  {
-    "id": 512,
-    "name": "Dragon's Rage",
-    "kind": "TRAP",
-    "value": "DRAGON_S_RAGE",
-    "text": "Dragon-Type monsters you control inflict piercing Battle Damage when they attack a Defense Position monster.",
-    "image": "imagenescartas/Mundo1/442.jpg"
-  },
-  {
-    "id": 513,
-    "name": "Interdimensional Matter Transporter",
-    "kind": "TRAP",
-    "value": "INTERDIMENSIONAL_MATTER_TRANSPORTER",
-    "text": "Target 1 face-up monster you control; banish that target until the End Phase.",
-    "image": "imagenescartas/Mundo1/443.jpg"
-  },
-  {
-    "id": 514,
-    "name": "Ring of Destruction",
-    "kind": "TRAP",
-    "value": "RING_OF_DESTRUCTION",
-    "text": "During your opponent's turn: Target 1 face-up monster your opponent controls whose ATK is less than or equal to their LP; destroy that face-up monster, and if you do, take damage equal to its original ATK, then inflict damage to your opponent, equal to the damage you took. You can only activate 1 \"Ring of Destruction\" per turn.",
-    "image": "imagenescartas/Mundo1/444.jpg"
-  },
-  {
-    "id": 515,
-    "name": "Shadow Spell",
-    "kind": "TRAP",
-    "value": "SHADOW_SPELL",
-    "text": "Activate this card by targeting 1 face-up monster your opponent controls; it loses 700 ATK, also it cannot attack or change its battle position. When it leaves the field, destroy this card.",
-    "image": "imagenescartas/Mundo1/445.jpg"
-  },
-  {
-    "id": 516,
-    "name": "Tyrant Wing",
-    "kind": "TRAP",
-    "value": "TYRANT_WING",
-    "text": "Target 1 Dragon monster on the field; equip this card to it. It gains 400 ATK/DEF, also it can make up to 2 attacks on monsters during each Battle Phase. Once per turn, during the End Phase, if the monster equipped with this card by this effect attacked an opponent's monster this turn: Destroy this card.",
-    "image": "imagenescartas/Mundo1/446.jpg"
   },
   {
     "id": 517,
@@ -4952,62 +3898,6 @@
     "sign2": "MERCURIO"
   },
   {
-    "id": 540,
-    "name": "Dark Magic Curtain",
-    "kind": "SPELL",
-    "value": "DARK_MAGIC_CURTAIN",
-    "text": "Pay half your LP; Special Summon 1 \"Dark Magician\" from your Deck. You cannot Summon other monsters the turn you activate this card (but you can Set).",
-    "image": "imagenescartas/Mundo1/470.jpg"
-  },
-  {
-    "id": 541,
-    "name": "Fiend's Sanctuary",
-    "kind": "SPELL",
-    "value": "FIEND_S_SANCTUARY",
-    "text": "Special Summon 1 \"Metal Fiend Token\" (Fiend/DARK/Level 1/ATK 0/DEF 0). It cannot attack. Your opponent takes any battle damage you would have taken from battles involving it. Once per turn, during your Standby Phase, pay 1000 LP or destroy this Token.",
-    "image": "imagenescartas/Mundo1/471.jpg"
-  },
-  {
-    "id": 542,
-    "name": "Magic Formula",
-    "kind": "SPELL",
-    "value": "MAGIC_FORMULA",
-    "text": "Equip only to \"Dark Magician\" or \"Dark Magician Girl\". It gains 700 ATK. If this card is sent from the field to the GY: Gain 1000 LP.",
-    "image": "imagenescartas/Mundo1/472.jpg"
-  },
-  {
-    "id": 543,
-    "name": "Thousand Knives",
-    "kind": "SPELL",
-    "value": "THOUSAND_KNIVES",
-    "text": "If you control \"Dark Magician\": Target 1 monster your opponent controls; destroy that target.",
-    "image": "imagenescartas/Mundo1/473.jpg"
-  },
-  {
-    "id": 544,
-    "name": "Black Illusion",
-    "kind": "TRAP",
-    "value": "BLACK_ILLUSION",
-    "text": "Until the end of this turn, all DARK Spellcaster-Type monsters with 2000 or more ATK you currently control cannot be destroyed by battle, their effects are negated, also they are unaffected by your opponent's card effects.",
-    "image": "imagenescartas/Mundo1/474.jpg"
-  },
-  {
-    "id": 545,
-    "name": "Dark Renewal",
-    "kind": "TRAP",
-    "value": "DARK_RENEWAL",
-    "text": "When your opponent Normal or Special Summons a monster(s): Target 1 of those monsters and 1 Spellcaster monster you control; send both monsters to the GY, then you can Special Summon 1 DARK Spellcaster monster from your Deck or GY.",
-    "image": "imagenescartas/Mundo1/475.jpg"
-  },
-  {
-    "id": 546,
-    "name": "Soul Rope",
-    "kind": "TRAP",
-    "value": "SOUL_ROPE",
-    "text": "When a monster you control is destroyed by a card effect and sent to the Graveyard (except during the Damage Step): Pay 1000 LP; Special Summon 1 Level 4 monster from your Deck.",
-    "image": "imagenescartas/Mundo1/476.jpg"
-  },
-  {
     "id": 547,
     "name": "Amulet Dragon",
     "kind": "FUSION",
@@ -5251,44 +4141,12 @@
     "sign2": "SATURNO"
   },
   {
-    "id": 564,
-    "name": "Contract with Exodia",
-    "kind": "SPELL",
-    "value": "CONTRACT_WITH_EXODIA",
-    "text": "If you have all 5 of \"Exodia the Forbidden One\", \"Right Arm of the Forbidden One\", \"Left Arm of the Forbidden One\", \"Right Leg of the Forbidden One\", and \"Left Leg of the Forbidden One\" in your Graveyard: Special Summon 1 \"Exodia Necross\" from your hand.",
-    "image": "imagenescartas/Mundo1/494.jpg"
-  },
-  {
-    "id": 565,
-    "name": "Painful Choice",
-    "kind": "SPELL",
-    "value": "PAINFUL_CHOICE",
-    "text": "Select 5 cards from your Deck and show them to your opponent. Your opponent selects 1 card among them. Add that card to your hand and discard the remaining cards to the Graveyard.",
-    "image": "imagenescartas/Mundo1/495.jpg"
-  },
-  {
     "id": 566,
     "name": "Polymerization",
     "kind": "SPELL",
     "value": "POLYMERIZATION",
     "text": "Fusion Summon 1 Fusion Monster from your Extra Deck, using monsters from your hand or field as Fusion Material.",
     "image": "imagenescartas/Mundo1/496.jpg"
-  },
-  {
-    "id": 567,
-    "name": "Remove Trap",
-    "kind": "SPELL",
-    "value": "REMOVE_TRAP",
-    "text": "Select 1 face-up Trap Card on the field and destroy it.",
-    "image": "imagenescartas/Mundo1/497.jpg"
-  },
-  {
-    "id": 568,
-    "name": "Obliterate!!!",
-    "kind": "TRAP",
-    "value": "OBLITERATE_",
-    "text": "You can target 1 monster on the field; send 1 \"Forbidden One\" monster or \"Exodia\" card from your hand or Deck to the Graveyard, and if you do, return that target to the hand. If this card is sent from the Spell & Trap Zone to the Graveyard: You can target 1 \"Forbidden One\" monster or \"Exodia\" card in your Graveyard; add it to your hand. You can only use 1 \"Obliterate!!!\" effect per turn, and only once that turn.",
-    "image": "imagenescartas/Mundo1/498.jpg"
   },
   {
     "id": 569,
@@ -5558,116 +4416,12 @@
     "sign2": "MARTE"
   },
   {
-    "id": 588,
-    "name": "A Legendary Ocean",
-    "kind": "SPELL",
-    "value": "A_LEGENDARY_OCEAN",
-    "text": "(This card's name is always treated as \"Umi\".)\r\nAll WATER monsters on the field gain 200 ATK/DEF. Reduce the Level of all WATER monsters in both players' hands and on the field by 1.",
-    "image": "imagenescartas/Mundo1/518.jpg"
-  },
-  {
-    "id": 589,
-    "name": "Dark-Piercing Light",
-    "kind": "SPELL",
-    "value": "DARK_PIERCING_LIGHT",
-    "text": "Flip all face-down monsters on your opponent's side of the field face-up.",
-    "image": "imagenescartas/Mundo1/519.jpg"
-  },
-  {
-    "id": 590,
-    "name": "Fury of Kairyu-Shin",
-    "kind": "SPELL",
-    "value": "FURY_OF_KAIRYU_SHIN",
-    "text": "Add 1 \"Torrential Tribute\" from your Deck to your hand. If a WATER monster(s) you control would be destroyed by card effect, you can banish this card from your GY instead. You can only use each effect of \"Fury of Kairyu-Shin\" once per turn.",
-    "image": "imagenescartas/Mundo1/520.jpg"
-  },
-  {
-    "id": 591,
-    "name": "Hydro Pressure Cannon",
-    "kind": "SPELL",
-    "value": "HYDRO_PRESSURE_CANNON",
-    "text": "Equip only to a Level 3 or lower WATER monster. If it destroys an opponent's monster by battle, send 1 random card in your opponent's hand to the Graveyard.",
-    "image": "imagenescartas/Mundo1/521.jpg"
-  },
-  {
-    "id": 592,
-    "name": "Rage of Kairyu-Shin",
-    "kind": "SPELL",
-    "value": "RAGE_OF_KAIRYU_SHIN",
-    "text": "If \"Umi\" is on the field: Target monsters your opponent controls, up to the number of WATER monsters you control whose original Levels are 5 or higher; destroy them, and if you do, the zones they were in cannot be used until the end of the next turn. You can only activate 1 \"Rage of Kairyu-Shin\" per turn.",
-    "image": "imagenescartas/Mundo1/522.jpg"
-  },
-  {
-    "id": 593,
-    "name": "Salvage",
-    "kind": "SPELL",
-    "value": "SALVAGE",
-    "text": "Target 2 WATER monsters with 1500 or less ATK in your Graveyard; add those targets to your hand.",
-    "image": "imagenescartas/Mundo1/523.jpg"
-  },
-  {
-    "id": 594,
-    "name": "Steel Shell",
-    "kind": "SPELL",
-    "value": "STEEL_SHELL",
-    "text": "A WATER monster equipped with this card increases its ATK by 400 points and decreases its DEF by 200 points.",
-    "image": "imagenescartas/Mundo1/524.jpg"
-  },
-  {
     "id": 595,
     "name": "Swords of Concealing Light",
     "kind": "SPELL",
     "value": "SWORDS_OF_CONCEALING_LIGHT",
     "text": "Destroy this card during your 2nd Standby Phase after activation. When this card resolves, change all monsters your opponent controls to face-down Defense Position. Monsters your opponent controls cannot change their battle positions.",
     "image": "imagenescartas/Mundo1/525.jpg"
-  },
-  {
-    "id": 596,
-    "name": "Umi",
-    "kind": "SPELL",
-    "value": "UMI",
-    "text": "All Fish, Sea Serpent, Thunder, and Aqua monsters on the field gain 200 ATK/DEF, also all Machine and Pyro monsters on the field lose 200 ATK/DEF.",
-    "image": "imagenescartas/Mundo1/526.jpg"
-  },
-  {
-    "id": 597,
-    "name": "Abyss-strom",
-    "kind": "TRAP",
-    "value": "ABYSS_STROM",
-    "text": "Send 1 face-up \"Umi\" you control to the Graveyard; send all Spell and Trap Cards on the field to the Graveyard.",
-    "image": "imagenescartas/Mundo1/527.jpg"
-  },
-  {
-    "id": 598,
-    "name": "Aegis of the Ocean Dragon Lord",
-    "kind": "TRAP",
-    "value": "AEGIS_OF_THE_OCEAN_DRAGON_LORD",
-    "text": "Until the End Phase, face-up Level 3 or lower WATER monsters you control cannot be destroyed by battle or by card effects.",
-    "image": "imagenescartas/Mundo1/528.jpg"
-  },
-  {
-    "id": 599,
-    "name": "Shattered Axe",
-    "kind": "TRAP",
-    "value": "SHATTERED_AXE",
-    "text": "Activate this card by targeting 1 face-up monster on the field. During each of your Standby Phases: It loses 500 ATK. When that target is destroyed, destroy this card.",
-    "image": "imagenescartas/Mundo1/529.jpg"
-  },
-  {
-    "id": 600,
-    "name": "Spiritual Water Art - Aoi",
-    "kind": "TRAP",
-    "value": "SPIRITUAL_WATER_ART_AOI",
-    "text": "Tribute 1 WATER monster; look at your opponent's hand, then send 1 card from their hand to the Graveyard.",
-    "image": "imagenescartas/Mundo1/530.jpg"
-  },
-  {
-    "id": 601,
-    "name": "Tornado Wall",
-    "kind": "TRAP",
-    "value": "TORNADO_WALL",
-    "text": "Activate only while \"Umi\" is on the field. While \"Umi\" is face-up on the field, you take no Battle Damage from attacking monsters. Destroy this card when \"Umi\" leaves the field.",
-    "image": "imagenescartas/Mundo1/531.jpg"
   },
   {
     "id": 602,
@@ -5724,5 +4478,243 @@
     "image": "imagenescartas/Mundo1/038.jpg",
     "sign1": "MERCURIO",
     "sign2": "JUPITER"
+  },
+  {
+    "id": 606,
+    "name": "One-Eyed White Dragon",
+    "kind": "MONSTER",
+    "type": "Dragon",
+    "attr": "LIGHT",
+    "level": 4,
+    "atk": 1300,
+    "def": 1000,
+    "text": "Dragón blanco de combate.",
+    "image": "imagenescartas/Mundo1/144.jpg",
+    "price": 300,
+    "tier": "DRAGÓN COMBATE"
+  },
+  {
+    "id": 607,
+    "name": "Koumori Dragon",
+    "kind": "MONSTER",
+    "type": "Dragon",
+    "attr": "DARK",
+    "level": 4,
+    "atk": 1500,
+    "def": 1200,
+    "text": "Dragón murciélago sombrío.",
+    "image": "imagenescartas/Mundo1/043.jpg",
+    "price": 500,
+    "tier": "DRAGÓN OSCURO"
+  },
+  {
+    "id": 608,
+    "name": "Kaminarikozou",
+    "kind": "MONSTER",
+    "type": "Thunder",
+    "attr": "WIND",
+    "level": 2,
+    "atk": 700,
+    "def": 600,
+    "text": "Espíritu eléctrico. ¡Fusiónalo con cualquier Dragón para crear al Dragón Trueno!",
+    "image": "imagenescartas/Mundo1/038.jpg",
+    "price": 150,
+    "tier": "TRUENO FUSIÓN"
+  },
+  {
+    "id": 609,
+    "name": "Lala Li-Oon",
+    "kind": "MONSTER",
+    "type": "Thunder",
+    "attr": "WIND",
+    "level": 2,
+    "atk": 600,
+    "def": 600,
+    "text": "Criatura de nubes de tormenta para fusiones eléctricas.",
+    "image": "imagenescartas/Mundo1/160.jpg",
+    "price": 150,
+    "tier": "TRUENO FUSIÓN"
+  },
+  {
+    "id": 610,
+    "name": "Mega Thunderball",
+    "kind": "MONSTER",
+    "type": "Thunder",
+    "attr": "WIND",
+    "level": 2,
+    "atk": 750,
+    "def": 600,
+    "text": "Esfera rodante de alto voltaje.",
+    "image": "imagenescartas/Mundo1/154.jpg",
+    "price": 200,
+    "tier": "TRUENO FUSIÓN"
+  },
+  {
+    "id": 611,
+    "name": "Electric Lizard",
+    "kind": "MONSTER",
+    "type": "Thunder",
+    "attr": "EARTH",
+    "level": 3,
+    "atk": 850,
+    "def": 800,
+    "text": "Reptil electrificado.",
+    "image": "imagenescartas/Mundo1/153.jpg",
+    "price": 300,
+    "tier": "TRUENO COMBATE"
+  },
+  {
+    "id": 612,
+    "name": "Frog the Jam",
+    "kind": "MONSTER",
+    "type": "Aqua",
+    "attr": "WATER",
+    "level": 2,
+    "atk": 700,
+    "def": 500,
+    "text": "Rana anfibia para fusiones acuáticas.",
+    "image": "imagenescartas/Mundo1/277.jpg",
+    "price": 150,
+    "tier": "AGUA BÁSICA"
+  },
+  {
+    "id": 613,
+    "name": "Root Water",
+    "kind": "MONSTER",
+    "type": "Aqua",
+    "attr": "WATER",
+    "level": 3,
+    "atk": 1000,
+    "def": 1000,
+    "text": "Anfibio azul de las profundidades marinas.",
+    "image": "imagenescartas/Mundo1/075.jpg",
+    "price": 250,
+    "tier": "AGUA COMBATE"
+  },
+  {
+    "id": 614,
+    "name": "Water Omotics",
+    "kind": "MONSTER",
+    "type": "Aqua",
+    "attr": "WATER",
+    "level": 4,
+    "atk": 1400,
+    "def": 1200,
+    "text": "Doncella de agua.",
+    "image": "imagenescartas/Mundo1/079.jpg",
+    "price": 400,
+    "tier": "AGUA DONCELLA"
+  },
+  {
+    "id": 615,
+    "name": "Kagemusha of the Blue Flame",
+    "kind": "MONSTER",
+    "type": "Warrior",
+    "attr": "EARTH",
+    "level": 2,
+    "atk": 800,
+    "def": 400,
+    "text": "Guerrero sombra de la llama azul.",
+    "image": "imagenescartas/Mundo1/051.jpg",
+    "price": 200,
+    "tier": "GUERRERO SOMBRA"
+  },
+  {
+    "id": 616,
+    "name": "Masaki the Legendary Swordsman",
+    "kind": "MONSTER",
+    "type": "Warrior",
+    "attr": "EARTH",
+    "level": 4,
+    "atk": 1100,
+    "def": 1100,
+    "text": "Espadachín legendario de mil batallas.",
+    "image": "imagenescartas/Mundo1/050.jpg",
+    "price": 300,
+    "tier": "GUERRERO ESPADA"
+  },
+  {
+    "id": 617,
+    "name": "Stone Armadiller",
+    "kind": "MONSTER",
+    "type": "Rock",
+    "attr": "EARTH",
+    "level": 3,
+    "atk": 1000,
+    "def": 1200,
+    "text": "Armadillo de piedra impenetrable.",
+    "image": "imagenescartas/Mundo1/122.jpg",
+    "price": 250,
+    "tier": "ROCA BLINDADA"
+  },
+  {
+    "id": 618,
+    "name": "Sand Stone",
+    "kind": "MONSTER",
+    "type": "Rock",
+    "attr": "EARTH",
+    "level": 5,
+    "atk": 1300,
+    "def": 1600,
+    "text": "Guardián rocoso del desierto.",
+    "image": "imagenescartas/Mundo1/121.jpg",
+    "price": 450,
+    "tier": "ROCA DESIERTO"
+  },
+  {
+    "id": 619,
+    "name": "Dancing Elf",
+    "kind": "MONSTER",
+    "type": "Fairy",
+    "attr": "WIND",
+    "level": 1,
+    "atk": 300,
+    "def": 200,
+    "text": "Hada elemental femenina para fusiones mágicas tempranas.",
+    "image": "imagenescartas/Mundo1/086.jpeg",
+    "price": 100,
+    "tier": "HADA DANZANTE"
+  },
+  {
+    "id": 620,
+    "name": "Key Mace",
+    "kind": "MONSTER",
+    "type": "Fairy",
+    "attr": "LIGHT",
+    "level": 1,
+    "atk": 400,
+    "def": 800,
+    "text": "Pequeña hada bondadosa con maza dorada.",
+    "image": "imagenescartas/Mundo1/092.jpg",
+    "price": 150,
+    "tier": "HADA SAGRADA"
+  },
+  {
+    "id": 621,
+    "name": "Lunar Queen Elzaim",
+    "kind": "MONSTER",
+    "type": "Fairy",
+    "attr": "LIGHT",
+    "level": 3,
+    "atk": 750,
+    "def": 1100,
+    "text": "Hechicera lunar que bendice el campo.",
+    "image": "imagenescartas/Mundo1/171.jpg",
+    "price": 250,
+    "tier": "REINA LUNAR"
+  },
+  {
+    "id": 622,
+    "name": "Harpie Lady",
+    "kind": "MONSTER",
+    "type": "Winged Beast",
+    "attr": "WIND",
+    "level": 4,
+    "atk": 1300,
+    "def": 1400,
+    "text": "Dama alada clásica de veloces ataques.",
+    "image": "imagenescartas/Mundo1/010.jpg",
+    "price": 450,
+    "tier": "ARPÍA ALADA"
   }
 ]
