@@ -12411,6 +12411,133 @@ window.getCardMetadata = function(name) {
     };
 };
 
+window.PROGRAMMED_ST_NAMES = new Set([
+  // Equipos
+  'axe of despair', 'black pendant', 'horn of the unicorn', 'dragon treasure', 'garra del dragón', 'garra del dragon',
+  'malevolent nuzzler', 'sword of dark destruction', 'dark energy', 'invigoration',
+  'electro-whip', 'cyber shield', 'mystical moon', 'silver bow and arrow',
+  'book of secret arts', "elf's light", 'elfs light', 'beast fangs', 'steel shell', 'vile germs',
+  'kunai with chain', 'fusion weapon', 'united we stand', 'legendary sword',
+  'laser cannon armor', 'insect armor with laser cannon', 'horn of light',
+  'machine conversion factory', 'raise body heat', 'follow wind', 'power of kaishin',
+  'violet crystal', 'shine palace', 'salamandra', 'mage power', 'poder del mago',
+  'crush card', 'tyrant wing',
+
+  // Magias normales, rápidas y continuas
+  'pot of greed', 'graceful charity', 'renace al monstruo', 'monster reborn', 'fissure',
+  'stop defense', 'dragon capture jar', 'dian keto the cure master', 'soul of the pure',
+  "goblin's secret remedy", 'goblins secret remedy', 'red medicine', 'mooyan curry', 'ookazi', 'hinotama',
+  'sparks', 'final flame', 'tremendous fire', 'swords of revealing light',
+  'swords of concealing light', 'espadas de luz reveladora', 'espadas de luz ocultadora',
+  'raigeki', 'dark hole', "harpie's feather duster", 'harpies feather duster', 'heavy storm', 'tormenta pesada',
+  'mystical space typhoon', 'change of heart', 'scapegoat', 'limiter removal',
+  'cybernetic zone', 'cybernetic fusion support', 'card of demise',
+
+  // Campos
+  'mountain', 'montaña', 'montana', 'yami', 'umi', 'forest', 'bosque', 'wasteland', 'yermo',
+  'sogen', 'pueblo secreto de los magos', 'spellcaster village', 'a legendary ocean',
+
+  // Trampas
+  'mirror force', 'magic cylinder', 'negate attack', 'sakuretsu armor', 'waboku',
+  'widespread ruin', 'trap hole', 'acid trap hole', 'torrential tribute', 'dust tornado',
+  'threatening roar', 'crush card virus', 'eatgaboon', 'bear trap', 'invisible wire',
+  'goblin fan', 'bad reaction to simochi', 'reverse trap', 'fake trap', 'javalina',
+  'llamado de la tumba', 'toon defense', 'curse of anubis', 'statue of the wicked',
+  'ring of defense', 'soul rope', 'obliterate!!!', 'destiny board', 'sentence of doom', 'muko'
+]);
+
+window.isCardProgrammed = function(cardOrName) {
+  if (!cardOrName) return false;
+  var c = null;
+  var name = '';
+  if (typeof cardOrName === 'string') {
+    name = cardOrName.trim().toLowerCase();
+    var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : null;
+    if (dict && (dict[cardOrName] || dict[name])) {
+      c = dict[cardOrName] || dict[name];
+    } else if (typeof window.getCardMetadata === 'function') {
+      c = window.getCardMetadata(cardOrName);
+    } else if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+      c = window.CARDS_DATA.find(function(x) { return x && (x.name === cardOrName || (x.name && x.name.toLowerCase().trim() === name)); });
+    }
+  } else {
+    c = cardOrName;
+    name = (c.name || c[0] || '').trim().toLowerCase();
+  }
+  if (!c) {
+    return window.PROGRAMMED_ST_NAMES.has(name);
+  }
+  var kind = String(c.kind || c.type || '').toUpperCase();
+  if (kind === 'MONSTER' || kind === 'FUSION' || kind === 'LINK' || c.isMonster || (c.atk !== undefined && c.atk !== '-' && kind !== 'SPELL' && kind !== 'TRAP' && kind !== 'EQUIP')) {
+    return true;
+  }
+  if (window.PROGRAMMED_ST_NAMES.has(name)) return true;
+  var val = String(c.value || '').toUpperCase();
+  if (val && (val.startsWith('FIELD_') || val.startsWith('HEAL_') || val.startsWith('BURN_') || val.startsWith('EQUIP_'))) return true;
+  return false;
+};
+
+window.cleanSaveCollection = function(s) {
+  if (!s) return s;
+  var modified = false;
+  if (s.collection && typeof s.collection === 'object') {
+    var keys = Object.keys(s.collection);
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      if (!window.isCardProgrammed(k)) {
+        delete s.collection[k];
+        modified = true;
+      }
+    }
+  }
+  var defaultFillers = ['Celtic Guardian', 'Silver Fang', 'Mammoth Graveyard', 'Feral Imp', 'Winged Dragon, Guardian of the Fortress #1'];
+  function sanitizeDeck(deckArr) {
+    if (!Array.isArray(deckArr)) return deckArr;
+    var filtered = deckArr.filter(function(cardName) {
+      if (!window.isCardProgrammed(cardName)) {
+        modified = true;
+        return false;
+      }
+      return true;
+    });
+    var fIdx = 0;
+    while (filtered.length < 40) {
+      filtered.push(defaultFillers[fIdx % defaultFillers.length]);
+      fIdx++;
+      modified = true;
+    }
+    return filtered;
+  }
+  if (Array.isArray(s.deck)) {
+    s.deck = sanitizeDeck(s.deck);
+  }
+  if (s.decks && typeof s.decks === 'object') {
+    for (var dName in s.decks) {
+      if (Array.isArray(s.decks[dName])) {
+        s.decks[dName] = sanitizeDeck(s.decks[dName]);
+      }
+    }
+  }
+  if (modified) {
+    if (typeof window.persistUserSave === 'function') {
+      window.persistUserSave(s);
+    } else {
+      var curSaveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+      var raw = JSON.stringify(s);
+      if (typeof origSet === 'function') {
+        origSet(curSaveKey, raw);
+        origSet('FMR_REBORN_STORY_V3000', raw);
+      } else if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(curSaveKey, raw);
+        localStorage.setItem('FMR_REBORN_STORY_V3000', raw);
+      }
+      if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(s);
+    }
+  }
+  return s;
+};
+
+
 function findLowestMonsterInDeck(deck, cardDict) {
     let lowestIdx = -1;
     let lowestAtk = Infinity;
@@ -12447,6 +12574,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     }
     s.collection = s.collection || {};
     s.deck = s.deck || [];
+    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
     
     let oppDeck = window.CHARACTER_DECKS && window.CHARACTER_DECKS[oppId];
     let oppDisplayName = (oppDeck && oppDeck.name) || OPPONENT_NAMES[oppId] || oppId.toUpperCase();
@@ -12478,7 +12606,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     ]);
     window.ELIMINATED_UNKNOWN_ST = ELIMINATED_UNKNOWN_ST;
     if (cardPool.length > 0) {
-        cardPool = cardPool.filter(c => !ELIMINATED_UNKNOWN_ST.has(c));
+        cardPool = cardPool.filter(c => !ELIMINATED_UNKNOWN_ST.has(c) && (typeof window.isCardProgrammed !== 'function' || window.isCardProgrammed(c)));
     }
     if (cardPool.length === 0) {
         cardPool = ['Dark Magician', 'Blue-Eyes White Dragon', 'Summoned Skull', 'Red-Eyes Black Dragon', 'Celtic Guardian'];
@@ -12687,6 +12815,7 @@ window.customShowShop = function() {
     let s = sStr ? JSON.parse(sStr) : (window.nativeAPI && window.nativeAPI.loadGame ? window.nativeAPI.loadGame() : null);
     if (!s) return;
     s.collection = s.collection || {};
+    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
     s.deck = s.deck || [];
     s.decks = s.decks || {};
     if (Object.keys(s.decks).length === 0) {
@@ -12822,6 +12951,7 @@ window.customShowShop = function() {
         if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
             window.CARDS_DATA.forEach(c => {
                 if (c && c.name && c.price && c.price > 0 && !existingNames.has(c.name.toLowerCase())) {
+                    if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(c)) return;
                     activeShopCards.push({
                         name: c.name,
                         price: parseInt(c.price),
@@ -14198,6 +14328,7 @@ window.customShowDeckEditor = function() {
     
     s.collection = s.collection || {};
     s.decks = s.decks || {};
+    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
     if (!s.deck || s.deck.length === 0) {
         s.deck = [...DEF];
         DEF.forEach(n => s.collection[n] = Math.max(s.collection[n] || 0, DEF.filter(x => x === n).length));
@@ -14408,6 +14539,11 @@ window.customShowDeckEditor = function() {
         if (Array.isArray(dArr)) dArr.forEach(n => ownedSet.add(n));
     });
     s.extra.forEach(n => ownedSet.add(n));
+    ownedSet.forEach(name => {
+        if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(name)) {
+            ownedSet.delete(name);
+        }
+    });
 
     // Fallback metadata for ANY card in ownedSet that isn't yet in cardDict
     ownedSet.forEach(name => {
@@ -15559,6 +15695,7 @@ function handleBackBtn(overlay) {
 window.customShowCollection = function() {
     let s = JSON.parse(origGet('FMR_SAVE_' + window.activeAccount) || '{}');
     if (!s.collection) return;
+    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
     
     let overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: #1a1a1a; z-index:9999999; display:flex; flex-direction:row; padding: 20px; box-sizing:border-box; color: #fff; font-family: "Segoe UI", Arial, sans-serif;';
@@ -15681,6 +15818,7 @@ window.customShowCollection = function() {
         let norm = rawName.toLowerCase().trim();
         let c = dict[rawName] || dict[norm];
         if (!c || c.type === 'UNKNOWN') return;
+        if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(c)) return;
         let cardNum = c.num;
         let cardName = c.name || rawName;
         let cardNorm = cardName.toLowerCase().trim();
@@ -16947,6 +17085,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           }
         }
         if (added > 0) {
+          if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(saveToUpdate);
           window.memorySave = saveToUpdate;
           try {
             var raw = JSON.stringify(saveToUpdate);
