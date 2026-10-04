@@ -8,10 +8,10 @@ html = html.replace('</script>\n/* V3.0.5', '</script>\n<script>\n/* V3.0.5');
 html = html.replace("audio=new Audio('assets/menu_principal.mp3');", "audio=null; return null;");
 html = html.replace("if(!muted) start();", "/* gesture audio disabled */");
 html = html.replace("function muteAll(){", "function muteAll(){ return; /* disabled */");
-html = html.replace(/function menuMusic\(\)\{[^}]*\}/, "function menuMusic(){}");
-html = html.replace(/function stopMusic\(\)\{[^}]*\}/, "function stopMusic(){}");
-html = html.replace(/menuMusic\(\);/g, "/* menuMusic disabled */");
-html = html.replace(/stopMusic\(\);/g, "/* stopMusic disabled */");
+html = html.replace(/function menuMusic\(\)\{[\s\S]*?catch\(e\)\{\}\}/, "function menuMusic(){}");
+html = html.replace(/function stopMusic\(\)\{[\s\S]*?catch\(e\)\{\}\}/, "function stopMusic(){}");
+html = html.replace(/menuMusic\(\);/g, "void 0;");
+html = html.replace(/stopMusic\(\);/g, "void 0;");
 
 // 2. Inject nativeAPI
 let target = '[80,400,1200,3000,6000,10000,15000,22000].forEach(t=>setTimeout(stamp,t));';
