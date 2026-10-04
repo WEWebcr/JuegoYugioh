@@ -6078,7 +6078,7 @@ body.view-hand #fusionBtn{display:inline-flex!important}
     else b.title='Selecciona exactamente 1 monstruo de la mano.';
   }
 
-  function setMonster103(){ if(window.setMonster103 && window.setMonster103!==setMonster103) return window.setMonster103.apply(this,arguments);
+  function setMonster103(){
     if(typeof game==='undefined'||!game||game.turn!=='player')return;
     if(game.handSummoned){if(typeof log==='function')log('Ya hiciste tu invocación o SET desde la mano este turno.');return;}
     const pick=validSetSelection103();
@@ -8811,6 +8811,8 @@ try { window.nativeAPI.getMemorySave = function() { return memorySave; }; } catc
 try { window.nativeAPI.setStoryDuelActive = function(v) { storyDuelActive = v; window.storyDuelActive = v; }; } catch(e){}
 try { window.nativeAPI.setStoryOpponent = function(v) { storyOpponent = v; window.storyOpponent = v; }; } catch(e){}
 try { window.nativeAPI.setStoryDeckReady = function(v) { storyDeckReady = v; window.storyDeckReady = v; }; } catch(e){}
+try { window.nativeAPI.setDuelHandled = function(v) { duelHandled = v; window.duelHandled = v; }; } catch(e){}
+try { window.nativeAPI.getDuelHandled = function() { return duelHandled; }; } catch(e){}
 try { window.nativeAPI.getStoryDuelActive = function() { return storyDuelActive; }; } catch(e){}
 try { window.nativeAPI.getStoryOpponent = function() { return storyOpponent; }; } catch(e){}
 try { window.nativeAPI.installStoryDecks = installStoryDecks; } catch(e){}
@@ -13853,6 +13855,15 @@ window.customFinishStoryDuel = function(win) {
     // Set duelOver flag so native engine doesn't loop
     if (typeof game !== 'undefined' && game) game.duelOver = true;
     window.storyDuelActive = false;
+    window.duelHandled = true;
+    if (window.nativeAPI) {
+      if (typeof window.nativeAPI.setStoryDuelActive === 'function') window.nativeAPI.setStoryDuelActive(false);
+      if (typeof window.nativeAPI.setDuelHandled === 'function') window.nativeAPI.setDuelHandled(true);
+      if (typeof window.nativeAPI.setStoryDeckReady === 'function') window.nativeAPI.setStoryDeckReady(false);
+    }
+    try { storyDuelActive = false; } catch(_) {}
+    try { duelHandled = true; } catch(_) {}
+    try { storyDeckReady = false; } catch(_) {}
     
     try { document.getElementById('duelOver64').classList.remove('show'); } catch(e){}
     try { document.getElementById('deckOut67').classList.remove('show'); } catch(e){}
@@ -16027,9 +16038,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     window.storyDeckReady = false;
     window.duelHandled = false;
     
-    if (window.nativeAPI && window.nativeAPI.setStoryOpponent) window.nativeAPI.setStoryOpponent(normId);
-    if (window.nativeAPI && window.nativeAPI.setStoryDuelActive) window.nativeAPI.setStoryDuelActive(true);
-    if (window.nativeAPI && window.nativeAPI.setStoryDeckReady) window.nativeAPI.setStoryDeckReady(false);
+    if (window.nativeAPI) {
+      if (typeof window.nativeAPI.setStoryOpponent === 'function') window.nativeAPI.setStoryOpponent(normId);
+      if (typeof window.nativeAPI.setStoryDuelActive === 'function') window.nativeAPI.setStoryDuelActive(true);
+      if (typeof window.nativeAPI.setStoryDeckReady === 'function') window.nativeAPI.setStoryDeckReady(false);
+      if (typeof window.nativeAPI.setDuelHandled === 'function') window.nativeAPI.setDuelHandled(false);
+    }
+    try { storyOpponent = normId; } catch(_) {}
+    try { storyDuelActive = true; } catch(_) {}
+    try { storyDeckReady = false; } catch(_) {}
+    try { duelHandled = false; } catch(_) {}
     
     // Instalar DIRECTAMENTE los decks limpios sin pasar por newGame() de Tristan
     window.installStoryDecks();
@@ -16158,9 +16176,38 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
 
     window.storyDeckReady = true;
-    try { storyDeckReady = true; } catch(_) {}
     window.duelHandled = false;
+    window.storyDuelActive = true;
+    if (window.nativeAPI) {
+      if (typeof window.nativeAPI.setStoryDeckReady === 'function') window.nativeAPI.setStoryDeckReady(true);
+      if (typeof window.nativeAPI.setDuelHandled === 'function') window.nativeAPI.setDuelHandled(false);
+      if (typeof window.nativeAPI.setStoryDuelActive === 'function') window.nativeAPI.setStoryDuelActive(true);
+    }
+    try { storyDeckReady = true; } catch(_) {}
     try { duelHandled = false; } catch(_) {}
+    try { storyDuelActive = true; } catch(_) {}
+
+    // Limpiar modales, overlays y clases de duelos previos
+    try {
+      var dOver = document.getElementById('duelOver64');
+      if (dOver) dOver.classList.remove('show');
+      var dOut = document.getElementById('deckOut67');
+      if (dOut) dOut.classList.remove('show');
+      var lFlow = document.getElementById('linkFlow64');
+      if (lFlow) lFlow.classList.remove('show');
+    } catch(_) {}
+    document.body.classList.remove('enemy-hand-50', 'enemy-hand-preview', 'link-pick-zone64');
+
+    // Desbloquear estado de turno y fases
+    try {
+      if (typeof bpLocked114 !== 'undefined') bpLocked114 = false;
+      if (typeof enterPlayerTurn114 === 'function') enterPlayerTurn114();
+    } catch(_) {}
+
+    // Asegurar vista de mano para que el jugador pueda interactuar de inmediato
+    if (typeof setDuelView === 'function') setDuelView('hand');
+    if (typeof playerHand50 === 'function') playerHand50();
+    if (typeof updateSetButton103 === 'function') updateSetButton103();
 
     // Encabezado del duelo en el tablero
     var oppDisplayName = (window.DUELISTS_NAMES && window.DUELISTS_NAMES[opp]) || opp.toUpperCase();
@@ -17024,69 +17071,95 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { normalSummon = window.normalSummon; } catch(_) {}
 
-  // setMonster hook (1 summon per turn + Gods cannot be set + transfer hand equips)
-  var prevSetMonster = window.setMonster103 || window.setMonster;
+  // setMonster hook: 1 invocación o colocación por turno + Dioses NO pueden ser SET + soporte directo sin recursión
   window.setMonster103 = function() {
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
-    if (g && g.handSummoned) {
-      duelToast('Solo se permite 1 invocaci\u00f3n o colocaci\u00f3n por turno.');
+    if (!g || g.turn !== 'player') return;
+    if (g.handSummoned) {
+      if (typeof duelToast === 'function') duelToast('Solo se permite 1 invocación o colocación por turno.');
+      if (typeof log === 'function') log('Ya hiciste tu invocación o SET desde la mano este turno.');
       return;
     }
-    var sel = (g && g.selected || []).find(function(x) { return x && x[0] === 'h'; });
-    var handCard = (sel && g.hand) ? g.hand[sel[1]] : null;
-    if (handCard) {
-      var selName = handCard.name || handCard[0] || '';
-      if (isEgyptianGod(selName)) {
-        var tributes = [];
-        for (var ti = 0; ti < (g.field || []).length; ti++) {
-          if (g.field[ti]) tributes.push(ti);
-        }
-        if (tributes.length < 3) {
-          duelToast('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere tributar 3 monstruos en tu campo para colocarse!');
-          if (typeof log === 'function') log('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere 3 tributos en el campo para colocarse!');
-          return;
-        }
-        // Send 3 tributes to graveyard
-        for (var k = 0; k < 3; k++) {
-          var tIdx = tributes[k];
-          var tMon = g.field[tIdx];
-          if (tMon && Array.isArray(g.grave)) {
-            g.grave.push(Object.assign({}, tMon, { faceUp: true }));
-          }
-          g.field[tIdx] = null;
-        }
-        if (typeof log === 'function') log('Tributaste 3 monstruos para colocar a ' + (handCard.name || 'Dios Egipcio') + ' en DEFENSA.');
-      }
-    }
-    var savedEquip = Number(handCard ? (handCard._handEquipAtk || handCard.equip || 0) : 0);
-    var savedBoost = handCard ? (handCard.tempBoost || 0) : 0;
-    var savedBoostDef = Number(handCard ? (handCard._handEquipDef || handCard.tempBoostDef || 0) : 0);
-    var savedEquippedCards = handCard && handCard.equippedCards ? handCard.equippedCards.slice() : [];
 
-    if (prevSetMonster) {
-      var r = prevSetMonster.apply(this, arguments);
-      if (savedEquip || savedBoost || savedBoostDef) {
-        for (var s = 0; s < (g.field || []).length; s++) {
-          var fMon = g.field[s];
-          if (fMon && fMon.name === (handCard.name || handCard[0]) && !fMon._handEquipTransferred) {
-            fMon._handEquipAtk = (fMon._handEquipAtk || 0) + savedEquip;
-            fMon.equip = (fMon.equip || 0) + savedEquip;
-            fMon._equipAtk111 = (fMon._equipAtk111 || 0) + savedEquip;
-            fMon._handEquipDef = (fMon._handEquipDef || 0) + savedBoostDef;
-            fMon.tempBoostDef = (fMon.tempBoostDef || 0) + savedBoostDef;
-            fMon._equipDef111 = (fMon._equipDef111 || 0) + savedBoostDef;
-            if (savedBoost) fMon.tempBoost = (fMon.tempBoost || 0) + savedBoost;
-            if (savedEquippedCards.length) {
-              fMon.equippedCards = (fMon.equippedCards || []).concat(savedEquippedCards);
-            }
-            fMon._handEquipTransferred = true;
-            break;
-          }
-        }
-        if (typeof render === 'function') render();
-      }
-      return r;
+    var sel = (g.selected || []).find(function(x) { return x && x[0] === 'h'; });
+    var handCard = (sel && g.hand) ? g.hand[sel[1]] : null;
+    if (!handCard) {
+      if (typeof duelToast === 'function') duelToast('Selecciona exactamente 1 monstruo de la mano para hacer SET.');
+      return;
     }
+
+    // Regla de Dioses Egipcios: NO pueden ser colocados boca abajo (SET)
+    var selName = handCard.name || handCard[0] || '';
+    if (typeof isEgyptianGod === 'function' && isEgyptianGod(selName)) {
+      if (typeof duelToast === 'function') duelToast('¡' + (handCard.name || 'El Dios Egipcio') + ' no puede colocarse boca abajo (SET)! Debe ser invocado en ATAQUE tributando 3 monstruos.');
+      if (typeof log === 'function') log('¡' + (handCard.name || 'El Dios Egipcio') + ' no puede colocarse boca abajo (SET)! Requiere 3 tributos en ATAQUE.');
+      return;
+    }
+
+    // Validación de monstruo
+    var isMonster = handCard.kind === 'MONSTER' || handCard.atk !== undefined || (typeof isST === 'function' && !isST(handCard));
+    var isFusion = String(handCard.kind || '').toUpperCase() === 'FUSION' || (window.FMR_CARD_META && window.FMR_CARD_META[selName] && String(window.FMR_CARD_META[selName].kind || '').toUpperCase() === 'FUSION');
+    if (!isMonster || isFusion) {
+      if (isFusion && typeof log === 'function') log('Los monstruos FUSIÓN no pueden colocarse con SET desde la mano.');
+      else if (typeof log === 'function') log('Solo se pueden colocar monstruos en DEFENSA boca abajo.');
+      return;
+    }
+
+    var slot = (g.field || []).findIndex(function(x) { return !x; });
+    if (slot < 0) {
+      if (typeof log === 'function') log('No hay espacio en tu campo para colocar el monstruo.');
+      return;
+    }
+
+    var placed = (typeof mk === 'function' ? mk(selName) : null);
+    if (!placed) {
+      placed = {
+        name: selName,
+        level: handCard.level != null ? handCard.level : handCard[1],
+        type: handCard.type || handCard[2] || 'Warrior',
+        attr: handCard.attr || handCard[3] || 'EARTH',
+        atk: handCard.atk != null ? handCard.atk : handCard[4],
+        def: handCard.def != null ? handCard.def : handCard[5],
+        materials: []
+      };
+    }
+    placed.pos = 'DEF';
+    placed.faceDown = true;
+    placed.faceDownSet103 = true;
+    placed.setFromHand = true;
+    placed.summonedTurn = g.turnNo;
+    if (window.playSetSound) window.playSetSound();
+    placed.activeSign = null;
+    placed.guardianSign = null;
+    delete placed._signChosen101;
+
+    // Transferencia de equipamientos de mano
+    var savedEquip = Number(handCard._handEquipAtk || handCard.equip || 0);
+    var savedBoost = handCard.tempBoost || 0;
+    var savedBoostDef = Number(handCard._handEquipDef || handCard.tempBoostDef || 0);
+    var savedEquippedCards = handCard.equippedCards ? handCard.equippedCards.slice() : [];
+    if (savedEquip || savedBoost || savedBoostDef) {
+      placed._handEquipAtk = (placed._handEquipAtk || 0) + savedEquip;
+      placed.equip = (placed.equip || 0) + savedEquip;
+      placed._equipAtk111 = (placed._equipAtk111 || 0) + savedEquip;
+      placed._handEquipDef = (placed._handEquipDef || 0) + savedBoostDef;
+      placed.tempBoostDef = (placed.tempBoostDef || 0) + savedBoostDef;
+      placed._equipDef111 = (placed._equipDef111 || 0) + savedBoostDef;
+      if (savedBoost) placed.tempBoost = (placed.tempBoost || 0) + savedBoost;
+      if (savedEquippedCards.length) {
+        placed.equippedCards = (placed.equippedCards || []).concat(savedEquippedCards);
+      }
+      placed._handEquipTransferred = true;
+    }
+
+    g.field[slot] = placed;
+    g.hand.splice(sel[1], 1);
+    g.handSummoned = true;
+    g.selected = [];
+    if (typeof render === 'function') render();
+    if (typeof setDuelView === 'function') setDuelView('field');
+    if (typeof log === 'function') log(selName + ' fue colocado en DEFENSA boca abajo (SET).');
+    if (typeof updateSetButton103 === 'function') updateSetButton103();
   };
   window.setMonster = window.setMonster103;
 
@@ -17099,14 +17172,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var sel = (g.selected || []).find(function(x) { return x && x[0] === 'h'; });
       var handCard = (sel && g.hand) ? g.hand[sel[1]] : null;
       if (handCard && typeof isEgyptianGod === 'function' && isEgyptianGod(handCard.name || handCard[0])) {
-        var tributes = (g.field || []).filter(Boolean);
-        if (tributes.length < 3) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          duelToast('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere tributar 3 monstruos en tu campo para colocarse!');
-          if (typeof log === 'function') log('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere 3 tributos en el campo para colocarse!');
-          return false;
-        }
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        duelToast('¡' + (handCard.name || 'El Dios Egipcio') + ' no puede colocarse boca abajo (SET)! Debe ser invocado en ATAQUE tributando 3 monstruos.');
+        if (typeof log === 'function') log('¡' + (handCard.name || 'El Dios Egipcio') + ' no puede colocarse boca abajo (SET)!');
+        return false;
       }
     }
   }, true);
