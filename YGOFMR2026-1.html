@@ -17189,42 +17189,44 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof log === 'function') log('Decks oficiales listos: ' + oppDisplayName + ' (40) vs ' + ((sSave && sSave.name) || 'Jugador') + ' (40)');
     console.log('[installStoryDecks] Instalación completada sin mezclas de Tristan.');
 
-    // Guaranteed God card in opening hand for Marik, Kaiba, and Yugi on Turn 1
-    var yugiChosenGod = null;
-    if (opp === 'yugi') {
-      var gods = ['Slifer the Sky Dragon', 'Obelisk the Tormentor', 'The Winged Dragon of Ra'];
-      yugiChosenGod = gods[Math.floor(Math.random() * gods.length)];
-      window._yugiSelectedGod = yugiChosenGod;
-      console.log('[Duel Yugi] Dios Egipcio seleccionado para Yugi:', yugiChosenGod);
-    }
+    // Garantizar que Marik, Kaiba y Yugi tengan única y exclusivamente su Dios asignado (máximo 1 copia total):
+    // Yugi -> Slifer the Sky Dragon
+    // Kaiba / Seto -> Obelisk the Tormentor
+    // Marik -> The Winged Dragon of Ra
     var godMap = {
       'marik': 'The Winged Dragon of Ra',
       'kaiba': 'Obelisk the Tormentor',
-      'yugi': yugiChosenGod || window._yugiSelectedGod || 'Slifer the Sky Dragon'
+      'seto': 'Obelisk the Tormentor',
+      'yugi': 'Slifer the Sky Dragon'
     };
     if (godMap[opp] && typeof game !== 'undefined' && game && Array.isArray(game.enemyHand)) {
       var targetGod = godMap[opp];
-      var hasGod = game.enemyHand.some(function(c) {
+      var hasGodInHand = game.enemyHand.some(function(c) {
         return c && (c.name === targetGod || c[0] === targetGod);
       });
-      if (!hasGod) {
+      if (!hasGodInHand) {
         var dIdx = (game.enemyDeck || []).findIndex(function(c) {
           return c && (c.name === targetGod || c[0] === targetGod);
         });
-        var swapCard = game.enemyHand[0];
         if (dIdx >= 0) {
+          var swapCard = game.enemyHand[0];
           var gCard = game.enemyDeck.splice(dIdx, 1)[0];
           game.enemyHand[0] = gCard;
           if (swapCard) game.enemyDeck.push(swapCard);
           console.log('[God Guarantee] Swapped ' + targetGod + ' into ' + opp + ' opening hand.');
-        } else {
-          var gCard = (typeof mk === 'function' ? mk(targetGod) : null) || { name: targetGod, atk: 5000, def: 5000, pos: 'ATK', faceUp: true };
-          gCard.atk = 5000; gCard.def = 5000; gCard.pos = 'ATK'; gCard.faceUp = true;
-          game.enemyHand[0] = gCard;
-          if (swapCard && Array.isArray(game.enemyDeck)) game.enemyDeck.push(swapCard);
-          console.log('[God Guarantee] Injected ' + targetGod + ' into ' + opp + ' opening hand.');
         }
       }
+      // Limpiar cualquier copia duplicada en el deck para garantizar estrictamente 1 copia en toda la partida
+      var godCountInHand = game.enemyHand.filter(function(c) { return c && (c.name === targetGod || c[0] === targetGod); }).length;
+      var keptInDeck = false;
+      game.enemyDeck = (game.enemyDeck || []).filter(function(c) {
+        if (c && (c.name === targetGod || c[0] === targetGod)) {
+          if (godCountInHand > 0 || keptInDeck) return false;
+          keptInDeck = true;
+          return true;
+        }
+        return true;
+      });
     }
 
     // Kosaburo Kaiba: starts with 5 Exodia pieces in Graveyard
@@ -18155,33 +18157,6 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
     var isGodBoss = (opp === 'marik' || opp === 'kaiba' || opp === 'seto' || opp === 'yugi');
     var hand = Array.isArray(game.enemyHand) ? game.enemyHand : [];
-
-    // Ensure God card in hand for God Bosses on turn 1
-    var godMap = {
-      'marik': 'The Winged Dragon of Ra',
-      'kaiba': 'Obelisk the Tormentor',
-      'seto': 'Obelisk the Tormentor',
-      'yugi': window._yugiSelectedGod || 'Slifer the Sky Dragon'
-    };
-    if (isGodBoss && godMap[opp] && (game.turnNo === 1 || !hand.some(function(c) { return c && isEgyptianGod(c.name || c[0]); }))) {
-      var targetGodName = godMap[opp];
-      var hasGodInHand = hand.some(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
-      var hasGodOnField = (game.enemy || []).some(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
-      if (!hasGodInHand && !hasGodOnField) {
-        var dIdx = (game.enemyDeck || []).findIndex(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
-        var swapC = hand[0];
-        if (dIdx >= 0) {
-          var gCard = game.enemyDeck.splice(dIdx, 1)[0];
-          hand[0] = gCard;
-          if (swapC) game.enemyDeck.push(swapC);
-        } else {
-          var gCard = (typeof mk === 'function' ? mk(targetGodName) : null) || { name: targetGodName, atk: 5000, def: 5000, pos: 'ATK', faceUp: true };
-          gCard.atk = 5000; gCard.def = 5000; gCard.pos = 'ATK'; gCard.faceUp = true;
-          hand[0] = gCard;
-          if (swapC && Array.isArray(game.enemyDeck)) game.enemyDeck.push(swapC);
-        }
-      }
-    }
 
     var godIdx = hand.findIndex(function(c) { return c && isEgyptianGod(c.name || c[0]); });
 
@@ -21249,32 +21224,6 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     // A0. Invocación de Dios Egipcio SIN tributos para Yugi, Kaiba y Marik (3 tributos solo para el jugador)
     if (isGodBoss) {
-      var godMap = {
-        'marik': 'The Winged Dragon of Ra',
-        'kaiba': 'Obelisk the Tormentor',
-        'seto': 'Obelisk the Tormentor',
-        'yugi': window._yugiSelectedGod || 'Slifer the Sky Dragon'
-      };
-      var targetGodName = godMap[opp];
-      if (targetGodName && (game.turnNo === 1 || !hand.some(function(c) { return c && isEgyptianGod(c.name || c[0]); }))) {
-        var hasGodInHand = hand.some(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
-        var hasGodOnField = (game.enemy || []).some(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
-        if (!hasGodInHand && !hasGodOnField) {
-          var dIdx = (game.enemyDeck || []).findIndex(function(c) { return c && (c.name === targetGodName || c[0] === targetGodName); });
-          var swapC = hand[0];
-          if (dIdx >= 0) {
-            var gCard = game.enemyDeck.splice(dIdx, 1)[0];
-            hand[0] = gCard;
-            if (swapC) game.enemyDeck.push(swapC);
-          } else {
-            var gCard = (typeof window.mk === 'function' ? window.mk(targetGodName) : null) || { name: targetGodName, atk: 5000, def: 5000, pos: 'ATK', faceUp: true };
-            gCard.atk = 5000; gCard.def = 5000; gCard.pos = 'ATK'; gCard.faceUp = true;
-            hand[0] = gCard;
-            if (swapC && Array.isArray(game.enemyDeck)) game.enemyDeck.push(swapC);
-          }
-        }
-      }
-
       var godIdx = hand.findIndex(function(c) { return c && isEgyptianGod(c.name || c[0]); });
       if (godIdx >= 0) {
         var targetSlot = (game.enemy || []).findIndex(function(x) { return !x; });
