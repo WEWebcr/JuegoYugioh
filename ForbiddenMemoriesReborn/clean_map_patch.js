@@ -8279,7 +8279,54 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { aiHandSummonOrSet = window.aiHandSummonOrSet; } catch(_) {}
 
-  // 3. Fusion System (Mano + Mano, Campo + Mano, Campo + Campo con Selección y Ejecución Automática)
+  // 3. Fusion System (Mano + Mano, Campo + Mano, Campo + Campo, Fusiones en Cadena de 3+ Materiales)
+  window.FUSION_MONSTER_NAMES = window.FUSION_MONSTER_NAMES || new Set([
+    "Alligator's Sword Dragon","Amazon of the Seas","Amphibious Bugroth","Amulet Dragon","Arcana Knight Joker",
+    "Armored Zombie","B. Dragon Jungle King","Bean Soldier","Black Skull Dragon","Blackland Fire Dragon",
+    "Bolt Escargot","Chimera the Flying Mythical Beast","Corroding Shark","Crimson Sunbird","Curse of Dragon",
+    "Cyber Saurus","Cyber Soldier","Dark Magician Girl the Dragon Knight","Dark Paladin","Dark Witch",
+    "Darkfire Dragon","Dice Armadillo","Disk Magician","Dissolverock","Doom Virus Dragon","Dragon Statue",
+    "Dragon Zombie","Egyptian God Slime","Empress Judge","Enchanting Mermaid","Fire Reaper","Firegrass",
+    "Flame Cerebrus","Flame Ghost","Flame Swordsman","Flower Wolf","Gaia the Dragon Champion","Giga-Tech Wolf",
+    "Great Mammoth of Goldfine","Humanoid Worm Drake","Ice Water","Kairyu-Shin","Kaminari Attack",
+    "Kwagar Hercules","Maga Oscura","Magical Ghost","Man-eating Black Shark","Marine Beast","Mavelus",
+    "Metal Dragon","Metal Fish","Misairuzame","Mystical Sand","Nekogal #2","Pumpking the King of Ghosts",
+    "Queen of Autumn Leaves","Rare Fish","Reaper on the Nightmare","Red-Eyes Black Dragon Sword",
+    "Rose Spectre of Dunn","Sea King Dragon","Shadow Specter","Skelgon","Skull Knight","Snakeyashi",
+    "Spike Seadra","Stone D.","Stone Ghost","Sword Arm of Dragon","The Immortal of Thunder",
+    "Thousand Dragon","Thunder Dragon","Tiger Axe","Tripwire Beast","Turtle Tiger","Twin-Headed Thunder Dragon",
+    "Tyrant Burst Dragon","Ultimate Dragon","Ushi Oni","Warrior of Tradition","Wood Remains","XY-Dragon Cannon",
+    "XYZ-Dragon Cannon","XZ-Tank Cannon","YZ-Tank Dragon","Zombie Warrior"
+  ]);
+
+  function isFusionMonster(c) {
+    if (!c) return false;
+    if (typeof isST === 'function' && isST(c)) return false;
+    if (c.kind === 'SPELL' || c.kind === 'TRAP' || c.kind === 'EQUIP') return false;
+    if (c.type === 'SPELL' || c.type === 'TRAP' || c.type === 'EQUIP') return false;
+    if (c.isFusion || c._isFused || c.kind === 'FUSION' || c.type === 'Fusion') return true;
+    if (Array.isArray(c.materials) && c.materials.length > 0) return true;
+    var name = c.name || c[0] || '';
+    if (window.FUSION_MONSTER_NAMES && window.FUSION_MONSTER_NAMES.has(name)) return true;
+    return false;
+  }
+  window.isFusionMonster = isFusionMonster;
+
+  function getMonsterLevel(c) {
+    if (!c) return 0;
+    var lvl = Number(c.level ?? c[1] ?? 0);
+    if (!lvl && typeof window.metaFor === 'function') {
+      var m = window.metaFor(c.name || c[0]);
+      if (m && m.level) lvl = Number(m.level);
+    }
+    if (!lvl && window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+      var cd = window.CARDS_DATA.find(function(x) { return x && x.name === (c.name || c[0]); });
+      if (cd && cd.level) lvl = Number(cd.level);
+    }
+    return lvl || 0;
+  }
+  window.getMonsterLevel = getMonsterLevel;
+
   function isMonsterCard(c) {
     if (!c) return false;
     var n = cardName(c).toLowerCase();
@@ -8294,6 +8341,116 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!c) return '';
     return c.name || c[0] || '';
   }
+
+  function callPairFusion(n1, n2) {
+    var fn = typeof fusionResult === 'function' ? fusionResult : window.fusionResult;
+    return fn ? fn([n1, n2]) : null;
+  }
+
+  function getPermutations(arr) {
+    if (arr.length <= 1) return [arr];
+    var res = [];
+    for (var i = 0; i < arr.length; i++) {
+      var cur = arr[i];
+      var rest = arr.slice(0, i).concat(arr.slice(i + 1));
+      var sub = getPermutations(rest);
+      for (var s = 0; s < sub.length; s++) {
+        res.push([cur].concat(sub[s]));
+      }
+    }
+    return res;
+  }
+
+  function resolveChainedFusion(cardNames) {
+    if (!cardNames || cardNames.length < 2) return null;
+    if (cardNames.length === 2) {
+      var r2 = callPairFusion(cardNames[0], cardNames[1]);
+      if (r2) {
+        var m2 = (typeof window.metaFor === 'function' ? window.metaFor(r2) : null) || {};
+        return { result: r2, chain: cardNames.slice(), atk: m2.atk || 0, materialsUsed: cardNames.slice() };
+      }
+      return null;
+    }
+
+    var perms = getPermutations(cardNames);
+    var best = null;
+
+    for (var p = 0; p < perms.length; p++) {
+      var perm = perms[p];
+      var current = callPairFusion(perm[0], perm[1]);
+      if (!current) continue;
+      var valid = true;
+      for (var k = 2; k < perm.length; k++) {
+        var next = callPairFusion(current, perm[k]);
+        if (!next) {
+          valid = false;
+          break;
+        }
+        current = next;
+      }
+      if (valid && current) {
+        var meta = (typeof window.metaFor === 'function' ? window.metaFor(current) : null) || {};
+        var atk = meta.atk || 0;
+        if (!best || atk > best.atk) {
+          best = { result: current, chain: perm.slice(), atk: atk, materialsUsed: cardNames.slice() };
+        }
+      }
+    }
+
+    return best;
+  }
+  window.resolveChainedFusion = resolveChainedFusion;
+
+  function resolveFieldChainedFusion(fieldName, handNames) {
+    if (!fieldName || !handNames || !handNames.length) return null;
+    if (handNames.length === 1) {
+      var r = callPairFusion(fieldName, handNames[0]);
+      if (r) {
+        var m = (typeof window.metaFor === 'function' ? window.metaFor(r) : null) || {};
+        return { result: r, chain: [fieldName, handNames[0]], atk: m.atk || 0 };
+      }
+      return null;
+    }
+
+    var perms = getPermutations(handNames);
+    var best = null;
+
+    for (var p = 0; p < perms.length; p++) {
+      var perm = perms[p];
+      var current = callPairFusion(fieldName, perm[0]);
+      if (!current) continue;
+      var valid = true;
+      for (var k = 1; k < perm.length; k++) {
+        var next = callPairFusion(current, perm[k]);
+        if (!next) { valid = false; break; }
+        current = next;
+      }
+      if (valid && current) {
+        var meta = (typeof window.metaFor === 'function' ? window.metaFor(current) : null) || {};
+        var atk = meta.atk || 0;
+        if (!best || atk > best.atk) {
+          best = { result: current, chain: [fieldName].concat(perm), atk: atk };
+        }
+      }
+    }
+
+    if (handNames.length >= 2) {
+      var handBest = resolveChainedFusion(handNames);
+      if (handBest) {
+        var fRes = callPairFusion(handBest.result, fieldName);
+        if (fRes) {
+          var meta2 = (typeof window.metaFor === 'function' ? window.metaFor(fRes) : null) || {};
+          var atk2 = meta2.atk || 0;
+          if (!best || atk2 > best.atk) {
+            best = { result: fRes, chain: handBest.chain.concat([fieldName]), atk: atk2 };
+          }
+        }
+      }
+    }
+
+    return best;
+  }
+  window.resolveFieldChainedFusion = resolveFieldChainedFusion;
 
   function getFusionCardThumb(name) {
     var dict = window.getGlobalCardDict ? window.getGlobalCardDict() : {};
@@ -8320,7 +8477,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var out = [];
     var seen = {};
 
-    // A. MANO + MANO
+    // A. MANO + MANO (Pares)
     for (var i = 0; i < game.hand.length; i++) {
       var c1 = game.hand[i];
       if (!isMonsterCard(c1)) continue;
@@ -8331,7 +8488,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (!isMonsterCard(c2)) continue;
         var name2 = cardName(c2);
         if (!name2) continue;
-        var r = typeof fusionResult === 'function' ? fusionResult([name1, name2]) : (window.fusionResult ? window.fusionResult([name1, name2]) : null);
+        var r = callPairFusion(name1, name2);
         if (r) {
           var key = 'h' + i + '+h' + j + '->' + r;
           if (!seen[key]) {
@@ -8340,6 +8497,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               type: 'hand-hand',
               a: { zone: 'h', index: i, card: c1, name: name1 },
               b: { zone: 'h', index: j, card: c2, name: name2 },
+              materials: [
+                { zone: 'h', index: i, card: c1, name: name1 },
+                { zone: 'h', index: j, card: c2, name: name2 }
+              ],
               result: r
             });
           }
@@ -8347,7 +8508,43 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // B. CAMPO + MANO
+    // B. MANO (3 Materiales en Cadena)
+    if (game.hand.length >= 3) {
+      for (var i = 0; i < game.hand.length; i++) {
+        var cA = game.hand[i];
+        if (!isMonsterCard(cA)) continue;
+        var nA = cardName(cA);
+        for (var j = i + 1; j < game.hand.length; j++) {
+          var cB = game.hand[j];
+          if (!isMonsterCard(cB)) continue;
+          var nB = cardName(cB);
+          for (var k = j + 1; k < game.hand.length; k++) {
+            var cC = game.hand[k];
+            if (!isMonsterCard(cC)) continue;
+            var nC = cardName(cC);
+            var r3 = resolveChainedFusion([nA, nB, nC]);
+            if (r3) {
+              var key3 = 'h' + i + '+h' + j + '+h' + k + '->' + r3.result;
+              if (!seen[key3]) {
+                seen[key3] = true;
+                out.push({
+                  type: 'hand-chain-3',
+                  materials: [
+                    { zone: 'h', index: i, card: cA, name: nA },
+                    { zone: 'h', index: j, card: cB, name: nB },
+                    { zone: 'h', index: k, card: cC, name: nC }
+                  ],
+                  result: r3.result,
+                  chain: r3.chain
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // C. CAMPO + MANO (Pares)
     for (var f = 0; f < (game.field || []).length; f++) {
       var cf = game.field[f];
       if (!cf || !isMonsterCard(cf)) continue;
@@ -8358,7 +8555,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (!isMonsterCard(ch)) continue;
         var nameH = cardName(ch);
         if (!nameH) continue;
-        var rF = typeof fusionResult === 'function' ? fusionResult([nameF, nameH]) : (window.fusionResult ? window.fusionResult([nameF, nameH]) : null);
+        var rF = callPairFusion(nameF, nameH);
         if (rF) {
           var keyF = 'f' + f + '+h' + h + '->' + rF;
           if (!seen[keyF]) {
@@ -8367,6 +8564,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               type: 'field-hand',
               a: { zone: 'f', index: f, card: cf, name: nameF },
               b: { zone: 'h', index: h, card: ch, name: nameH },
+              materials: [
+                { zone: 'f', index: f, card: cf, name: nameF },
+                { zone: 'h', index: h, card: ch, name: nameH }
+              ],
               result: rF
             });
           }
@@ -8374,7 +8575,43 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // C. CAMPO + CAMPO
+    // D. CAMPO + 2 CARTAS DE MANO (3 Materiales)
+    if (game.hand.length >= 2) {
+      for (var f = 0; f < (game.field || []).length; f++) {
+        var cf = game.field[f];
+        if (!cf || !isMonsterCard(cf)) continue;
+        var nameF = cardName(cf);
+        for (var h1 = 0; h1 < game.hand.length; h1++) {
+          var ch1 = game.hand[h1];
+          if (!isMonsterCard(ch1)) continue;
+          var nh1 = cardName(ch1);
+          for (var h2 = h1 + 1; h2 < game.hand.length; h2++) {
+            var ch2 = game.hand[h2];
+            if (!isMonsterCard(ch2)) continue;
+            var nh2 = cardName(ch2);
+            var rf3 = resolveFieldChainedFusion(nameF, [nh1, nh2]);
+            if (rf3) {
+              var keyF3 = 'f' + f + '+h' + h1 + '+h' + h2 + '->' + rf3.result;
+              if (!seen[keyF3]) {
+                seen[keyF3] = true;
+                out.push({
+                  type: 'field-hand-chain-3',
+                  materials: [
+                    { zone: 'f', index: f, card: cf, name: nameF },
+                    { zone: 'h', index: h1, card: ch1, name: nh1 },
+                    { zone: 'h', index: h2, card: ch2, name: nh2 }
+                  ],
+                  result: rf3.result,
+                  chain: rf3.chain
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // E. CAMPO + CAMPO
     for (var f1 = 0; f1 < (game.field || []).length; f1++) {
       var cF1 = game.field[f1];
       if (!cF1 || !isMonsterCard(cF1)) continue;
@@ -8385,7 +8622,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (!cF2 || !isMonsterCard(cF2)) continue;
         var nF2 = cardName(cF2);
         if (!nF2) continue;
-        var rFF = typeof fusionResult === 'function' ? fusionResult([nF1, nF2]) : (window.fusionResult ? window.fusionResult([nF1, nF2]) : null);
+        var rFF = callPairFusion(nF1, nF2);
         if (rFF) {
           var keyFF = 'f' + f1 + '+f' + f2 + '->' + rFF;
           if (!seen[keyFF]) {
@@ -8394,6 +8631,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               type: 'field-field',
               a: { zone: 'f', index: f1, card: cF1, name: nF1 },
               b: { zone: 'f', index: f2, card: cF2, name: nF2 },
+              materials: [
+                { zone: 'f', index: f1, card: cF1, name: nF1 },
+                { zone: 'f', index: f2, card: cF2, name: nF2 }
+              ],
               result: rFF
             });
           }
@@ -8451,13 +8692,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
 
     var resultName = opt.result;
-    var matA = opt.a;
-    var matB = opt.b;
+    var mats = opt.materials || [opt.a, opt.b].filter(Boolean);
 
-    // Verificar espacio en campo si es hand-hand
+    // Determinar casilla objetivo en campo:
     var targetSlot = -1;
-    if (opt.type === 'field-hand' || opt.type === 'field-field') {
-      targetSlot = matA.index;
+    var fieldMat = mats.find(function(m) { return m && m.zone === 'f'; });
+    if (fieldMat) {
+      targetSlot = fieldMat.index;
     } else {
       targetSlot = game.field.findIndex(function(x) { return !x; });
       if (targetSlot < 0) {
@@ -8471,29 +8712,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof window.recordDiscoveredFusion === 'function') window.recordDiscoveredFusion(resultName);
     } catch(_) {}
 
-    // Enviar materiales al cementerio
-    if (opt.type === 'hand-hand') {
-      var idxs = [matA.index, matB.index].sort(function(a, b) { return b - a; });
-      idxs.forEach(function(idx) {
-        var card = game.hand.splice(idx, 1)[0];
-        if (card) game.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
-      });
-    } else if (opt.type === 'field-hand') {
-      var fCard = game.field[matA.index];
-      game.field[matA.index] = null;
+    // Enviar materiales de campo al cementerio:
+    mats.filter(function(m) { return m && m.zone === 'f'; }).forEach(function(m) {
+      var fCard = game.field[m.index];
+      game.field[m.index] = null;
       if (fCard) game.grave.push(Object.assign({}, fCard, { set: false, faceUp: true }));
-      var hCard = game.hand.splice(matB.index, 1)[0];
-      if (hCard) game.grave.push(Object.assign({}, hCard, { set: false, faceUp: true }));
-    } else if (opt.type === 'field-field') {
-      var fCardA = game.field[matA.index];
-      game.field[matA.index] = null;
-      if (fCardA) game.grave.push(Object.assign({}, fCardA, { set: false, faceUp: true }));
-      var fCardB = game.field[matB.index];
-      game.field[matB.index] = null;
-      if (fCardB) game.grave.push(Object.assign({}, fCardB, { set: false, faceUp: true }));
-    }
+    });
 
-    // Crear el monstruo de fusión
+    // Enviar materiales de mano al cementerio (en orden descendente de índice para no desfasar el splice):
+    var handMats = mats.filter(function(m) { return m && m.zone === 'h'; });
+    var handIndices = handMats.map(function(m) { return m.index; }).sort(function(a, b) { return b - a; });
+    handIndices.forEach(function(idx) {
+      var card = game.hand.splice(idx, 1)[0];
+      if (card) game.grave.push(Object.assign({}, card, { set: false, faceUp: true }));
+    });
+
+    // Crear el monstruo de fusión:
     var fused = window.mk(resultName) || {
       name: resultName,
       level: 6,
@@ -8502,14 +8736,18 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       atk: 2100,
       def: 1800,
       pos: 'ATK',
-      materials: [matA.name, matB.name],
+      materials: opt.chain || mats.map(function(m) { return m.name; }),
       faceUp: true
     };
-    fused.materials = [matA.name, matB.name];
+    fused.materials = opt.chain || mats.map(function(m) { return m.name; });
     fused.pos = 'ATK';
     fused.faceUp = true;
     fused.faceDownSet103 = false;
+    fused._isFused = true;
+    fused.isFusion = true;
+    fused.kind = 'FUSION';
     game.field[targetSlot] = fused;
+
     if (typeof window.recordDiscoveredFusion === 'function') {
       try { window.recordDiscoveredFusion(resultName); } catch(_) {}
     }
@@ -8525,7 +8763,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof render === 'function') render();
     if (typeof setDuelView === 'function') setDuelView('field');
 
-    var matDesc = '[' + (matA.zone === 'f' ? 'CAMPO' : 'MANO') + '] ' + matA.name + ' + [' + (matB.zone === 'f' ? 'CAMPO' : 'MANO') + '] ' + matB.name;
+    var matDesc = mats.map(function(m) {
+      return '[' + (m.zone === 'f' ? 'CAMPO' : 'MANO') + '] ' + m.name;
+    }).join(' + ');
     duelToast('¡FUSIÓN EXITOSA! Invocaste a ' + resultName + '.');
     if (typeof log === 'function') log('FUSIÓN → ' + resultName + ' (' + matDesc + ').');
   }
@@ -8547,8 +8787,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var sortedOpts = options.slice();
     if (selFocus) {
       sortedOpts.sort(function(a, b) {
-        var aMatch = (a.a.zone === selFocus.zone && a.a.index === selFocus.index) || (a.b.zone === selFocus.zone && a.b.index === selFocus.index);
-        var bMatch = (b.a.zone === selFocus.zone && b.a.index === selFocus.index) || (b.b.zone === selFocus.zone && b.b.index === selFocus.index);
+        var aMats = a.materials || [a.a, a.b].filter(Boolean);
+        var bMats = b.materials || [b.a, b.b].filter(Boolean);
+        var aMatch = aMats.some(function(m) { return m.zone === selFocus.zone && m.index === selFocus.index; });
+        var bMatch = bMats.some(function(m) { return m.zone === selFocus.zone && m.index === selFocus.index; });
         if (aMatch && !bMatch) return -1;
         if (!aMatch && bMatch) return 1;
         return 0;
@@ -8580,10 +8822,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var item = document.createElement('div');
       item.style.cssText = 'background:linear-gradient(135deg,#2b1f33 0%,#17111c 100%);border:2px solid #7a4299;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 4px 10px rgba(0,0,0,0.5);cursor:pointer;transition:all 0.2s;';
 
-      var locA = o.a.zone === 'f' ? 'CAMPO' : 'MANO';
-      var locB = o.b.zone === 'f' ? 'CAMPO' : 'MANO';
-      var tagStyleA = o.a.zone === 'f' ? 'background:#00364d;border:1px solid #00c3ff;color:#8ce8ff;' : 'background:#4a3000;border:1px solid #d4af37;color:#ffd700;';
-      var tagStyleB = o.b.zone === 'f' ? 'background:#00364d;border:1px solid #00c3ff;color:#8ce8ff;' : 'background:#4a3000;border:1px solid #d4af37;color:#ffd700;';
+      var mats = o.materials || [o.a, o.b].filter(Boolean);
+      var matsHtml = mats.map(function(m, idx) {
+        var loc = m.zone === 'f' ? 'CAMPO' : 'MANO';
+        var tagStyle = m.zone === 'f' ? 'background:#00364d;border:1px solid #00c3ff;color:#8ce8ff;' : 'background:#4a3000;border:1px solid #d4af37;color:#ffd700;';
+        return '<div style="display:flex;align-items:center;gap:6px;font-size:14px;color:#fff;">' +
+          '<span style="padding:1px 5px;border-radius:4px;font-size:10px;font-weight:900;' + tagStyle + '">' + loc + '</span> ' +
+          '<span>' + m.name + '</span>' +
+        '</div>';
+      }).join('<div style="color:#efc6ff;font-size:11px;margin-left:12px;">+</div>');
+
+      var multiBadge = (mats.length > 2) ? '<span style="background:#b8860b;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:bold;margin-left:6px;">' + mats.length + ' MATS</span>' : '';
 
       var mMeta = (window.mk ? window.mk(o.result) : null) || {};
       var atk = mMeta.atk != null ? mMeta.atk : '?';
@@ -8591,21 +8840,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var thumb = getFusionCardThumb(o.result);
 
       item.innerHTML = '<div style="display:flex;align-items:center;gap:12px;flex:1.8;">' +
-        '<div style="display:flex;flex-direction:column;gap:5px;flex:1;">' +
-          '<div style="display:flex;align-items:center;gap:6px;font-size:15px;color:#fff;">' +
-            '<span style="padding:2px 6px;border-radius:5px;font-size:11px;font-weight:900;' + tagStyleA + '">' + locA + '</span> ' +
-            '<span>' + o.a.name + '</span>' +
-          '</div>' +
-          '<div style="color:#efc6ff;font-size:12px;margin-left:15px;">+</div>' +
-          '<div style="display:flex;align-items:center;gap:6px;font-size:15px;color:#fff;">' +
-            '<span style="padding:2px 6px;border-radius:5px;font-size:11px;font-weight:900;' + tagStyleB + '">' + locB + '</span> ' +
-            '<span>' + o.b.name + '</span>' +
-          '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:4px;flex:1;">' +
+          matsHtml +
         '</div>' +
         '<div style="font-size:22px;color:#ffd700;font-weight:bold;margin:0 4px;">➔</div>' +
         '<img src="' + thumb + '" alt="' + o.result + '" style="width:48px;height:70px;object-fit:cover;border-radius:5px;border:1px solid #ffd700;box-shadow:0 2px 6px #000;background:#000;flex-shrink:0;">' +
         '<div style="display:flex;flex-direction:column;gap:2px;">' +
-          '<div style="font-size:18px;font-weight:900;color:#ffd700;line-height:1.2;">' + o.result + '</div>' +
+          '<div style="font-size:18px;font-weight:900;color:#ffd700;line-height:1.2;display:flex;align-items:center;">' + o.result + multiBadge + '</div>' +
           '<div style="font-size:14px;color:#55dfff;">ATK ' + atk + ' / DEF ' + def + '</div>' +
           (mMeta.type ? '<div style="font-size:12px;color:#aaa;">' + mMeta.type + ' · ' + (mMeta.attr || '') + '</div>' : '') +
         '</div>' +
@@ -8647,47 +8888,56 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var hs = (game.selected || []).filter(function(x) { return x && x[0] === 'h'; }).map(function(x) { return Number(x[1]); }).filter(Number.isInteger);
     var fs = (game.selected || []).filter(function(x) { return x && x[0] === 'f'; }).map(function(x) { return Number(x[1]); }).filter(Number.isInteger);
 
-    // 1. Si ya hay 2 cartas seleccionadas válidas, fusionar directamente:
-    if (hs.length === 2 && fs.length === 0) {
-      var cA = game.hand[hs[0]], cB = game.hand[hs[1]];
-      if (isMonsterCard(cA) && isMonsterCard(cB)) {
-        var nA = cardName(cA), nB = cardName(cB);
-        var res = typeof fusionResult === 'function' ? fusionResult([nA, nB]) : (window.fusionResult ? window.fusionResult([nA, nB]) : null);
-        if (res) {
+    // 1. Fusión directa de MANO (2 o más materiales seleccionados, ej: 2, 3, 4, 5 cartas)
+    if (hs.length >= 2 && fs.length === 0) {
+      var handCards = hs.map(function(i) { return game.hand[i]; });
+      if (handCards.every(isMonsterCard)) {
+        var handNames = handCards.map(cardName);
+        var chainRes = resolveChainedFusion(handNames);
+        if (chainRes) {
           executeFusion({
-            type: 'hand-hand',
-            a: { zone: 'h', index: hs[0], card: cA, name: nA },
-            b: { zone: 'h', index: hs[1], card: cB, name: nB },
-            result: res
+            type: 'hand-chain',
+            materials: hs.map(function(idx, i) { return { zone: 'h', index: idx, card: handCards[i], name: handNames[i] }; }),
+            result: chainRes.result,
+            chain: chainRes.chain
           });
           return;
         }
       }
-    } else if (hs.length === 1 && fs.length === 1) {
-      var cF = game.field[fs[0]], cH = game.hand[hs[0]];
-      if (isMonsterCard(cF) && isMonsterCard(cH)) {
-        var nF = cardName(cF), nH = cardName(cH);
-        var resF = typeof fusionResult === 'function' ? fusionResult([nF, nH]) : (window.fusionResult ? window.fusionResult([nF, nH]) : null);
-        if (resF) {
+    } else if (fs.length === 1 && hs.length >= 1) {
+      // 2. Fusión directa CAMPO (1 monstruo) + MANO (1 o más monstruos seleccionados)
+      var fCard = game.field[fs[0]];
+      var handCardsF = hs.map(function(i) { return game.hand[i]; });
+      if (isMonsterCard(fCard) && handCardsF.every(isMonsterCard)) {
+        var fName = cardName(fCard);
+        var handNamesF = handCardsF.map(cardName);
+        var chainResF = resolveFieldChainedFusion(fName, handNamesF);
+        if (chainResF) {
+          var allMats = [{ zone: 'f', index: fs[0], card: fCard, name: fName }].concat(
+            hs.map(function(idx, i) { return { zone: 'h', index: idx, card: handCardsF[i], name: handNamesF[i] }; })
+          );
           executeFusion({
-            type: 'field-hand',
-            a: { zone: 'f', index: fs[0], card: cF, name: nF },
-            b: { zone: 'h', index: hs[0], card: cH, name: nH },
-            result: resF
+            type: 'field-hand-chain',
+            materials: allMats,
+            result: chainResF.result,
+            chain: chainResF.chain
           });
           return;
         }
       }
     } else if (fs.length === 2 && hs.length === 0) {
+      // 3. Fusión directa CAMPO + CAMPO
       var cF1 = game.field[fs[0]], cF2 = game.field[fs[1]];
       if (isMonsterCard(cF1) && isMonsterCard(cF2)) {
         var nF1 = cardName(cF1), nF2 = cardName(cF2);
-        var resFF = typeof fusionResult === 'function' ? fusionResult([nF1, nF2]) : (window.fusionResult ? window.fusionResult([nF1, nF2]) : null);
+        var resFF = callPairFusion(nF1, nF2);
         if (resFF) {
           executeFusion({
             type: 'field-field',
-            a: { zone: 'f', index: fs[0], card: cF1, name: nF1 },
-            b: { zone: 'f', index: fs[1], card: cF2, name: nF2 },
+            materials: [
+              { zone: 'f', index: fs[0], card: cF1, name: nF1 },
+              { zone: 'f', index: fs[1], card: cF2, name: nF2 }
+            ],
             result: resFF
           });
           return;
@@ -8695,7 +8945,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // 2. Si no hay 2 materiales válidos preseleccionados, abrir el modal de selección:
+    // 4. Si no hay combinación directa válida preseleccionada, abrir el modal de selección de Fusiones disponibles:
     var opts = getAvailableFusionOptions();
     if (!opts.length) {
       duelToast('No hay ninguna Fusión disponible en este momento.');
@@ -8941,7 +9191,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       return monType.includes('winged beast') || monType.includes('bestia alada');
     }
     if (eqVal === 'FUSION_WEAPON' || eqName === 'Fusion Weapon') {
-      return (monKind === 'FUSION' || target.isFusion) && (monLevel <= 6);
+      return isFusionMonster(target) && (getMonsterLevel(target) <= 6) && (getMonsterLevel(target) > 0);
     }
     return true;
   }

@@ -1150,14 +1150,20 @@ body.enemy-hand-preview.view-hand #hand .enemyHandBack{display:block!important;v
   window.FMR_SIGN_SYMBOL=SIGN_SYMBOL;
 
   function metaFor(name){
+    if(typeof window!=='undefined'&&window.FMR_CARD_META&&window.FMR_CARD_META[name])return window.FMR_CARD_META[name];
     if(META[name])return META[name];
-    const d=DB.find(c=>c[0]===name);
-    if(!d)return null;
-    return {name:d[0],level:d[1],type:d[2],attr:d[3],atk:d[4],def:d[5],sign1:null,sign2:null,signs:[],tags:[],kind:null};
+    const d=(typeof DB!=='undefined'&&Array.isArray(DB))?DB.find(c=>c[0]===name):null;
+    if(d)return {name:d[0],level:d[1],type:d[2],attr:d[3],atk:d[4],def:d[5],sign1:d[6]||null,sign2:d[7]||null,signs:[d[6],d[7]].filter(Boolean),tags:[],kind:null};
+    if(typeof window!=='undefined'&&window.CARDS_DATA&&Array.isArray(window.CARDS_DATA)){
+      const cd=window.CARDS_DATA.find(c=>c&&(c.name===name||(c.name&&c.name.toLowerCase()===name.toLowerCase())));
+      if(cd)return {name:cd.name,level:cd.level||4,type:cd.type||'Warrior',attr:cd.attr||'EARTH',atk:cd.atk||0,def:cd.def||0,sign1:cd.sign1||null,sign2:cd.sign2||null,signs:[cd.sign1,cd.sign2].filter(Boolean),tags:cd.kind==='FUSION'?['FUSION']:[],kind:cd.kind||null};
+    }
+    return null;
   }
+  try{window.metaFor=metaFor;}catch(_){ }
   function normalizeTag(s){return String(s||'').toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'');}
   function tagsFor(name){
-    const m=metaFor(name);if(!m)return new Set();
+    const m=(typeof window!=='undefined'&&window.metaFor)?window.metaFor(name):metaFor(name);if(!m)return new Set();
     const s=new Set((m.tags||[]).map(normalizeTag));
     s.add(normalizeTag(m.type));
     s.add(normalizeTag(m.attr));
@@ -1167,15 +1173,28 @@ body.enemy-hand-preview.view-hand #hand .enemyHandBack{display:block!important;v
     if(m.attr==='FIRE')s.add('PYRO');
     if(m.attr==='WATER'&&(m.type==='Aqua'||m.type==='Sea Serpent'||m.type==='Fish'))s.add('AQUA');
     if(m.attr==='DARK'&&m.type==='Spellcaster')s.add('DARK_SPELLCASTER');
+    if(m.type==='Dragon'||(m.name&&(m.name.toLowerCase().includes('dragon')||m.name.toLowerCase().includes('dragón'))))s.add('DRAGON');
+    if(m.type==='Thunder'||(m.name&&(m.name.toLowerCase().includes('thunder')||m.name.toLowerCase().includes('trueno'))))s.add('THUNDER');
+    if(m.type==='Warrior'||(m.name&&(m.name.toLowerCase().includes('warrior')||m.name.toLowerCase().includes('guerrero'))))s.add('WARRIOR');
+    if(m.type==='Spellcaster'||(m.name&&(m.name.toLowerCase().includes('magician')||m.name.toLowerCase().includes('mago')||m.name.toLowerCase().includes('witch')||m.name.toLowerCase().includes('bruja'))))s.add('SPELLCASTER');
+    if(m.type==='Zombie'||(m.name&&(m.name.toLowerCase().includes('zombie')||m.name.toLowerCase().includes('ghost')||m.name.toLowerCase().includes('fantasma'))))s.add('ZOMBIE');
+    if(m.type==='Machine'||(m.name&&(m.name.toLowerCase().includes('machine')||m.name.toLowerCase().includes('máquina'))))s.add('MACHINE');
     return s;
   }
+  try{window.tagsFor=tagsFor;}catch(_){ }
 
   /* mk ahora conserva la estructura clásica pero añade metadatos sin alterar las mecánicas estables. */
   mk=function(name){
-    const x=DB.find(c=>c[0]===name);if(!x)return null;
+    let x=(typeof DB!=='undefined'&&Array.isArray(DB))?DB.find(c=>c[0]===name):null;
     const m=metaFor(name)||{};
+    if(!x&&m.name){
+      x=[m.name,m.level||4,m.type||'Warrior',m.attr||'EARTH',m.atk||0,m.def||0];
+    }
+    if(!x)return null;
+    const isFus = m.kind==='FUSION' || (window.FUSION_MONSTER_NAMES && window.FUSION_MONSTER_NAMES.has(x[0]));
     return {name:x[0],level:x[1],type:x[2],attr:x[3],atk:x[4],def:x[5],pos:'ATK',materials:[],
-      sign1:m.sign1||null,sign2:m.sign2||null,signs:m.signs?[...m.signs]:[],activeSign:null,tags:m.tags?[...m.tags]:[],kind:m.kind||undefined};
+      sign1:m.sign1||null,sign2:m.sign2||null,signs:m.signs?[...m.signs]:[],activeSign:null,tags:m.tags?[...m.tags]:[],
+      kind:m.kind||(isFus?'FUSION':undefined),isFusion:isFus||undefined};
   };
   try{window.mk=mk;}catch(_){ }
 
@@ -7025,6 +7044,11 @@ body[data-phase106="EP"] #epBtn{
     if(eq.value==='HORN_UNICORN')return {atk:700,def:700};
     if(eq.value==='DRAGON_TREASURE')return target.type==='Dragon'?{atk:300,def:300}:{atk:0,def:0};
     if(eq.value==='UNITED_WE_STAND'){const n=Math.min(4,faceUpCount109(side));return {atk:n*500,def:n*500};}
+    if(eq.value==='FUSION_WEAPON'||eq.name==='Fusion Weapon'){
+      const isFus=(typeof isFusionMonster==='function'?isFusionMonster(target):(target.isFusion||target._isFused||target.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(target.name||target[0]))));
+      const lvl=Number(target.level??target[1]??(window.metaFor?window.metaFor(target.name||target[0])?.level:0)??0);
+      return (isFus&&lvl<=6&&lvl>0)?{atk:1500,def:500}:{atk:0,def:0};
+    }
     return {atk:0,def:0};
   }
   function applyEquipDelta109(eq,target,desired){
@@ -7098,6 +7122,11 @@ body[data-phase106="EP"] #epBtn{
     const d=ownerData109(side),hi=d.hand.indexOf(c),bi=d.back.findIndex(x=>!x);if(hi<0||bi<0||!targetEntry||!targetEntry.card)return false;
     if(targetEntry.card.faceDown||targetEntry.card.faceDownSet103)return false;
     if(c.value==='DRAGON_TREASURE'&&targetEntry.card.type!=='Dragon')return false;
+    if((c.value==='FUSION_WEAPON'||c.name==='Fusion Weapon')){
+      const isFus=(typeof isFusionMonster==='function'?isFusionMonster(targetEntry.card):(targetEntry.card.isFusion||targetEntry.card._isFused||targetEntry.card.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(targetEntry.card.name||targetEntry.card[0]))));
+      const lvl=Number(targetEntry.card.level??targetEntry.card[1]??(window.metaFor?window.metaFor(targetEntry.card.name||targetEntry.card[0])?.level:0)??0);
+      if(!isFus||lvl>6||lvl<=0)return false;
+    }
     const token=targetEntry.card._equipToken109||('EQM109-'+Date.now()+'-'+Math.random());targetEntry.card._equipToken109=token;
     d.hand.splice(hi,1);const eq={...c,set:false,faceUp:true,equipToken109:token,_appliedAtk109:0,_appliedDef109:0};d.back[bi]=eq;
     applyEquipDelta109(eq,targetEntry.card,bonuses109(eq,targetEntry.card,side));
@@ -7106,9 +7135,17 @@ body[data-phase106="EP"] #epBtn{
   }
   function activateEquipPlayer109(c){
     if(game.playerBack.every(Boolean))return log('No hay espacio en tu zona de Magia/Trampa para equipar.');
-    let targets=allFieldMons109('player').filter(x=>monsterFaceUp109(x.card));if(c.value==='DRAGON_TREASURE')targets=targets.filter(x=>x.card.type==='Dragon');
-    if(!targets.length)return log(c.value==='DRAGON_TREASURE'?'Dragon Treasure necesita un Dragón boca arriba.':'Necesitas un monstruo boca arriba para equipar.');
-    showChoices109(c.name,'Selecciona el monstruo que recibirá el Equipo.',targets.map(x=>({title:x.card.name,sub:'ATK '+x.card.atk+' · DEF '+(x.card.def??'�'),action:()=>{if(equipCard109('player',c,x)){game.selected=[];render();setDuelView('field');}}})));
+    let targets=allFieldMons109('player').filter(x=>monsterFaceUp109(x.card));
+    if(c.value==='DRAGON_TREASURE')targets=targets.filter(x=>x.card.type==='Dragon');
+    if(c.value==='FUSION_WEAPON'||c.name==='Fusion Weapon'){
+      targets=targets.filter(x=>{
+        const isFus=(typeof isFusionMonster==='function'?isFusionMonster(x.card):(x.card.isFusion||x.card._isFused||x.card.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(x.card.name||x.card[0]))));
+        const lvl=Number(x.card.level??x.card[1]??(window.metaFor?window.metaFor(x.card.name||x.card[0])?.level:0)??0);
+        return isFus&&lvl<=6&&lvl>0;
+      });
+    }
+    if(!targets.length)return (typeof duelToast==='function'?duelToast:log)((c.value==='DRAGON_TREASURE'||c.name==='Dragon Treasure')?'Dragon Treasure necesita un Dragón boca arriba.':(c.value==='FUSION_WEAPON'||c.name==='Fusion Weapon')?'Fusion Weapon solo puede equiparse a un Monstruo de Fusión de Nivel 6 o menor en el campo.':'Necesitas un monstruo boca arriba para equipar.');
+    showChoices109(c.name,'Selecciona el monstruo que recibirá el Equipo.',targets.map(x=>({title:x.card.name,sub:'ATK '+x.card.atk+' · DEF '+(x.card.def??'—'),action:()=>{if(equipCard109('player',c,x)){game.selected=[];render();setDuelView('field');}}})));
   }
 
   function canLightning109(side){
@@ -7415,7 +7452,19 @@ body[data-phase106="EP"] #epBtn{
       case 'HORN_UNICORN': return {atk:700,def:700};
       case 'DRAGON_TREASURE': return target.type==='Dragon'?{atk:300,def:300}:{atk:0,def:0};
       case 'UNITED_WE_STAND': {const n=Math.min(4,faceUpCount111(side));return {atk:n*500,def:n*500};}
-      default:return {atk:0,def:0};
+      case 'FUSION_WEAPON': {
+        const isFus=(typeof isFusionMonster==='function'?isFusionMonster(target):(target.isFusion||target._isFused||target.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(target.name||target[0]))));
+        const lvl=Number(target.level??target[1]??(window.metaFor?window.metaFor(target.name||target[0])?.level:0)??0);
+        return (isFus&&lvl<=6&&lvl>0)?{atk:1500,def:500}:{atk:0,def:0};
+      }
+      default: {
+        if(eq.name==='Fusion Weapon'){
+          const isFus=(typeof isFusionMonster==='function'?isFusionMonster(target):(target.isFusion||target._isFused||target.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(target.name||target[0]))));
+          const lvl=Number(target.level??target[1]??(window.metaFor?window.metaFor(target.name||target[0])?.level:0)??0);
+          return (isFus&&lvl<=6&&lvl>0)?{atk:1500,def:500}:{atk:0,def:0};
+        }
+        return {atk:0,def:0};
+      }
     }
   }
   function equipsFor111(side,target){
