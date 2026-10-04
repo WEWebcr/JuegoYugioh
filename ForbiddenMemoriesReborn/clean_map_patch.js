@@ -6073,26 +6073,41 @@ console.log('=== V5 CLEAN MASTER PATCH INJECTED ===');
 
 
 
+// Build case-insensitive lookup cache for CARD_MAPPINGS
+window.getCardNumber = function(cardName) {
+    if (!cardName) return null;
+    if (window.CARD_MAPPINGS && window.CARD_MAPPINGS[cardName]) return window.CARD_MAPPINGS[cardName];
+    let norm = String(cardName).toLowerCase().trim();
+    if (!window.CARD_MAPPINGS_LOWER && window.CARD_MAPPINGS) {
+        window.CARD_MAPPINGS_LOWER = {};
+        for (let k in window.CARD_MAPPINGS) {
+            window.CARD_MAPPINGS_LOWER[k.toLowerCase().trim()] = window.CARD_MAPPINGS[k];
+        }
+    }
+    if (window.CARD_MAPPINGS_LOWER && window.CARD_MAPPINGS_LOWER[norm]) {
+        return window.CARD_MAPPINGS_LOWER[norm];
+    }
+    return null;
+};
+
 const originalCardHTML = window.cardHTML;
 window.cardHTML = function(c, z, i) {
     let html = originalCardHTML ? originalCardHTML(c, z, i) : '';
     let name = c?.name || c?.[0] || '';
-    if (name && window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]) {
-        let num = window.CARD_MAPPINGS[name];
-        if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
-            let localSrc = window.CUSTOM_LOCAL_IMAGES[num];
-            let box = document.createElement('div');
-            box.innerHTML = html;
-            let art = box.querySelector('.cardArt');
-            if (art) {
-                art.innerHTML = '<img src="' + localSrc + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;" />';
-            }
-            let fa = box.querySelector('.fieldArt');
-            if (fa) {
-                fa.innerHTML = '<img src="' + localSrc + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;" />';
-            }
-            return box.innerHTML;
+    let num = window.getCardNumber(name);
+    if (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
+        let localSrc = window.CUSTOM_LOCAL_IMAGES[num];
+        let box = document.createElement('div');
+        box.innerHTML = html;
+        let art = box.querySelector('.cardArt');
+        if (art) {
+            art.innerHTML = '<img src="' + localSrc + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;" />';
         }
+        let fa = box.querySelector('.fieldArt');
+        if (fa) {
+            fa.innerHTML = '<img src="' + localSrc + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;" />';
+        }
+        return box.innerHTML;
     }
     return html;
 };
@@ -6302,29 +6317,33 @@ window.getGlobalCardDict = function() {
     names.forEach(name => {
         let rawNum = window.CARD_MAPPINGS[name];
         let num = typeof rawNum === 'number' ? rawNum : (parseInt(String(rawNum || '').replace(/[^\d]/g, ''), 10) || 0);
-        let meta = window.FMR_CARD_META && window.FMR_CARD_META[name];
+        let normName = name.toLowerCase().trim();
+        let meta = window.FMR_CARD_META && (window.FMR_CARD_META[name] || window.FMR_CARD_META[normName]);
+        let cardEntry = null;
         if (meta) {
-            dict[name] = { num, name, type: meta.type, attr: meta.attr, atk: meta.atk, def: meta.def, isMonster: true, isExtra: meta.kind === 'FUSION' };
+            cardEntry = { num, name, type: meta.type, attr: meta.attr, atk: meta.atk, def: meta.def, isMonster: true, isExtra: meta.kind === 'FUSION' };
         } else {
-            let st = window.FMR_ST_POOL_V1 && window.FMR_ST_POOL_V1.find(x => x && x.name === name);
+            let st = window.FMR_ST_POOL_V1 && window.FMR_ST_POOL_V1.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
             if (st) {
-                dict[name] = { num, name, type: st.kind, isMonster: false, text: st.text, isExtra: false };
+                cardEntry = { num, name, type: st.kind, isMonster: false, text: st.text, isExtra: false };
             } else {
-                let dbCard = typeof DB !== 'undefined' && Array.isArray(DB) && DB.find(x => x && x[0] === name);
+                let dbCard = typeof DB !== 'undefined' && Array.isArray(DB) && DB.find(x => x && (x[0] === name || (x[0] && x[0].toLowerCase().trim() === normName)));
                 if (dbCard) {
-                    dict[name] = { num, name, type: dbCard[2], attr: dbCard[3], atk: dbCard[4], def: dbCard[5], isMonster: true, isExtra: false };
+                    cardEntry = { num, name, type: dbCard[2], attr: dbCard[3], atk: dbCard[4], def: dbCard[5], isMonster: true, isExtra: false };
                 } else {
-                    let cd = (window.CARDS_DATA || []).find(x => x && x.name === name);
+                    let cd = (window.CARDS_DATA || []).find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
                     if (cd && (cd.kind === 'MONSTER' || cd.kind === 'FUSION' || cd.atk !== undefined)) {
-                        dict[name] = { num, name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: cd.kind === 'FUSION' };
+                        cardEntry = { num, name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: cd.kind === 'FUSION', text: cd.text || cd.desc || '' };
                     } else if (cd) {
-                        dict[name] = { num, name, type: cd.kind || 'SPELL', isMonster: false, text: cd.text || cd.desc || '', isExtra: false };
+                        cardEntry = { num, name, type: cd.kind || 'SPELL', isMonster: false, text: cd.text || cd.desc || '', isExtra: false };
                     } else {
-                        dict[name] = { num, name, type: 'UNKNOWN', isMonster: false, isExtra: false };
+                        cardEntry = { num, name, type: 'UNKNOWN', isMonster: false, isExtra: false };
                     }
                 }
             }
         }
+        dict[name] = cardEntry;
+        dict[normName] = cardEntry;
     });
     window.globalCardDict = dict;
     return dict;
@@ -6332,8 +6351,9 @@ window.getGlobalCardDict = function() {
 
 function updatePreview(previewImg, infoBox, name, extraHtml) {
     let dict = window.getGlobalCardDict();
-    if (dict[name]) {
-        let c = dict[name];
+    let norm = name ? String(name).toLowerCase().trim() : '';
+    let c = dict[name] || dict[norm];
+    if (c) {
         if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[c.num]) {
             previewImg.src = window.CUSTOM_LOCAL_IMAGES[c.num];
             previewImg.style.display = 'block';
@@ -6344,11 +6364,12 @@ function updatePreview(previewImg, infoBox, name, extraHtml) {
         infoBox.style.display = 'block';
         
         let descHtml = extraHtml || '';
-        if (!c.isMonster && c.text) {
-            descHtml = c.text + (descHtml ? '<br/><br/>' + descHtml : '');
+        let txt = c.text || c.desc || '';
+        if (txt) {
+            descHtml = txt + (descHtml ? '<br/><br/>' + descHtml : '');
         }
         
-        infoBox.innerHTML = `<h3 style="margin:0 0 10px 0; color:#ffcc00;">${name}</h3>` +
+        infoBox.innerHTML = `<h3 style="margin:0 0 10px 0; color:#ffcc00;">#${String(c.num).padStart(3, '0')} ${name}</h3>` +
             (c.isMonster ? `<div style="color:#aaa; font-size:12px; margin-bottom:10px;">[${c.type}] · ${c.attr}</div>
             <div style="font-weight:bold;"><span style="color:#ff4d4d">ATK ${c.atk}</span> / <span style="color:#4da6ff">DEF ${c.def}</span></div>`
             : `<div style="color:#ff80ab; font-size:12px; margin-bottom:10px;">[${c.type}] Mágica/Trampa</div>`) + 
@@ -6474,14 +6495,33 @@ window.customShowCollection = function() {
     
     let tbody = overlay.querySelector('#coll-tbody');
     let dict = window.getGlobalCardDict();
-    let allNames = Object.keys(window.CARD_MAPPINGS || {}).sort((a,b) => {
+    
+    // Strictly deduplicate collection entries: 1 entry per card (by ID and normalized name)
+    let seenIds = new Set();
+    let seenNames = new Set();
+    let allCards = [];
+    
+    let sortedKeys = Object.keys(window.CARD_MAPPINGS || {}).sort((a,b) => {
         let na = parseInt(String(window.CARD_MAPPINGS[a] || 0).replace(/[^\d]/g, ''), 10) || 0;
         let nb = parseInt(String(window.CARD_MAPPINGS[b] || 0).replace(/[^\d]/g, ''), 10) || 0;
         return na - nb;
     });
     
+    sortedKeys.forEach(rawName => {
+        let norm = rawName.toLowerCase().trim();
+        let c = dict[rawName] || dict[norm];
+        if (!c || c.type === 'UNKNOWN') return;
+        let cardNum = c.num;
+        let cardName = c.name || rawName;
+        let cardNorm = cardName.toLowerCase().trim();
+        if (seenIds.has(cardNum) || seenNames.has(cardNorm)) return;
+        seenIds.add(cardNum);
+        seenNames.add(cardNorm);
+        allCards.push(c);
+    });
+    
     function renderList() {
-        let q = overlay.querySelector('#coll-search').value.toLowerCase();
+        let q = overlay.querySelector('#coll-search').value.toLowerCase().trim();
         let fCard = overlay.querySelector('#f-cardtype').value;
         let fAttr = overlay.querySelector('#f-attr').value;
         let fType = overlay.querySelector('#f-type').value;
@@ -6491,13 +6531,13 @@ window.customShowCollection = function() {
         
         tbody.innerHTML = '';
         
-        allNames.forEach(name => {
-            let c = dict[name];
-            if (!c) return;
-            let count = s.collection[name] || 0;
+        allCards.forEach(c => {
+            let name = c.name;
+            let norm = name.toLowerCase().trim();
+            let count = (s.collection && (s.collection[name] !== undefined ? s.collection[name] : s.collection[norm])) || 0;
             
             // Filters
-            if (q && !name.toLowerCase().includes(q)) return;
+            if (q && !norm.includes(q)) return;
             if (fCard === 'MONSTER' && !c.isMonster) return;
             if (fCard === 'SPELL' && c.type !== 'SPELL') return;
             if (fCard === 'TRAP' && c.type !== 'TRAP') return;
@@ -6517,7 +6557,7 @@ window.customShowCollection = function() {
             
             tr.onclick = () => {
                 let siblings = tbody.querySelectorAll('tr');
-                siblings.forEach(s => s.style.background = 'transparent');
+                siblings.forEach(sib => sib.style.background = 'transparent');
                 tr.style.background = '#444';
                 tr.onmouseout = () => tr.style.background = '#444';
                 siblings.forEach(sib => { if(sib!==tr) sib.onmouseout = () => sib.style.background = 'transparent'; });

@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": 20,
     "name": "Baby Dragon",
     "kind": "MONSTER",
     "type": "Dragon",
@@ -9,12 +9,12 @@
     "atk": 700,
     "def": 700,
     "text": "Dragón pequeño de gran agilidad para fusiones con Trueno y Guerrero.",
-    "image": "imagenescartas/Mundo1/028.jpg",
+    "image": "imagenescartas/Mundo1/020.jpeg",
     "price": 150,
     "tier": "DRAGÓN BÁSICO"
   },
   {
-    "id": 2,
+    "id": 88,
     "name": "Acrobat Monkey",
     "kind": "MONSTER",
     "type": "Beast-Warrior",
@@ -23,10 +23,10 @@
     "atk": 1000,
     "def": 1000,
     "text": "Un mono acrobata de gran agilidad.",
-    "image": "imagenescartas/Mundo1/001.jpg"
+    "image": "imagenescartas/Mundo1/088.jpg"
   },
   {
-    "id": 3,
+    "id": 89,
     "name": "Beastking of the Swamps",
     "kind": "MONSTER",
     "type": "Aqua",
@@ -35,10 +35,10 @@
     "atk": 1590,
     "def": 1510,
     "text": "El rey de las bestias pantanosas.",
-    "image": "imagenescartas/Mundo1/002.jpg"
+    "image": "imagenescartas/Mundo1/089.jpg"
   },
   {
-    "id": 4,
+    "id": 90,
     "name": "Exiled Force",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -47,12 +47,12 @@
     "atk": 1000,
     "def": 1000,
     "text": "Tropa guerrera de asalto.",
-    "image": "imagenescartas/Mundo1/003.jpg",
+    "image": "imagenescartas/Mundo1/090.jpg",
     "price": 300,
     "tier": "GUERRERO TÁCTICO"
   },
   {
-    "id": 5,
+    "id": 91,
     "name": "Goblin Attack Force",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -61,10 +61,10 @@
     "atk": 2300,
     "def": 0,
     "text": "Al atacar, cambia a posicion de Defensa al final del Damage Step.",
-    "image": "imagenescartas/Mundo1/004.jpg"
+    "image": "imagenescartas/Mundo1/091.png"
   },
   {
-    "id": 6,
+    "id": 92,
     "name": "Lava Battleguard",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -73,10 +73,10 @@
     "atk": 1550,
     "def": 1800,
     "text": "Gana 500 ATK por cada Swamp Battleguard que controles.",
-    "image": "imagenescartas/Mundo1/005.jpg"
+    "image": "imagenescartas/Mundo1/092.jpg"
   },
   {
-    "id": 7,
+    "id": 93,
     "name": "Mataza the Zapper",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -85,10 +85,10 @@
     "atk": 1300,
     "def": 800,
     "text": "Puede atacar dos veces durante cada Battle Phase.",
-    "image": "imagenescartas/Mundo1/006.jpg"
+    "image": "imagenescartas/Mundo1/093.jpg"
   },
   {
-    "id": 8,
+    "id": 94,
     "name": "Ninja Grandmaster Sasuke",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -97,10 +97,10 @@
     "atk": 1800,
     "def": 1000,
     "text": "Al atacar un monstruo en posicion de Defensa boca abajo, lo destruye sin voltear.",
-    "image": "imagenescartas/Mundo1/008.jpg"
+    "image": "imagenescartas/Mundo1/094.jpg"
   },
   {
-    "id": 9,
+    "id": 95,
     "name": "Robolady",
     "kind": "MONSTER",
     "type": "Machine",
@@ -109,10 +109,10 @@
     "atk": 1000,
     "def": 1000,
     "text": "Una robot guerrera de alta tecnologia.",
-    "image": "imagenescartas/Mundo1/009.jpg"
+    "image": "imagenescartas/Mundo1/095.jpg"
   },
   {
-    "id": 10,
+    "id": 96,
     "name": "Roboyarou",
     "kind": "MONSTER",
     "type": "Machine",
@@ -121,10 +121,10 @@
     "atk": 1200,
     "def": 1400,
     "text": "Un robot guerrero. Puede fusionarse con Robolady.",
-    "image": "imagenescartas/Mundo1/010.jpg"
+    "image": "imagenescartas/Mundo1/096.jpg"
   },
   {
-    "id": 11,
+    "id": 97,
     "name": "Science Soldier",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -133,10 +133,10 @@
     "atk": 1000,
     "def": 1100,
     "text": "Soldado equipado con tecnologia cientifica avanzada.",
-    "image": "imagenescartas/Mundo1/011.jpg"
+    "image": "imagenescartas/Mundo1/097.png"
   },
   {
-    "id": 12,
+    "id": 98,
     "name": "Spirit Ryu",
     "kind": "MONSTER",
     "type": "Dragon",
@@ -145,10 +145,10 @@
     "atk": 1000,
     "def": 1000,
     "text": "Descarta 1 Dragon; este monstruo gana 1000 ATK y DEF.",
-    "image": "imagenescartas/Mundo1/012.jpg"
+    "image": "imagenescartas/Mundo1/098.jpg"
   },
   {
-    "id": 13,
+    "id": 99,
     "name": "Swamp Battleguard",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -157,10 +157,10 @@
     "atk": 1800,
     "def": 1500,
     "text": "Gana 500 ATK por cada Lava Battleguard que controles.",
-    "image": "imagenescartas/Mundo1/013.jpg"
+    "image": "imagenescartas/Mundo1/099.jpg"
   },
   {
-    "id": 14,
+    "id": 100,
     "name": "Sword Hunter",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -169,10 +169,10 @@
     "atk": 2450,
     "def": 1700,
     "text": "Al destruir un monstruo en batalla, lo equipa a si mismo.",
-    "image": "imagenescartas/Mundo1/014.jpg"
+    "image": "imagenescartas/Mundo1/100.jpg"
   },
   {
-    "id": 15,
+    "id": 101,
     "name": "The Fiend Megacyber",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -181,10 +181,10 @@
     "atk": 2200,
     "def": 1200,
     "text": "Puede invocarse sin sacrificio si el rival tiene mas monstruos.",
-    "image": "imagenescartas/Mundo1/015.jpg"
+    "image": "imagenescartas/Mundo1/101.jpg"
   },
   {
-    "id": 16,
+    "id": 102,
     "name": "Warrior Dai Grepher",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -193,7 +193,7 @@
     "atk": 1700,
     "def": 1600,
     "text": "Un guerrero oscuro de gran poder.",
-    "image": "imagenescartas/Mundo1/016.jpg"
+    "image": "imagenescartas/Mundo1/102.jpg"
   },
   {
     "id": 17,
@@ -208,7 +208,7 @@
     "image": "imagenescartas/Mundo1/114.jpg"
   },
   {
-    "id": 18,
+    "id": 19,
     "name": "Celtic Guardian",
     "kind": "MONSTER",
     "type": "Warrior",
@@ -217,12 +217,12 @@
     "atk": 1400,
     "def": 1200,
     "text": "Elfo guerrero clásico con rápida espada.",
-    "image": "imagenescartas/Mundo1/007.jpg",
+    "image": "imagenescartas/Mundo1/019.jpeg",
     "price": 450,
     "tier": "GUERRERO ÉLITE"
   },
   {
-    "id": 19,
+    "id": 26,
     "name": "Beaver Warrior",
     "kind": "MONSTER",
     "type": "Beast-Warrior",
@@ -231,12 +231,12 @@
     "atk": 1200,
     "def": 1500,
     "text": "Guerrero leal con gran defensa.",
-    "image": "imagenescartas/Mundo1/008.jpg",
+    "image": "imagenescartas/Mundo1/026.jpeg",
     "price": 350,
     "tier": "GUERRERO BESTIA"
   },
   {
-    "id": 20,
+    "id": 44,
     "name": "Battle Ox",
     "kind": "MONSTER",
     "type": "Beast-Warrior",
@@ -245,10 +245,10 @@
     "atk": 1700,
     "def": 1000,
     "text": "Un buey de combate que arrasa todo a su paso.",
-    "image": "imagenescartas/Mundo1/009.jpg"
+    "image": "imagenescartas/Mundo1/044.jpg"
   },
   {
-    "id": 21,
+    "id": 27,
     "name": "Mystical Elf",
     "kind": "MONSTER",
     "type": "Spellcaster",
@@ -257,12 +257,12 @@
     "atk": 800,
     "def": 2000,
     "text": "Sacerdotisa mística con monumental defensa de 2000 DEF.",
-    "image": "imagenescartas/Mundo1/012.jpg",
+    "image": "imagenescartas/Mundo1/027.jpeg",
     "price": 500,
     "tier": "ELFA MÍSTICA"
   },
   {
-    "id": 22,
+    "id": 46,
     "name": "Feral Imp",
     "kind": "MONSTER",
     "type": "Fiend",
@@ -271,10 +271,10 @@
     "atk": 1300,
     "def": 1400,
     "text": "Un duende salvaje con habilidades impredecibles.",
-    "image": "imagenescartas/Mundo1/013.jpg"
+    "image": "imagenescartas/Mundo1/046.jpg"
   },
   {
-    "id": 23,
+    "id": 15,
     "name": "Winged Dragon, Guardian of the Fortress #1",
     "kind": "MONSTER",
     "type": "Dragon",
@@ -283,12 +283,12 @@
     "atk": 1400,
     "def": 1200,
     "text": "Dragón guardián defensor de fortalezas.",
-    "image": "imagenescartas/Mundo1/014.jpg",
+    "image": "imagenescartas/Mundo1/015.jpg",
     "price": 450,
     "tier": "DRAGÓN ALADO"
   },
   {
-    "id": 24,
+    "id": 41,
     "name": "Petit Dragon",
     "kind": "MONSTER",
     "type": "Dragon",
@@ -297,12 +297,12 @@
     "atk": 700,
     "def": 600,
     "text": "Pequeño dragón con alas veloces para fusiones tempranas.",
-    "image": "imagenescartas/Mundo1/026.jpg",
+    "image": "imagenescartas/Mundo1/041.jpg",
     "price": 150,
     "tier": "DRAGÓN BÁSICO"
   },
   {
-    "id": 25,
+    "id": 45,
     "name": "Giant Soldier of Stone",
     "kind": "MONSTER",
     "type": "Rock",
@@ -311,12 +311,12 @@
     "atk": 1300,
     "def": 2000,
     "text": "Guardián legendario de roca sólida con 2000 DEF.",
-    "image": "imagenescartas/Mundo1/031.jpg",
+    "image": "imagenescartas/Mundo1/045.jpg",
     "price": 500,
     "tier": "ROCA COLOSAL"
   },
   {
-    "id": 26,
+    "id": 48,
     "name": "Man-Eater Bug",
     "kind": "MONSTER",
     "type": "Insect",
@@ -325,10 +325,10 @@
     "atk": 450,
     "def": 600,
     "text": "Al ser volteado: destruye 1 monstruo en el Campo.",
-    "image": "imagenescartas/Mundo1/038.jpg"
+    "image": "imagenescartas/Mundo1/048.jpg"
   },
   {
-    "id": 27,
+    "id": 21,
     "name": "Silver Fang",
     "kind": "MONSTER",
     "type": "Beast",
@@ -337,10 +337,10 @@
     "atk": 1200,
     "def": 800,
     "text": "Un lobo veloz cuya agilidad sorprende a sus enemigos.",
-    "image": "imagenescartas/Mundo1/039.jpg"
+    "image": "imagenescartas/Mundo1/021.jpg"
   },
   {
-    "id": 28,
+    "id": 49,
     "name": "Flame Manipulator",
     "kind": "MONSTER",
     "type": "Spellcaster",
@@ -349,7 +349,7 @@
     "atk": 900,
     "def": 1000,
     "text": "Un mago que domina las llamas a su antojo.",
-    "image": "imagenescartas/Mundo1/040.jpg"
+    "image": "imagenescartas/Mundo1/049.jpg"
   },
   {
     "id": 103,
@@ -392,14 +392,16 @@
     "name": "Renace al Monstruo",
     "kind": "SPELL",
     "value": "REBORN",
-    "text": "Invoca 1 monstruo de cualquiera de los dos Cementerios."
+    "text": "Invoca 1 monstruo de cualquiera de los dos Cementerios.",
+    "image": "imagenescartas/Mundo1/201.jpg"
   },
   {
     "id": 202,
     "name": "Llamado de la Tumba",
     "kind": "TRAP",
     "value": "GRAVE_CALL",
-    "text": "Estando SET, invoca 1 monstruo de cualquiera de los dos Cementerios."
+    "text": "Estando SET, invoca 1 monstruo de cualquiera de los dos Cementerios.",
+    "image": "imagenescartas/Mundo1/202.jpg"
   },
   {
     "id": 337,
@@ -503,105 +505,120 @@
     "name": "United We Stand",
     "kind": "EQUIP",
     "value": "UNITED_WE_STAND",
-    "text": "Gana 500 ATK/DEF por cada monstruo boca arriba que controlas, maximo 2000."
+    "text": "Gana 500 ATK/DEF por cada monstruo boca arriba que controlas, maximo 2000.",
+    "image": "imagenescartas/Mundo1/212.jpg"
   },
   {
     "id": 213,
     "name": "Mirror Force",
     "kind": "TRAP",
     "value": "MIRROR_FORCE",
-    "text": "Cuando el rival ataca, destruye todos sus monstruos en posicion de ATAQUE."
+    "text": "Cuando el rival ataca, destruye todos sus monstruos en posicion de ATAQUE.",
+    "image": "imagenescartas/Mundo1/213.jpg"
   },
   {
     "id": 214,
     "name": "Trap Hole",
     "kind": "TRAP",
     "value": "TRAP_HOLE",
-    "text": "Cuando el rival invoca un monstruo de 1000 ATK o mas, destruyelo."
+    "text": "Cuando el rival invoca un monstruo de 1000 ATK o mas, destruyelo.",
+    "image": "imagenescartas/Mundo1/214.jpg"
   },
   {
     "id": 215,
     "name": "Magic Cylinder",
     "kind": "TRAP",
     "value": "MAGIC_CYLINDER",
-    "text": "Niega un ataque y causa daño igual al ATK del atacante."
+    "text": "Niega un ataque y causa daño igual al ATK del atacante.",
+    "image": "imagenescartas/Mundo1/215.jpg"
   },
   {
     "id": 216,
     "name": "Waboku",
     "kind": "TRAP",
     "value": "WABOKU",
-    "text": "Este turno no recibes daño de batalla y tus monstruos no son destruidos por batalla."
+    "text": "Este turno no recibes daño de batalla y tus monstruos no son destruidos por batalla.",
+    "image": "imagenescartas/Mundo1/216.jpg"
   },
   {
     "id": 217,
     "name": "Negate Attack",
     "kind": "TRAP",
     "value": "NEGATE_ATTACK",
-    "text": "Niega el ataque y termina la Battle Phase rival."
+    "text": "Niega el ataque y termina la Battle Phase rival.",
+    "image": "imagenescartas/Mundo1/217.jpg"
   },
   {
     "id": 218,
     "name": "Sakuretsu Armor",
     "kind": "TRAP",
     "value": "SAKURETSU_ARMOR",
-    "text": "Cuando un monstruo rival ataca, destruye al atacante."
+    "text": "Cuando un monstruo rival ataca, destruye al atacante.",
+    "image": "imagenescartas/Mundo1/218.jpg"
   },
   {
     "id": 219,
     "name": "Torrential Tribute",
     "kind": "TRAP",
     "value": "TORRENTIAL",
-    "text": "Cuando se invoca un monstruo, destruye todos los monstruos en el Campo."
+    "text": "Cuando se invoca un monstruo, destruye todos los monstruos en el Campo.",
+    "image": "imagenescartas/Mundo1/219.jpg"
   },
   {
     "id": 220,
     "name": "Dust Tornado",
     "kind": "TRAP",
     "value": "DUST_TORNADO",
-    "text": "Destruye 1 Magia, Trampa o Equipo del rival."
+    "text": "Destruye 1 Magia, Trampa o Equipo del rival.",
+    "image": "imagenescartas/Mundo1/220.jpg"
   },
   {
     "id": 223,
     "name": "Fusion Weapon",
     "kind": "EQUIP",
     "value": "FUSION_WEAPON",
-    "text": "Monstruo de Fusion Nivel 6 o inferior gana 1500 ATK y 500 DEF."
+    "text": "Monstruo de Fusion Nivel 6 o inferior gana 1500 ATK y 500 DEF.",
+    "image": "imagenescartas/Mundo1/223.jpg"
   },
   {
     "id": 224,
     "name": "Graceful Charity",
     "kind": "SPELL",
     "value": "GRACEFUL_CHARITY",
-    "text": "Roba 3 cartas de tu mazo, luego descarta 2 cartas de tu mano."
+    "text": "Roba 3 cartas de tu mazo, luego descarta 2 cartas de tu mano.",
+    "image": "imagenescartas/Mundo1/224.jpg"
   },
   {
     "id": 225,
     "name": "Limiter Removal",
     "kind": "SPELL",
     "value": "LIMITER_REMOVAL",
-    "text": "Dobla el ATK de todos los Monstruos de Maquina. Al final del turno, destruyelos."
+    "text": "Dobla el ATK de todos los Monstruos de Maquina. Al final del turno, destruyelos.",
+    "image": "imagenescartas/Mundo1/225.jpg"
   },
   {
     "id": 226,
     "name": "Pot of Greed",
     "kind": "SPELL",
     "value": "POT_OF_GREED",
-    "text": "Roba 2 cartas."
+    "text": "Roba 2 cartas.",
+    "image": "imagenescartas/Mundo1/226.jpg"
   },
   {
     "id": 227,
     "name": "Scapegoat",
     "kind": "SPELL",
     "value": "SCAPEGOAT",
-    "text": "Invoca hasta 4 Tokens de Ovejas en Posicion de Defensa."
+    "text": "Invoca hasta 4 Tokens de Ovejas en Posicion de Defensa.",
+    "image": "imagenescartas/Mundo1/227.jpg"
   },
   {
     "id": 229,
     "name": "Harpie's Feather Duster",
     "kind": "SPELL",
     "value": "FEATHER_DUSTER",
-    "text": "Destruye todas las Magias, Trampas y Equipos del rival."
+    "text": "Destruye todas las Magias, Trampas y Equipos del rival.",
+    "image": "imagenescartas/Mundo1/229.jpg"
   },
   {
     "id": 115,
@@ -637,19 +654,7 @@
     "def": 1700,
     "kind": "FUSION",
     "desc": "Fusi?n de Dragon Zombie + Thunder Dragon.",
-    "image": "imagenescartas/Mundo1/056.jpg"
-  },
-  {
-    "id": 54,
-    "name": "Meteor Dragon",
-    "level": 6,
-    "type": "Dragon",
-    "attr": "EARTH",
-    "atk": 1800,
-    "def": 2000,
-    "kind": "MONSTER",
-    "desc": "Fusi?n de Curse of Dragon + Baby Dragon.",
-    "image": "imagenescartas/Mundo1/054.jpg"
+    "image": "imagenescartas/Mundo1/056.jpeg"
   },
   {
     "id": 55,
@@ -661,7 +666,7 @@
     "def": 2600,
     "kind": "FUSION",
     "desc": "Fusi?n de X-Head Cannon + Y-Dragon Head + Z-Metal Tank.",
-    "image": "imagenescartas/Mundo1/055.jpg"
+    "image": "imagenescartas/Mundo1/055.jpeg"
   },
   {
     "id": 116,
@@ -1574,20 +1579,6 @@
     "sign2": "MARTE"
   },
   {
-    "id": 258,
-    "name": "Perfectbly Ultimate Great Moth",
-    "kind": "FUSION",
-    "type": "Insect",
-    "attr": "EARTH",
-    "level": 8,
-    "atk": 3500,
-    "def": 3000,
-    "text": "Fusión: Great Moth + Cocoon of Evolution. La forma final y definitiva de Great Moth.",
-    "image": "imagenescartas/Mundo1/192.jpg",
-    "sign1": "URANO",
-    "sign2": "SOL"
-  },
-  {
     "id": 259,
     "name": "Amazoness Archer",
     "kind": "MONSTER",
@@ -1968,7 +1959,7 @@
     "sign2": "MERCURIO"
   },
   {
-    "id": 315,
+    "id": 249,
     "name": "Alligator's Sword Dragon",
     "level": 5,
     "type": "Dragon",
@@ -2365,7 +2356,7 @@
     "tier": "MAGIA DE DAÑO"
   },
   {
-    "id": 348,
+    "id": 278,
     "name": "Dark Spirit of Malice",
     "kind": "MONSTER",
     "type": "Fiend",
@@ -3561,7 +3552,7 @@
     "sign2": "MARTE"
   },
   {
-    "id": 487,
+    "id": 1,
     "name": "Blue-Eyes White Dragon",
     "kind": "MONSTER",
     "type": "Dragon",
@@ -3570,7 +3561,7 @@
     "atk": 3000,
     "def": 2500,
     "text": "This legendary dragon is a powerful engine of destruction. Virtually invincible, very few have faced this awesome creature and lived to tell the tale.",
-    "image": "imagenescartas/Mundo1/001.jpg",
+    "image": "imagenescartas/Mundo1/001.jpeg",
     "sign1": "SOL",
     "sign2": "JUPITER"
   },
@@ -3687,20 +3678,6 @@
     "sign2": "SATURNO"
   },
   {
-    "id": 496,
-    "name": "Ryu-Kishin Powered",
-    "kind": "MONSTER",
-    "type": "Fiend",
-    "attr": "DARK",
-    "level": 4,
-    "atk": 1600,
-    "def": 1200,
-    "text": "A gargoyle enhanced by the powers of darkness. Very sharp talons make it a worthy opponent.",
-    "image": "imagenescartas/Mundo1/426.jpg",
-    "sign1": "LUNA",
-    "sign2": "SATURNO"
-  },
-  {
     "id": 497,
     "name": "Spear Dragon",
     "kind": "MONSTER",
@@ -3791,21 +3768,6 @@
     "value": "CRUSH_CARD_VIRUS",
     "text": "Tribute 1 DARK monster with 1000 or less ATK; your opponent takes no damage until the end of the next turn after this card resolves, also, you look at your opponent's hand and all monsters they control, and if you do, destroy the monsters among them with 1500 or more ATK, then your opponent can destroy up to 3 monsters with 1500 or more ATK in their Deck.",
     "image": "imagenescartas/Mundo1/441.jpg"
-  },
-  {
-    "id": 517,
-    "name": "Blue-Eyes Ultimate Dragon",
-    "kind": "FUSION",
-    "type": "Dragon",
-    "attr": "LIGHT",
-    "level": 12,
-    "atk": 4500,
-    "def": 3800,
-    "text": "\"Blue-Eyes White Dragon\" + \"Blue-Eyes White Dragon\" + \"Blue-Eyes White Dragon\"",
-    "desc": "Fusión: Blue-Eyes White Dragon + Blue-Eyes White Dragon + Blue-Eyes White Dragon",
-    "image": "imagenescartas/Mundo1/447.jpg",
-    "sign1": "SOL",
-    "sign2": "JUPITER"
   },
   {
     "id": 822,
@@ -3953,7 +3915,7 @@
     "sign2": "MARTE"
   },
   {
-    "id": 528,
+    "id": 6,
     "name": "Dark Magician",
     "kind": "MONSTER",
     "type": "Spellcaster",
@@ -3962,7 +3924,7 @@
     "atk": 2500,
     "def": 2100,
     "text": "''The ultimate wizard in terms of attack and defense.''",
-    "image": "imagenescartas/Mundo1/006.jpg",
+    "image": "imagenescartas/Mundo1/006.jpeg",
     "sign1": "LUNA",
     "sign2": "MERCURIO"
   },
@@ -4461,34 +4423,6 @@
     "sign2": "LUNA"
   },
   {
-    "id": 575,
-    "name": "Fortress Whale",
-    "kind": "MONSTER",
-    "type": "Fish",
-    "attr": "WATER",
-    "level": 7,
-    "atk": 2350,
-    "def": 2150,
-    "text": "You can Ritual Summon this card with \"Fortress Whale's Oath\".",
-    "image": "imagenescartas/Mundo1/505.jpg",
-    "sign1": "NEPTUNO",
-    "sign2": "SATURNO"
-  },
-  {
-    "id": 576,
-    "name": "Giant Red Seasnake",
-    "kind": "MONSTER",
-    "type": "Aqua",
-    "attr": "WATER",
-    "level": 4,
-    "atk": 1800,
-    "def": 800,
-    "text": "A sea-dwelling snake that attacks passing enemies with its sharp teeth.",
-    "image": "imagenescartas/Mundo1/506.jpg",
-    "sign1": "NEPTUNO",
-    "sign2": "MARTE"
-  },
-  {
     "id": 577,
     "name": "Great White",
     "kind": "MONSTER",
@@ -4729,7 +4663,7 @@
     "tier": "DRAGÓN COMBATE"
   },
   {
-    "id": 607,
+    "id": 43,
     "name": "Koumori Dragon",
     "kind": "MONSTER",
     "type": "Dragon",
@@ -4850,7 +4784,7 @@
     "atk": 800,
     "def": 400,
     "text": "Guerrero sombra de la llama azul.",
-    "image": "imagenescartas/Mundo1/051.jpg",
+    "image": "imagenescartas/Mundo1/051.png",
     "price": 200,
     "tier": "GUERRERO SOMBRA"
   },
@@ -4939,7 +4873,7 @@
     "tier": "REINA LUNAR"
   },
   {
-    "id": 622,
+    "id": 10,
     "name": "Harpie Lady",
     "kind": "MONSTER",
     "type": "Winged Beast",
@@ -4948,7 +4882,7 @@
     "atk": 1300,
     "def": 1400,
     "text": "Dama alada clásica de veloces ataques.",
-    "image": "imagenescartas/Mundo1/010.jpg",
+    "image": "imagenescartas/Mundo1/010.jpeg",
     "price": 450,
     "tier": "ARPÍA ALADA"
   },

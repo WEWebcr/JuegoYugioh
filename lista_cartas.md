@@ -349,7 +349,7 @@
 | #343 | **Slifer the Sky Dragon** | Dios Egipcio (Divine-Beast) · **Requiere 3 Tributos** | 5000 / 5000 | `imagenescartas/Mundo1/343.jpg` |
 | #344 | **Asura Priest** | Monstruo (Fairy / Spirit) | 1700 / 1200 | `imagenescartas/Mundo1/344.jpg` |
 | #345 | **Big-Tusked Mammoth** | Monstruo (Beast) | 2000 / 1000 | `imagenescartas/Mundo1/345.jpg` |
-| #346 | **Chiron the Mage** | Monstruo (Beast-Warrior) | 1800 / 1000 | `imagenescartas/Mundo1/346.jpg` |
+| #778 | **Chiron the Mage** | Monstruo (Beast-Warrior) | 1800 / 1000 | imagenescartas/Mundo1/778.jpg |
 | #347 | **Giant Rex** | Monstruo (Dinosaur) | 2000 / 1200 | `imagenescartas/Mundo1/347.jpg` |
 | #348 | **Gradius** | Monstruo (Machine) | 1200 / 800 | `imagenescartas/Mundo1/348.jpg` |
 | #349 | **Gradius' Option** | Monstruo (Machine) | 0 / 0 | `imagenescartas/Mundo1/349.jpg` |
@@ -506,7 +506,7 @@
 | #477 | **Amulet Dragon** | `Dark Magician` + Dragón | 2900 / 2500 | `imagenescartas/Mundo1/477.jpg` |
 | #480 | **Dark Magician Girl the Dragon Knight** | `Dark Magician Girl` + Dragón | 2600 / 1700 | `imagenescartas/Mundo1/480.jpg` |
 | #478 | **Arcana Knight Joker** | `Queen's Knight` + `King's Knight` + `Jack's Knight` | 3800 / 2500 | `imagenescartas/Mundo1/478.jpg` |
-| #465 | **Valkyrion the Magna Warrior** | `Alpha The Magnet Warrior` + `Beta The Magnet Warrior` (+ `Gamma the Magnet Warrior`) | 3500 / 3850 | `imagenescartas/Mundo1/465.jpg` |
+| #838 | **Valkyrion the Magna Warrior** | Alpha The Magnet Warrior + Beta The Magnet Warrior (+ Gamma the Magnet Warrior) | 3500 / 3850 | imagenescartas/Mundo1/838.jpg |
 
 ## Regla Especial: Dioses Egipcios (Ra, Obelisk, Slifer)
 * **Poder de Dios**: Cuentan con **5000 ATK** y **5000 DEF**.

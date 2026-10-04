@@ -1,0 +1,2890 @@
+[
+  {
+    "num": 1,
+    "name": "Blue-Eyes White Dragon"
+  },
+  {
+    "num": 2,
+    "name": "Mystical Elf"
+  },
+  {
+    "num": 3,
+    "name": "Hitotsu-me Giant"
+  },
+  {
+    "num": 4,
+    "name": "Baby Dragon"
+  },
+  {
+    "num": 5,
+    "name": "Ryu-kishin"
+  },
+  {
+    "num": 6,
+    "name": "Feral Imp"
+  },
+  {
+    "num": 7,
+    "name": "Winged Dragon #1"
+  },
+  {
+    "num": 8,
+    "name": "Mushroom Man"
+  },
+  {
+    "num": 9,
+    "name": "Shadow Specter"
+  },
+  {
+    "num": 10,
+    "name": "Blackland Fire Dragon"
+  },
+  {
+    "num": 11,
+    "name": "Sword Arm of Dragon"
+  },
+  {
+    "num": 12,
+    "name": "Swamp Battleguard"
+  },
+  {
+    "num": 13,
+    "name": "Tyhone"
+  },
+  {
+    "num": 14,
+    "name": "Battle Steer"
+  },
+  {
+    "num": 15,
+    "name": "Flame Swordsman"
+  },
+  {
+    "num": 16,
+    "name": "Time Wizard"
+  },
+  {
+    "num": 17,
+    "name": "Right Leg of the Forbidden One"
+  },
+  {
+    "num": 18,
+    "name": "Left Leg of the Forbidden One"
+  },
+  {
+    "num": 19,
+    "name": "Right Arm of the Forbidden One"
+  },
+  {
+    "num": 20,
+    "name": "Left Arm of the Forbidden One"
+  },
+  {
+    "num": 21,
+    "name": "Exodia the Forbidden One"
+  },
+  {
+    "num": 22,
+    "name": "Summoned Skull"
+  },
+  {
+    "num": 23,
+    "name": "The Wicked Worm Beast"
+  },
+  {
+    "num": 24,
+    "name": "Skull Servant"
+  },
+  {
+    "num": 25,
+    "name": "Horn Imp"
+  },
+  {
+    "num": 26,
+    "name": "Battle Ox"
+  },
+  {
+    "num": 27,
+    "name": "Beaver Warrior"
+  },
+  {
+    "num": 28,
+    "name": "Rock Ogre Grotto #1"
+  },
+  {
+    "num": 29,
+    "name": "Mountain Warrior"
+  },
+  {
+    "num": 30,
+    "name": "Zombie Warrior"
+  },
+  {
+    "num": 31,
+    "name": "Koumori Dragon"
+  },
+  {
+    "num": 32,
+    "name": "Two-headed King Rex"
+  },
+  {
+    "num": 33,
+    "name": "Judge Man"
+  },
+  {
+    "num": 34,
+    "name": "Saggi the Dark Clown"
+  },
+  {
+    "num": 35,
+    "name": "Dark Magician"
+  },
+  {
+    "num": 36,
+    "name": "The Snake Hair"
+  },
+  {
+    "num": 37,
+    "name": "Gaia the Dragon Champion"
+  },
+  {
+    "num": 38,
+    "name": "Gaia the Fierce Knight"
+  },
+  {
+    "num": 39,
+    "name": "Curse of Dragon"
+  },
+  {
+    "num": 40,
+    "name": "Dragon Piper"
+  },
+  {
+    "num": 41,
+    "name": "Celtic Guardian"
+  },
+  {
+    "num": 42,
+    "name": "Illusionist Faceless Mage"
+  },
+  {
+    "num": 43,
+    "name": "Karbonala Warrior"
+  },
+  {
+    "num": 44,
+    "name": "Rogue Doll"
+  },
+  {
+    "num": 45,
+    "name": "Oscillo Hero #2"
+  },
+  {
+    "num": 46,
+    "name": "Griffore"
+  },
+  {
+    "num": 47,
+    "name": "Torike"
+  },
+  {
+    "num": 48,
+    "name": "Sangan"
+  },
+  {
+    "num": 49,
+    "name": "Big Insect"
+  },
+  {
+    "num": 50,
+    "name": "Basic Insect"
+  },
+  {
+    "num": 51,
+    "name": "Armored Lizard"
+  },
+  {
+    "num": 52,
+    "name": "Hercules Beetle"
+  },
+  {
+    "num": 53,
+    "name": "Killer Needle"
+  },
+  {
+    "num": 54,
+    "name": "Gokibore"
+  },
+  {
+    "num": 55,
+    "name": "Giant Flea"
+  },
+  {
+    "num": 56,
+    "name": "Larvae Moth"
+  },
+  {
+    "num": 57,
+    "name": "Great Moth"
+  },
+  {
+    "num": 58,
+    "name": "Kuriboh"
+  },
+  {
+    "num": 59,
+    "name": "Mammoth Graveyard"
+  },
+  {
+    "num": 60,
+    "name": "Great White"
+  },
+  {
+    "num": 61,
+    "name": "Wolf"
+  },
+  {
+    "num": 62,
+    "name": "Harpie Lady"
+  },
+  {
+    "num": 63,
+    "name": "Harpie Lady Sisters"
+  },
+  {
+    "num": 64,
+    "name": "Tiger Axe"
+  },
+  {
+    "num": 65,
+    "name": "Silver Fang"
+  },
+  {
+    "num": 66,
+    "name": "Kojikocy"
+  },
+  {
+    "num": 67,
+    "name": "Perfectly Ultimate Great Moth"
+  },
+  {
+    "num": 68,
+    "name": "Garoozis"
+  },
+  {
+    "num": 69,
+    "name": "Thousand Dragon"
+  },
+  {
+    "num": 70,
+    "name": "Fiend Kraken"
+  },
+  {
+    "num": 71,
+    "name": "Jellyfish"
+  },
+  {
+    "num": 72,
+    "name": "Cocoon of Evolution"
+  },
+  {
+    "num": 73,
+    "name": "Kairyu-Shin"
+  },
+  {
+    "num": 74,
+    "name": "Giant Soldier of Stone"
+  },
+  {
+    "num": 75,
+    "name": "Man-eating Plant"
+  },
+  {
+    "num": 76,
+    "name": "Krokodilus"
+  },
+  {
+    "num": 77,
+    "name": "Grappler"
+  },
+  {
+    "num": 78,
+    "name": "Axe Raider"
+  },
+  {
+    "num": 79,
+    "name": "Megazowler"
+  },
+  {
+    "num": 80,
+    "name": "Uraby"
+  },
+  {
+    "num": 81,
+    "name": "Crawling Dragon #2"
+  },
+  {
+    "num": 82,
+    "name": "Red-Eyes B. Dragon"
+  },
+  {
+    "num": 83,
+    "name": "Castle of Dark Illusions"
+  },
+  {
+    "num": 84,
+    "name": "Reaper of the Cards"
+  },
+  {
+    "num": 85,
+    "name": "King of Yamimakai"
+  },
+  {
+    "num": 86,
+    "name": "Barox"
+  },
+  {
+    "num": 87,
+    "name": "Dark Chimera"
+  },
+  {
+    "num": 88,
+    "name": "Metal Guardian"
+  },
+  {
+    "num": 89,
+    "name": "Catapult Turtle"
+  },
+  {
+    "num": 90,
+    "name": "Gyakutenno Megami"
+  },
+  {
+    "num": 91,
+    "name": "Mystic Horseman"
+  },
+  {
+    "num": 92,
+    "name": "Rabid Horseman"
+  },
+  {
+    "num": 93,
+    "name": "Zanki"
+  },
+  {
+    "num": 94,
+    "name": "Crawling Dragon"
+  },
+  {
+    "num": 95,
+    "name": "Crass Clown"
+  },
+  {
+    "num": 96,
+    "name": "Armored Zombie"
+  },
+  {
+    "num": 97,
+    "name": "Dragon Zombie"
+  },
+  {
+    "num": 98,
+    "name": "Clown Zombie"
+  },
+  {
+    "num": 99,
+    "name": "Pumpking the King of Ghosts"
+  },
+  {
+    "num": 100,
+    "name": "Battle Warrior"
+  },
+  {
+    "num": 101,
+    "name": "Wings of Wicked Flame"
+  },
+  {
+    "num": 102,
+    "name": "Mask of Darkness"
+  },
+  {
+    "num": 103,
+    "name": "Job-Change Mirror"
+  },
+  {
+    "num": 104,
+    "name": "Curtain of the Dark Ones"
+  },
+  {
+    "num": 105,
+    "name": "Tomozaurus"
+  },
+  {
+    "num": 106,
+    "name": "Spirit of the Winds"
+  },
+  {
+    "num": 107,
+    "name": "Kageningen"
+  },
+  {
+    "num": 108,
+    "name": "Graveyard and the Hand of Invitation"
+  },
+  {
+    "num": 109,
+    "name": "Goddess with the Third Eye"
+  },
+  {
+    "num": 110,
+    "name": "Hero of the East"
+  },
+  {
+    "num": 111,
+    "name": "Doma The Angel of Silence"
+  },
+  {
+    "num": 112,
+    "name": "That Which Feeds on Life"
+  },
+  {
+    "num": 113,
+    "name": "Dark Gray"
+  },
+  {
+    "num": 114,
+    "name": "White Magical Hat"
+  },
+  {
+    "num": 115,
+    "name": "Kamion Wizard"
+  },
+  {
+    "num": 116,
+    "name": "Nightmare Scorpion"
+  },
+  {
+    "num": 117,
+    "name": "Spirit of the Books"
+  },
+  {
+    "num": 118,
+    "name": "Supporter in the Shadows"
+  },
+  {
+    "num": 119,
+    "name": "Trial of Nightmares"
+  },
+  {
+    "num": 120,
+    "name": "Dream Clown"
+  },
+  {
+    "num": 121,
+    "name": "Sleeping Lion"
+  },
+  {
+    "num": 122,
+    "name": "Yamatano Dragon Scroll"
+  },
+  {
+    "num": 123,
+    "name": "Dark Plant"
+  },
+  {
+    "num": 124,
+    "name": "Ancient Tool"
+  },
+  {
+    "num": 125,
+    "name": "Faith Bird"
+  },
+  {
+    "num": 126,
+    "name": "Orion the Battle King"
+  },
+  {
+    "num": 127,
+    "name": "Ansatsu"
+  },
+  {
+    "num": 128,
+    "name": "LaMoon"
+  },
+  {
+    "num": 129,
+    "name": "Nemuriko"
+  },
+  {
+    "num": 130,
+    "name": "Weather Control"
+  },
+  {
+    "num": 131,
+    "name": "Octoberser"
+  },
+  {
+    "num": 132,
+    "name": "The 13th Grave"
+  },
+  {
+    "num": 133,
+    "name": "Charubin the Fire Knight"
+  },
+  {
+    "num": 134,
+    "name": "Mystical Capture Chain"
+  },
+  {
+    "num": 135,
+    "name": "Fiend’s Hand"
+  },
+  {
+    "num": 136,
+    "name": "Witty Phantom"
+  },
+  {
+    "num": 137,
+    "name": "Mystery Hand"
+  },
+  {
+    "num": 138,
+    "name": "Dragon Statue"
+  },
+  {
+    "num": 139,
+    "name": "Blue-eyed Silver Zombie"
+  },
+  {
+    "num": 140,
+    "name": "Toad Master"
+  },
+  {
+    "num": 141,
+    "name": "Spiked Snail"
+  },
+  {
+    "num": 142,
+    "name": "Flame Manipulator"
+  },
+  {
+    "num": 143,
+    "name": "Necrolancer the Timelord"
+  },
+  {
+    "num": 144,
+    "name": "Djinn the Watcher of the Wind"
+  },
+  {
+    "num": 145,
+    "name": "The Bewitching Phantom Thief"
+  },
+  {
+    "num": 146,
+    "name": "Temple of Skulls"
+  },
+  {
+    "num": 147,
+    "name": "Monster Egg"
+  },
+  {
+    "num": 148,
+    "name": "The Shadow Who Controls the Dark"
+  },
+  {
+    "num": 149,
+    "name": "Lord of the Lamp"
+  },
+  {
+    "num": 150,
+    "name": "Akihiron"
+  },
+  {
+    "num": 151,
+    "name": "Rhaimundos of the Red Sword"
+  },
+  {
+    "num": 152,
+    "name": "The Melting Red Shadow"
+  },
+  {
+    "num": 153,
+    "name": "Dokuroizo the Grim Reaper"
+  },
+  {
+    "num": 154,
+    "name": "Fire Reaper"
+  },
+  {
+    "num": 155,
+    "name": "Larvas"
+  },
+  {
+    "num": 156,
+    "name": "Hard Armor"
+  },
+  {
+    "num": 157,
+    "name": "Firegrass"
+  },
+  {
+    "num": 158,
+    "name": "Man Eater"
+  },
+  {
+    "num": 159,
+    "name": "Dig Beak"
+  },
+  {
+    "num": 160,
+    "name": "M-warrior #1"
+  },
+  {
+    "num": 161,
+    "name": "M-warrior #2"
+  },
+  {
+    "num": 162,
+    "name": "Tainted Wisdom"
+  },
+  {
+    "num": 163,
+    "name": "Lisark"
+  },
+  {
+    "num": 164,
+    "name": "Lord of Zemia"
+  },
+  {
+    "num": 165,
+    "name": "The Judgement Hand"
+  },
+  {
+    "num": 166,
+    "name": "Mysterious Puppeteer"
+  },
+  {
+    "num": 167,
+    "name": "Ancient Jar"
+  },
+  {
+    "num": 168,
+    "name": "Darkfire Dragon"
+  },
+  {
+    "num": 169,
+    "name": "Dark King of the Abyss"
+  },
+  {
+    "num": 170,
+    "name": "Spirit of the Harp"
+  },
+  {
+    "num": 171,
+    "name": "Big Eye"
+  },
+  {
+    "num": 172,
+    "name": "Armaill"
+  },
+  {
+    "num": 173,
+    "name": "Dark Prisoner"
+  },
+  {
+    "num": 174,
+    "name": "The Immortal of Thunder"
+  },
+  {
+    "num": 175,
+    "name": "Nebra and Parshath"
+  },
+  {
+    "num": 176,
+    "name": "Fire Eye"
+  },
+  {
+    "num": 177,
+    "name": "Monsturtle"
+  },
+  {
+    "num": 178,
+    "name": "Claw Reacher"
+  },
+  {
+    "num": 179,
+    "name": "Mystic Clown"
+  },
+  {
+    "num": 180,
+    "name": "Arlownay"
+  },
+  {
+    "num": 181,
+    "name": "Dark Shade"
+  },
+  {
+    "num": 182,
+    "name": "Masked Clown"
+  },
+  {
+    "num": 183,
+    "name": "Lucky Trinket"
+  },
+  {
+    "num": 184,
+    "name": "Genin"
+  },
+  {
+    "num": 185,
+    "name": "Eyearmor"
+  },
+  {
+    "num": 186,
+    "name": "Morphing Jar"
+  },
+  {
+    "num": 187,
+    "name": "Gate Deeg"
+  },
+  {
+    "num": 188,
+    "name": "Aqua Madoor"
+  },
+  {
+    "num": 189,
+    "name": "Orca Mega-Fortress of Darkness"
+  },
+  {
+    "num": 190,
+    "name": "Shell Knight"
+  },
+  {
+    "num": 191,
+    "name": "Sea King Dragon"
+  },
+  {
+    "num": 192,
+    "name": "Key Mace"
+  },
+  {
+    "num": 193,
+    "name": "Armored Glass"
+  },
+  {
+    "num": 194,
+    "name": "Terra the Terrible"
+  },
+  {
+    "num": 195,
+    "name": "Stone Ogre Grotto"
+  },
+  {
+    "num": 196,
+    "name": "Granite Golem"
+  },
+  {
+    "num": 197,
+    "name": "Rock Spirit"
+  },
+  {
+    "num": 198,
+    "name": "Stone D. Golem"
+  },
+  {
+    "num": 199,
+    "name": "Penguin Knight"
+  },
+  {
+    "num": 200,
+    "name": "Mysterious Magician"
+  },
+  {
+    "num": 201,
+    "name": "Magician of Faith"
+  },
+  {
+    "num": 202,
+    "name": "Air Marmot of Nefariousness"
+  },
+  {
+    "num": 203,
+    "name": "Masaki the Legendary Swordsman"
+  },
+  {
+    "num": 204,
+    "name": "Mabarrel"
+  },
+  {
+    "num": 205,
+    "name": "Blue Flame Swordsman"
+  },
+  {
+    "num": 206,
+    "name": "Warrior of Tradition"
+  },
+  {
+    "num": 207,
+    "name": "Milus Radiant"
+  },
+  {
+    "num": 208,
+    "name": "Petit Angel"
+  },
+  {
+    "num": 209,
+    "name": "Winged Cleaver"
+  },
+  {
+    "num": 210,
+    "name": "The Forgiving Maiden"
+  },
+  {
+    "num": 211,
+    "name": "Kaminarikozou"
+  },
+  {
+    "num": 212,
+    "name": "Winged Cleaver"
+  },
+  {
+    "num": 213,
+    "name": "Killer Whale"
+  },
+  {
+    "num": 214,
+    "name": "Aqua Jet"
+  },
+  {
+    "num": 215,
+    "name": "Flame Ghost"
+  },
+  {
+    "num": 216,
+    "name": "Piranhas"
+  },
+  {
+    "num": 217,
+    "name": "Bizarre Head"
+  },
+  {
+    "num": 218,
+    "name": "Two-mouth Darkruler"
+  },
+  {
+    "num": 219,
+    "name": "Cockroach Knight"
+  },
+  {
+    "num": 220,
+    "name": "Infernal Queen Alexiel"
+  },
+  {
+    "num": 221,
+    "name": "Kumootoko"
+  },
+  {
+    "num": 222,
+    "name": "Midnight Fiend"
+  },
+  {
+    "num": 223,
+    "name": "Roaring Ocean Snake"
+  },
+  {
+    "num": 224,
+    "name": "Turtle Raccoon"
+  },
+  {
+    "num": 225,
+    "name": "Copycat"
+  },
+  {
+    "num": 226,
+    "name": "Skull Stalker"
+  },
+  {
+    "num": 227,
+    "name": "Hitodenchak"
+  },
+  {
+    "num": 228,
+    "name": "Ghoul King of Dark World"
+  },
+  {
+    "num": 229,
+    "name": "Hourglass of Life"
+  },
+  {
+    "num": 230,
+    "name": "Rare Fish"
+  },
+  {
+    "num": 231,
+    "name": "Legendary Aura"
+  },
+  {
+    "num": 232,
+    "name": "Stone Golem"
+  },
+  {
+    "num": 233,
+    "name": "Scapegoat"
+  },
+  {
+    "num": 234,
+    "name": "Beautiful Headhuntress"
+  },
+  {
+    "num": 235,
+    "name": "Fortress Whale"
+  },
+  {
+    "num": 236,
+    "name": "Rude Kaiser"
+  },
+  {
+    "num": 237,
+    "name": "Laser Cannon Armor"
+  },
+  {
+    "num": 238,
+    "name": "Mechanical Spider"
+  },
+  {
+    "num": 239,
+    "name": "Cyber Soldier"
+  },
+  {
+    "num": 240,
+    "name": "Mechanical Chaser"
+  },
+  {
+    "num": 241,
+    "name": "Dark Assailant"
+  },
+  {
+    "num": 242,
+    "name": "Beastie"
+  },
+  {
+    "num": 243,
+    "name": "Water Element"
+  },
+  {
+    "num": 244,
+    "name": "Mystic Probe"
+  },
+  {
+    "num": 245,
+    "name": "Meda Bat"
+  },
+  {
+    "num": 246,
+    "name": "Catastador"
+  },
+  {
+    "num": 247,
+    "name": "Monstrous Bird"
+  },
+  {
+    "num": 248,
+    "name": "Swordsoul Guardian"
+  },
+  {
+    "num": 249,
+    "name": "Empowering Stone"
+  },
+  {
+    "num": 250,
+    "name": "Fusion Sword Murasame Blade"
+  },
+  {
+    "num": 251,
+    "name": "Enchanting Mermaid"
+  },
+  {
+    "num": 252,
+    "name": "Nekogal #1"
+  },
+  {
+    "num": 253,
+    "name": "Angelwitch"
+  },
+  {
+    "num": 254,
+    "name": "Embryonic Beast"
+  },
+  {
+    "num": 255,
+    "name": "Prevent Rat"
+  },
+  {
+    "num": 256,
+    "name": "Dimensional Warrior"
+  },
+  {
+    "num": 257,
+    "name": "Stone Armadiller"
+  },
+  {
+    "num": 258,
+    "name": "Beastking of the Swamps"
+  },
+  {
+    "num": 259,
+    "name": "Ancient Sorcerer"
+  },
+  {
+    "num": 260,
+    "name": "Lunar Queen Elzaim"
+  },
+  {
+    "num": 261,
+    "name": "Wicked Mirror"
+  },
+  {
+    "num": 262,
+    "name": "The Little Swordsman of Aile"
+  },
+  {
+    "num": 263,
+    "name": "Rock Ogre Grotto #2"
+  },
+  {
+    "num": 264,
+    "name": "Wing Egg Elf"
+  },
+  {
+    "num": 265,
+    "name": "The Furious Sea King"
+  },
+  {
+    "num": 266,
+    "name": "Princess of Tsurugi"
+  },
+  {
+    "num": 267,
+    "name": "Unknown Warrior of Fiend"
+  },
+  {
+    "num": 268,
+    "name": "Sectarian of Secrets"
+  },
+  {
+    "num": 269,
+    "name": "Versago the Destroyer"
+  },
+  {
+    "num": 270,
+    "name": "Wetha"
+  },
+  {
+    "num": 271,
+    "name": "Megirus Light"
+  },
+  {
+    "num": 272,
+    "name": "Mavelus"
+  },
+  {
+    "num": 273,
+    "name": "Ancient Tree of Enlightenment"
+  },
+  {
+    "num": 274,
+    "name": "Green Phantom King"
+  },
+  {
+    "num": 275,
+    "name": "Ground Attacker Bugroth"
+  },
+  {
+    "num": 276,
+    "name": "Ray &amp; Temperature"
+  },
+  {
+    "num": 277,
+    "name": "Gorgon Egg"
+  },
+  {
+    "num": 278,
+    "name": "Petit Moth"
+  },
+  {
+    "num": 279,
+    "name": "King Fog"
+  },
+  {
+    "num": 280,
+    "name": "Protector of the Throne"
+  },
+  {
+    "num": 281,
+    "name": "Mystic Clown"
+  },
+  {
+    "num": 282,
+    "name": "Mystical Sheep #2"
+  },
+  {
+    "num": 283,
+    "name": "Holograh"
+  },
+  {
+    "num": 284,
+    "name": "Tao the Chanter"
+  },
+  {
+    "num": 285,
+    "name": "Serpent Marauder"
+  },
+  {
+    "num": 286,
+    "name": "Gatekeeper"
+  },
+  {
+    "num": 287,
+    "name": "Ogre of the Black Shadow"
+  },
+  {
+    "num": 288,
+    "name": "Dark Artist"
+  },
+  {
+    "num": 289,
+    "name": "Change Slime"
+  },
+  {
+    "num": 290,
+    "name": "Moon Envoy"
+  },
+  {
+    "num": 291,
+    "name": "Fireyarou"
+  },
+  {
+    "num": 292,
+    "name": "Psychic Kappa"
+  },
+  {
+    "num": 293,
+    "name": "Masaki the Legendary Swordsman"
+  },
+  {
+    "num": 294,
+    "name": "Dragoness the Wicked Knight"
+  },
+  {
+    "num": 295,
+    "name": "Bio Plant"
+  },
+  {
+    "num": 296,
+    "name": "One-eyed Shield Dragon"
+  },
+  {
+    "num": 297,
+    "name": "Cyber Soldier of Darkworld"
+  },
+  {
+    "num": 298,
+    "name": "Wicked Dragon with the Ersatz Head"
+  },
+  {
+    "num": 299,
+    "name": "Sonic Maid"
+  },
+  {
+    "num": 300,
+    "name": "Kurama"
+  },
+  {
+    "num": 301,
+    "name": "Legendary Sword"
+  },
+  {
+    "num": 302,
+    "name": "Sword of Dark Destruction"
+  },
+  {
+    "num": 303,
+    "name": "Dark Energy"
+  },
+  {
+    "num": 304,
+    "name": "Axe of Despair"
+  },
+  {
+    "num": 305,
+    "name": "Laser Cannon Armor"
+  },
+  {
+    "num": 306,
+    "name": "Insect Armor with Laser Cannon"
+  },
+  {
+    "num": 307,
+    "name": "Elf’s Light"
+  },
+  {
+    "num": 308,
+    "name": "Beast Fangs"
+  },
+  {
+    "num": 309,
+    "name": "Steel Shell"
+  },
+  {
+    "num": 310,
+    "name": "Vile Germs"
+  },
+  {
+    "num": 311,
+    "name": "Black Pendant"
+  },
+  {
+    "num": 312,
+    "name": "Silver Bow and Arrow"
+  },
+  {
+    "num": 313,
+    "name": "Horn of Light"
+  },
+  {
+    "num": 314,
+    "name": "Horn of the Unicorn"
+  },
+  {
+    "num": 315,
+    "name": "Dragon Treasure"
+  },
+  {
+    "num": 316,
+    "name": "Electro-whip"
+  },
+  {
+    "num": 317,
+    "name": "Cyber Shield"
+  },
+  {
+    "num": 318,
+    "name": "Elegant Egotist"
+  },
+  {
+    "num": 319,
+    "name": "Mystical Moon"
+  },
+  {
+    "num": 320,
+    "name": "Stop Defense"
+  },
+  {
+    "num": 321,
+    "name": "Malevolent Nuzzler"
+  },
+  {
+    "num": 322,
+    "name": "Violet Crystal"
+  },
+  {
+    "num": 323,
+    "name": "Book of Secret Arts"
+  },
+  {
+    "num": 324,
+    "name": "Invigoration"
+  },
+  {
+    "num": 325,
+    "name": "Machine Conversion Factory"
+  },
+  {
+    "num": 326,
+    "name": "Raise Body Heat"
+  },
+  {
+    "num": 327,
+    "name": "Follow Wind"
+  },
+  {
+    "num": 328,
+    "name": "Power of Kaishin"
+  },
+  {
+    "num": 329,
+    "name": "Dragon Capture Jar"
+  },
+  {
+    "num": 330,
+    "name": "Forest"
+  },
+  {
+    "num": 331,
+    "name": "Wasteland"
+  },
+  {
+    "num": 332,
+    "name": "Mountain"
+  },
+  {
+    "num": 333,
+    "name": "Sogen"
+  },
+  {
+    "num": 334,
+    "name": "Umi"
+  },
+  {
+    "num": 335,
+    "name": "Yami"
+  },
+  {
+    "num": 336,
+    "name": "Dark Hole"
+  },
+  {
+    "num": 337,
+    "name": "Raigeki"
+  },
+  {
+    "num": 338,
+    "name": "Mooyan Curry"
+  },
+  {
+    "num": 339,
+    "name": "Red Medicine"
+  },
+  {
+    "num": 340,
+    "name": "Goblin’s Secret Remedy"
+  },
+  {
+    "num": 341,
+    "name": "Soul of the Pure"
+  },
+  {
+    "num": 342,
+    "name": "Dian Keto the Cure Master"
+  },
+  {
+    "num": 343,
+    "name": "Sparks"
+  },
+  {
+    "num": 344,
+    "name": "Hinotama"
+  },
+  {
+    "num": 345,
+    "name": "Final Flame"
+  },
+  {
+    "num": 346,
+    "name": "Ookazi"
+  },
+  {
+    "num": 347,
+    "name": "Tremendous Fire"
+  },
+  {
+    "num": 348,
+    "name": "Swords of Revealing Light"
+  },
+  {
+    "num": 349,
+    "name": "Spellbinding Circle"
+  },
+  {
+    "num": 350,
+    "name": "Dark-piercing Light"
+  },
+  {
+    "num": 351,
+    "name": "Yaranzo"
+  },
+  {
+    "num": 352,
+    "name": "Kanan the Swordmistress"
+  },
+  {
+    "num": 353,
+    "name": "Takriminos"
+  },
+  {
+    "num": 354,
+    "name": "Stuffed Animal"
+  },
+  {
+    "num": 355,
+    "name": "Megasonic Eye"
+  },
+  {
+    "num": 356,
+    "name": "Super War-lion"
+  },
+  {
+    "num": 357,
+    "name": "Yamadron"
+  },
+  {
+    "num": 358,
+    "name": "Seiyaryu"
+  },
+  {
+    "num": 359,
+    "name": "Three-legged Zombies"
+  },
+  {
+    "num": 360,
+    "name": "Zera The Mant"
+  },
+  {
+    "num": 361,
+    "name": "Flying Penguin"
+  },
+  {
+    "num": 362,
+    "name": "Millennium Shield"
+  },
+  {
+    "num": 363,
+    "name": "Fairy’s Gift"
+  },
+  {
+    "num": 364,
+    "name": "Black Luster Soldier"
+  },
+  {
+    "num": 365,
+    "name": "Fiend’s Mirror"
+  },
+  {
+    "num": 366,
+    "name": "Labyrinth Wall"
+  },
+  {
+    "num": 367,
+    "name": "Jirai Gumo"
+  },
+  {
+    "num": 368,
+    "name": "Shadow Ghoul"
+  },
+  {
+    "num": 369,
+    "name": "Wall Shadow"
+  },
+  {
+    "num": 370,
+    "name": "Labyrinth Tank"
+  },
+  {
+    "num": 371,
+    "name": "Sanga of the Thunder"
+  },
+  {
+    "num": 372,
+    "name": "Kazejin"
+  },
+  {
+    "num": 373,
+    "name": "Suijin"
+  },
+  {
+    "num": 374,
+    "name": "Gate Guardian"
+  },
+  {
+    "num": 375,
+    "name": "Dungeon Worm"
+  },
+  {
+    "num": 376,
+    "name": "Monster Tamer"
+  },
+  {
+    "num": 377,
+    "name": "Ryu-kishin Powered"
+  },
+  {
+    "num": 378,
+    "name": "Swordstalker"
+  },
+  {
+    "num": 379,
+    "name": "La Jinn the Mystical Genie"
+  },
+  {
+    "num": 380,
+    "name": "Blue-eyes Ultimate Dragon"
+  },
+  {
+    "num": 381,
+    "name": "Toon Alligator"
+  },
+  {
+    "num": 382,
+    "name": "Rude Kaiser"
+  },
+  {
+    "num": 383,
+    "name": "Parrot Dragon"
+  },
+  {
+    "num": 384,
+    "name": "Dark Rabbit"
+  },
+  {
+    "num": 385,
+    "name": "Bickuribox"
+  },
+  {
+    "num": 386,
+    "name": "Harpie’s Pet Dragon"
+  },
+  {
+    "num": 387,
+    "name": "Mystic Lamp"
+  },
+  {
+    "num": 388,
+    "name": "Pendulum Machine"
+  },
+  {
+    "num": 389,
+    "name": "Giltia the D. Knight"
+  },
+  {
+    "num": 390,
+    "name": "Launcher Spider"
+  },
+  {
+    "num": 391,
+    "name": "Zoa"
+  },
+  {
+    "num": 392,
+    "name": "Metalzoa"
+  },
+  {
+    "num": 393,
+    "name": "Zone Eater"
+  },
+  {
+    "num": 394,
+    "name": "Steel Scorpion"
+  },
+  {
+    "num": 395,
+    "name": "Dancing Elf"
+  },
+  {
+    "num": 396,
+    "name": "Ocubeam"
+  },
+  {
+    "num": 397,
+    "name": "Leghul"
+  },
+  {
+    "num": 398,
+    "name": "Ooguchi"
+  },
+  {
+    "num": 399,
+    "name": "Swordsman from a Foreign Land"
+  },
+  {
+    "num": 400,
+    "name": "Emperor of the Land and Sea"
+  },
+  {
+    "num": 401,
+    "name": "Ushi Oni"
+  },
+  {
+    "num": 402,
+    "name": "Monster Eye"
+  },
+  {
+    "num": 403,
+    "name": "Leogun"
+  },
+  {
+    "num": 404,
+    "name": "Tatsunootoshigo"
+  },
+  {
+    "num": 405,
+    "name": "Saber Slasher"
+  },
+  {
+    "num": 406,
+    "name": "Yaiba Robo"
+  },
+  {
+    "num": 407,
+    "name": "Machine King"
+  },
+  {
+    "num": 408,
+    "name": "Giant Mech-soldier"
+  },
+  {
+    "num": 409,
+    "name": "Metal Dragon"
+  },
+  {
+    "num": 410,
+    "name": "Mechanical Spider"
+  },
+  {
+    "num": 411,
+    "name": "Bat"
+  },
+  {
+    "num": 412,
+    "name": "Giga-tech Wolf"
+  },
+  {
+    "num": 413,
+    "name": "Cyber Soldier"
+  },
+  {
+    "num": 414,
+    "name": "Shovel Crusher"
+  },
+  {
+    "num": 415,
+    "name": "Mechanicalchacer"
+  },
+  {
+    "num": 416,
+    "name": "Blocker"
+  },
+  {
+    "num": 417,
+    "name": "Blast Juggler"
+  },
+  {
+    "num": 418,
+    "name": "Golgoil"
+  },
+  {
+    "num": 419,
+    "name": "Giganto"
+  },
+  {
+    "num": 420,
+    "name": "Cyber-Stein"
+  },
+  {
+    "num": 421,
+    "name": "Cyber Commander"
+  },
+  {
+    "num": 422,
+    "name": "Jinzo #7"
+  },
+  {
+    "num": 423,
+    "name": "Dice Armadillo"
+  },
+  {
+    "num": 424,
+    "name": "Sky Dragon"
+  },
+  {
+    "num": 425,
+    "name": "Thunder Dragon"
+  },
+  {
+    "num": 426,
+    "name": "Stone D."
+  },
+  {
+    "num": 427,
+    "name": "Kaiser Dragon"
+  },
+  {
+    "num": 428,
+    "name": "Magician of Faith"
+  },
+  {
+    "num": 429,
+    "name": "Goddess of Whim"
+  },
+  {
+    "num": 430,
+    "name": "Water Magician"
+  },
+  {
+    "num": 431,
+    "name": "Ice Water"
+  },
+  {
+    "num": 432,
+    "name": "Waterdragon Fairy"
+  },
+  {
+    "num": 433,
+    "name": "Ancient Elf"
+  },
+  {
+    "num": 434,
+    "name": "Beautiful Beast Trainer"
+  },
+  {
+    "num": 435,
+    "name": "Water Girl"
+  },
+  {
+    "num": 436,
+    "name": "White Dolphin"
+  },
+  {
+    "num": 437,
+    "name": "Deepsea Shark"
+  },
+  {
+    "num": 438,
+    "name": "Metal Fish"
+  },
+  {
+    "num": 439,
+    "name": "Bottom Dweller"
+  },
+  {
+    "num": 440,
+    "name": "7 Colored Fish"
+  },
+  {
+    "num": 441,
+    "name": "Mech Bass"
+  },
+  {
+    "num": 442,
+    "name": "Aqua Dragon"
+  },
+  {
+    "num": 443,
+    "name": "Sea King Dragon"
+  },
+  {
+    "num": 444,
+    "name": "Turu-Purun"
+  },
+  {
+    "num": 445,
+    "name": "Guardian of the Sea"
+  },
+  {
+    "num": 446,
+    "name": "Aqua Snake"
+  },
+  {
+    "num": 447,
+    "name": "Giant Red Seasnake"
+  },
+  {
+    "num": 448,
+    "name": "Spike Seadra"
+  },
+  {
+    "num": 449,
+    "name": "30,000-Year White Turtle"
+  },
+  {
+    "num": 450,
+    "name": "Kappa Avenger"
+  },
+  {
+    "num": 451,
+    "name": "Kanikabuto"
+  },
+  {
+    "num": 452,
+    "name": "Zarigun"
+  },
+  {
+    "num": 453,
+    "name": "Millennium Golem"
+  },
+  {
+    "num": 454,
+    "name": "Destroyer Golem"
+  },
+  {
+    "num": 455,
+    "name": "Barrel Rock"
+  },
+  {
+    "num": 456,
+    "name": "Minomushi Warrior"
+  },
+  {
+    "num": 457,
+    "name": "Stone Ghost"
+  },
+  {
+    "num": 458,
+    "name": "Kaminari Attack"
+  },
+  {
+    "num": 459,
+    "name": "Tripwire Beast"
+  },
+  {
+    "num": 460,
+    "name": "Bolt Escargot"
+  },
+  {
+    "num": 461,
+    "name": "Bolt Penguin"
+  },
+  {
+    "num": 462,
+    "name": "The Immortal of Thunder"
+  },
+  {
+    "num": 463,
+    "name": "Electric Snake"
+  },
+  {
+    "num": 464,
+    "name": "Wing Eagle"
+  },
+  {
+    "num": 465,
+    "name": "Punished Eagle"
+  },
+  {
+    "num": 466,
+    "name": "Skull Red Bird"
+  },
+  {
+    "num": 467,
+    "name": "Crimson Sunbird"
+  },
+  {
+    "num": 468,
+    "name": "Queen Bird"
+  },
+  {
+    "num": 469,
+    "name": "Armed Ninja"
+  },
+  {
+    "num": 470,
+    "name": "Magical Ghost"
+  },
+  {
+    "num": 471,
+    "name": "Soul Hunter"
+  },
+  {
+    "num": 472,
+    "name": "Air Eater"
+  },
+  {
+    "num": 473,
+    "name": "Vermillion Sparrow"
+  },
+  {
+    "num": 474,
+    "name": "Sea Kamen"
+  },
+  {
+    "num": 475,
+    "name": "Sinister Serpent"
+  },
+  {
+    "num": 476,
+    "name": "Ganigumo"
+  },
+  {
+    "num": 477,
+    "name": "Alinsection"
+  },
+  {
+    "num": 478,
+    "name": "Insect Soldiers of the Sky"
+  },
+  {
+    "num": 479,
+    "name": "Cockroach Knight"
+  },
+  {
+    "num": 480,
+    "name": "Kuwagata α"
+  },
+  {
+    "num": 481,
+    "name": "Burglar"
+  },
+  {
+    "num": 482,
+    "name": "Pragtical"
+  },
+  {
+    "num": 483,
+    "name": "Garvas"
+  },
+  {
+    "num": 484,
+    "name": "Ameba"
+  },
+  {
+    "num": 485,
+    "name": "Korogashi"
+  },
+  {
+    "num": 486,
+    "name": "Boo Koo"
+  },
+  {
+    "num": 487,
+    "name": "Flower Wolf"
+  },
+  {
+    "num": 488,
+    "name": "Rainbow Flower"
+  },
+  {
+    "num": 489,
+    "name": "Barrel Lily"
+  },
+  {
+    "num": 490,
+    "name": "Needle Ball"
+  },
+  {
+    "num": 491,
+    "name": "Peacock"
+  },
+  {
+    "num": 492,
+    "name": "Hoshiningen"
+  },
+  {
+    "num": 493,
+    "name": "Maha Vailo"
+  },
+  {
+    "num": 494,
+    "name": "Rainbow Marine Mermaid"
+  },
+  {
+    "num": 495,
+    "name": "Musician King"
+  },
+  {
+    "num": 496,
+    "name": "Wilmee"
+  },
+  {
+    "num": 497,
+    "name": "Yado Karu"
+  },
+  {
+    "num": 498,
+    "name": "Morinphen"
+  },
+  {
+    "num": 499,
+    "name": "Kattapillar"
+  },
+  {
+    "num": 500,
+    "name": "Dragon Seeker"
+  },
+  {
+    "num": 501,
+    "name": "Man-eater Bug"
+  },
+  {
+    "num": 502,
+    "name": "D. Human"
+  },
+  {
+    "num": 503,
+    "name": "Turtle Raccoon"
+  },
+  {
+    "num": 504,
+    "name": "Fungi of the Musk"
+  },
+  {
+    "num": 505,
+    "name": "Prisman"
+  },
+  {
+    "num": 506,
+    "name": "Gale Dogra"
+  },
+  {
+    "num": 507,
+    "name": "Crazy Fish"
+  },
+  {
+    "num": 508,
+    "name": "Cyber Saurus"
+  },
+  {
+    "num": 509,
+    "name": "Bracchio-raidus"
+  },
+  {
+    "num": 510,
+    "name": "Laughing Flower"
+  },
+  {
+    "num": 511,
+    "name": "Bean Soldier"
+  },
+  {
+    "num": 512,
+    "name": "Cannon Soldier"
+  },
+  {
+    "num": 513,
+    "name": "Guardian of the Throne Room"
+  },
+  {
+    "num": 514,
+    "name": "Brave Scizzar"
+  },
+  {
+    "num": 515,
+    "name": "The Statue of Easter Island"
+  },
+  {
+    "num": 516,
+    "name": "Muka Muka"
+  },
+  {
+    "num": 517,
+    "name": "Sand Stone"
+  },
+  {
+    "num": 518,
+    "name": "Boulder Tortoise"
+  },
+  {
+    "num": 519,
+    "name": "Fire Kraken"
+  },
+  {
+    "num": 520,
+    "name": "Turtle Bird"
+  },
+  {
+    "num": 521,
+    "name": "Skullbird"
+  },
+  {
+    "num": 522,
+    "name": "Monstrous Bird"
+  },
+  {
+    "num": 523,
+    "name": "The Bistro Butcher"
+  },
+  {
+    "num": 524,
+    "name": "Star Boy"
+  },
+  {
+    "num": 525,
+    "name": "Spirit of the Mountain"
+  },
+  {
+    "num": 526,
+    "name": "Neck Hunter"
+  },
+  {
+    "num": 527,
+    "name": "Milus Radiant"
+  },
+  {
+    "num": 528,
+    "name": "Togex"
+  },
+  {
+    "num": 529,
+    "name": "Flame Cerebrus"
+  },
+  {
+    "num": 530,
+    "name": "Eldeen"
+  },
+  {
+    "num": 531,
+    "name": "Mystical Sand"
+  },
+  {
+    "num": 532,
+    "name": "Gemini Elf"
+  },
+  {
+    "num": 533,
+    "name": "Kwagar Hercules"
+  },
+  {
+    "num": 534,
+    "name": "Minar"
+  },
+  {
+    "num": 535,
+    "name": "Kamakiriman"
+  },
+  {
+    "num": 536,
+    "name": "Mechaleon"
+  },
+  {
+    "num": 537,
+    "name": "Mega Thunderball"
+  },
+  {
+    "num": 538,
+    "name": "Niwatori"
+  },
+  {
+    "num": 539,
+    "name": "Corroding Shark"
+  },
+  {
+    "num": 540,
+    "name": "Skelengel"
+  },
+  {
+    "num": 541,
+    "name": "Hane-Hane"
+  },
+  {
+    "num": 542,
+    "name": "Misairuzame"
+  },
+  {
+    "num": 543,
+    "name": "Tongyo"
+  },
+  {
+    "num": 544,
+    "name": "Dharma Cannon"
+  },
+  {
+    "num": 545,
+    "name": "Skelgon"
+  },
+  {
+    "num": 546,
+    "name": "Wow Warrior"
+  },
+  {
+    "num": 547,
+    "name": "Griggle"
+  },
+  {
+    "num": 548,
+    "name": "Bone Mouse"
+  },
+  {
+    "num": 549,
+    "name": "Frog the Jam"
+  },
+  {
+    "num": 550,
+    "name": "Behegon"
+  },
+  {
+    "num": 551,
+    "name": "Dark Elf"
+  },
+  {
+    "num": 552,
+    "name": "Winged Dragon #2"
+  },
+  {
+    "num": 553,
+    "name": "Mushroom Man #2"
+  },
+  {
+    "num": 554,
+    "name": "Lava Battleguard"
+  },
+  {
+    "num": 555,
+    "name": "Tyhone #2"
+  },
+  {
+    "num": 556,
+    "name": "The Wandering Doomed"
+  },
+  {
+    "num": 557,
+    "name": "Steel Ogre Grotto #1"
+  },
+  {
+    "num": 558,
+    "name": "Pot the Trick"
+  },
+  {
+    "num": 559,
+    "name": "Oscillo Hero"
+  },
+  {
+    "num": 560,
+    "name": "Invader from Another Dimension"
+  },
+  {
+    "num": 561,
+    "name": "Lesser Dragon"
+  },
+  {
+    "num": 562,
+    "name": "Needle Worm"
+  },
+  {
+    "num": 563,
+    "name": "Wretched Ghost of the Attic"
+  },
+  {
+    "num": 564,
+    "name": "Great Mammoth of Goldfine"
+  },
+  {
+    "num": 565,
+    "name": "Man-eating Black Shark"
+  },
+  {
+    "num": 566,
+    "name": "Yormungarde"
+  },
+  {
+    "num": 567,
+    "name": "Darkworld Thorns"
+  },
+  {
+    "num": 568,
+    "name": "Anthrosaurus"
+  },
+  {
+    "num": 569,
+    "name": "Drooling Lizard"
+  },
+  {
+    "num": 570,
+    "name": "Trakadon"
+  },
+  {
+    "num": 571,
+    "name": "B. Dragon Jungle King"
+  },
+  {
+    "num": 572,
+    "name": "Empress Judge"
+  },
+  {
+    "num": 573,
+    "name": "Little D"
+  },
+  {
+    "num": 574,
+    "name": "Witch of the Black Forest"
+  },
+  {
+    "num": 575,
+    "name": "Ancient One of the Deep Forest"
+  },
+  {
+    "num": 576,
+    "name": "Giant Scorpion of the Tundra"
+  },
+  {
+    "num": 577,
+    "name": "Crow Goblin"
+  },
+  {
+    "num": 578,
+    "name": "Leo Wizard"
+  },
+  {
+    "num": 579,
+    "name": "Abyss Flower"
+  },
+  {
+    "num": 580,
+    "name": "Patrol Robo"
+  },
+  {
+    "num": 581,
+    "name": "Takuhee"
+  },
+  {
+    "num": 582,
+    "name": "Dark Witch"
+  },
+  {
+    "num": 583,
+    "name": "Weather Report"
+  },
+  {
+    "num": 584,
+    "name": "Binding Chain"
+  },
+  {
+    "num": 585,
+    "name": "Mechanical Snail"
+  },
+  {
+    "num": 586,
+    "name": "Greenkappa"
+  },
+  {
+    "num": 587,
+    "name": "Mon Larvas"
+  },
+  {
+    "num": 588,
+    "name": "Living Vase"
+  },
+  {
+    "num": 589,
+    "name": "Tentacle Plant"
+  },
+  {
+    "num": 590,
+    "name": "Beaked Snake"
+  },
+  {
+    "num": 591,
+    "name": "Morphing Jar"
+  },
+  {
+    "num": 592,
+    "name": "Muse-A"
+  },
+  {
+    "num": 593,
+    "name": "Giant Turtle Who Feeds on Flames"
+  },
+  {
+    "num": 594,
+    "name": "Rose Spectre of Dunn"
+  },
+  {
+    "num": 595,
+    "name": "Fiend Refrection #1"
+  },
+  {
+    "num": 596,
+    "name": "Ghoul with an Appetite"
+  },
+  {
+    "num": 597,
+    "name": "Pale Beast"
+  },
+  {
+    "num": 598,
+    "name": "Little Chimera"
+  },
+  {
+    "num": 599,
+    "name": "Violent Rain"
+  },
+  {
+    "num": 600,
+    "name": "Key Mace #2"
+  },
+  {
+    "num": 601,
+    "name": "Tenderness"
+  },
+  {
+    "num": 602,
+    "name": "Penguin Soldier"
+  },
+  {
+    "num": 603,
+    "name": "Fairy Dragon"
+  },
+  {
+    "num": 604,
+    "name": "Obese Marmot of Nefariousness"
+  },
+  {
+    "num": 605,
+    "name": "Liquid Beast"
+  },
+  {
+    "num": 606,
+    "name": "Twin Long Rods 2"
+  },
+  {
+    "num": 607,
+    "name": "Great Bill"
+  },
+  {
+    "num": 608,
+    "name": "Shining Friendship"
+  },
+  {
+    "num": 609,
+    "name": "Bladefly"
+  },
+  {
+    "num": 610,
+    "name": "Electric Lizard"
+  },
+  {
+    "num": 611,
+    "name": "Hiro’s Shadow Scout"
+  },
+  {
+    "num": 612,
+    "name": "Lady of Faith"
+  },
+  {
+    "num": 613,
+    "name": "Twin-headed Thunder Dragon"
+  },
+  {
+    "num": 614,
+    "name": "Hunter Spider"
+  },
+  {
+    "num": 615,
+    "name": "Armored Starfish"
+  },
+  {
+    "num": 616,
+    "name": "Hourglass of Courage"
+  },
+  {
+    "num": 617,
+    "name": "Marine Beast"
+  },
+  {
+    "num": 618,
+    "name": "Warrior of Tradition"
+  },
+  {
+    "num": 619,
+    "name": "Rock Spirit"
+  },
+  {
+    "num": 620,
+    "name": "Snakeyashi"
+  },
+  {
+    "num": 621,
+    "name": "Succubus Knight"
+  },
+  {
+    "num": 622,
+    "name": "Ill Witch"
+  },
+  {
+    "num": 623,
+    "name": "The Thing That Hides In the Mud"
+  },
+  {
+    "num": 624,
+    "name": "High Tide Gyojin"
+  },
+  {
+    "num": 625,
+    "name": "Fairy of the Fountain"
+  },
+  {
+    "num": 626,
+    "name": "Amazon of the Seas"
+  },
+  {
+    "num": 627,
+    "name": "Nekogal #2"
+  },
+  {
+    "num": 628,
+    "name": "Witch’s Apprentice"
+  },
+  {
+    "num": 629,
+    "name": "Armored Rat"
+  },
+  {
+    "num": 630,
+    "name": "Ancient Lizard Warrior"
+  },
+  {
+    "num": 631,
+    "name": "Maiden of the Moonlight"
+  },
+  {
+    "num": 632,
+    "name": "Stone Ogre Grotto"
+  },
+  {
+    "num": 633,
+    "name": "Winged Egg of New Life"
+  },
+  {
+    "num": 634,
+    "name": "Night Lizard"
+  },
+  {
+    "num": 635,
+    "name": "Queen’s Double"
+  },
+  {
+    "num": 636,
+    "name": "Blue-winged Crown"
+  },
+  {
+    "num": 637,
+    "name": "Trent"
+  },
+  {
+    "num": 638,
+    "name": "Queen of Autumn Leaves"
+  },
+  {
+    "num": 639,
+    "name": "Amphibious Bugroth"
+  },
+  {
+    "num": 640,
+    "name": "Acid Crawler"
+  },
+  {
+    "num": 641,
+    "name": "Invader of the Throne"
+  },
+  {
+    "num": 642,
+    "name": "Mystical Sheep #1"
+  },
+  {
+    "num": 643,
+    "name": "Disk Magician"
+  },
+  {
+    "num": 644,
+    "name": "Flame Viper"
+  },
+  {
+    "num": 645,
+    "name": "Royal Guard"
+  },
+  {
+    "num": 646,
+    "name": "Gruesome Goo"
+  },
+  {
+    "num": 647,
+    "name": "Hyosube"
+  },
+  {
+    "num": 648,
+    "name": "Machine Attacker"
+  },
+  {
+    "num": 649,
+    "name": "Hibikime"
+  },
+  {
+    "num": 650,
+    "name": "Whiptail Crow"
+  },
+  {
+    "num": 651,
+    "name": "Kunai with Chain"
+  },
+  {
+    "num": 652,
+    "name": "Magical Labyrinth"
+  },
+  {
+    "num": 653,
+    "name": "Warrior Elimination"
+  },
+  {
+    "num": 654,
+    "name": "Salamandra"
+  },
+  {
+    "num": 655,
+    "name": "Cursebreaker"
+  },
+  {
+    "num": 656,
+    "name": "Eternal Rest"
+  },
+  {
+    "num": 657,
+    "name": "Megamorph"
+  },
+  {
+    "num": 658,
+    "name": "Metalmorph"
+  },
+  {
+    "num": 659,
+    "name": "Winged Trumpeter"
+  },
+  {
+    "num": 660,
+    "name": "Stain Storm"
+  },
+  {
+    "num": 661,
+    "name": "Crush Card"
+  },
+  {
+    "num": 662,
+    "name": "Eradicating Aerosol"
+  },
+  {
+    "num": 663,
+    "name": "Breath of Light"
+  },
+  {
+    "num": 664,
+    "name": "Eternal Draught"
+  },
+  {
+    "num": 665,
+    "name": "Curse of Millennium Shield"
+  },
+  {
+    "num": 666,
+    "name": "Yamadron Ritual"
+  },
+  {
+    "num": 667,
+    "name": "Gate Guardian Ritual"
+  },
+  {
+    "num": 668,
+    "name": "Bright Castle"
+  },
+  {
+    "num": 669,
+    "name": "Shadow Spell"
+  },
+  {
+    "num": 670,
+    "name": "Black Luster Ritual"
+  },
+  {
+    "num": 671,
+    "name": "Zera Ritual"
+  },
+  {
+    "num": 672,
+    "name": "Harpie’s Feather Duster"
+  },
+  {
+    "num": 673,
+    "name": "War-lion Ritual"
+  },
+  {
+    "num": 674,
+    "name": "Beastry Mirror Ritual"
+  },
+  {
+    "num": 675,
+    "name": "Ultimate Dragon"
+  },
+  {
+    "num": 676,
+    "name": "Commencement Dance"
+  },
+  {
+    "num": 677,
+    "name": "Hamburger Recipe"
+  },
+  {
+    "num": 678,
+    "name": "Revival of Sennen Genjin"
+  },
+  {
+    "num": 679,
+    "name": "Novox’s Prayer"
+  },
+  {
+    "num": 680,
+    "name": "Curse of Tri-Horned Dragon"
+  },
+  {
+    "num": 681,
+    "name": "House of Adhesive Tape"
+  },
+  {
+    "num": 682,
+    "name": "Eatgaboon"
+  },
+  {
+    "num": 683,
+    "name": "Bear Trap"
+  },
+  {
+    "num": 684,
+    "name": "Invisible Wire"
+  },
+  {
+    "num": 685,
+    "name": "Acid Trap Hole"
+  },
+  {
+    "num": 686,
+    "name": "Widespread Ruin"
+  },
+  {
+    "num": 687,
+    "name": "Goblin Fan"
+  },
+  {
+    "num": 688,
+    "name": "Bad Reaction to Simochi"
+  },
+  {
+    "num": 689,
+    "name": "Reverse Trap"
+  },
+  {
+    "num": 690,
+    "name": "Fake Trap"
+  },
+  {
+    "num": 691,
+    "name": "Revived of Serpent Night Dragon"
+  },
+  {
+    "num": 692,
+    "name": "Turtle Oath"
+  },
+  {
+    "num": 693,
+    "name": "Contruct of Mask"
+  },
+  {
+    "num": 694,
+    "name": "Resurrection of Chakra"
+  },
+  {
+    "num": 695,
+    "name": "Puppet Ritual"
+  },
+  {
+    "num": 696,
+    "name": "Javelin Beetle Pact"
+  },
+  {
+    "num": 697,
+    "name": "Garma Sword Oath"
+  },
+  {
+    "num": 698,
+    "name": "Cosmo Queen’s Prayer"
+  },
+  {
+    "num": 699,
+    "name": "Revival of Skeleton Rider"
+  },
+  {
+    "num": 700,
+    "name": "Fortress Whale’s Oath"
+  },
+  {
+    "num": 701,
+    "name": "Performance of Sword"
+  },
+  {
+    "num": 702,
+    "name": "Hungry Burger"
+  },
+  {
+    "num": 703,
+    "name": "Sengenjin"
+  },
+  {
+    "num": 704,
+    "name": "Skull Guardian"
+  },
+  {
+    "num": 705,
+    "name": "Tri-horned Dragon"
+  },
+  {
+    "num": 706,
+    "name": "Serpent Night Dragon"
+  },
+  {
+    "num": 707,
+    "name": "Skull Knight"
+  },
+  {
+    "num": 708,
+    "name": "Cosmo Queen"
+  },
+  {
+    "num": 709,
+    "name": "Chakra"
+  },
+  {
+    "num": 710,
+    "name": "Crab Turtle"
+  },
+  {
+    "num": 711,
+    "name": "Mikazukinoyaiba"
+  },
+  {
+    "num": 712,
+    "name": "Meteor Dragon"
+  },
+  {
+    "num": 713,
+    "name": "Meteor B. Dragon"
+  },
+  {
+    "num": 714,
+    "name": "Firewing Pegasus"
+  },
+  {
+    "num": 715,
+    "name": "Psycho-Puppet"
+  },
+  {
+    "num": 716,
+    "name": "Garma Sword"
+  },
+  {
+    "num": 717,
+    "name": "Javelin Beetle"
+  },
+  {
+    "num": 718,
+    "name": "Fortress Whale"
+  },
+  {
+    "num": 719,
+    "name": "Dokurorider"
+  },
+  {
+    "num": 720,
+    "name": "Mask of Shine &amp; Dark"
+  },
+  {
+    "num": 721,
+    "name": "Dark Magic Ritual"
+  },
+  {
+    "num": 722,
+    "name": "Magician of Black Chaos"
+  }
+]
