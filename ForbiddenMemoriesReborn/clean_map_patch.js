@@ -639,8 +639,8 @@ document.head.appendChild(duelScaleStyle);
 
 const portraitMap = {
     'MOTO': 'abueloYugi.jpg', 'TRISTAN_INTRO': 'Tristan.jpg', 'TRISTAN': 'Tristan.jpg', 'WEEVIL': 'Weevil.jpeg', 'MAI': 'Mai.jpeg',
-    'JOEY': 'Joey.jpeg', 'PEGASUS': 'Pegasus.jpeg', 'BAKURA': 'Bakura.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg',
-    'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg', 'KOSABURO': 'Kosaburo_Kaiba.jpeg', 'MAKO': 'mako.jpg', 'SETO': 'SetoKaiba.jpeg', 'KAIBA': 'DialogoSetoKaiba.png', 'YUGI': 'YugiMoTo.jpeg',
+    'JOEY': 'DialogoJoe.png', 'PEGASUS': 'Pegasus.jpeg', 'BAKURA': 'Bakura.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg',
+    'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg', 'KOSABURO': 'Kosaburo_Kaiba.jpeg', 'MAKO': 'mako.jpg', 'SETO': 'DialogoSetoKaiba.png', 'KAIBA': 'DialogoSetoKaiba.png', 'YUGI': 'YugiMoTo.jpeg',
     'ABUELO': 'abueloYugi.jpg', 'ATEM': 'DialogoFaraom.png'
 };
 
@@ -1503,7 +1503,7 @@ window.renderCustomStoryDialog = function(lines, index, onFinish, btnText) {
     else if (line.speaker === 'SETO' || line.speaker === 'KAIBA') nameOverride = 'SETO KAIBA';
     else if (line.speaker === 'MOTO' || line.speaker === 'ABUELO') nameOverride = 'SR. MOTO';
     
-    d.style.cssText = `position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: url('ImagenesPersonajes/${pFilename}?v=20261003b') center top / contain no-repeat, #000; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; cursor:pointer;`;
+    d.style.cssText = `position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: url('ImagenesPersonajes/${pFilename}?v=20261003c') center top / contain no-repeat, #000; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; cursor:pointer;`;
     
     let darkOverlay = document.createElement('div');
     darkOverlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.9) 100%); pointer-events:none;';
@@ -3115,7 +3115,16 @@ const POWERFUL_SHOP_CARDS = [
     { name: 'Negate Attack', price: 26000, tier: 'TRAMPA DEFENSA', desc: 'Niega el ataque enemigo y finaliza la fase de batalla inmediatamente.' },
     { name: 'Sakuretsu Armor', price: 22000, tier: 'TRAMPA DESTRUCCIÓN', desc: 'Armadura explosiva que aniquila instantáneamente al monstruo que declare un ataque.' },
     { name: 'Waboku', price: 19000, tier: 'TRAMPA DEFENSA', desc: 'El jugador no recibe ningún daño por combate durante este turno.' },
-    { name: 'Trap Hole', price: 15000, tier: 'TRAMPA CLÁSICA', desc: 'Agujero trampa que destruye inmediatamente a cualquier monstruo invocado con 1000+ ATK.' }
+    { name: 'Trap Hole', price: 15000, tier: 'TRAMPA CLÁSICA', desc: 'Agujero trampa que destruye inmediatamente a cualquier monstruo invocado con 1000+ ATK.' },
+    { name: 'Widespread Ruin', price: 12000, tier: 'TRAMPA DEVASTADORA', desc: 'Destruye al monstruo rival en posición de ataque con mayor ATK al ser atacado.' },
+    { name: 'Acid Trap Hole', price: 5000, tier: 'TRAMPA CLÁSICA', desc: 'Disuelve y destruye de inmediato al monstruo atacante o invocado del rival.' },
+    { name: 'Invisible Wire', price: 3000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye al monstruo enemigo si su ATK es 2000 o menor.' },
+    { name: 'Bear Trap', price: 1500, tier: 'TRAMPA CLÁSICA', desc: 'Destruye al monstruo enemigo si su ATK es 1500 o menor.' },
+    { name: 'Eatgaboon', price: 1000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye al monstruo enemigo si su ATK es 1000 o menor.' },
+    { name: 'Goblin Fan', price: 1200, tier: 'TRAMPA CLÁSICA', desc: 'Niega el ataque enemigo y causa 500 LP de daño directo al rival.' },
+    { name: 'Bad Reaction to Simochi', price: 2000, tier: 'TRAMPA CLÁSICA', desc: 'Causa 1000 LP de daño al rival y debilita en 1000 ATK al atacante.' },
+    { name: 'Reverse Trap', price: 3500, tier: 'TRAMPA CLÁSICA', desc: 'Invierte el curso del combate otorgando +1000 ATK de sorpresa a tu defensa.' },
+    { name: 'Fake Trap', price: 1500, tier: 'TRAMPA CLÁSICA', desc: 'Trampa señuelo que absorbe y niega por completo el ataque enemigo.' }
 ];
 
 window.getCardMetadata = function(name) {
@@ -3309,6 +3318,16 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     if (cardPool.length === 0) {
         cardPool = ['Dark Magician', 'Blue-Eyes White Dragon', 'Summoned Skull', 'Red-Eyes Black Dragon', 'Celtic Guardian'];
     }
+
+    const NEW_REWARD_TRAPS = [
+        'Eatgaboon', 'Bear Trap', 'Invisible Wire', 'Acid Trap Hole',
+        'Widespread Ruin', 'Goblin Fan', 'Bad Reaction to Simochi',
+        'Reverse Trap', 'Fake Trap'
+    ];
+    window.NEW_REWARD_TRAPS = NEW_REWARD_TRAPS;
+    NEW_REWARD_TRAPS.forEach(t => {
+        if (!cardPool.includes(t)) cardPool.push(t);
+    });
     
     // Shuffle pool and select 3 cards
     let shuffled = [...cardPool].sort(() => 0.5 - Math.random());
@@ -3320,6 +3339,17 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         let rc = cardPool[Math.floor(Math.random() * cardPool.length)];
         if (!selected3.includes(rc) || selected3.length === cardPool.length) {
             selected3.push(rc);
+        }
+    }
+
+    // Asegurar alta probabilidad de ofrecer una de las nuevas trampas clásicas como recompensa
+    if (Math.random() < 0.65 && selected3.length > 0) {
+        let unownedTraps = NEW_REWARD_TRAPS.filter(t => (s.collection[t] || 0) < 3);
+        let bonusTrap = unownedTraps.length > 0
+            ? unownedTraps[Math.floor(Math.random() * unownedTraps.length)]
+            : NEW_REWARD_TRAPS[Math.floor(Math.random() * NEW_REWARD_TRAPS.length)];
+        if (bonusTrap && !selected3.includes(bonusTrap)) {
+            selected3[selected3.length - 1] = bonusTrap;
         }
     }
     
@@ -9885,8 +9915,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
 
       // Automatic response traps
-      if (['MIRROR_FORCE', 'TRAP_HOLE', 'MAGIC_CYLINDER', 'NEGATE_ATTACK', 'SAKURETSU_ARMOR', 'TORRENTIAL'].includes(val) ||
-          ['Trap Hole', 'Sakuretsu Armor', 'Negate Attack', 'Mirror Force', 'Torrential Tribute'].includes(cName)) {
+      if (['MIRROR_FORCE', 'TRAP_HOLE', 'MAGIC_CYLINDER', 'NEGATE_ATTACK', 'SAKURETSU_ARMOR', 'TORRENTIAL', 'WIDESPREAD_RUIN', 'EATGABOON', 'BEAR_TRAP', 'INVISIBLE_WIRE', 'ACID_TRAP_HOLE', 'GOBLIN_FAN', 'BAD_REACTION_TO_SIMOCHI', 'REVERSE_TRAP', 'FAKE_TRAP'].includes(val) ||
+          ['Trap Hole', 'Sakuretsu Armor', 'Negate Attack', 'Mirror Force', 'Torrential Tribute', 'Widespread Ruin', 'Eatgaboon', 'Bear Trap', 'Invisible Wire', 'Acid Trap Hole', 'Goblin Fan', 'Bad Reaction to Simochi', 'Reverse Trap', 'Fake Trap'].includes(cName)) {
         duelToast(cName + ' es una Trampa de respuesta automática. Se activará cuando el rival ataque o invoque.');
         return;
       }
@@ -10191,6 +10221,96 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof log === 'function') log(labelTH + ' ' + sName + ' (' + sAtk + ' ATK) es destruido de inmediato al ser invocado.');
       if (typeof render === 'function') render();
       return true;
+    }
+
+    // 3. Acid Trap Hole ante Invocación
+    var athIdx = defBack.findIndex(function(c) {
+      return c && c.set && isTrapReady(c) && (c.value === 'ACID_TRAP_HOLE' || c.name === 'Acid Trap Hole');
+    });
+    if (athIdx >= 0) {
+      var sName = summonedCard.name || summonedCard[0] || 'Monstruo';
+      if (!isEgyptianGod(sName)) {
+        var trapATH = defBack[athIdx];
+        defBack[athIdx] = null;
+        defGrave.push(Object.assign({}, trapATH, { set: false, faceUp: true }));
+        if (slotIndex != null) sumField[slotIndex] = null;
+        sumGrave.push(summonedCard);
+        if (window.playDestroySound) window.playDestroySound();
+        var labelATH = defendingSide === 'player' ? '¡Tu Acid Trap Hole activado!' : '¡El rival activa Acid Trap Hole!';
+        if (typeof duelToast === 'function') duelToast(labelATH + ' ' + sName + ' fue disuelto en ácido y destruido.');
+        if (typeof log === 'function') log(labelATH + ' ' + sName + ' es destruido por Acid Trap Hole al ser invocado.');
+        if (typeof render === 'function') render();
+        return true;
+      }
+    }
+
+    // 4. Eatgaboon ante Invocación (ATK <= 1000)
+    if (sAtk <= 1000) {
+      var eatIdx = defBack.findIndex(function(c) {
+        return c && c.set && isTrapReady(c) && (c.value === 'EATGABOON' || c.name === 'Eatgaboon');
+      });
+      if (eatIdx >= 0) {
+        var sName = summonedCard.name || summonedCard[0] || 'Monstruo';
+        if (!isEgyptianGod(sName)) {
+          var trapEat = defBack[eatIdx];
+          defBack[eatIdx] = null;
+          defGrave.push(Object.assign({}, trapEat, { set: false, faceUp: true }));
+          if (slotIndex != null) sumField[slotIndex] = null;
+          sumGrave.push(summonedCard);
+          if (window.playDestroySound) window.playDestroySound();
+          var labelEat = defendingSide === 'player' ? '¡Tu Eatgaboon activado!' : '¡El rival activa Eatgaboon!';
+          if (typeof duelToast === 'function') duelToast(labelEat + ' ' + sName + ' (' + sAtk + ' ATK) fue devorado.');
+          if (typeof log === 'function') log(labelEat + ' ' + sName + ' es devorado por Eatgaboon al ser invocado.');
+          if (typeof render === 'function') render();
+          return true;
+        }
+      }
+    }
+
+    // 5. Bear Trap ante Invocación (ATK <= 1500)
+    if (sAtk <= 1500) {
+      var bearIdx = defBack.findIndex(function(c) {
+        return c && c.set && isTrapReady(c) && (c.value === 'BEAR_TRAP' || c.name === 'Bear Trap');
+      });
+      if (bearIdx >= 0) {
+        var sName = summonedCard.name || summonedCard[0] || 'Monstruo';
+        if (!isEgyptianGod(sName)) {
+          var trapBear = defBack[bearIdx];
+          defBack[bearIdx] = null;
+          defGrave.push(Object.assign({}, trapBear, { set: false, faceUp: true }));
+          if (slotIndex != null) sumField[slotIndex] = null;
+          sumGrave.push(summonedCard);
+          if (window.playDestroySound) window.playDestroySound();
+          var labelBear = defendingSide === 'player' ? '¡Tu Bear Trap activada!' : '¡El rival activa Bear Trap!';
+          if (typeof duelToast === 'function') duelToast(labelBear + ' ' + sName + ' (' + sAtk + ' ATK) cayó en la trampa de oso.');
+          if (typeof log === 'function') log(labelBear + ' ' + sName + ' es atrapado y destruido por Bear Trap.');
+          if (typeof render === 'function') render();
+          return true;
+        }
+      }
+    }
+
+    // 6. Invisible Wire ante Invocación (ATK <= 2000)
+    if (sAtk <= 2000) {
+      var wireIdx = defBack.findIndex(function(c) {
+        return c && c.set && isTrapReady(c) && (c.value === 'INVISIBLE_WIRE' || c.name === 'Invisible Wire');
+      });
+      if (wireIdx >= 0) {
+        var sName = summonedCard.name || summonedCard[0] || 'Monstruo';
+        if (!isEgyptianGod(sName)) {
+          var trapWire = defBack[wireIdx];
+          defBack[wireIdx] = null;
+          defGrave.push(Object.assign({}, trapWire, { set: false, faceUp: true }));
+          if (slotIndex != null) sumField[slotIndex] = null;
+          sumGrave.push(summonedCard);
+          if (window.playDestroySound) window.playDestroySound();
+          var labelWire = defendingSide === 'player' ? '¡Tu Invisible Wire activado!' : '¡El rival activa Invisible Wire!';
+          if (typeof duelToast === 'function') duelToast(labelWire + ' ' + sName + ' (' + sAtk + ' ATK) fue rebanado.');
+          if (typeof log === 'function') log(labelWire + ' ' + sName + ' es rebanado por Invisible Wire al ser invocado.');
+          if (typeof render === 'function') render();
+          return true;
+        }
+      }
     }
 
     return false;
@@ -10595,6 +10715,33 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       } else if (val === 'MAGIC_CYLINDER' || name === 'Magic Cylinder') {
         trapType = 'MAGIC_CYLINDER';
         trapDesc = 'Niega el ataque y refleja el daño de ATK directamente al rival.';
+      } else if (val === 'WIDESPREAD_RUIN' || name === 'Widespread Ruin') {
+        trapType = 'WIDESPREAD_RUIN';
+        trapDesc = 'Destruye al monstruo rival en modo de Ataque con mayor ATK.';
+      } else if (val === 'EATGABOON' || name === 'Eatgaboon') {
+        trapType = 'EATGABOON';
+        trapDesc = 'Destruye al monstruo atacante si su ATK es 1000 o menor.';
+      } else if (val === 'BEAR_TRAP' || name === 'Bear Trap') {
+        trapType = 'BEAR_TRAP';
+        trapDesc = 'Destruye al monstruo atacante si su ATK es 1500 o menor.';
+      } else if (val === 'INVISIBLE_WIRE' || name === 'Invisible Wire') {
+        trapType = 'INVISIBLE_WIRE';
+        trapDesc = 'Destruye al monstruo atacante si su ATK es 2000 o menor.';
+      } else if (val === 'ACID_TRAP_HOLE' || name === 'Acid Trap Hole') {
+        trapType = 'ACID_TRAP_HOLE';
+        trapDesc = 'Disuelve y destruye de inmediato al monstruo atacante.';
+      } else if (val === 'GOBLIN_FAN' || name === 'Goblin Fan') {
+        trapType = 'GOBLIN_FAN';
+        trapDesc = 'Niega el ataque enemigo y causa 500 LP de daño al rival.';
+      } else if (val === 'BAD_REACTION_TO_SIMOCHI' || name === 'Bad Reaction to Simochi') {
+        trapType = 'BAD_REACTION_TO_SIMOCHI';
+        trapDesc = 'Causa 1000 LP de daño al rival y debilita al atacante en 1000 ATK.';
+      } else if (val === 'REVERSE_TRAP' || name === 'Reverse Trap') {
+        trapType = 'REVERSE_TRAP';
+        trapDesc = 'Invierte el combate otorgando +1000 ATK de sorpresa a tu defensa.';
+      } else if (val === 'FAKE_TRAP' || name === 'Fake Trap') {
+        trapType = 'FAKE_TRAP';
+        trapDesc = 'Señuelo que absorbe y niega por completo el ataque enemigo.';
       }
 
       if (trapType) {
@@ -10858,6 +11005,133 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
                 if (typeof log === 'function') log('¡Magic Cylinder! Ataque negado y refleja ' + dmgCyl + ' LP de daño al rival.');
                 continue;
               }
+            } else if (chosenTrap.type === 'WIDESPREAD_RUIN') {
+              var highAtk = -1, highIdx = -1;
+              for (var wk = 0; wk < (game.enemy || []).length; wk++) {
+                var wem = game.enemy[wk];
+                if (wem && (wem.pos !== 'DEF' || wem.kind === 'LINK')) {
+                  if (isEgyptianGod(wem.name || wem[0])) continue;
+                  var curAtk = typeof effectiveAtk === 'function' ? effectiveAtk(wem) : (wem.atk || 0);
+                  if (curAtk > highAtk) {
+                    highAtk = curAtk;
+                    highIdx = wk;
+                  }
+                }
+              }
+              if (highIdx >= 0) {
+                var killedM = game.enemy[highIdx];
+                game.enemyGrave.push(killedM);
+                game.enemy[highIdx] = null;
+                if (window.playDestroySound) window.playDestroySound();
+                if (typeof render === 'function') render();
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Widespread Ruin', '¡Destruye a ' + (killedM.name || 'monstruo') + ' (' + highAtk + ' ATK)!');
+                duelToast('¡Widespread Ruin destruyó a ' + (killedM.name || 'monstruo') + ' (' + highAtk + ' ATK)!');
+                if (typeof log === 'function') log('¡Widespread Ruin! Destruye al monstruo con mayor ATK del rival: ' + (killedM.name || 'monstruo') + '.');
+                if (highIdx === ei) continue;
+              } else {
+                duelToast('¡Widespread Ruin activado, pero no hay objetivos en ataque!');
+              }
+            } else if (chosenTrap.type === 'ACID_TRAP_HOLE') {
+              if (attackerIsGod) {
+                duelToast('¡Acid Trap Hole falla contra Dios Egipcio!');
+              } else {
+                game.enemy[ei] = null;
+                game.enemyGrave.push(e);
+                e.attackedTurn = game.turnNo;
+                if (window.playDestroySound) window.playDestroySound();
+                if (typeof render === 'function') render();
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Acid Trap Hole', '¡Disuelve y destruye al atacante!');
+                duelToast('¡Acid Trap Hole disolvió y destruyó a ' + (e.name || 'el atacante') + '!');
+                if (typeof log === 'function') log('¡Acid Trap Hole! Disuelve en ácido a ' + (e.name || 'el atacante') + '.');
+                continue;
+              }
+            } else if (chosenTrap.type === 'EATGABOON') {
+              if (attackerIsGod) {
+                duelToast('¡Eatgaboon falla contra Dios Egipcio!');
+              } else if (currentEffectiveAtk <= 1000) {
+                game.enemy[ei] = null;
+                game.enemyGrave.push(e);
+                e.attackedTurn = game.turnNo;
+                if (window.playDestroySound) window.playDestroySound();
+                if (typeof render === 'function') render();
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Eatgaboon', '¡Devora al atacante!');
+                duelToast('¡Eatgaboon devoró y destruyó a ' + (e.name || 'el atacante') + '!');
+                if (typeof log === 'function') log('¡Eatgaboon! Devora y destruye a ' + (e.name || 'el atacante') + ' (' + currentEffectiveAtk + ' ATK).');
+                continue;
+              } else {
+                duelToast('¡Eatgaboon activado, pero el atacante tiene más de 1000 ATK!');
+                if (typeof log === 'function') log('¡Eatgaboon falla! El atacante supera los 1000 ATK (' + currentEffectiveAtk + ' ATK).');
+              }
+            } else if (chosenTrap.type === 'BEAR_TRAP') {
+              if (attackerIsGod) {
+                duelToast('¡Bear Trap falla contra Dios Egipcio!');
+              } else if (currentEffectiveAtk <= 1500) {
+                game.enemy[ei] = null;
+                game.enemyGrave.push(e);
+                e.attackedTurn = game.turnNo;
+                if (window.playDestroySound) window.playDestroySound();
+                if (typeof render === 'function') render();
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Bear Trap', '¡Atrapa y destruye al atacante!');
+                duelToast('¡Bear Trap atrapó y destruyó a ' + (e.name || 'el atacante') + '!');
+                if (typeof log === 'function') log('¡Bear Trap! Atrapa y destruye a ' + (e.name || 'el atacante') + ' (' + currentEffectiveAtk + ' ATK).');
+                continue;
+              } else {
+                duelToast('¡Bear Trap activada, pero el atacante tiene más de 1500 ATK!');
+                if (typeof log === 'function') log('¡Bear Trap falla! El atacante supera los 1500 ATK (' + currentEffectiveAtk + ' ATK).');
+              }
+            } else if (chosenTrap.type === 'INVISIBLE_WIRE') {
+              if (attackerIsGod) {
+                duelToast('¡Invisible Wire falla contra Dios Egipcio!');
+              } else if (currentEffectiveAtk <= 2000) {
+                game.enemy[ei] = null;
+                game.enemyGrave.push(e);
+                e.attackedTurn = game.turnNo;
+                if (window.playDestroySound) window.playDestroySound();
+                if (typeof render === 'function') render();
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Invisible Wire', '¡Corta y destruye al atacante!');
+                duelToast('¡Invisible Wire rebanó y destruyó a ' + (e.name || 'el atacante') + '!');
+                if (typeof log === 'function') log('¡Invisible Wire! Corta y destruye a ' + (e.name || 'el atacante') + ' (' + currentEffectiveAtk + ' ATK).');
+                continue;
+              } else {
+                duelToast('¡Invisible Wire activado, pero el atacante tiene más de 2000 ATK!');
+                if (typeof log === 'function') log('¡Invisible Wire falla! El atacante supera los 2000 ATK (' + currentEffectiveAtk + ' ATK).');
+              }
+            } else if (chosenTrap.type === 'GOBLIN_FAN') {
+              if (attackerIsGod) {
+                duelToast('¡Goblin Fan falla contra Dios Egipcio!');
+              } else {
+                e.attackedTurn = game.turnNo;
+                game.elp = Math.max(0, game.elp - 500);
+                if (typeof render === 'function') render();
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Goblin Fan', '¡Ataque cancelado y 500 LP de daño al rival!');
+                duelToast('¡Goblin Fan canceló el ataque y causó 500 LP de daño al rival!');
+                if (typeof log === 'function') log('¡Goblin Fan! Anula el ataque de ' + (e.name || 'el atacante') + ' y causa 500 LP de daño directo.');
+                continue;
+              }
+            } else if (chosenTrap.type === 'FAKE_TRAP') {
+              e.attackedTurn = game.turnNo;
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Fake Trap', '¡Ataque absorbido por el señuelo!');
+              duelToast('¡Fake Trap absorbió y anuló el ataque enemigo por completo!');
+              if (typeof log === 'function') log('¡Fake Trap! Actúa como señuelo absorbiendo todo el impacto del ataque.');
+              continue;
+            } else if (chosenTrap.type === 'BAD_REACTION_TO_SIMOCHI') {
+              game.elp = Math.max(0, game.elp - 1000);
+              e.tempBoost = (e.tempBoost || 0) - 1000;
+              currentEffectiveAtk = Math.max(0, currentEffectiveAtk - 1000);
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Bad Reaction to Simochi', '¡1000 LP de daño y -1000 ATK al atacante!');
+              duelToast('¡Bad Reaction to Simochi causa 1000 LP de daño y reduce el ATK rival en -1000!');
+              if (typeof log === 'function') log('¡Bad Reaction to Simochi! Causa 1000 LP de daño y reduce el ATK de ' + (e.name || 'atacante') + ' en -1000.');
+            } else if (chosenTrap.type === 'REVERSE_TRAP') {
+              if (typeof bestTarget !== 'undefined' && bestTarget && bestTarget.c) {
+                bestTarget.c.tempBoost = (bestTarget.c.tempBoost || 0) + 1000;
+              }
+              currentEffectiveAtk = Math.max(0, currentEffectiveAtk - 1000);
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Reverse Trap', '¡+1000 ATK a tu defensa e invierte la fuerza!');
+              duelToast('¡Reverse Trap otorga +1000 ATK de sorpresa a tu defensa!');
+              if (typeof log === 'function') log('¡Reverse Trap! Invierte el combate otorgando +1000 ATK defensivo de sorpresa.');
             }
           }
         }
@@ -11054,6 +11328,133 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               if (typeof log === 'function') log('¡Magic Cylinder! Ataque negado y refleja ' + dmgCyl + ' LP de daño al rival.');
               continue;
             }
+          } else if (chosenTrap.type === 'WIDESPREAD_RUIN') {
+            var highAtk = -1, highIdx = -1;
+            for (var wk = 0; wk < (game.enemy || []).length; wk++) {
+              var wem = game.enemy[wk];
+              if (wem && (wem.pos !== 'DEF' || wem.kind === 'LINK')) {
+                if (isEgyptianGod(wem.name || wem[0])) continue;
+                var curAtk = typeof effectiveAtk === 'function' ? effectiveAtk(wem) : (wem.atk || 0);
+                if (curAtk > highAtk) {
+                  highAtk = curAtk;
+                  highIdx = wk;
+                }
+              }
+            }
+            if (highIdx >= 0) {
+              var killedM = game.enemy[highIdx];
+              game.enemyGrave.push(killedM);
+              game.enemy[highIdx] = null;
+              if (window.playDestroySound) window.playDestroySound();
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Widespread Ruin', '¡Destruye a ' + (killedM.name || 'monstruo') + ' (' + highAtk + ' ATK)!');
+              duelToast('¡Widespread Ruin destruyó a ' + (killedM.name || 'monstruo') + ' (' + highAtk + ' ATK)!');
+              if (typeof log === 'function') log('¡Widespread Ruin! Destruye al monstruo con mayor ATK del rival: ' + (killedM.name || 'monstruo') + '.');
+              if (highIdx === ei) continue;
+            } else {
+              duelToast('¡Widespread Ruin activado, pero no hay objetivos en ataque!');
+            }
+          } else if (chosenTrap.type === 'ACID_TRAP_HOLE') {
+            if (attackerIsGod) {
+              duelToast('¡Acid Trap Hole falla contra Dios Egipcio!');
+            } else {
+              game.enemy[ei] = null;
+              game.enemyGrave.push(e);
+              e.attackedTurn = game.turnNo;
+              if (window.playDestroySound) window.playDestroySound();
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Acid Trap Hole', '¡Disuelve y destruye al atacante!');
+              duelToast('¡Acid Trap Hole disolvió y destruyó a ' + (e.name || 'el atacante') + '!');
+              if (typeof log === 'function') log('¡Acid Trap Hole! Disuelve en ácido a ' + (e.name || 'el atacante') + '.');
+              continue;
+            }
+          } else if (chosenTrap.type === 'EATGABOON') {
+            if (attackerIsGod) {
+              duelToast('¡Eatgaboon falla contra Dios Egipcio!');
+            } else if (currentEffectiveAtk <= 1000) {
+              game.enemy[ei] = null;
+              game.enemyGrave.push(e);
+              e.attackedTurn = game.turnNo;
+              if (window.playDestroySound) window.playDestroySound();
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Eatgaboon', '¡Devora al atacante!');
+              duelToast('¡Eatgaboon devoró y destruyó a ' + (e.name || 'el atacante') + '!');
+              if (typeof log === 'function') log('¡Eatgaboon! Devora y destruye a ' + (e.name || 'el atacante') + ' (' + currentEffectiveAtk + ' ATK).');
+              continue;
+            } else {
+              duelToast('¡Eatgaboon activado, pero el atacante tiene más de 1000 ATK!');
+              if (typeof log === 'function') log('¡Eatgaboon falla! El atacante supera los 1000 ATK (' + currentEffectiveAtk + ' ATK).');
+            }
+          } else if (chosenTrap.type === 'BEAR_TRAP') {
+            if (attackerIsGod) {
+              duelToast('¡Bear Trap falla contra Dios Egipcio!');
+            } else if (currentEffectiveAtk <= 1500) {
+              game.enemy[ei] = null;
+              game.enemyGrave.push(e);
+              e.attackedTurn = game.turnNo;
+              if (window.playDestroySound) window.playDestroySound();
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Bear Trap', '¡Atrapa y destruye al atacante!');
+              duelToast('¡Bear Trap atrapó y destruyó a ' + (e.name || 'el atacante') + '!');
+              if (typeof log === 'function') log('¡Bear Trap! Atrapa y destruye a ' + (e.name || 'el atacante') + ' (' + currentEffectiveAtk + ' ATK).');
+              continue;
+            } else {
+              duelToast('¡Bear Trap activada, pero el atacante tiene más de 1500 ATK!');
+              if (typeof log === 'function') log('¡Bear Trap falla! El atacante supera los 1500 ATK (' + currentEffectiveAtk + ' ATK).');
+            }
+          } else if (chosenTrap.type === 'INVISIBLE_WIRE') {
+            if (attackerIsGod) {
+              duelToast('¡Invisible Wire falla contra Dios Egipcio!');
+            } else if (currentEffectiveAtk <= 2000) {
+              game.enemy[ei] = null;
+              game.enemyGrave.push(e);
+              e.attackedTurn = game.turnNo;
+              if (window.playDestroySound) window.playDestroySound();
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Invisible Wire', '¡Corta y destruye al atacante!');
+              duelToast('¡Invisible Wire rebanó y destruyó a ' + (e.name || 'el atacante') + '!');
+              if (typeof log === 'function') log('¡Invisible Wire! Corta y destruye a ' + (e.name || 'el atacante') + ' (' + currentEffectiveAtk + ' ATK).');
+              continue;
+            } else {
+              duelToast('¡Invisible Wire activado, pero el atacante tiene más de 2000 ATK!');
+              if (typeof log === 'function') log('¡Invisible Wire falla! El atacante supera los 2000 ATK (' + currentEffectiveAtk + ' ATK).');
+            }
+          } else if (chosenTrap.type === 'GOBLIN_FAN') {
+            if (attackerIsGod) {
+              duelToast('¡Goblin Fan falla contra Dios Egipcio!');
+            } else {
+              e.attackedTurn = game.turnNo;
+              game.elp = Math.max(0, game.elp - 500);
+              if (typeof render === 'function') render();
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Goblin Fan', '¡Ataque cancelado y 500 LP de daño al rival!');
+              duelToast('¡Goblin Fan canceló el ataque y causó 500 LP de daño al rival!');
+              if (typeof log === 'function') log('¡Goblin Fan! Anula el ataque de ' + (e.name || 'el atacante') + ' y causa 500 LP de daño directo.');
+              continue;
+            }
+          } else if (chosenTrap.type === 'FAKE_TRAP') {
+            e.attackedTurn = game.turnNo;
+            if (typeof render === 'function') render();
+            if (typeof window.showTrap114 === 'function') window.showTrap114('Fake Trap', '¡Ataque absorbido por el señuelo!');
+            duelToast('¡Fake Trap absorbió y anuló el ataque enemigo por completo!');
+            if (typeof log === 'function') log('¡Fake Trap! Actúa como señuelo absorbiendo todo el impacto del ataque.');
+            continue;
+          } else if (chosenTrap.type === 'BAD_REACTION_TO_SIMOCHI') {
+            game.elp = Math.max(0, game.elp - 1000);
+            e.tempBoost = (e.tempBoost || 0) - 1000;
+            currentEffectiveAtk = Math.max(0, currentEffectiveAtk - 1000);
+            if (typeof render === 'function') render();
+            if (typeof window.showTrap114 === 'function') window.showTrap114('Bad Reaction to Simochi', '¡1000 LP de daño y -1000 ATK al atacante!');
+            duelToast('¡Bad Reaction to Simochi causa 1000 LP de daño y reduce el ATK rival en -1000!');
+            if (typeof log === 'function') log('¡Bad Reaction to Simochi! Causa 1000 LP de daño y reduce el ATK de ' + (e.name || 'atacante') + ' en -1000.');
+          } else if (chosenTrap.type === 'REVERSE_TRAP') {
+            if (typeof bestTarget !== 'undefined' && bestTarget && bestTarget.c) {
+              bestTarget.c.tempBoost = (bestTarget.c.tempBoost || 0) + 1000;
+            }
+            currentEffectiveAtk = Math.max(0, currentEffectiveAtk - 1000);
+            if (typeof render === 'function') render();
+            if (typeof window.showTrap114 === 'function') window.showTrap114('Reverse Trap', '¡+1000 ATK a tu defensa e invierte la fuerza!');
+            duelToast('¡Reverse Trap otorga +1000 ATK de sorpresa a tu defensa!');
+            if (typeof log === 'function') log('¡Reverse Trap! Invierte el combate otorgando +1000 ATK defensivo de sorpresa.');
           }
         }
       }
@@ -11324,6 +11725,34 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             duelToast('\u00a1' + oppName + ' activa Sakuretsu Armor! ' + (p.name || 'Tu atacante') + ' fue destruido.');
             if (typeof log === 'function') log('\u00a1' + oppName + ' activa Sakuretsu Armor! Destruye a tu atacante ' + (p.name || 'atacante') + '.');
             return;
+          }
+        }
+
+        // 4b. Enemy Widespread Ruin
+        var enemyWideIdx = (game.enemyBack || []).findIndex(function(c) {
+          return c && c.set && isTrapReady(c) && (c.value === 'WIDESPREAD_RUIN' || c.name === 'Widespread Ruin');
+        });
+        if (enemyWideIdx >= 0) {
+          var eWide = game.enemyBack[enemyWideIdx];
+          game.enemyBack[enemyWideIdx] = null;
+          game.enemyGrave.push(Object.assign({}, eWide, { set: false, faceUp: true }));
+          var pHighAtk = -1, pHighIdx = -1;
+          for (var wi = 0; wi < (game.field || []).length; wi++) {
+            var pm = game.field[wi];
+            if (pm && (pm.pos !== 'DEF' || pm.kind === 'LINK')) {
+              var wAtk = typeof effectiveAtk === 'function' ? effectiveAtk(pm) : (pm.atk || 0);
+              if (wAtk > pHighAtk) { pHighAtk = wAtk; pHighIdx = wi; }
+            }
+          }
+          if (pHighIdx >= 0 && !isEgyptianGod(game.field[pHighIdx].name || game.field[pHighIdx][0])) {
+            var desPm = game.field[pHighIdx];
+            game.field[pHighIdx] = null;
+            game.grave.push(desPm);
+            if (window.playDestroySound) window.playDestroySound();
+            if (typeof render === 'function') render();
+            duelToast('¡' + oppName + ' activa Widespread Ruin! Destruye a ' + (desPm.name || 'tu monstruo'));
+            if (typeof log === 'function') log('¡' + oppName + ' activa Widespread Ruin! Destruye a tu ' + (desPm.name || 'monstruo') + ' (' + pHighAtk + ' ATK).');
+            if (pi != null && pHighIdx === pi[1]) return;
           }
         }
 

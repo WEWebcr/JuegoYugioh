@@ -4716,5 +4716,104 @@
     "image": "imagenescartas/Mundo1/010.jpg",
     "price": 450,
     "tier": "ARPÍA ALADA"
+  },
+  {
+    "id": 682,
+    "name": "Eatgaboon",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Se activa cuando un monstruo enemigo ataca: si su ATK es de 1000 o menor, lo destruye instantáneamente.",
+    "image": "imagenescartas/Mundo1/682.jpg",
+    "price": 1000,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "EATGABOON"
+  },
+  {
+    "id": 683,
+    "name": "Bear Trap",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Se activa cuando un monstruo enemigo ataca: si su ATK es de 1500 o menor, lo atrapa y lo destruye.",
+    "image": "imagenescartas/Mundo1/683.jpg",
+    "price": 1500,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "BEAR_TRAP"
+  },
+  {
+    "id": 684,
+    "name": "Invisible Wire",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Se activa cuando un monstruo enemigo ataca: si su ATK es de 2000 o menor, corta su ofensiva y lo destruye.",
+    "image": "imagenescartas/Mundo1/684.jpg",
+    "price": 3000,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "INVISIBLE_WIRE"
+  },
+  {
+    "id": 685,
+    "name": "Acid Trap Hole",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Se activa ante el ataque o invocación del rival: destruye al monstruo enemigo disolviéndolo en ácido.",
+    "image": "imagenescartas/Mundo1/685.jpg",
+    "price": 5000,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "ACID_TRAP_HOLE"
+  },
+  {
+    "id": 686,
+    "name": "Widespread Ruin",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa legendaria. Cuando un monstruo rival declara un ataque: destruye al monstruo del rival que tenga el mayor ATK.",
+    "image": "imagenescartas/Mundo1/686.jpg",
+    "price": 12000,
+    "tier": "TRAMPA DEVASTADORA",
+    "value": "WIDESPREAD_RUIN"
+  },
+  {
+    "id": 687,
+    "name": "Goblin Fan",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Cuando un monstruo rival ataca: anula el ataque y causa 500 LP de daño al rival.",
+    "image": "imagenescartas/Mundo1/687.jpg",
+    "price": 1200,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "GOBLIN_FAN"
+  },
+  {
+    "id": 688,
+    "name": "Bad Reaction to Simochi",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Corrompe los efectos curativos: cualquier incremento de LP del rival se convierte en daño directo.",
+    "image": "imagenescartas/Mundo1/688.jpg",
+    "price": 2000,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "BAD_REACTION_TO_SIMOCHI"
+  },
+  {
+    "id": 689,
+    "name": "Reverse Trap",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa. Invierte el curso del combate: confiere un bono defensivo sorpresa de +1000 ATK a tu monstruo en combate.",
+    "image": "imagenescartas/Mundo1/689.jpg",
+    "price": 3500,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "REVERSE_TRAP"
+  },
+  {
+    "id": 690,
+    "name": "Fake Trap",
+    "kind": "TRAP",
+    "type": "Trap",
+    "text": "Carta Trampa señuelo. Absorbe y neutraliza un ataque enemigo salvando a tus monstruos y LP.",
+    "image": "imagenescartas/Mundo1/690.jpg",
+    "price": 1500,
+    "tier": "TRAMPA CLÁSICA",
+    "value": "FAKE_TRAP"
   }
 ]
