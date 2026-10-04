@@ -13313,7 +13313,6 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     // APLICACIÓN DE REGLAS DE RECOMPENSAS MUY RARAS:
     let rankStr = String(rank || '').toUpperCase();
     let isHighRank = rankStr.includes('S') || rankStr.includes('A');
-    let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     let isKaibaOrYugi = (normalizedOpp === 'kaiba' || normalizedOpp === 'seto' || normalizedOpp === 'yugi' || normalizedOpp === 'atem');
 
     // Blue-Eyes Ultimate Dragon y Gate Guardian: solo Seto Kaiba y Yugi, rango S o A, probabilidad muy rara (~5%)
