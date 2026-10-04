@@ -6,7 +6,27 @@
       window.FMR_ST_POOL_V1 = window.FMR_ST_POOL_V1 || [];
       window.CARDS_DATA.forEach(function(c) {
         if (!c || !c.name) return;
-        if (c.kind === 'MONSTER' || c.kind === 'FUSION' || (!c.kind && c.atk !== undefined)) {
+        var k = String(c.kind || '').toUpperCase();
+        var t = String(c.type || '').toLowerCase();
+        var isST = k === 'SPELL' || k === 'TRAP' || k === 'EQUIP' || k === 'FIELD' || t.includes('equip') || t.includes('field');
+        if (isST) {
+          if (window.FMR_CARD_META[c.name]) delete window.FMR_CARD_META[c.name];
+          if (typeof DB !== 'undefined' && Array.isArray(DB)) {
+            var dbIdx = DB.findIndex(function(x){ return x && x[0] === c.name; });
+            if (dbIdx >= 0) DB.splice(dbIdx, 1);
+          }
+          var stKind = k === 'TRAP' ? 'TRAP' : (k === 'EQUIP' || t.includes('equip') ? 'EQUIP' : 'SPELL');
+          var stObj = {
+            name: c.name, kind: stKind, value: c.value || c.name.toUpperCase().replace(/\s+/g, '_'),
+            text: c.text || c.desc || '', faceUp: true
+          };
+          if (!window.FMR_ST_POOL_V1.find(function(x){ return x && x.name === c.name; })) {
+            window.FMR_ST_POOL_V1.push(stObj);
+          }
+          if (typeof STDB !== 'undefined' && Array.isArray(STDB) && !STDB.find(function(x){ return x && x.name === c.name; })) {
+            STDB.push(stObj);
+          }
+        } else if (k === 'MONSTER' || k === 'FUSION' || (!k && c.atk !== undefined)) {
           if (!window.FMR_CARD_META[c.name]) {
             window.FMR_CARD_META[c.name] = {
               name: c.name, level: c.level || 4, type: c.type || 'Warrior', attr: c.attr || 'EARTH',
@@ -17,17 +37,6 @@
           }
           if (typeof DB !== 'undefined' && Array.isArray(DB) && !DB.find(function(x){ return x && x[0] === c.name; })) {
             DB.push([c.name, c.level || 4, c.type || 'Warrior', c.attr || 'EARTH', c.atk || 0, c.def || 0, c.sign1 || 'MARTE', c.sign2 || 'JUPITER']);
-          }
-        } else if (c.kind === 'SPELL' || c.kind === 'TRAP' || c.kind === 'EQUIP') {
-          var stObj = {
-            name: c.name, kind: c.kind, value: c.value || c.name.toUpperCase().replace(/\s+/g, '_'),
-            text: c.text || c.desc || '', faceUp: true
-          };
-          if (!window.FMR_ST_POOL_V1.find(function(x){ return x && x.name === c.name; })) {
-            window.FMR_ST_POOL_V1.push(stObj);
-          }
-          if (typeof STDB !== 'undefined' && Array.isArray(STDB) && !STDB.find(function(x){ return x && x.name === c.name; })) {
-            STDB.push(stObj);
           }
         }
       });
@@ -3769,42 +3778,49 @@ window.getCardMetadata = function(name) {
         };
     }
     
-    // Check CARDS_DATA / FMR_CARD_META
-    if (window.FMR_CARD_META && window.FMR_CARD_META[name]) {
-        let m = window.FMR_CARD_META[name];
-        return {
-            name: m.name, num: num, imgUrl: imgUrl,
-            type: m.type || 'Monstruo', attr: m.attr || 'TIERRA',
-            atk: m.atk !== undefined ? m.atk : 0,
-            def: m.def !== undefined ? m.def : 0,
-            isMonster: true, isSpell: false, isTrap: false,
-            desc: m.desc || m.text || ''
-        };
-    }
-    // Check CARDS_DATA array directly
+    // Check CARDS_DATA array directly first as authoritative source
     if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
-        let cd = window.CARDS_DATA.find(x => x && x.name === name);
+        let normName = String(name).toLowerCase().trim();
+        let cd = window.CARDS_DATA.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
         if (cd) {
             let cardImg = cd.image || imgUrl;
             let cardNum = cd.id || num;
-            if (cd.kind === 'MONSTER' || cd.atk !== undefined) {
+            let cdKind = String(cd.kind || '').toUpperCase();
+            let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
+            if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
                 return {
                     name: cd.name, num: cardNum, imgUrl: cardImg,
                     type: cd.type || 'Monstruo', attr: cd.attr || 'TIERRA',
-                    atk: cd.atk !== undefined ? cd.atk : 0,
-                    def: cd.def !== undefined ? cd.def : 0,
+                    atk: (cd.atk !== undefined && cd.atk !== '-') ? cd.atk : 0,
+                    def: (cd.def !== undefined && cd.def !== '-') ? cd.def : 0,
                     isMonster: true, isSpell: false, isTrap: false,
                     desc: cd.text || cd.desc || ''
                 };
             } else {
+                let isTrap = cdKind === 'TRAP' || String(cd.type).toUpperCase() === 'TRAP';
                 return {
                     name: cd.name, num: cardNum, imgUrl: cardImg,
-                    type: cd.kind || 'MAGIA', attr: '-',
+                    type: cd.type || cd.kind || (isTrap ? 'TRAP' : 'MAGIA'), attr: '-',
                     atk: '-', def: '-',
-                    isMonster: false, isSpell: cd.kind === 'SPELL', isTrap: cd.kind === 'TRAP',
+                    isMonster: false, isSpell: !isTrap, isTrap: isTrap,
                     desc: cd.text || cd.desc || ''
                 };
             }
+        }
+    }
+    // Check FMR_CARD_META only for actual monsters
+    if (window.FMR_CARD_META && window.FMR_CARD_META[name]) {
+        let m = window.FMR_CARD_META[name];
+        let mKind = String(m.kind || '').toUpperCase();
+        if (mKind !== 'SPELL' && mKind !== 'TRAP' && mKind !== 'EQUIP' && mKind !== 'FIELD') {
+            return {
+                name: m.name, num: num, imgUrl: imgUrl,
+                type: m.type || 'Monstruo', attr: m.attr || 'TIERRA',
+                atk: m.atk !== undefined ? m.atk : 0,
+                def: m.def !== undefined ? m.def : 0,
+                isMonster: true, isSpell: false, isTrap: false,
+                desc: m.desc || m.text || ''
+            };
         }
     }
     // Check FMR_ST_POOL_V1
@@ -5997,6 +6013,8 @@ window.customShowDeckEditor = function() {
     if (window.FMR_CARD_META) {
         Object.values(window.FMR_CARD_META).forEach((c) => {
             if (isAdvanced(c)) return;
+            let cdKind = String(c.kind || '').toUpperCase();
+            if (cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD') return;
             if (!cardDict[c.name]) {
                 let rawNum = window.CARD_MAPPINGS ? (window.CARD_MAPPINGS[c.name] || globalNum++) : globalNum++;
                 let num = typeof rawNum === 'number' ? rawNum : (parseInt(String(rawNum || '').replace(/[^\d]/g, ''), 10) || 0);
@@ -7148,26 +7166,33 @@ window.getGlobalCardDict = function() {
         let rawNum = window.CARD_MAPPINGS[name];
         let num = typeof rawNum === 'number' ? rawNum : (parseInt(String(rawNum || '').replace(/[^\d]/g, ''), 10) || 0);
         let normName = name.toLowerCase().trim();
-        let meta = window.FMR_CARD_META && (window.FMR_CARD_META[name] || window.FMR_CARD_META[normName]);
         let cardEntry = null;
-        if (meta) {
-            cardEntry = { num, name, type: meta.type, attr: meta.attr, atk: meta.atk, def: meta.def, isMonster: true, isExtra: meta.kind === 'FUSION' };
+
+        // Check CARDS_DATA first as authoritative source
+        let cd = (window.CARDS_DATA || []).find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
+        if (cd) {
+            let cdKind = String(cd.kind || '').toUpperCase();
+            let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
+            if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
+                cardEntry = { num, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: cdKind === 'FUSION', text: cd.text || cd.desc || '' };
+            } else {
+                cardEntry = { num, name: cd.name, type: cd.type || cd.kind || (cdKind === 'TRAP' ? 'TRAP' : 'SPELL'), isMonster: false, atk: '-', def: '-', text: cd.text || cd.desc || '', isExtra: false };
+            }
         } else {
             let st = window.FMR_ST_POOL_V1 && window.FMR_ST_POOL_V1.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
             if (st) {
-                cardEntry = { num, name, type: st.kind, isMonster: false, text: st.text, isExtra: false };
+                cardEntry = { num, name, type: st.kind, isMonster: false, atk: '-', def: '-', text: st.text, isExtra: false };
             } else {
-                let dbCard = typeof DB !== 'undefined' && Array.isArray(DB) && DB.find(x => x && (x[0] === name || (x[0] && x[0].toLowerCase().trim() === normName)));
-                if (dbCard) {
-                    cardEntry = { num, name, type: dbCard[2], attr: dbCard[3], atk: dbCard[4], def: dbCard[5], isMonster: true, isExtra: false };
+                let meta = window.FMR_CARD_META && (window.FMR_CARD_META[name] || window.FMR_CARD_META[normName]);
+                let mKind = meta ? String(meta.kind || '').toUpperCase() : '';
+                if (meta && mKind !== 'SPELL' && mKind !== 'TRAP' && mKind !== 'EQUIP' && mKind !== 'FIELD') {
+                    cardEntry = { num, name, type: meta.type, attr: meta.attr, atk: meta.atk, def: meta.def, isMonster: true, isExtra: meta.kind === 'FUSION', text: meta.desc || '' };
                 } else {
-                    let cd = (window.CARDS_DATA || []).find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
-                    if (cd && (cd.kind === 'MONSTER' || cd.kind === 'FUSION' || cd.atk !== undefined)) {
-                        cardEntry = { num, name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: cd.kind === 'FUSION', text: cd.text || cd.desc || '' };
-                    } else if (cd) {
-                        cardEntry = { num, name, type: cd.kind || 'SPELL', isMonster: false, text: cd.text || cd.desc || '', isExtra: false };
+                    let dbCard = typeof DB !== 'undefined' && Array.isArray(DB) && DB.find(x => x && (x[0] === name || (x[0] && x[0].toLowerCase().trim() === normName)));
+                    if (dbCard) {
+                        cardEntry = { num, name, type: dbCard[2], attr: dbCard[3], atk: dbCard[4], def: dbCard[5], isMonster: true, isExtra: false };
                     } else {
-                        cardEntry = { num, name, type: 'UNKNOWN', isMonster: false, isExtra: false };
+                        cardEntry = { num, name, type: 'UNKNOWN', isMonster: false, atk: '-', def: '-', isExtra: false };
                     }
                 }
             }

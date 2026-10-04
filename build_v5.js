@@ -53,6 +53,7 @@ console.log('NATIVE API INJECTED:', Object.keys(window.nativeAPI));
 html = html.replace(target, injection);
 
 // 3.1 Intercept newGame to avoid default Tristan deck
+html = html.replace("['Sword of Dark Destruction',4,'Warrior','DARK',1000,1000],", "");
 html = html.replace('function newGame(){', 'function newGame(){ if(window.customNewGame && (window.storyDuelActive || (typeof storyDuelActive!=="undefined" && storyDuelActive))){ return window.customNewGame(); }');
 html = html.replace('onclick="newGame()"', 'onclick="if(window.customNewGame && (window.storyDuelActive || (typeof storyDuelActive!=="undefined" && storyDuelActive))) window.customNewGame(); else newGame();"');
 
