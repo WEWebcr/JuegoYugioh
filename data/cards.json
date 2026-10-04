@@ -9521,7 +9521,7 @@
     "atk": 800,
     "def": 2000,
     "text": "Hecho de arcilla, este Héroe Elemental tiene un cuerpo de defensa impenetrable.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/843.jpg",
     "sign1": "SATURNO",
     "sign2": "URANO"
   },
@@ -9606,7 +9606,7 @@
     "def": 1200,
     "text": "\"Elemental HERO Avian\" + \"Elemental HERO Burstinatrix\"\nMust be Fusion Summoned.",
     "desc": "Fusión: Avian + Burstinatrix",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/849.jpg",
     "sign1": "SOL",
     "sign2": "MARTE"
   },
@@ -9970,7 +9970,7 @@
     "atk": 1900,
     "def": 600,
     "text": "El Héroe Definitivo del Destino. Absorbe el poder de los monstruos enemigos.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/874.jpg",
     "sign1": "LUNA",
     "sign2": "PLUTON"
   },
@@ -9984,7 +9984,7 @@
     "atk": 2000,
     "def": 2000,
     "text": "Gobernante de la Prisión de la Torre del Reloj que protege a todos los Héroes del Destino.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/875.jpg",
     "sign1": "LUNA",
     "sign2": "SATURNO"
   },
@@ -9998,7 +9998,7 @@
     "atk": 2100,
     "def": 1600,
     "text": "Dragón mecánico cibernético de vanguardia y emblema de la excelencia del Obelisco Azul.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/876.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
   },
@@ -10212,7 +10212,7 @@
     "atk": 3000,
     "def": 3000,
     "text": "El titán definitivo del Dr. Crowler. Sus engranajes ancestrales impiden activar magias y trampas al atacar.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/891.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10380,7 +10380,7 @@
     "atk": 2700,
     "def": 2000,
     "text": "Una especie de koala gigante. Aunque generalmente es dócil, posee un poder destructivo increíble.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/903.jpg",
     "sign1": "SATURNO",
     "sign2": "URANO"
   },
@@ -10394,7 +10394,7 @@
     "atk": 1500,
     "def": 1700,
     "text": "Un canguro boxeador con ganchos y patadas devastadoras.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/904.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10409,7 +10409,7 @@
     "def": 3700,
     "text": "\"Big Koala\" + \"Des Kangaroo\"\nMust be Fusion Summoned. El coloso rey de las bestias australianas.",
     "desc": "Fusión: Big Koala + Des Kangaroo",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/905.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10423,7 +10423,7 @@
     "atk": 1800,
     "def": 1000,
     "text": "Locomotora de vapor que gana fuerza al atacar.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/906.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10437,7 +10437,7 @@
     "atk": 1000,
     "def": 1000,
     "text": "Helicóptero acrobático que resiste el primer ataque de cada turno.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/907.jpg",
     "sign1": "MARTE",
     "sign2": "JUPITER"
   },
@@ -10451,7 +10451,7 @@
     "atk": 1600,
     "def": 1600,
     "text": "Máquina perforadora que destruye instantáneamente monstruos en posición de defensa.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/908.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10465,7 +10465,7 @@
     "atk": 800,
     "def": 1800,
     "text": "Submarino táctico que puede atacar directamente a los puntos de vida.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/909.jpg",
     "sign1": "LUNA",
     "sign2": "NEPTUNO"
   },
@@ -10480,7 +10480,7 @@
     "def": 3000,
     "text": "\"Truckroid\" + \"Expressroid\" + \"Drillroid\" + \"Stealthroid\"\nMust be Fusion Summoned.",
     "desc": "Fusión: Vehicroid + Vehicroid (Máquina + Máquina)",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/910.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10494,7 +10494,7 @@
     "atk": 1600,
     "def": 1000,
     "text": "Monstruo de hidrógeno que invoca más copias al destruir a un enemigo.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/911.jpg",
     "sign1": "LUNA",
     "sign2": "NEPTUNO"
   },
@@ -10508,7 +10508,7 @@
     "atk": 1800,
     "def": 800,
     "text": "Monstruo de oxígeno que causa explosiones al ser combatido.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/912.jpg",
     "sign1": "MARTE",
     "sign2": "JUPITER"
   },
@@ -10522,7 +10522,7 @@
     "atk": 2800,
     "def": 2600,
     "text": "Cannot be Normal Summoned/Set. Must be Special Summoned with \"Bonding - H2O\". Reduce el ATK de monstruos FUEGO y Piro a 0.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/913.jpg",
     "sign1": "LUNA",
     "sign2": "NEPTUNO"
   },
@@ -10536,7 +10536,7 @@
     "atk": 1000,
     "def": 800,
     "text": "Bailarina cibernética que ataca directamente si el rival solo tiene monstruos fuertes.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/914.jpg",
     "sign1": "SATURNO",
     "sign2": "VENUS"
   },
@@ -10550,7 +10550,7 @@
     "atk": 2300,
     "def": 1600,
     "text": "Prima ballerina que destruye todas las cartas mágicas boca arriba al ser invocada.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/915.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
   },
@@ -10565,7 +10565,7 @@
     "def": 800,
     "text": "\"Etoile Cyber\" + \"Blade Skater\"\nMust be Fusion Summoned.",
     "desc": "Fusión: Etoile Cyber + Blade Skater",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/916.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10579,7 +10579,7 @@
     "atk": 1200,
     "def": 1600,
     "text": "Patinadora cibernética elegante de combate cuerpo a cuerpo.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/917.jpg",
     "sign1": "SATURNO",
     "sign2": "VENUS"
   },
@@ -10593,7 +10593,7 @@
     "atk": 1400,
     "def": 1500,
     "text": "Guerrera patinadora con cuchillas afiladas.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/918.jpg",
     "sign1": "SATURNO",
     "sign2": "MARTE"
   },
@@ -10607,7 +10607,7 @@
     "atk": 0,
     "def": 1000,
     "text": "Uno del infame trío Ojama. Le gusta meterse en problemas.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/919.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
   },
@@ -10621,7 +10621,7 @@
     "atk": 0,
     "def": 1000,
     "text": "Uno del infame trío Ojama. Viste ropa interior negra ajustada.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/920.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
   },
@@ -10635,7 +10635,7 @@
     "atk": 0,
     "def": 1000,
     "text": "Uno del infame trío Ojama. Siempre rezongando por todo.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/921.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
   },
@@ -10650,7 +10650,7 @@
     "def": 3000,
     "text": "\"Ojama Green\" + \"Ojama Yellow\" + \"Ojama Black\"\nBloquea hasta 3 zonas de monstruos de tu adversario.",
     "desc": "Fusión: Trío Ojama (Bestia + Bestia)",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/922.jpg",
     "sign1": "SOL",
     "sign2": "MERCURIO"
   },
@@ -10664,7 +10664,7 @@
     "atk": 1200,
     "def": 900,
     "text": "Dragón con armadura metálica que evoluciona durante el combate.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/923.jpg",
     "sign1": "MARTE",
     "sign2": "JUPITER"
   },
@@ -10678,7 +10678,7 @@
     "atk": 2400,
     "def": 1700,
     "text": "Forma desarrollada del Dragón Armado capaz de destruir monstruos con menor ataque.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/924.jpg",
     "sign1": "MARTE",
     "sign2": "JUPITER"
   },
@@ -10692,7 +10692,7 @@
     "atk": 2800,
     "def": 1000,
     "text": "La cúspide del Dragón Armado de Chazz. Arrasa con el campo del adversario.",
-    "image": "",
+    "image": "imagenescartas/Mundo2/Nuevas/925.jpg",
     "sign1": "MARTE",
     "sign2": "JUPITER"
   }

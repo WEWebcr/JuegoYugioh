@@ -3895,6 +3895,9 @@ window.getCardMetadata = function(name) {
         else if (window.CUSTOM_LOCAL_IMAGES[padded + '.jpeg']) imgUrl = window.CUSTOM_LOCAL_IMAGES[padded + '.jpeg'];
         else if (window.CUSTOM_LOCAL_IMAGES[padded + '.png']) imgUrl = window.CUSTOM_LOCAL_IMAGES[padded + '.png'];
     }
+    if ((!imgUrl || imgUrl.includes('imgur.com')) && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) {
+        imgUrl = window.CUSTOM_LOCAL_IMAGES[name];
+    }
     
     // Check known special monsters first (Gate Guardian, Sanga, Suijin, Kazejin, and classic field monsters)
     const KNOWN_SPECIAL_MONSTERS = {
@@ -4314,9 +4317,11 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     let rankStr = String(rank || '').toUpperCase();
     let isHighRank = rankStr.includes('S') || rankStr.includes('A');
 
+    s.wins = s.wins || {};
+    let oppWins = (s.wins[normalizedOpp] || 0);
+
     // RECOMPENSAS GX EXCLUSIVAS Y JEFES SUPREMOS:
     if (isGXOpponent) {
-        // En GX, si el rango es S o A (o 65% de probabilidad), garantizamos al menos 1 carta estrella o Fusión del deck del rival
         let gxBossPool = [];
         if (oppDeck && Array.isArray(oppDeck.extraDeck || oppDeck.extra_deck) && (oppDeck.extraDeck || oppDeck.extra_deck).length > 0) {
             gxBossPool = [...new Set(oppDeck.extraDeck || oppDeck.extra_deck)];
@@ -4325,14 +4330,40 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         if (gxBossPool.length === 0 && oppDeck && oppDeck.cards) {
             gxBossPool = oppDeck.cards.filter(c => ['Water Dragon', 'Hydrogeddon', 'Oxygeddon', 'Ancient Gear Golem', 'Dark Armed Dragon', 'Armed Dragon LV7', 'Destiny HERO - Plasma'].includes(c));
         }
-        if (gxBossPool.length > 0) {
+
+        // Si es el primer duelo que se le gana (oppWins <= 1), la probabilidad de dar una carta jefe/fusión es muy baja (5% con S, 2% con A, 0% con otros)
+        // Aumenta progresivamente con el número de victorias (farmeo) y rango alto (S/A)
+        let bossChance = 0;
+        if (oppWins <= 1) {
+            bossChance = rankStr.includes('S') ? 0.05 : (rankStr.includes('A') ? 0.02 : 0);
+        } else if (oppWins < 5) {
+            bossChance = rankStr.includes('S') ? 0.20 : (rankStr.includes('A') ? 0.10 : 0.02);
+        } else {
+            bossChance = rankStr.includes('S') ? 0.40 : (rankStr.includes('A') ? 0.25 : 0.05);
+        }
+
+        let gotBoss = false;
+        if (gxBossPool.length > 0 && Math.random() < bossChance) {
             let unownedBoss = gxBossPool.filter(c => (s.collection[c] || 0) < 3);
             let bossChoice = unownedBoss.length > 0
                 ? unownedBoss[Math.floor(Math.random() * unownedBoss.length)]
                 : gxBossPool[Math.floor(Math.random() * gxBossPool.length)];
-            let bossChance = isHighRank ? 0.90 : 0.65;
-            if (Math.random() < bossChance && bossChoice && !selected3.includes(bossChoice) && selected3.length > 0) {
+            if (bossChoice && selected3.length > 0) {
                 selected3[0] = bossChoice; // Posición de honor
+                gotBoss = true;
+            }
+        }
+
+        // En el primer duelo ganado o cuando no toca jefe, aseguramos que las 3 cartas vengan de su baraja normal/materiales comunes
+        let normalDeckPool = cardPool.filter(c => !gxBossPool.includes(c));
+        if (normalDeckPool.length >= 3) {
+            let candidatesNormal = normalDeckPool.filter(c => (s.collection[c] || 0) < 3);
+            if (candidatesNormal.length < 3) candidatesNormal = normalDeckPool;
+            let shuffledNorm = [...candidatesNormal].sort(() => 0.5 - Math.random());
+            if (gotBoss) {
+                selected3 = [selected3[0], shuffledNorm[0], shuffledNorm[1]];
+            } else {
+                selected3 = shuffledNorm.slice(0, 3);
             }
         }
     } else {
@@ -4349,9 +4380,10 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
 
         // APLICACIÓN DE REGLAS DE RECOMPENSAS MUY RARAS:
         let isKaibaOrYugi = (normalizedOpp === 'kaiba' || normalizedOpp === 'seto' || normalizedOpp === 'yugi' || normalizedOpp === 'atem');
+        let bossChanceDM = oppWins <= 1 ? (rankStr.includes('S') ? 0.03 : (rankStr.includes('A') ? 0.01 : 0)) : (rankStr.includes('S') ? 0.15 : 0.06);
 
-        // Blue-Eyes Ultimate Dragon y Gate Guardian: solo Seto Kaiba y Yugi, rango S o A, probabilidad muy rara (~5%)
-        if (isKaibaOrYugi && isHighRank && Math.random() < 0.06 && selected3.length > 0) {
+        // Blue-Eyes Ultimate Dragon y Gate Guardian: solo Seto Kaiba y Yugi, rango S o A, probabilidad muy rara
+        if (isKaibaOrYugi && isHighRank && Math.random() < bossChanceDM && selected3.length > 0) {
             let unownedBoss = ULTRA_RARE_BOSS_CARDS.filter(c => (s.collection[c] || 0) < 3);
             let bossChoice = unownedBoss.length > 0
                 ? unownedBoss[Math.floor(Math.random() * unownedBoss.length)]
@@ -4362,7 +4394,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         }
 
         // Zoa y Metalzoa: recompensas muy raras (~4% de probabilidad en duelos de rango S o A)
-        if (isHighRank && Math.random() < 0.05 && selected3.length > 0) {
+        if (isHighRank && Math.random() < (oppWins <= 1 ? 0.02 : 0.06) && selected3.length > 0) {
             let unownedVR = VERY_RARE_CARDS.filter(c => (s.collection[c] || 0) < 3);
             let vrChoice = unownedVR.length > 0
                 ? unownedVR[Math.floor(Math.random() * unownedVR.length)]
@@ -4372,14 +4404,14 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             }
         }
 
-        // RECOMPENSAS DESTACADAS DE JOEY Y PEGASUS: Summoned Skull y Meteor B. Dragon (3500 ATK)
+        // RECOMPENSAS DESTACADAS DE JOEY Y PEGASUS: Summoned Skull y Meteor B. Dragon
         if ((normalizedOpp === 'joey' || normalizedOpp === 'pegasus') && selected3.length > 0) {
             let jpPool = ['Summoned Skull', 'Meteor B. Dragon'];
             let unownedJP = jpPool.filter(c => (s.collection[c] || 0) < 3);
             let jpChoice = unownedJP.length > 0
                 ? unownedJP[Math.floor(Math.random() * unownedJP.length)]
                 : jpPool[Math.floor(Math.random() * jpPool.length)];
-            let jpChance = isHighRank ? 0.85 : 0.55;
+            let jpChance = oppWins <= 1 ? (rankStr.includes('S') ? 0.08 : 0.03) : (isHighRank ? 0.45 : 0.20);
             if (Math.random() < jpChance && jpChoice && !selected3.includes(jpChoice)) {
                 selected3[selected3.length - 1] = jpChoice;
             }
@@ -4463,6 +4495,8 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             let freshSave = curStr ? JSON.parse(curStr) : s;
             freshSave.collection = freshSave.collection || {};
             freshSave.collection[cardName] = (freshSave.collection[cardName] || 0) + 1;
+            freshSave.wins = freshSave.wins || {};
+            freshSave.wins[normalizedOpp] = (freshSave.wins[normalizedOpp] || 0) + 1;
             
             if (window.persistUserSave) {
                 window.persistUserSave(freshSave);
@@ -7406,9 +7440,18 @@ const originalCardHTML = window.cardHTML;
 window.cardHTML = function(c, z, i) {
     let html = originalCardHTML ? originalCardHTML(c, z, i) : '';
     let name = c?.name || c?.[0] || '';
-    let num = window.getCardNumber(name);
+    let num = (typeof window.getCardNumber === 'function' ? window.getCardNumber(name) : null) || (window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]);
+    let localSrc = '';
     if (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
-        let localSrc = window.CUSTOM_LOCAL_IMAGES[num];
+        localSrc = window.CUSTOM_LOCAL_IMAGES[num];
+    } else if (c?.image) {
+        localSrc = c.image;
+    } else if (name && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) {
+        localSrc = window.CUSTOM_LOCAL_IMAGES[name];
+    } else if (c?.id && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[c.id]) {
+        localSrc = window.CUSTOM_LOCAL_IMAGES[c.id];
+    }
+    if (localSrc) {
         let box = document.createElement('div');
         box.innerHTML = html;
         let art = box.querySelector('.cardArt');
@@ -7463,10 +7506,18 @@ window.stHTML = function(c, zone, i) {
   var num = (window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]) || 0;
   var imgSrc = (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) || '';
   if (!imgSrc && window.CUSTOM_LOCAL_IMAGES) {
-    var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : (window.CARD_MAPPINGS || {});
-    var dNum = dict[name] && dict[name].num ? dict[name].num : dict[name];
-    if (dNum && window.CUSTOM_LOCAL_IMAGES[dNum]) {
-      imgSrc = window.CUSTOM_LOCAL_IMAGES[dNum];
+    if (window.CUSTOM_LOCAL_IMAGES[name]) {
+      imgSrc = window.CUSTOM_LOCAL_IMAGES[name];
+    } else if (c.image) {
+      imgSrc = c.image;
+    } else if (c.id && window.CUSTOM_LOCAL_IMAGES[c.id]) {
+      imgSrc = window.CUSTOM_LOCAL_IMAGES[c.id];
+    } else {
+      var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : (window.CARD_MAPPINGS || {});
+      var dNum = dict[name] && dict[name].num ? dict[name].num : dict[name];
+      if (dNum && window.CUSTOM_LOCAL_IMAGES[dNum]) {
+        imgSrc = window.CUSTOM_LOCAL_IMAGES[dNum];
+      }
     }
   }
   var isEquip = (c.kind === 'EQUIP' || c.value === 'EQUIP');
