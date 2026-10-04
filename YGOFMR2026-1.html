@@ -17599,17 +17599,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof playerHand50 === 'function') playerHand50();
     if (typeof updateSetButton103 === 'function') updateSetButton103();
 
-    // Setup Extra Deck for GX / World 2
-    if (!isWorld1Duel()) {
-      var enemyExtraNames = (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]) && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]).extraDeck) || [];
-      g.enemyExtra = (enemyExtraNames || []).map(cardResolver).filter(Boolean);
-      
-      var playerExtraNames = (sSave && sSave.extraDeck) || (sSave && sSave.decks && sSave.activeDeck && sSave.decks[sSave.activeDeck + '_extra']) || [];
-      g.extra = (playerExtraNames || []).map(cardResolver).filter(Boolean);
-    } else {
-      g.extra = [];
-      g.enemyExtra = [];
-    }
+    // Extra Deck desactivado tanto en Mundo 1 como en Mundo 2 (solo fusiones al estilo clasico FMR)
+    g.extra = [];
+    g.enemyExtra = [];
+    g.linkZones = [null, null];
+    g.enemyLinkZones = [null, null];
+    g.linkField = null;
+    g.enemyLinkField = null;
 
     // Encabezado del duelo en el tablero
     var currentWorld = (sSave && sSave.world) || (isWorld1Duel() ? 1 : 2);
@@ -23555,30 +23551,23 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { activateSetCard = window.activateSetCard; } catch(_) {}
 
-  // 7. World 1 Extra Deck blocker
+  // 7. Extra Deck blocker (Desactivado en Mundo 1 y Mundo 2: solo fusiones al estilo clasico FMR)
   var prevAiExtraMaster = window.aiExtraSummon;
   window.aiExtraSummon = function() {
-    if (isWorld1Duel()) {
-      return;
-    }
-    if (prevAiExtraMaster) return prevAiExtraMaster.apply(this, arguments);
+    return;
   };
   try { aiExtraSummon = window.aiExtraSummon; } catch(_) {}
 
   var prevPlaceLinkMaster = window.placeLink;
   window.placeLink = function(c, side) {
-    if (isWorld1Duel()) {
-      return null;
-    }
-    if (prevPlaceLinkMaster) return prevPlaceLinkMaster.apply(this, arguments);
     return null;
   };
   try { placeLink = window.placeLink; } catch(_) {}
 
   var prevOpenPileMaster = window.openPile;
   window.openPile = function(kind) {
-    if ((kind === 'extra' || kind === 'enemyExtra') && isWorld1Duel()) {
-      duelToast('El Extra Deck est\u00e1 prohibido en el Mundo 1.');
+    if (kind === 'extra' || kind === 'enemyExtra') {
+      duelToast('En este mundo solo se permiten Fusiones al estilo FMR.');
       return;
     }
     if (prevOpenPileMaster) return prevOpenPileMaster.apply(this, arguments);
@@ -23758,7 +23747,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         game._threateningRoarActive = false;
       }
     }
-    if (isWorld1Duel() && typeof game !== 'undefined' && game) {
+    if (typeof game !== 'undefined' && game) {
       game.extra = [];
       game.extraUsed = [];
       game.linkZones = [null, null];
@@ -23768,14 +23757,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     if (prevRenderMaster) prevRenderMaster.apply(this, arguments);
 
-    if (isWorld1Duel()) {
-      var ep = document.getElementById('enemyExtraPile');
-      if (ep) ep.style.display = 'none';
-      var pp = document.querySelector('.playerPileGroup .extraPile');
-      if (pp) pp.style.display = 'none';
-      var sl = document.getElementById('sharedLink');
-      if (sl) sl.style.display = 'none';
-    }
+    var ep = document.getElementById('enemyExtraPile');
+    if (ep) ep.style.display = 'none';
+    var pp = document.querySelector('.playerPileGroup .extraPile');
+    if (pp) pp.style.display = 'none';
+    var exp = document.getElementById('extraPile');
+    if (exp) exp.style.display = 'none';
+    var sl = document.getElementById('sharedLink');
+    if (sl) sl.style.display = 'none';
 
     if (typeof updateFusionAssist === 'function') try { updateFusionAssist(); } catch(_) {}
     if (typeof updateSetButton103 === 'function') try { updateSetButton103(); } catch(_) {}
@@ -23901,9 +23890,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    body.story-world-1 #enemyExtraPile,
-    body.story-world-1 .extraPile,
-    body.story-world-1 #sharedLink { display: none !important; }
+    #enemyExtraPile,
+    .extraPile,
+    #extraPile,
+    #sharedLink,
+    .linkZone { display: none !important; }
     body.view-field #fusionBtn { display: inline-flex !important; }
 
     /* GUARDIAN SIGNS BATTLE INDICATORS */
