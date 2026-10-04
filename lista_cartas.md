@@ -9,6 +9,7 @@
 | #006 | **Dark Magician** | Monstruo (Spellcaster) | 2500 / 2100 | imagenescartas/Mundo1/006.jpeg |
 | #007 | **Thousand Dragon** | Fusión (Dragon) | 2400 / 2000 | imagenescartas/Mundo1/007.jpeg |
 | #010 | **Harpie Lady** | Monstruo (Winged Beast) | 1300 / 1400 | imagenescartas/Mundo1/010.jpeg |
+| #013 | **Summoned Skull** | Monstruo (Fiend) | 2500 / 1200 | imagenescartas/Mundo1/013.jpg |
 | #015 | **Winged Dragon, Guardian of the Fortress #1** | Monstruo (Dragon) | 1400 / 1200 | imagenescartas/Mundo1/015.jpg |
 | #017 | **Cyber Commander** | Monstruo (Machine) | 750 / 700 | imagenescartas/Mundo1/114.jpg |
 | #019 | **Celtic Guardian** | Monstruo (Warrior) | 1400 / 1200 | imagenescartas/Mundo1/019.jpeg |
@@ -635,6 +636,7 @@
 | #710 | **Crab Turtle** | Monstruo (Aqua) | 2550 / 2500 | imagenescartas/Mundo1/710.jpg |
 | #711 | **Mikazukinoyaiba** | Monstruo (Dragon) | 2200 / 2350 | imagenescartas/Mundo1/711.jpg |
 | #712 | **Meteor Dragon** | Monstruo (Dragon) | 1800 / 2000 | imagenescartas/Mundo1/712.jpg |
+| #713 | **Meteor B. Dragon** | Monstruo (Dragon) | 3500 / 2000 | imagenescartas/Mundo1/713.jpg |
 | #714 | **Firewing Pegasus** | Monstruo (Beast) | 2250 / 1800 | imagenescartas/Mundo1/714.jpg |
 | #715 | **Psycho-Puppet** | Monstruo (Fiend) | 2000 / 2350 | imagenescartas/Mundo1/715.jpg |
 | #716 | **Garma Sword** | Monstruo (Warrior) | 2550 / 2150 | imagenescartas/Mundo1/716.jpg |

@@ -4117,13 +4117,19 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         'The Immortal of Thunder', 'Electric Snake', 'Wing Eagle', 'Punished Eagle',
         'Performance of Sword', 'Hungry Burger', 'Sengenjin', 'Skull Guardian',
         'Tri-Horned Dragon', 'Serpent Night Dragon', 'Skull Knight', 'Cosmo Queen',
-        'Chakra', 'Crab Turtle', 'Mikazukinoyaiba',
-        'Meteor Dragon', 'Firewing Pegasus', 'Psycho-Puppet', 'Garma Sword', 'Javelin Beetle', 'Fortress Whale', 'Dokurorider', 'Mask of Shine & Dark'
+        'Meteor Dragon', 'Firewing Pegasus', 'Psycho-Puppet', 'Garma Sword', 'Javelin Beetle', 'Fortress Whale', 'Dokurorider', 'Mask of Shine & Dark',
+        'Summoned Skull', 'Meteor B. Dragon'
     ];
     window.NEW_REWARD_MONSTERS = NEW_REWARD_MONSTERS;
     NEW_REWARD_MONSTERS.forEach(m => {
         if (!cardPool.includes(m)) cardPool.push(m);
     });
+
+    let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (normalizedOpp === 'joey' || normalizedOpp === 'pegasus') {
+        if (!cardPool.includes('Summoned Skull')) cardPool.push('Summoned Skull');
+        if (!cardPool.includes('Meteor B. Dragon')) cardPool.push('Meteor B. Dragon');
+    }
 
     // REGLAS ESPECIALES DE RECOMPENSAS:
     // 1. Blue-Eyes Ultimate Dragon y Gate Guardian SOLO son recompensas de rango muy raro para Seto Kaiba y Yugi.
@@ -4183,6 +4189,19 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             : VERY_RARE_CARDS[Math.floor(Math.random() * VERY_RARE_CARDS.length)];
         if (vrChoice && !selected3.includes(vrChoice)) {
             selected3[selected3.length - 1] = vrChoice;
+        }
+    }
+
+    // RECOMPENSAS DESTACADAS DE JOEY Y PEGASUS: Summoned Skull y Meteor B. Dragon (3500 ATK)
+    if ((normalizedOpp === 'joey' || normalizedOpp === 'pegasus') && selected3.length > 0) {
+        let jpPool = ['Summoned Skull', 'Meteor B. Dragon'];
+        let unownedJP = jpPool.filter(c => (s.collection[c] || 0) < 3);
+        let jpChoice = unownedJP.length > 0
+            ? unownedJP[Math.floor(Math.random() * unownedJP.length)]
+            : jpPool[Math.floor(Math.random() * jpPool.length)];
+        let jpChance = isHighRank ? 0.85 : 0.55;
+        if (Math.random() < jpChance && jpChoice && !selected3.includes(jpChoice)) {
+            selected3[selected3.length - 1] = jpChoice;
         }
     }
     

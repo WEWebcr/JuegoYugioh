@@ -305,6 +305,8 @@ function fusionResult(names){
   if(names.includes('Baby Dragon')&&names.includes('Thunder Dragon'))return 'Twin-Headed Thunder Dragon';
   if(names.includes('Dragon Zombie')&&names.includes('Thunder Dragon'))return 'Maga Oscura';
   if(names.includes('Curse of Dragon')&&names.includes('Baby Dragon'))return 'Meteor Dragon';
+  if(names.includes('Red-Eyes Black Dragon')&&names.includes('Meteor Dragon'))return 'Meteor B. Dragon';
+  if(names.includes('Red-Eyes Black Dragon')&&names.includes('Summoned Skull'))return 'Black Skull Dragon';
   // TRISTAN FUSIONS
   if(names.includes('Warrior Dai Grepher')&&names.includes('Spirit Ryu'))return 'Ryu Senshi';
   if(names.includes('Robolady')&&names.includes('Roboyarou'))return 'Super Roboyarou';
@@ -8435,9 +8437,10 @@ const TRISTAN_POOL=[
 const WEEVIL_POOL=['Basic Insect','Killer Needle','Man-Eater Bug','Hercules Beetle','Trap Hole','Waboku','Sakuretsu Armor','Black Pendant','Giant Soldier of Stone'];
 const MAI_POOL=['Harpie Lady','Cyber Harpie Lady','Harpie Lady Sisters','Winged Dragon, Guardian of the Fortress #1','Dragon Treasure','Horn of the Unicorn','Dust Tornado','Waboku','Negate Attack'];
 const MAKO_POOL=['The Legendary Fisherman','Fortress Whale','Amphibian Beast','Giant Red Seasnake','High Tide Gyojin','Umi','Steel Shell','Torrential Tribute','Tornado Wall'];
-const JOEY_POOL=['Baby Dragon','Time Wizard','Flame Swordsman','Masaki the Legendary Swordsman','Flame Manipulator','Battle Ox','Dragon Treasure','Axe of Despair','Trap Hole'];
+const JOEY_POOL=['Baby Dragon','Time Wizard','Flame Swordsman','Masaki the Legendary Swordsman','Flame Manipulator','Battle Ox','Dragon Treasure','Axe of Despair','Trap Hole','Summoned Skull','Meteor B. Dragon'];
 const STORY_DECKS={tristan:TRISTAN_DECK,weevil:WEEVIL_DECK,mai:MAI_DECK,joey:JOEY_DECK};
-const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,mako:MAKO_POOL,joey:JOEY_POOL};
+const PEGASUS_POOL=['Bickuribox','Gate Guardian','Summoned Skull','Meteor B. Dragon','Toon Alligator','Parrot Dragon','Dark Rabbit','Illusionist Faceless Mage'];
+const STORY_POOLS={tristan:TRISTAN_POOL,weevil:WEEVIL_POOL,mai:MAI_POOL,mako:MAKO_POOL,joey:JOEY_POOL,pegasus:PEGASUS_POOL};
 const STORY_UNLOCK_NEXT={tristan:'weevil',weevil:'mai',mai:'mako',mako:'joey',joey:'pegasus',pegasus:'bakura',bakura:'noah',noah:'kosaburo',kosaburo:'ishizu',ishizu:'odion',odion:'marik',marik:'kaiba',kaiba:'yugi',yugi:'atem'};
 
 const PROLOGUE=[

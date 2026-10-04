@@ -74,6 +74,22 @@
     "tier": "ARPÍA ALADA"
   },
   {
+    "id": 13,
+    "name": "Summoned Skull",
+    "kind": "MONSTER",
+    "type": "Fiend",
+    "attr": "DARK",
+    "level": 6,
+    "atk": 2500,
+    "def": 1200,
+    "text": "Un monstruo demoníaco con grandes poderes de oscuridad para confundir al enemigo. Entre los monstruos de tipo Demonio, presume de una fuerza devastadora.",
+    "image": "imagenescartas/Mundo1/013.jpg",
+    "sign1": "LUNA",
+    "sign2": "MARTE",
+    "price": 25000,
+    "tier": "DEMONIO DEVASTADOR"
+  },
+  {
     "id": 15,
     "name": "Winged Dragon, Guardian of the Fortress #1",
     "kind": "MONSTER",
@@ -8149,6 +8165,22 @@
     "price": 28000,
     "text": "Un dragón meteórico caído del cosmos con gran dureza defensiva.",
     "image": "imagenescartas/Mundo1/712.jpg"
+  },
+  {
+    "id": 713,
+    "name": "Meteor B. Dragon",
+    "kind": "MONSTER",
+    "type": "Dragon",
+    "attr": "FIRE",
+    "level": 8,
+    "atk": 3500,
+    "def": 2000,
+    "price": 60000,
+    "tier": "DRAGÓN METEORO SUPREMO",
+    "text": "Fusión legendaria: Red-Eyes Black Dragon + Meteor Dragon. Un dragón meteórico cósmico de poder devastador con 3500 ATK.",
+    "image": "imagenescartas/Mundo1/713.jpg",
+    "sign1": "MARTE",
+    "sign2": "SOL"
   },
   {
     "id": 714,
