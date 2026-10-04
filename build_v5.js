@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 let html = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/FMR_V3_0_7_BANDAI1998_MENU.html', 'utf8');
 
 // 1. Fix native missing <script> tag before V3.0.5
@@ -110,6 +111,16 @@ html = html
   .replace(/\ufffd&\ufffd/g, '★')
   .replace(/\ufffdS\ufffd/g, '⭐');
 
+let mappings = {};
+try {
+    mappings = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/card_mappings.json', 'utf8'));
+} catch(e) {}
+
+let cardsData = [];
+try {
+    cardsData = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/data/cards.json', 'utf8'));
+} catch(e) {}
+
 // 4. Scan Images
 let customImages = {};
 try {
@@ -122,18 +133,41 @@ try {
         }
     });
 } catch(e) {
-    console.log('Images folder not found during build');
+    console.log('Mundo1 images folder not found during build');
 }
 
-let mappings = {};
+function scanDirRecursive(dir) {
+    if (!fs.existsSync(dir)) return;
+    const items = fs.readdirSync(dir, { withFileTypes: true });
+    items.forEach(it => {
+        const full = path.join(dir, it.name);
+        if (it.isDirectory()) {
+            scanDirRecursive(full);
+        } else {
+            const rel = full.replace(/\\/g, '/').replace(/^.*?(imagenescartas\/)/i, '$1');
+            customImages[it.name] = rel;
+            const match = it.name.match(/^(\d+)\.(jpg|jpeg|png)$/i);
+            if (match) {
+                customImages[parseInt(match[1])] = rel;
+            }
+        }
+    });
+}
 try {
-    mappings = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/card_mappings.json', 'utf8'));
-} catch(e) {}
+    scanDirRecursive('C:/Deploy/proyectoygo/imagenescartas/Mundo2');
+} catch(e) {
+    console.log('Mundo2 images folder error:', e.message);
+}
 
-let cardsData = [];
-try {
-    cardsData = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/data/cards.json', 'utf8'));
-} catch(e) {}
+// Ensure every card in cardsData with an image property is registered by ID and name
+if (Array.isArray(cardsData)) {
+    cardsData.forEach(c => {
+        if (c.id && c.image) {
+            customImages[c.id] = c.image;
+            if (c.name) customImages[c.name] = c.image;
+        }
+    });
+}
 
 let characterDecks = {};
 try {

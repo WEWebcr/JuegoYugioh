@@ -656,7 +656,11 @@ const portraitMap = {
     'MOTO': 'abueloYugi.jpg', 'TRISTAN_INTRO': 'Tristan.jpg', 'TRISTAN': 'Tristan.jpg', 'WEEVIL': 'Weevil.jpeg', 'MAI': 'Mai.jpeg',
     'JOEY': 'DialogoJoe.png', 'PEGASUS': 'Pegasus.jpeg', 'BAKURA': 'Bakura.jpeg', 'MARIK': 'Marik.jpeg', 'ISHIZU': 'Ishuzu.jpeg',
     'ODION': 'Odion.jpeg', 'NOAH': 'NoahKaiba.jpeg', 'KOSABURO': 'Kosaburo_Kaiba.jpeg', 'MAKO': 'mako.jpg', 'SETO': 'DialogoSetoKaiba.png', 'KAIBA': 'DialogoSetoKaiba.png', 'YUGI': 'YugiMoTo.jpeg',
-    'ABUELO': 'abueloYugi.jpg', 'ATEM': 'DialogoFaraom.png'
+    'ABUELO': 'abueloYugi.jpg', 'ATEM': 'DialogoFaraom.png',
+    // GX characters (Mundo 2)
+    'CHUMLEY': 'Chumley.jpg', 'SYRUS': 'Syrus.png', 'JADEN': 'Jaden.png',
+    'BASTION': 'Bastion.png', 'ALEXIS': 'Alexis.png', 'CHAZZ': 'Chazz.png',
+    'ZANE': 'Zane.png', 'CROWLER': 'Crowler.png', 'ASTER': 'Aster.png'
 };
 
 const dialogPortraitMap = {
@@ -678,7 +682,46 @@ const dialogPortraitMap = {
     'ISHIZU': 'Ishuzu.jpeg',
     'ODION': 'Odion.jpeg',
     'MOTO': 'abueloYugi.jpg',
-    'ABUELO': 'abueloYugi.jpg'
+    'ABUELO': 'abueloYugi.jpg',
+    // GX characters (Mundo 2)
+    'CHUMLEY': 'Chumley.jpg',
+    'SYRUS': 'Syrus.png',
+    'JADEN': 'Jaden.png',
+    'BASTION': 'Bastion.png',
+    'ALEXIS': 'Alexis.png',
+    'CHAZZ': 'Chazz.png',
+    'ZANE': 'Zane.png',
+    'CROWLER': 'Crowler.png',
+    'ASTER': 'Aster.png'
+};
+
+window.DUELISTS_NAMES = {
+    'tristan': 'Tristan Taylor',
+    'weevil': 'Weevil Underwood',
+    'mai': 'Mai Valentine',
+    'mako': 'Mako Tsunami',
+    'joey': 'Joey Wheeler',
+    'pegasus': 'Maximillion Pegasus',
+    'bakura': 'Yami Bakura',
+    'noah': 'Noah Kaiba',
+    'kosaburo': 'Kosaburo Kaiba',
+    'ishizu': 'Ishizu Ishtar',
+    'odion': 'Odion',
+    'marik': 'Yami Marik',
+    'kaiba': 'Seto Kaiba',
+    'seto': 'Seto Kaiba',
+    'yugi': 'Yugi Muto',
+    'atem': 'Faraón Atem',
+    // GX characters
+    'chumley': 'Chumley Huffington',
+    'syrus': 'Syrus Truesdale',
+    'jaden': 'Jaden Yuki',
+    'bastion': 'Bastion Misawa',
+    'alexis': 'Alexis Rhodes',
+    'chazz': 'Chazz Princeton',
+    'zane': 'Zane Truesdale',
+    'crowler': 'Dr. Vellian Crowler',
+    'aster': 'Aster Phoenix'
 };
 
 const introDialog = [
@@ -787,6 +830,10 @@ window.getDuelMusic = function(charId) {
     if (charId === 'noah' || charId === 'kosaburo' || charId === 'gozaburo') return 'duelosjefes.mp3';
     if (charId === 'ishizu') return 'dueloIshizu.mp3';
     if (charId === 'odion') return 'dueloOdion.mp3';
+    if (charId === 'chumley' || charId === 'syrus') return 'duelo1.mp3';
+    if (charId === 'jaden' || charId === 'bastion' || charId === 'alexis') return 'duelo2.mp3';
+    if (charId === 'chazz' || charId === 'crowler') return 'MusicaJefes.mp3';
+    if (charId === 'zane' || charId === 'aster') return 'dueloJefeFinal.mp3';
     if (charId === 'seto' || charId === 'kaiba' || charId === 'marik' || charId === 'yugi' || charId === 'atem') {
         return 'dueloJefeFinal.mp3';
     }
@@ -2933,6 +2980,34 @@ window.CUSTOM_NODES = [
     { id: 'n14', left: '50%', top: '4%', label: 'PUERTA SAGRADA', char: 'ATEM', req: ['bakura','noah','kosaburo','ishizu','pegasus','yugi','kaiba','joey','marik','odion','mako'] }
 ];
 
+// ════════════════════════════════════════════════════════════════
+//  NODOS Y RUTA DEL MAPA MUNDO 2: ACADEMIA DE DUELOS (GX)
+// ════════════════════════════════════════════════════════════════
+window.CUSTOM_NODES_GX = [
+    { id: 'gx1', left: '50%', top: '84%', label: 'CHUMLEY', char: 'CHUMLEY', req: [] },
+    { id: 'gx2', left: '35%', top: '75%', label: 'SYRUS', char: 'SYRUS', req: ['chumley'] },
+    { id: 'gx3', left: '65%', top: '66%', label: 'JADEN', char: 'JADEN', req: ['syrus'] },
+    { id: 'gx4', left: '35%', top: '57%', label: 'BASTION', char: 'BASTION', req: ['jaden'] },
+    { id: 'gx5', left: '65%', top: '48%', label: 'ALEXIS', char: 'ALEXIS', req: ['bastion'] },
+    { id: 'gx6', left: '35%', top: '39%', label: 'CHAZZ', char: 'CHAZZ', req: ['alexis'] },
+    { id: 'gx7', left: '65%', top: '30%', label: 'ZANE', char: 'ZANE', req: ['chazz'] },
+    { id: 'gx8', left: '50%', top: '21%', label: 'CROWLER', char: 'CROWLER', req: ['zane'] },
+    { id: 'gx9', left: '50%', top: '11%', label: 'ASTER', char: 'ASTER', req: ['crowler'] },
+    { id: 'gx_shop', left: '88%', top: '84%', label: 'TIENDA GX', char: 'ABUELO', req: [] }
+];
+
+const MAP_EDGES_GX = [
+    ['gx1', 'gx2'],
+    ['gx2', 'gx3'],
+    ['gx3', 'gx4'],
+    ['gx4', 'gx5'],
+    ['gx5', 'gx6'],
+    ['gx6', 'gx7'],
+    ['gx7', 'gx8'],
+    ['gx8', 'gx9'],
+    ['gx1', 'gx_shop']
+];
+
 window.customShowMap = function() {
     window.isFreeDuelMode = false;
     if (window.cleanAllOverlays) window.cleanAllOverlays();
@@ -2952,17 +3027,25 @@ window.customShowMap = function() {
         else if (window.memorySave) s = window.memorySave;
     } catch(e) {}
     
-    let cleared = Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : [];
+    let isGX = ((s.world || 1) === 2);
+    let nodes = isGX ? window.CUSTOM_NODES_GX : window.CUSTOM_NODES;
+    let edges = isGX ? MAP_EDGES_GX : MAP_EDGES;
+    let cleared = isGX 
+        ? (Array.isArray(s.clearedGX) ? s.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []))
+        : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : []);
     let curActiveDeck = (s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || [];
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
     
     const MILLENNIUM_ITEMS = window.getMillenniumItems(s);
     const unlockedCount = MILLENNIUM_ITEMS.filter(it => it.unlocked).length;
     
-    // Contenedor principal del Mapa con imagen de ruinas egipcias
+    // Contenedor principal del Mapa con imagen de ruinas egipcias o academia GX
     let map = document.createElement('div');
     map.id = 'map-container-overlay';
-    map.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: linear-gradient(180deg, rgba(8,5,2,0.72) 0%, rgba(18,12,5,0.84) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #0a0600; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; font-family:"Segoe UI", sans-serif;';
+    let mapBg = isGX 
+        ? 'linear-gradient(180deg, rgba(4,14,32,0.85) 0%, rgba(8,24,56,0.92) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #030a18;'
+        : 'linear-gradient(180deg, rgba(8,5,2,0.72) 0%, rgba(18,12,5,0.84) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #0a0600;';
+    map.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: ' + mapBg + ' overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; font-family:"Segoe UI", sans-serif;';
     
     let mapStage = document.createElement('div');
     mapStage.id = 'map-stage-track';
@@ -3019,45 +3102,80 @@ window.customShowMap = function() {
     // ── 1. BARRA SUPERIOR HUD ESTILO KAME GAME ─────────────────────
     let topBar = document.createElement('div');
     topBar.id = 'map-top-bar';
-    topBar.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:62px; background:linear-gradient(180deg, rgba(10,6,2,0.96) 0%, rgba(22,14,5,0.92) 80%, rgba(22,14,5,0) 100%); border-bottom:2px solid #b8860b; box-shadow:0 4px 20px rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-sizing:border-box;';
+    topBar.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:62px; background:linear-gradient(180deg, rgba(10,6,2,0.96) 0%, rgba(22,14,5,0.92) 80%, rgba(22,14,5,0) 100%); border-bottom:2px solid ' + (isGX ? '#00b0ff' : '#b8860b') + '; box-shadow:0 4px 20px rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-sizing:border-box;';
     
     // 1.1 Left: Título y Logo
     let brandWrap = document.createElement('div');
     brandWrap.id = 'map-brand-wrap';
     brandWrap.style.cssText = 'display:flex; align-items:center; gap:10px; cursor:pointer;';
     brandWrap.innerHTML = `
-        <div style="font-size:26px; filter:drop-shadow(0 0 8px #ffd700); line-height:1;">☥</div>
+        <div style="font-size:26px; filter:drop-shadow(0 0 8px ${isGX ? '#00e5ff' : '#ffd700'}); line-height:1;">${isGX ? '🎓' : '☥'}</div>
         <div>
-            <div class="map-brand-title" style="font-family:'Cinzel', serif, 'Times New Roman'; font-size:15px; font-weight:900; color:#ffd700; letter-spacing:1.5px; text-shadow:0 2px 6px rgba(0,0,0,0.8);">CAMPAÑA · EL REINO DE LOS DUELOS</div>
-            <div class="map-brand-subtitle" style="font-size:10px; color:#d4af37; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">Ruta Sagrada hacia la Puerta del Nuevo Mundo</div>
+            <div class="map-brand-title" style="font-family:'Cinzel', serif, 'Times New Roman'; font-size:15px; font-weight:900; color:${isGX ? '#00e5ff' : '#ffd700'}; letter-spacing:1.5px; text-shadow:0 2px 6px rgba(0,0,0,0.8);">${isGX ? 'ACADEMIA DE DUELOS · YU-GI-OH! GX' : 'CAMPAÑA · EL REINO DE LOS DUELOS'}</div>
+            <div class="map-brand-subtitle" style="font-size:10px; color:${isGX ? '#80d8ff' : '#d4af37'}; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">${isGX ? 'Dormitorios Slifer Red, Ra Yellow y Obelisk Blue' : 'Ruta Sagrada hacia la Puerta del Nuevo Mundo'}</div>
         </div>
     `;
     topBar.appendChild(brandWrap);
     
-    // 1.2 Center: Mini Barra de los 7 Artículos del Milenio
-    let relicsBar = document.createElement('div');
-    relicsBar.id = 'map-relics-bar';
-    relicsBar.style.cssText = 'display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.65); padding:4px 10px; border-radius:20px; border:1px solid #7c5a14;';
-    
-    MILLENNIUM_ITEMS.forEach(it => {
-        let relicChip = document.createElement('div');
-        relicChip.style.cssText = `display:flex; align-items:center; gap:4px; padding:3px 8px; border-radius:14px; cursor:pointer; transition:transform 0.18s ease; ${it.unlocked ? 'background:linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8)); border:1.5px solid #ffd700; box-shadow:0 0 8px rgba(255,215,0,0.4);' : 'background:rgba(20,15,5,0.7); border:1px solid #4a3610; opacity:0.55;'}`;
-        relicChip.title = it.unlocked ? `${it.name}: ¡RECUPERADO de ${it.bearer}!` : `${it.name}: Custodiado por ${it.bearer}. ¡Derrótalo para reclamarlo!`;
-        relicChip.innerHTML = `<span>${it.unlocked ? it.icon : '🔒'}</span><span style="font-size:11px; font-weight:bold; color:${it.unlocked ? '#ffd700' : '#887755'}; font-family:'Segoe UI', sans-serif;">${it.shortName}</span>`;
-        relicChip.onmouseover = () => { relicChip.style.transform = 'scale(1.1)'; };
-        relicChip.onmouseout = () => { relicChip.style.transform = 'scale(1)'; };
-        relicChip.onclick = () => {
-            if (window.playViolinClick) window.playViolinClick();
-            alert(`${it.icon} ${it.name.toUpperCase()}\n\nPortador Sagrado: ${it.bearer}\nPoder: ${it.power}\n\n"${it.desc}"\n\nEstado: ${it.unlocked ? '✅ RECUPERADO' : '🔒 BLOQUEADO (' + it.hint + ')'}`);
-        };
-        relicsBar.appendChild(relicChip);
-    });
-    topBar.appendChild(relicsBar);
+    // 1.2 Center: Reliquias o Estado de la Academia GX
+    if (isGX) {
+        let gxBar = document.createElement('div');
+        gxBar.id = 'map-relics-bar';
+        gxBar.style.cssText = 'display:flex; align-items:center; gap:8px; background:rgba(0,15,35,0.75); padding:4px 14px; border-radius:20px; border:1px solid #00b0ff; box-shadow:0 0 10px rgba(0,176,255,0.3);';
+        let gxClearedCount = cleared.filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)).length;
+        gxBar.innerHTML = `<span style="font-size:16px;">🎓</span><span style="font-size:12px; font-weight:bold; color:#00e5ff; font-family:'Segoe UI', sans-serif;">ACADEMIA GX: ${gxClearedCount} / 9 CONQUISTADOS</span>`;
+        topBar.appendChild(gxBar);
+    } else {
+        let relicsBar = document.createElement('div');
+        relicsBar.id = 'map-relics-bar';
+        relicsBar.style.cssText = 'display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.65); padding:4px 10px; border-radius:20px; border:1px solid #7c5a14;';
+        
+        MILLENNIUM_ITEMS.forEach(it => {
+            let relicChip = document.createElement('div');
+            relicChip.style.cssText = `display:flex; align-items:center; gap:4px; padding:3px 8px; border-radius:14px; cursor:pointer; transition:transform 0.18s ease; ${it.unlocked ? 'background:linear-gradient(135deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8)); border:1.5px solid #ffd700; box-shadow:0 0 8px rgba(255,215,0,0.4);' : 'background:rgba(20,15,5,0.7); border:1px solid #4a3610; opacity:0.55;'}`;
+            relicChip.title = it.unlocked ? `${it.name}: ¡RECUPERADO de ${it.bearer}!` : `${it.name}: Custodiado por ${it.bearer}. ¡Derrótalo para reclamarlo!`;
+            relicChip.innerHTML = `<span>${it.unlocked ? it.icon : '🔒'}</span><span style="font-size:11px; font-weight:bold; color:${it.unlocked ? '#ffd700' : '#887755'}; font-family:'Segoe UI', sans-serif;">${it.shortName}</span>`;
+            relicChip.onmouseover = () => { relicChip.style.transform = 'scale(1.1)'; };
+            relicChip.onmouseout = () => { relicChip.style.transform = 'scale(1)'; };
+            relicChip.onclick = () => {
+                if (window.playViolinClick) window.playViolinClick();
+                alert(`${it.icon} ${it.name.toUpperCase()}\n\nPortador Sagrado: ${it.bearer}\nPoder: ${it.power}\n\n"${it.desc}"\n\nEstado: ${it.unlocked ? '✅ RECUPERADO' : '🔒 BLOQUEADO (' + it.hint + ')'}`);
+            };
+            relicsBar.appendChild(relicChip);
+        });
+        topBar.appendChild(relicsBar);
+    }
     
     // 1.3 Right: Stats y Botones de Acción
     let actionsWrap = document.createElement('div');
     actionsWrap.id = 'map-actions-wrap';
     actionsWrap.style.cssText = 'display:flex; align-items:center; gap:10px;';
+
+    // Botón Viaje Interdimensional entre Mundos
+    let btnSwitchWorld = document.createElement('button');
+    btnSwitchWorld.className = 'map-top-action-btn';
+    if (isGX) {
+        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #2b1f0c 0%, #150f05 100%); border: 1.5px solid #ffd700; color: #fff8cc; font-weight:bold;';
+        btnSwitchWorld.innerHTML = '<span>🏛️</span><span>MUNDO 1: DM</span>';
+        btnSwitchWorld.onclick = () => {
+            if (window.playViolinClick) window.playViolinClick();
+            s.world = 1;
+            if (window.persistUserSave) window.persistUserSave(s);
+            else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            window.customShowMap();
+        };
+    } else {
+        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #0d324d 0%, #061625 100%); border: 1.5px solid #00e5ff; color: #e1f5fe; font-weight:bold; box-shadow:0 0 10px rgba(0,229,255,0.4);';
+        btnSwitchWorld.innerHTML = '<span>🎓</span><span>MUNDO 2: GX</span>';
+        btnSwitchWorld.onclick = () => {
+            if (window.playViolinClick) window.playViolinClick();
+            s.world = 2;
+            if (window.persistUserSave) window.persistUserSave(s);
+            else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            window.customShowMap();
+        };
+    }
+    actionsWrap.appendChild(btnSwitchWorld);
     
     // PM
     let pmBadge = document.createElement('div');
@@ -3076,11 +3194,13 @@ window.customShowMap = function() {
     };
     actionsWrap.appendChild(deckBadge);
     
-    // Milenio Counter Pill
-    let milenioBadge = document.createElement('div');
-    milenioBadge.style.cssText = 'background:#382200; border:1.5px solid #ffd700; border-radius:6px; padding:4px 12px; color:#ffd700; font-family:VT323, monospace; font-size:16px; font-weight:bold; box-shadow:0 0 10px rgba(255,215,0,0.3);';
-    milenioBadge.textContent = `✨ MILENIO: ${unlockedCount} / 7`;
-    actionsWrap.appendChild(milenioBadge);
+    // Milenio Counter Pill (solo en Mundo 1)
+    if (!isGX) {
+        let milenioBadge = document.createElement('div');
+        milenioBadge.style.cssText = 'background:#382200; border:1.5px solid #ffd700; border-radius:6px; padding:4px 12px; color:#ffd700; font-family:VT323, monospace; font-size:16px; font-weight:bold; box-shadow:0 0 10px rgba(255,215,0,0.3);';
+        milenioBadge.textContent = `✨ MILENIO: ${unlockedCount} / 7`;
+        actionsWrap.appendChild(milenioBadge);
+    }
 
     // Suscripción Countdown Pill
     let subBadge = document.createElement('div');
@@ -3179,44 +3299,25 @@ window.customShowMap = function() {
       </defs>
     `;
     
-    const nodes = window.CUSTOM_NODES;
-    const MAP_EDGES = [
-        ['n1', 'n2'],
-        ['n2', 'n3'],
-        ['n3', 'n3b'],
-        ['n3b', 'n4'],
-        ['n4', 'n5'],
-        ['n5', 'n6'],
-        ['n6', 'n7'],
-        ['n7', 'n7b'],
-        ['n7b', 'n8'],
-        ['n8', 'n9'],
-        ['n9', 'n10'],
-        ['n10', 'n11'],
-        ['n11', 'n12'],
-        ['n12', 'n14'],
-        ['n1', 'n13']
-    ];
-    
-    MAP_EDGES.forEach(([fId, tId]) => {
+    edges.forEach(([fId, tId]) => {
         let fNode = nodes.find(x => x.id === fId);
         let tNode = nodes.find(x => x.id === tId);
         if (!fNode || !tNode) return;
         
         let fChar = (fNode.char || '').toLowerCase();
         if (fChar === 'seto') fChar = 'kaiba';
-        let isPathConquered = (fNode.id === 'n13') || cleared.includes(fChar);
+        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop') || cleared.includes(fChar);
         
         let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', fNode.left); line.setAttribute('y1', fNode.top);
         line.setAttribute('x2', tNode.left); line.setAttribute('y2', tNode.top);
         
         if (isPathConquered) {
-            line.setAttribute('stroke', '#ffd700');
+            line.setAttribute('stroke', isGX ? '#00e5ff' : '#ffd700');
             line.setAttribute('stroke-width', '4.5');
-            line.style.cssText = 'filter: drop-shadow(0 0 6px rgba(255,215,0,0.85)); animation: mapPathGlow 2.5s infinite ease-in-out;';
+            line.style.cssText = `filter: drop-shadow(0 0 6px ${isGX ? 'rgba(0,229,255,0.85)' : 'rgba(255,215,0,0.85)'}); animation: mapPathGlow 2.5s infinite ease-in-out;`;
         } else {
-            line.setAttribute('stroke', '#664a18');
+            line.setAttribute('stroke', isGX ? '#0d324d' : '#664a18');
             line.setAttribute('stroke-width', '3');
             line.setAttribute('stroke-dasharray', '7,7');
             line.setAttribute('opacity', '0.65');
@@ -3235,7 +3336,7 @@ window.customShowMap = function() {
         if (cid === 'seto') cid = 'kaiba';
         
         let isUnlocked = true;
-        if (cid === 'abuelo' || cid === 'atem') {
+        if (n.id === 'n13' || n.id === 'gx_shop' || cid === 'abuelo' || cid === 'atem' || !n.req || n.req.length === 0) {
             isUnlocked = true;
         } else {
             isUnlocked = n.req.every(r => cleared.includes(r.toLowerCase()));
@@ -3276,7 +3377,7 @@ window.customShowMap = function() {
             
             // 3.2 Etiqueta inferior de estado
             let labelText = isCleared ? `<span style="color:#a3e9a4">✓ ${n.label}</span>` : (!isUnlocked ? '???' : n.label);
-            if (n.id === 'n13') labelText = '🏪 TIENDA';
+            if (n.id === 'n13' || n.id === 'gx_shop') labelText = '🏪 TIENDA';
             if (n.id === 'n14') labelText = unlockedCount >= 7 ? '🌌 NUEVO MUNDO' : `🔒 PUERTA (${unlockedCount}/7)`;
             
             btn.innerHTML = `
@@ -3298,17 +3399,19 @@ window.customShowMap = function() {
             if (window.playViolinClick) window.playViolinClick();
             
             // Caso Tienda
-            if (n.id === 'n13') {
+            if (n.id === 'n13' || n.id === 'gx_shop') {
                 if (window.openCustomShopMenu) window.openCustomShopMenu();
                 return;
             }
             
-            // Caso Puerta al Nuevo Mundo
+            // Caso Puerta al Nuevo Mundo (Portal a Academia GX)
             if (n.id === 'n14') {
-                if (unlockedCount >= 7) {
-                    alert('🌌 ¡HAS REUNIDO LOS 7 ARTÍCULOS DEL MILENIO!\n\nEl Faraón Atem ha abierto las puertas del Nuevo Mundo. ¡El próximo capítulo comenzará muy pronto!');
-                } else {
-                    alert(`🔒 PUERTA SAGRADA DEL NUEVO MUNDO\n\nProgreso actual: ${unlockedCount} / 7 Artículos Recuperados.\n\nDebes derrotar a todos los portadores sagrados en la Campaña para quebrar el sello ancestral.`);
+                let choice = confirm('🌌 ¡PUERTA SAGRADA DEL NUEVO MUNDO!\n\n¿Deseas viajar a la prestigiosa Academia de Duelos de Yu-Gi-Oh! GX?\n(Tus cartas, barajas y DP se conservan al 100%).');
+                if (choice) {
+                    s.world = 2;
+                    if (window.persistUserSave) window.persistUserSave(s);
+                    else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+                    window.customShowMap();
                 }
                 return;
             }
@@ -3357,7 +3460,7 @@ window.customShowMap = function() {
             
             // Bloqueado
             if (!isUnlocked) {
-                alert('🔒 CAMINO BLOQUEADO\n\nDebes superar los duelos anteriores para abrir este sendero en el Reino de los Duelistas.');
+                alert('🔒 CAMINO BLOQUEADO\n\nDebes superar los duelos anteriores para abrir este sendero.');
                 return;
             }
             
@@ -3447,6 +3550,24 @@ window.customShowMap = function() {
                         introLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Yo soy Kosaburo Kaiba! El verdadero poder de Exodia yace en mi cementerio. ¡Contempla la fuerza imparable de Exodia Necross!' }];
                     } else if (charKey === 'yugi') {
                         introLines = [{ role: 'system', speaker: 'YUGI', text: '¡Has llegado al duelo supremo! El Rompecabezas del Milenio y el poder de los Dioses Egipcios decidirán el destino. ¡Es hora del Duelo!' }];
+                    } else if (charKey === 'chumley') {
+                        introLines = [{ role: 'system', speaker: 'CHUMLEY', text: '¡Hola! Espero que este duelo sea tan rico como mis sándwiches de queso a la parrilla. ¡Koala al ataque!' }];
+                    } else if (charKey === 'syrus') {
+                        introLines = [{ role: 'system', speaker: 'SYRUS', text: '¡Hola! Soy Syrus de Slifer Red. ¡Espero dar un buen combate con mis Vehicroids!' }];
+                    } else if (charKey === 'jaden') {
+                        introLines = [{ role: 'system', speaker: 'JADEN', text: '¡Hola! ¡Soy Jaden Yuki de Slifer Red! ¡Juego limpio y a divertirse! ¡Vamos, Héroes Elementales!' }];
+                    } else if (charKey === 'bastion') {
+                        introLines = [{ role: 'system', speaker: 'BASTION', text: 'He calculado 7 formulaciones estratégicas para este enfrentamiento. ¡Observa el poder de mis Bestias Químicas!' }];
+                    } else if (charKey === 'alexis') {
+                        introLines = [{ role: 'system', speaker: 'ALEXIS', text: 'En la Academia de Duelos las chicas del Obelisk Blue no nos andamos con rodeos. ¡Prepárate para bailar con mis Ciber Bailarinas!' }];
+                    } else if (charKey === 'chazz') {
+                        introLines = [{ role: 'system', speaker: 'CHAZZ', text: '¡Arrodíllate ante el gran Chazz Princeton! ¡Te aplastaré con mis Dragones Armados y mis Ojamas!' }];
+                    } else if (charKey === 'zane') {
+                        introLines = [{ role: 'system', speaker: 'ZANE', text: 'No tengo tiempo para debilidades. Te mostraré la furia despiadada de los Ciber Dragones del Obelisk Blue.' }];
+                    } else if (charKey === 'crowler') {
+                        introLines = [{ role: 'system', speaker: 'CROWLER', text: '¡Na-no-ne! ¡¿Quién se cree este novato para desafiar al mismísimo Dr. Crowler?! ¡Te enseñaré modales con mis Mecanismos Antiguos!' }];
+                    } else if (charKey === 'aster') {
+                        introLines = [{ role: 'system', speaker: 'ASTER', text: 'El destino ya ha escrito el final de este combate. Mis Héroes del Destino nunca fallan.' }];
                     }
                     
                     window.playCustomMusic('dialogos.mp3');
@@ -3518,18 +3639,24 @@ window.openFreeDuelMenu = function() {
     try {
         let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
         let savedStr = origGet(saveKey) || origGet('FMR_REBORN_STORY_V3000');
+        let saved = null;
         if (savedStr) {
-            let saved = JSON.parse(savedStr);
+            saved = JSON.parse(savedStr);
             if (saved && saved.cleared) cleared = saved.cleared.map(x => String(x).toLowerCase()); 
             if (saved && saved.wins) wins = saved.wins;
             if (saved && saved.losses) losses = saved.losses;
         }
     } catch(e) {}
     
-    window.CUSTOM_NODES.forEach(n => {
-        if (!n.char) return;
+    let allNodes = [...(window.CUSTOM_NODES || []), ...(window.CUSTOM_NODES_GX || [])];
+    let seenChars = new Set();
+    allNodes.forEach(n => {
+        if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop') return;
         let cid = n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase();
-        if (cleared.includes(cid)) {
+        if (seenChars.has(cid)) return;
+        seenChars.add(cid);
+        let isDefeated = cleared.includes(cid) || (saved && Array.isArray(saved.clearedGX) && saved.clearedGX.map(x => String(x).toLowerCase()).includes(cid));
+        if (isDefeated) {
             let p = portraitMap[n.char];
             let w = wins[cid] || 0;
             let l = losses[cid] || 0;
@@ -5683,9 +5810,20 @@ window.customFinishStoryDuel = function(win) {
         s.wins = s.wins || {};
         s.wins[id] = (s.wins[id] || 0) + 1;
         if (!(s.cleared || []).includes(id)) s.cleared.push(id);
+        if (!s.clearedGX) s.clearedGX = [];
+        var gxDuelists = ['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster'];
+        if (gxDuelists.includes(id) && !s.clearedGX.includes(id)) {
+            s.clearedGX.push(id);
+        }
         if (!s.unlocked) s.unlocked = [];
         if (!s.unlocked.includes(id)) s.unlocked.push(id);
-        const storyNextMap = { tristan: 'weevil', weevil: 'mai', mai: 'mako', mako: 'joey', joey: 'pegasus', pegasus: 'bakura', bakura: 'noah', noah: 'kosaburo', kosaburo: 'ishizu', ishizu: 'odion', odion: 'marik', marik: 'kaiba', kaiba: 'yugi', yugi: 'atem' };
+        const storyNextMap = { 
+            tristan: 'weevil', weevil: 'mai', mai: 'mako', mako: 'joey', joey: 'pegasus', 
+            pegasus: 'bakura', bakura: 'noah', noah: 'kosaburo', kosaburo: 'ishizu', 
+            ishizu: 'odion', odion: 'marik', marik: 'kaiba', kaiba: 'yugi', yugi: 'atem',
+            chumley: 'syrus', syrus: 'jaden', jaden: 'bastion', bastion: 'alexis',
+            alexis: 'chazz', chazz: 'zane', zane: 'crowler', crowler: 'aster'
+        };
         const nextOpp = storyNextMap[id] || (typeof STORY_UNLOCK_NEXT !== 'undefined' && STORY_UNLOCK_NEXT[id]);
         if (nextOpp && !s.unlocked.includes(nextOpp)) s.unlocked.push(nextOpp);
         
@@ -5753,6 +5891,27 @@ window.customFinishStoryDuel = function(win) {
                 { role: 'system', speaker: 'YUGI', text: '¡Ese fue un duelo supremo y legendario! Me enseñaste el verdadero significado de confiar en el Corazón de las Cartas.' },
                 { role: 'system', speaker: 'YUGI', text: 'Eres digno de portar el Rompecabezas del Milenio. ¡Ahora tienes los 7 Artículos Sagrados para abrir la Puerta del Nuevo Mundo!' }
             ];
+        } else if (id === 'chumley') {
+            winLines = [{ role: 'system', speaker: 'CHUMLEY', text: '¡Ay caramba! ¡Eso fue una delicia de duelo, casi tan bueno como un sándwich de queso a la parrilla! ¡Sigue adelante!' }];
+        } else if (id === 'syrus') {
+            winLines = [{ role: 'system', speaker: 'SYRUS', text: '¡Vaya! ¡Eres increíble! Me recuerdas a mi hermano Zane y a Jaden cuando dan todo en el campo.' }];
+        } else if (id === 'jaden') {
+            winLines = [
+                { role: 'system', speaker: 'JADEN', text: '¡Eso estuvo genial! ¡Ese sí que fue un duelo alucinante! ¡Me hiciste dar mi mejor esfuerzo!' },
+                { role: 'system', speaker: 'JADEN', text: '¡A divertirse con el siguiente desafío en la Academia de Duelos!' }
+            ];
+        } else if (id === 'bastion') {
+            winLines = [{ role: 'system', speaker: 'BASTION', text: 'Fascinante... Mis ecuaciones probabilísticas y mi baraja de seis atributos fueron superadas por tu instinto. Mis respetos.' }];
+        } else if (id === 'alexis') {
+            winLines = [{ role: 'system', speaker: 'ALEXIS', text: 'Tienes un ritmo impecable. Mis patinadoras no pudieron seguirte el paso. ¡Sigue brillando en la Academia!' }];
+        } else if (id === 'chazz') {
+            winLines = [{ role: 'system', speaker: 'CHAZZ', text: '¡¿Qué?! ¡¿Cómo pudo un novato vencer al Gran Chazz Princeton?! ¡1, 10, 100, 1000... CHAZZ VA PRIMERO!' }];
+        } else if (id === 'zane') {
+            winLines = [{ role: 'system', speaker: 'ZANE', text: 'Excelente ejecución. El respeto se gana en el campo de batalla, y hoy has demostrado la verdadera fuerza de un duelista supremo.' }];
+        } else if (id === 'crowler') {
+            winLines = [{ role: 'system', speaker: 'CROWLER', text: '¡Mamma Mia! ¡Un alumno desafiando a un doctor en duelos y ganando de esta forma! ¡Qué humillación para el Obelisk Blue!' }];
+        } else if (id === 'aster') {
+            winLines = [{ role: 'system', speaker: 'ASTER', text: 'El destino nunca se equivoca... pero hoy demostraste que tu convicción puede torcer el hilo del futuro de mis Héroes del Destino. ¡Gran victoria!' }];
         }
         
         // Show 3-card reward choice screen for the defeated character
@@ -6866,6 +7025,134 @@ setTimeout(() => {
                 if (hasAncientBrain && hasTaintedWisdom) {
                     return "Skull Knight";
                 }
+
+                // ════════════════════════════════════════════════
+                // MUNDO 2: FUSIONES DE YU-GI-OH! GX
+                // ════════════════════════════════════════════════
+                // JADEN YUKI:
+                // 1) Flame Wingman = Avian + Burstinatrix
+                if (names.includes("Elemental HERO Avian") && names.includes("Elemental HERO Burstinatrix")) {
+                    return "Elemental HERO Flame Wingman";
+                }
+                // 2) Thunder Giant = Sparkman + Clayman
+                if (names.includes("Elemental HERO Sparkman") && names.includes("Elemental HERO Clayman")) {
+                    return "Elemental HERO Thunder Giant";
+                }
+                // 3) Shining Flare Wingman = Flame Wingman + Sparkman
+                if (names.includes("Elemental HERO Flame Wingman") && names.includes("Elemental HERO Sparkman")) {
+                    return "Elemental HERO Shining Flare Wingman";
+                }
+                // 4) Mariner = Bubbleman + Avian
+                if (names.includes("Elemental HERO Bubbleman") && names.includes("Elemental HERO Avian")) {
+                    return "Elemental HERO Mariner";
+                }
+                // 5) Wild Wingman = Wildheart + Avian
+                if (names.includes("Elemental HERO Wildheart") && names.includes("Elemental HERO Avian")) {
+                    return "Elemental HERO Wild Wingman";
+                }
+                // 6) Wildedge = Wildheart + Sparkman
+                if (names.includes("Elemental HERO Wildheart") && names.includes("Elemental HERO Sparkman")) {
+                    return "Elemental HERO Wildedge";
+                }
+                // 7) Darkbright = Sparkman + Necroshade
+                if (names.includes("Elemental HERO Sparkman") && names.includes("Elemental HERO Necroshade")) {
+                    return "Elemental HERO Darkbright";
+                }
+                // 8) Brave Neos = Neos + HERO
+                const hasNeos = names.some(n => n.includes("Neos") && !n.includes("Brave Neos"));
+                const hasHero = names.some(n => n.includes("Elemental HERO") && !n.includes("Neos"));
+                if (hasNeos && hasHero) {
+                    return "Elemental HERO Brave Neos";
+                }
+                // 9) Omnis / Atributos: Absolute Zero = HERO + AGUA
+                const hasWater = names.some(n => n.includes("Bubbleman") || n.includes("Hydrogeddon") || n.includes("Submarineroid"));
+                if (hasHero && hasWater) {
+                    return "Elemental HERO Absolute Zero";
+                }
+                // 10) The Shining = HERO + LUZ
+                const hasLightHero = names.some(n => n.includes("Sparkman") || n.includes("Prisma") || n.includes("Cyber Dragon"));
+                if (hasHero && hasLightHero) {
+                    return "Elemental HERO The Shining";
+                }
+                // 11) Great Tornado = HERO + VIENTO
+                const hasWindHero = names.some(n => n.includes("Avian") || n.includes("Stratos") || n.includes("Gyroid"));
+                if (hasHero && hasWindHero) {
+                    return "Elemental HERO Great Tornado";
+                }
+                // 12) Nova Master = HERO + FUEGO
+                const hasFireHero = names.some(n => n.includes("Burstinatrix") || n.includes("Steamroid"));
+                if (hasHero && hasFireHero) {
+                    return "Elemental HERO Nova Master";
+                }
+                // 13) Escuridao = HERO + OSCURIDAD
+                const hasDarkHero = names.some(n => n.includes("Necroshade") || n.includes("Dark Panther") || n.includes("Doom Lord"));
+                if (hasHero && hasDarkHero) {
+                    return "Elemental HERO Escuridao";
+                }
+
+                // ZANE TRUESDALE:
+                // 14) Cyber Twin Dragon = Cyber Dragon + Cyber Dragon
+                const cyberCount = names.filter(n => n.includes("Cyber Dragon") || n.includes("Proto-Cyber Dragon")).length;
+                if (cyberCount >= 2) {
+                    return "Cyber Twin Dragon";
+                }
+                // 15) Cyber End Dragon = Cyber Twin Dragon + Cyber Dragon
+                if (names.includes("Cyber Twin Dragon") && names.some(n => n.includes("Cyber Dragon") || n.includes("Proto-Cyber Dragon"))) {
+                    return "Cyber End Dragon";
+                }
+                // 16) Chimeratech Overdragon = Cyber Dragon + Machine
+                const hasCyberD = names.some(n => n.includes("Cyber Dragon") || n.includes("Proto-Cyber Dragon"));
+                const hasMachine = names.some(n => n.includes("Machine") || n.includes("Ancient Gear") || n.includes("roid") || n.includes("Cannon") || n.includes("Tank"));
+                if (hasCyberD && hasMachine && cyberCount < 2) {
+                    return "Chimeratech Overdragon";
+                }
+
+                // CROWLER:
+                // 17) Ancient Gear Megaton Golem = Ancient Gear Golem + Ancient Gear
+                const agCount = names.filter(n => n.includes("Ancient Gear")).length;
+                if (agCount >= 2 && names.some(n => n.includes("Golem") || n.includes("Gadjiltron"))) {
+                    return "Ancient Gear Megaton Golem";
+                }
+
+                // ALEXIS:
+                // 18) Cyber Blader = Etoile Cyber + Blade Skater
+                if (names.includes("Etoile Cyber") && names.includes("Blade Skater")) {
+                    return "Cyber Blader";
+                }
+
+                // CHAZZ:
+                // 19) Ojama King = Ojama + Ojama
+                const ojamaCount = names.filter(n => n.toLowerCase().includes("ojama")).length;
+                if (ojamaCount >= 2) {
+                    return "Ojama King";
+                }
+
+                // SYRUS:
+                // 20) Super Vehicroid - Stealth Union = Drillroid + Steamroid / Submarineroid
+                const roidCount = names.filter(n => n.toLowerCase().includes("roid")).length;
+                if (roidCount >= 2 && names.includes("Drillroid")) {
+                    return "Super Vehicroid - Stealth Union";
+                }
+
+                // BASTION:
+                // 21) Water Dragon = Hydrogeddon + Oxygeddon
+                if (names.includes("Hydrogeddon") && names.includes("Oxygeddon")) {
+                    return "Water Dragon";
+                }
+
+                // ASTER:
+                // 22) Evil HERO Dark Gaia = Fiend + Rock
+                const hasFiendCard = names.some(n => n.includes("Malicious Edge") || n.includes("Dreadmaster") || n.includes("Doom Lord"));
+                const hasRockCard = names.some(n => n.includes("Giant Soldier of Stone") || n.includes("Prisma") || n.includes("Clayman"));
+                if (hasFiendCard && hasRockCard) {
+                    return "Evil HERO Dark Gaia";
+                }
+                // 23) Evil HERO Malicious Fiend = Malicious Edge + High Level Fiend
+                const hasMaliciousEdge = names.includes("Evil HERO Malicious Edge");
+                const hasHighFiend = names.some(n => n.includes("Plasma") || n.includes("Dogma") || n.includes("Dreadmaster"));
+                if (hasMaliciousEdge && hasHighFiend) {
+                    return "Evil HERO Malicious Fiend";
+                }
             }
             return origFusionResult(names);
         };
@@ -6975,7 +7262,66 @@ setTimeout(() => {
             { exact: ["Dragon Zombie", "Thunder Dragon"], result: "Maga Oscura" },
             { exact: ["Thunder Dragon", "Dragon Zombie"], result: "Maga Oscura" },
             { exact: ["Curse of Dragon", "Baby Dragon"], result: "Meteor Dragon" },
-            { exact: ["Baby Dragon", "Curse of Dragon"], result: "Meteor Dragon" }
+            { exact: ["Baby Dragon", "Curse of Dragon"], result: "Meteor Dragon" },
+            // GX EXACT FUSION RULES
+            { exact: ["Elemental HERO Avian", "Elemental HERO Burstinatrix"], result: "Elemental HERO Flame Wingman" },
+            { exact: ["Elemental HERO Burstinatrix", "Elemental HERO Avian"], result: "Elemental HERO Flame Wingman" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Clayman"], result: "Elemental HERO Thunder Giant" },
+            { exact: ["Elemental HERO Clayman", "Elemental HERO Sparkman"], result: "Elemental HERO Thunder Giant" },
+            { exact: ["Elemental HERO Flame Wingman", "Elemental HERO Sparkman"], result: "Elemental HERO Shining Flare Wingman" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Flame Wingman"], result: "Elemental HERO Shining Flare Wingman" },
+            { exact: ["Elemental HERO Bubbleman", "Elemental HERO Avian"], result: "Elemental HERO Mariner" },
+            { exact: ["Elemental HERO Avian", "Elemental HERO Bubbleman"], result: "Elemental HERO Mariner" },
+            { exact: ["Elemental HERO Wildheart", "Elemental HERO Avian"], result: "Elemental HERO Wild Wingman" },
+            { exact: ["Elemental HERO Avian", "Elemental HERO Wildheart"], result: "Elemental HERO Wild Wingman" },
+            { exact: ["Elemental HERO Wildheart", "Elemental HERO Sparkman"], result: "Elemental HERO Wildedge" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Wildheart"], result: "Elemental HERO Wildedge" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Necroshade"], result: "Elemental HERO Darkbright" },
+            { exact: ["Elemental HERO Necroshade", "Elemental HERO Sparkman"], result: "Elemental HERO Darkbright" },
+            { exact: ["Elemental HERO Neos", "Elemental HERO Stratos"], result: "Elemental HERO Brave Neos" },
+            { exact: ["Elemental HERO Stratos", "Elemental HERO Neos"], result: "Elemental HERO Brave Neos" },
+            { exact: ["Elemental HERO Neos", "Elemental HERO Sparkman"], result: "Elemental HERO Brave Neos" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Neos"], result: "Elemental HERO Brave Neos" },
+            { exact: ["Elemental HERO Neos", "Elemental HERO Prisma"], result: "Elemental HERO Brave Neos" },
+            { exact: ["Elemental HERO Prisma", "Elemental HERO Neos"], result: "Elemental HERO Brave Neos" },
+            { exact: ["Elemental HERO Bubbleman", "Elemental HERO Sparkman"], result: "Elemental HERO Absolute Zero" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Bubbleman"], result: "Elemental HERO Absolute Zero" },
+            { exact: ["Elemental HERO Stratos", "Elemental HERO Sparkman"], result: "Elemental HERO Great Tornado" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Stratos"], result: "Elemental HERO Great Tornado" },
+            { exact: ["Elemental HERO Burstinatrix", "Elemental HERO Sparkman"], result: "Elemental HERO Nova Master" },
+            { exact: ["Elemental HERO Sparkman", "Elemental HERO Burstinatrix"], result: "Elemental HERO Nova Master" },
+            { exact: ["Elemental HERO Necroshade", "Elemental HERO Avian"], result: "Elemental HERO Escuridao" },
+            { exact: ["Elemental HERO Avian", "Elemental HERO Necroshade"], result: "Elemental HERO Escuridao" },
+            { exact: ["Elemental HERO Prisma", "Elemental HERO Burstinatrix"], result: "Elemental HERO The Shining" },
+            { exact: ["Elemental HERO Burstinatrix", "Elemental HERO Prisma"], result: "Elemental HERO The Shining" },
+            { exact: ["Cyber Dragon", "Cyber Dragon"], result: "Cyber Twin Dragon" },
+            { exact: ["Cyber Twin Dragon", "Cyber Dragon"], result: "Cyber End Dragon" },
+            { exact: ["Cyber Dragon", "Cyber Twin Dragon"], result: "Cyber End Dragon" },
+            { exact: ["Cyber Dragon", "Proto-Cyber Dragon"], result: "Cyber Twin Dragon" },
+            { exact: ["Proto-Cyber Dragon", "Cyber Dragon"], result: "Cyber Twin Dragon" },
+            { exact: ["Etoile Cyber", "Blade Skater"], result: "Cyber Blader" },
+            { exact: ["Blade Skater", "Etoile Cyber"], result: "Cyber Blader" },
+            { exact: ["Ojama Green", "Ojama Yellow"], result: "Ojama King" },
+            { exact: ["Ojama Yellow", "Ojama Green"], result: "Ojama King" },
+            { exact: ["Ojama Green", "Ojama Black"], result: "Ojama King" },
+            { exact: ["Ojama Black", "Ojama Green"], result: "Ojama King" },
+            { exact: ["Ojama Yellow", "Ojama Black"], result: "Ojama King" },
+            { exact: ["Ojama Black", "Ojama Yellow"], result: "Ojama King" },
+            { exact: ["Drillroid", "Steamroid"], result: "Super Vehicroid - Stealth Union" },
+            { exact: ["Steamroid", "Drillroid"], result: "Super Vehicroid - Stealth Union" },
+            { exact: ["Drillroid", "Submarineroid"], result: "Super Vehicroid - Stealth Union" },
+            { exact: ["Submarineroid", "Drillroid"], result: "Super Vehicroid - Stealth Union" },
+            { exact: ["Ancient Gear Golem", "Ancient Gear Golem"], result: "Ancient Gear Megaton Golem" },
+            { exact: ["Ancient Gear Golem", "Ancient Gear Gadjiltron Dragon"], result: "Ancient Gear Megaton Golem" },
+            { exact: ["Ancient Gear Gadjiltron Dragon", "Ancient Gear Golem"], result: "Ancient Gear Megaton Golem" },
+            { exact: ["Hydrogeddon", "Oxygeddon"], result: "Water Dragon" },
+            { exact: ["Oxygeddon", "Hydrogeddon"], result: "Water Dragon" },
+            { exact: ["Evil HERO Malicious Edge", "Giant Soldier of Stone"], result: "Evil HERO Dark Gaia" },
+            { exact: ["Giant Soldier of Stone", "Evil HERO Malicious Edge"], result: "Evil HERO Dark Gaia" },
+            { exact: ["Evil HERO Malicious Edge", "Destiny HERO - Plasma"], result: "Evil HERO Malicious Fiend" },
+            { exact: ["Destiny HERO - Plasma", "Evil HERO Malicious Edge"], result: "Evil HERO Malicious Fiend" },
+            { exact: ["Evil HERO Malicious Edge", "Destiny HERO - Dogma"], result: "Evil HERO Malicious Fiend" },
+            { exact: ["Destiny HERO - Dogma", "Evil HERO Malicious Edge"], result: "Evil HERO Malicious Fiend" }
         );
     }
 }, 500);
@@ -8036,14 +8382,27 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof playerHand50 === 'function') playerHand50();
     if (typeof updateSetButton103 === 'function') updateSetButton103();
 
+    // Setup Extra Deck for GX / World 2
+    if (!isWorld1Duel()) {
+      var enemyExtraNames = (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]) && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]).extraDeck) || [];
+      g.enemyExtra = (enemyExtraNames || []).map(cardResolver).filter(Boolean);
+      
+      var playerExtraNames = (sSave && sSave.extraDeck) || (sSave && sSave.decks && sSave.activeDeck && sSave.decks[sSave.activeDeck + '_extra']) || [];
+      g.extra = (playerExtraNames || []).map(cardResolver).filter(Boolean);
+    } else {
+      g.extra = [];
+      g.enemyExtra = [];
+    }
+
     // Encabezado del duelo en el tablero
+    var currentWorld = (sSave && sSave.world) || (isWorld1Duel() ? 1 : 2);
     var oppDisplayName = (window.DUELISTS_NAMES && window.DUELISTS_NAMES[opp]) || opp.toUpperCase();
     var hud = document.getElementById('campaignDuelHud3000');
-    if (hud) hud.textContent = 'MUNDO 1 · ' + oppDisplayName;
+    if (hud) hud.textContent = 'MUNDO ' + currentWorld + ' · ' + oppDisplayName;
     var topHeader = document.getElementById('duelTopHeader');
     if (topHeader) {
       var b = topHeader.querySelector('b');
-      if (b) b.textContent = 'MUNDO 1 · ' + oppDisplayName;
+      if (b) b.textContent = 'MUNDO ' + currentWorld + ' · ' + oppDisplayName;
     }
 
     if (typeof showLoading === 'function') showLoading(false);
@@ -8799,10 +9158,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   }
 
   function isWorld1Duel() {
-    if (typeof storyDuelActive !== 'undefined' && storyDuelActive) return true;
-    var opp = (typeof storyOpponent !== 'undefined' && storyOpponent) ? String(storyOpponent).toLowerCase() : '';
-    if (['tristan', 'weevil', 'mai', 'joey'].includes(opp)) return true;
+    var opp = (typeof storyOpponent !== 'undefined' && storyOpponent) ? String(storyOpponent).toLowerCase() : ((window.lastDuelOpponent || '').toLowerCase());
+    var gxDuelists = ['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster'];
+    if (gxDuelists.includes(opp)) return false;
     var s = (typeof loadGame === 'function' ? loadGame() : null) || window.memorySave;
+    if (s && s.world === 2) return false;
+    if (typeof storyDuelActive !== 'undefined' && storyDuelActive) return true;
+    if (['tristan', 'weevil', 'mai', 'joey'].includes(opp)) return true;
     if (!s || (s.world || 1) === 1) return true;
     return false;
   }
