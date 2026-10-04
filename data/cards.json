@@ -9451,5 +9451,22 @@
     "image": "imagenescartas/Mundo1/838.jpg",
     "sign1": "SATURNO",
     "sign2": "PLUTON"
+  },
+  {
+    "id": 839,
+    "name": "Dragon Master Knight",
+    "kind": "FUSION",
+    "type": "Dragon",
+    "attr": "LIGHT",
+    "level": 12,
+    "atk": 5000,
+    "def": 5000,
+    "text": "\"Black Luster Soldier\" + \"Blue-Eyes Ultimate Dragon\"\nMust be Fusion Summoned. This card gains 500 ATK for each Dragon monster you control, except this card.",
+    "desc": "Fusión: Black Luster Soldier + Blue-Eyes Ultimate Dragon",
+    "image": "imagenescartas/Mundo1/839.jpg",
+    "sign1": "SOL",
+    "sign2": "MARTE",
+    "price": 99999,
+    "tier": "CABALLERO DRAGÓN DEFINITIVO"
   }
 ]

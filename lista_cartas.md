@@ -750,3 +750,4 @@
 | #836 | **Jack's Knight** | Monstruo (Warrior) | 1900 / 1000 | imagenescartas/Mundo1/836.jpg |
 | #837 | **King's Knight** | Monstruo (Warrior) | 1600 / 1400 | imagenescartas/Mundo1/837.jpg |
 | #838 | **Valkyrion the Magna Warrior** | Monstruo (Rock) | 3500 / 3850 | imagenescartas/Mundo1/838.jpg |
+| #839 | **Dragon Master Knight** | Fusión (Dragon) | 5000 / 5000 | imagenescartas/Mundo1/839.jpg |

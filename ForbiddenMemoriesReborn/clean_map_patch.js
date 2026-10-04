@@ -4134,7 +4134,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     // REGLAS ESPECIALES DE RECOMPENSAS:
     // 1. Blue-Eyes Ultimate Dragon y Gate Guardian SOLO son recompensas de rango muy raro para Seto Kaiba y Yugi.
     // 2. Zoa y Metalzoa también son recompensas muy raras.
-    const ULTRA_RARE_BOSS_CARDS = ['Blue-Eyes Ultimate Dragon', 'Gate Guardian'];
+    const ULTRA_RARE_BOSS_CARDS = ['Blue-Eyes Ultimate Dragon', 'Gate Guardian', 'Dragon Master Knight'];
     const VERY_RARE_CARDS = ['Zoa', 'Metalzoa'];
 
     // Asegurar que NO aparezcan en el cardPool general de otros duelistas
@@ -6778,6 +6778,12 @@ setTimeout(() => {
                 }
 
                 // KAIBA FUSIONS:
+                // 0) Dragon Master Knight = Black Luster Soldier + Blue-Eyes Ultimate Dragon
+                const hasBLS = names.some(n => n.toLowerCase().includes("black luster soldier"));
+                const hasBEUD = names.some(n => n.toLowerCase().includes("blue-eyes ultimate dragon") || n.toLowerCase().includes("ultimate dragon") || n.toLowerCase().includes("dragon definitivo") || n.toLowerCase().includes("dragón definitivo"));
+                if (hasBLS && hasBEUD) {
+                    return "Dragon Master Knight";
+                }
                 // 1) Blue-Eyes Ultimate Dragon = Blue-Eyes White Dragon + Blue-Eyes White Dragon
                 const bewdCount = names.filter(n => n.toLowerCase().includes("blue-eyes white dragon") || n.toLowerCase().includes("ojos azules")).length;
                 if (bewdCount >= 2) {
@@ -6930,6 +6936,8 @@ setTimeout(() => {
 
         // KAIBA FUSIONS IN RULES
         window.FMR_FUSION_RULES_V1.push(
+            { exact: ["Black Luster Soldier", "Blue-Eyes Ultimate Dragon"], result: "Dragon Master Knight" },
+            { exact: ["Blue-Eyes Ultimate Dragon", "Black Luster Soldier"], result: "Dragon Master Knight" },
             { exact: ["Blue-Eyes White Dragon", "Blue-Eyes White Dragon"], result: "Blue-Eyes Ultimate Dragon" },
             { exact: ["The Fang of Critias", "Crush Card Virus"], result: "Doom Virus Dragon" },
             { exact: ["The Fang of Critias", "Tyrant Wing"], result: "Tyrant Burst Dragon" },
@@ -8446,6 +8454,25 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         }).length;
         val += (pCount * 300);
       }
+
+      // Dragon Master Knight ATK bonus: +500 ATK por cada otro Dragón que controles
+      if (cName === 'Dragon Master Knight') {
+        var sideDMK = (typeof findSide111 === 'function') ? findSide111(c) : null;
+        var myField = [];
+        if (typeof game !== 'undefined' && game) {
+          if (sideDMK === 'enemy' || (!sideDMK && ((game.enemy && game.enemy.includes(c)) || (game.enemyLinkZones && game.enemyLinkZones.includes(c))))) {
+            myField = (game.enemy || []).concat(game.enemyLinkZones || []);
+          } else {
+            myField = (game.field || []).concat(game.linkZones || []);
+          }
+        }
+        var otherDragons = myField.filter(function(m) {
+          if (!m || m === c) return false;
+          var t = (m.type || m[2] || '').toLowerCase();
+          return t === 'dragon' || t.includes('dragon');
+        }).length;
+        val += (otherDragons * 500);
+      }
       return Math.max(0, val);
     };
     try { effectiveAtk = window.effectiveAtk; } catch(_) {}
@@ -9156,7 +9183,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     "Armored Zombie","B. Dragon Jungle King","Bean Soldier","Black Skull Dragon","Blackland Fire Dragon",
     "Bolt Escargot","Chimera the Flying Mythical Beast","Corroding Shark","Crimson Sunbird","Curse of Dragon",
     "Cyber Saurus","Cyber Soldier","Dark Magician Girl the Dragon Knight","Dark Paladin","Dark Witch",
-    "Darkfire Dragon","Dice Armadillo","Disk Magician","Dissolverock","Doom Virus Dragon","Dragon Statue",
+    "Darkfire Dragon","Dice Armadillo","Disk Magician","Dissolverock","Doom Virus Dragon","Dragon Master Knight","Dragon Statue",
     "Dragon Zombie","Egyptian God Slime","Empress Judge","Enchanting Mermaid","Fire Reaper","Firegrass",
     "Flame Cerebrus","Flame Ghost","Flame Swordsman","Flower Wolf","Gaia the Dragon Champion","Giga-Tech Wolf",
     "Great Mammoth of Goldfine","Humanoid Worm Drake","Ice Water","Kairyu-Shin","Kaminari Attack",
@@ -12307,8 +12334,49 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // E. INVOCACIÓN NORMAL INTELIGENTE, PRUDENTE Y AGRESIVA
+    // D2. FUSIÓN INTELIGENTE DESDE LA MANO PARA LA IA (Ej: Black Luster Soldier + Blue-Eyes Ultimate Dragon)
     var openSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+    if (openSlot >= 0 && game.enemyHand.length >= 2) {
+      var bestFusion = null;
+      var fIdx1 = -1, fIdx2 = -1;
+      for (var fi = 0; fi < game.enemyHand.length; fi++) {
+        for (var fj = fi + 1; fj < game.enemyHand.length; fj++) {
+          var fc1 = game.enemyHand[fi], fc2 = game.enemyHand[fj];
+          if (!fc1 || !fc2) continue;
+          var fn1 = fc1.name || fc1[0] || '', fn2 = fc2.name || fc2[0] || '';
+          var fnCheck = typeof window.fusionResult === 'function' ? window.fusionResult : null;
+          var fRes = fnCheck ? (fnCheck([fn1, fn2]) || fnCheck([fn2, fn1])) : null;
+          if (fRes) {
+            var fCardObj = (typeof window.mk === 'function' ? window.mk(fRes) : null) || { name: fRes, atk: 0, def: 0 };
+            var fCardStats = getCardStats(fCardObj);
+            if (!bestFusion || (fCardStats.atk || 0) > (bestFusion.stats.atk || 0)) {
+              bestFusion = { name: fRes, card: fCardObj, stats: fCardStats, mat1: fn1, mat2: fn2 };
+              fIdx1 = fi; fIdx2 = fj;
+            }
+          }
+        }
+      }
+      if (bestFusion && (bestFusion.stats.atk || 0) >= 2000) {
+        var matCard2 = game.enemyHand.splice(fIdx2, 1)[0];
+        var matCard1 = game.enemyHand.splice(fIdx1, 1)[0];
+        if (Array.isArray(game.enemyGrave)) {
+          game.enemyGrave.push(matCard1);
+          game.enemyGrave.push(matCard2);
+        }
+        var summonedFusion = (typeof window.mk === 'function' ? window.mk(bestFusion.name) : null) || bestFusion.card;
+        summonedFusion.pos = 'ATK';
+        summonedFusion.faceUp = true;
+        summonedFusion.materials = [bestFusion.mat1, bestFusion.mat2];
+        game.enemy[openSlot] = summonedFusion;
+        var fMsg = '¡' + opp.toUpperCase() + ' realiza una FUSIÓN invocando a ' + bestFusion.name + ' (' + (summonedFusion.atk || bestFusion.stats.atk) + ' ATK)!';
+        if (typeof log === 'function') log(fMsg);
+        if (typeof duelToast === 'function') duelToast(fMsg);
+        if (typeof render === 'function') render();
+        return;
+      }
+    }
+
+    // E. INVOCACIÓN NORMAL INTELIGENTE, PRUDENTE Y AGRESIVA
     if (openSlot >= 0 && game.enemyHand.length > 0) {
       var monsters = game.enemyHand.filter(function(c) {
         if (!c || isST(c)) return false;
