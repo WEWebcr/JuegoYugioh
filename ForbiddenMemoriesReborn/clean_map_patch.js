@@ -10108,8 +10108,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var box = document.createElement('div');
     box.style.cssText = "width:480px;max-width:92vw;max-height:85vh;display:flex;flex-direction:column;background:linear-gradient(145deg, #231b12, #100b07);border:3px solid #ffd700;border-radius:10px;padding:20px;box-shadow:0 0 35px #000;box-sizing:border-box;";
 
-    var eqStats = getEquipStats(eqCard, target && target.card ? target.card : null);
-    var boostStr = '+' + eqStats.atk + ' ATK' + (eqStats.def ? ' / +' + eqStats.def + ' DEF' : '');
+    var sampleCard = (allTargets.length > 0 && allTargets[0]) ? allTargets[0].card : null;
+    var eqStats = getEquipStats(eqCard, sampleCard);
+    var isMega = (eqName === 'Megamorph' || eqVal === 'MEGAMORPH' || eqName === 'Megamorfo');
+    var boostStr = isMega
+      ? 'Duplica ATK (si LP < rival) / Mitad ATK (si LP > rival)'
+      : ((eqStats.atk >= 0 ? '+' : '') + eqStats.atk + ' ATK' + (eqStats.def ? ' / +' + eqStats.def + ' DEF' : ''));
 
     var headerHTML = '<h3 style="color:#ffd700;font-size:24px;margin:0 0 6px;text-align:center;letter-spacing:1px;text-shadow:0 0 8px #ffb300;">' +
       'EQUIPAR: ' + eqName + '</h3>' +
@@ -10122,10 +10126,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     allTargets.forEach(function(t) {
       var c = t.card;
       var name = c.name || c[0] || 'Monstruo';
+      var tStats = getEquipStats(eqCard, c);
       var curAtk = (t.zone === 'h') ? (Number(c.atk ?? c[4] ?? 0) + Number(c.tempBoost || 0) + Number(c.equip || 0)) : (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(c) : c.atk);
       var curDef = (c.kind === 'LINK') ? 'LINK' : (Number(c.def ?? c[5] ?? 0) + Number(c.tempDefense || 0) + Number(c.tempBoostDef || 0));
-      var newAtk = curAtk + eqStats.atk;
-      var newDef = (c.kind === 'LINK') ? 'LINK' : (curDef + eqStats.def);
+      var newAtk = curAtk + tStats.atk;
+      var newDef = (c.kind === 'LINK') ? 'LINK' : (curDef + tStats.def);
 
       var num = (window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]) || 0;
       var imgSrc = (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) || '';
@@ -10160,7 +10165,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
       row.onclick = function() {
         overlay.remove();
-        executeEquip(eqCard, source, t, eqStats);
+        executeEquip(eqCard, source, t, tStats);
       };
 
       scrollList.appendChild(row);
