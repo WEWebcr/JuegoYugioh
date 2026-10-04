@@ -11181,7 +11181,14 @@ window.customShowMain = function() {
        let btnTrade = document.createElement('button');
     btnTrade.className = 'campBtn3000 ps1-btn'; btnTrade.textContent = 'TRADE';
     btnTrade.onmouseover = window.playHoverSound;
-    btnTrade.onclick = () => { window.playViolinClick(); alert("El modo TRADE estará disponible pronto."); };
+    btnTrade.onclick = () => {
+        window.playViolinClick();
+        if (typeof window.openTradeMode === 'function') {
+            window.openTradeMode();
+        } else {
+            alert("El modo TRADE no está disponible.");
+        }
+    };
     
     let btnOpt = document.createElement('button');
     btnOpt.className = 'campBtn3000 ps1-btn'; btnOpt.textContent = 'OPCIONES';
@@ -11194,6 +11201,585 @@ window.customShowMain = function() {
     btnContainer.appendChild(btnOpt);
     camp.appendChild(btnContainer);
 };
+
+// ════════════════════════════════════════════════════════════════
+//  SISTEMA DE INTERCAMBIO (TRADE) ENTRE JUGADORES ACTIVOS
+// ════════════════════════════════════════════════════════════════
+
+window.showLoginForTrade = function(onSuccess) {
+    let existingOverlay = document.getElementById('trade-login-overlay');
+    if (existingOverlay) existingOverlay.remove();
+
+    let overlay = document.createElement('div');
+    overlay.id = 'trade-login-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);z-index:10000001;display:flex;justify-content:center;align-items:center;font-family:VT323, monospace;';
+    
+    let box = document.createElement('div');
+    box.style.cssText = 'width: 440px; padding: 30px; display: flex; flex-direction: column; gap: 14px; background:rgba(10,12,18,0.97); border:4px solid #b8860b; border-radius: 8px; box-shadow: 0 0 30px rgba(255,215,0,0.4);';
+    
+    let curAcc = window.activeAccount || '';
+    box.innerHTML = `
+        <h2 style="color:#ffd700; font-size:26px; text-align:center; margin:0 0 5px; letter-spacing:2px;">IDENTIFICAR DUELISTA (TRADE)</h2>
+        <div style="color:#aaa; font-size:14px; text-align:center; margin-top:-5px;">Ingresa tus credenciales para acceder a la banca de intercambio</div>
+        <input type="text" id="trade-login-name" value="${curAcc}" placeholder="Nombre de jugador o Correo" style="padding:12px; background:#111; color:#fff; border:2px solid #555; font-family:inherit; font-size:18px; text-align:center;">
+        <input type="password" id="trade-login-pass" placeholder="Contraseña" style="padding:12px; background:#111; color:#fff; border:2px solid #555; font-family:inherit; font-size:18px; text-align:center;">
+        <div id="trade-login-msg" style="color:#ff5555; font-size:15px; min-height:18px; text-align:center;"></div>
+        <button id="trade-btn-do-login" style="width:100%; padding:14px; background:#006600; color:#fff; border:2px solid #00ff00; font-family:inherit; cursor:pointer; font-size:18px; font-weight:bold;">ENTRAR AL MODO TRADE</button>
+        <button id="trade-btn-close-login" style="width:100%; padding:12px; background:#660000; color:#fff; border:2px solid #ff0000; font-family:inherit; cursor:pointer; font-size:16px;">CANCELAR</button>
+    `;
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    let nameInput = document.getElementById('trade-login-name');
+    let passInput = document.getElementById('trade-login-pass');
+    let msgEl = document.getElementById('trade-login-msg');
+
+    async function handleLogin() {
+        window.playViolinClick && window.playViolinClick();
+        let name = nameInput.value.trim();
+        let pass = passInput.value.trim();
+        if (!name || !pass) {
+            msgEl.textContent = 'Llena todos los campos.';
+            return;
+        }
+        msgEl.style.color = '#ffcc00';
+        msgEl.textContent = 'Verificando duelista...';
+
+        try {
+            let res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, password: pass })
+            });
+            let data = await res.json();
+            if (!res.ok || data.error) {
+                msgEl.style.color = '#ff5555';
+                msgEl.textContent = data.error || 'Credenciales inválidas.';
+                return;
+            }
+            let save = data.save;
+            let actualName = (save && save.name) || name;
+            window.activeAccount = actualName;
+            window.currentPassword = pass;
+            window.memorySave = save;
+            try {
+                localStorage.setItem('FMR_ACTIVE_ACCOUNT', actualName);
+                sessionStorage.setItem('FMR_SESSION', JSON.stringify({ name: actualName, password: pass }));
+            } catch(_) {}
+            if (typeof origSet === 'function') {
+                origSet('FMR_SAVE_' + actualName, JSON.stringify(save));
+                origSet('FMR_REBORN_STORY_V3000', JSON.stringify(save));
+            }
+            overlay.remove();
+            if (typeof onSuccess === 'function') onSuccess();
+        } catch (e) {
+            // Fallback de login local si el servidor no responde
+            let localSaveStr = origGet ? (origGet('FMR_SAVE_' + name) || origGet('FMR_REBORN_STORY_V3000')) : null;
+            if (localSaveStr) {
+                try {
+                    let save = JSON.parse(localSaveStr);
+                    window.activeAccount = name;
+                    window.currentPassword = pass;
+                    window.memorySave = save;
+                    overlay.remove();
+                    if (typeof onSuccess === 'function') onSuccess();
+                    return;
+                } catch(_) {}
+            }
+            msgEl.style.color = '#ff5555';
+            msgEl.textContent = 'Error de conexión con el servidor.';
+        }
+    }
+
+    document.getElementById('trade-btn-do-login').onclick = handleLogin;
+    document.getElementById('trade-btn-close-login').onclick = () => {
+        window.playViolinClick && window.playViolinClick();
+        overlay.remove();
+    };
+    nameInput.onkeydown = (e) => { if (e.key === 'Enter') handleLogin(); };
+    passInput.onkeydown = (e) => { if (e.key === 'Enter') handleLogin(); };
+
+    setTimeout(() => {
+        if (!nameInput.value) nameInput.focus();
+        else passInput.focus();
+    }, 100);
+};
+
+window.openTradeMode = function() {
+    if (!window.activeAccount) {
+        window.showLoginForTrade(() => {
+            window.openTradeDashboard();
+        });
+    } else {
+        window.openTradeDashboard();
+    }
+};
+
+window.openTradeDashboard = function() {
+    let saveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+    let sStr = (typeof origGet === 'function' ? origGet(saveKey) : null) || (typeof origGet === 'function' ? origGet('FMR_REBORN_STORY_V3000') : null) || localStorage.getItem(saveKey);
+    let s = null;
+    try { if (sStr) s = JSON.parse(sStr); } catch(_) {}
+    if (!s && window.memorySave) s = window.memorySave;
+    if (!s) s = { collection: {}, deck: [], decks: {} };
+
+    s.collection = s.collection || {};
+    s.decks = s.decks || {};
+    s.deck = s.deck || [];
+    s.extra = s.extra || [];
+
+    if (typeof window.cleanSaveCollection === 'function') {
+        window.cleanSaveCollection(s);
+    }
+
+    function persistSave() {
+        if (typeof window.persistUserSave === 'function') {
+            window.persistUserSave(s);
+        } else {
+            let curSaveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+            let raw = JSON.stringify(s);
+            if (typeof origSet === 'function') {
+                origSet(curSaveKey, raw);
+                origSet('FMR_REBORN_STORY_V3000', raw);
+            } else {
+                localStorage.setItem(curSaveKey, raw);
+                localStorage.setItem('FMR_REBORN_STORY_V3000', raw);
+            }
+            if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(s);
+        }
+    }
+
+    // Calcula cuántas copias están en uso en cualquier deck del emisor
+    function getCopiesInDecks(cardName) {
+        let maxCount = 0;
+        if (Array.isArray(s.deck)) {
+            maxCount = Math.max(maxCount, s.deck.filter(c => c === cardName).length);
+        }
+        if (s.decks && typeof s.decks === 'object') {
+            Object.values(s.decks).forEach(dArr => {
+                if (Array.isArray(dArr)) {
+                    maxCount = Math.max(maxCount, dArr.filter(c => c === cardName).length);
+                }
+            });
+        }
+        if (Array.isArray(s.extra)) {
+            maxCount = Math.max(maxCount, s.extra.filter(c => c === cardName).length);
+        }
+        return maxCount;
+    }
+
+    let existingDashboard = document.getElementById('custom-trade-dashboard');
+    if (existingDashboard) existingDashboard.remove();
+
+    let overlay = document.createElement('div');
+    overlay.id = 'custom-trade-dashboard';
+    overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:#121216; z-index:9999999; display:flex; flex-direction:row; padding:20px; box-sizing:border-box; color:#fff; font-family:"Segoe UI", Arial, sans-serif;';
+
+    // Panel Izquierdo: Preview de Carta y Desglose de Stock
+    let leftSide = document.createElement('div');
+    leftSide.style.cssText = 'width: 330px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px; flex-shrink:0;';
+
+    let previewImgWrap = document.createElement('div');
+    previewImgWrap.style.cssText = 'width:100%; height: 430px; border: 3px solid #b8860b; border-radius: 8px; background: #000; overflow: hidden; display:flex; align-items:center; justify-content:center; box-shadow: 0 0 20px rgba(0,0,0,0.8);';
+    let previewImg = document.createElement('img');
+    previewImg.style.cssText = 'width:100%; height:100%; object-fit:contain; background:#000; display:block;';
+    previewImg.src = 'https://i.imgur.com/vHqR8Kq.png';
+    previewImgWrap.appendChild(previewImg);
+    leftSide.appendChild(previewImgWrap);
+
+    let infoBox = document.createElement('div');
+    infoBox.style.cssText = 'margin-top:14px; padding:12px; background:#1a1a24; border:1px solid #334466; border-radius:8px;';
+    infoBox.innerHTML = `
+        <div id="trade-preview-name" style="font-weight:bold; font-size:16px; color:#ffd700;">Selecciona una carta</div>
+        <div id="trade-preview-meta" style="font-size:12px; color:#aaa; margin-top:3px;">-</div>
+        <div id="trade-preview-stats" style="margin-top:6px; font-size:13px; font-weight:bold;">-</div>
+        <div id="trade-preview-desc" style="margin-top:8px; font-size:12px; color:#ddd; line-height:1.35; max-height:85px; overflow-y:auto;">Haz clic sobre una carta de la lista para inspeccionar sus detalles.</div>
+    `;
+    leftSide.appendChild(infoBox);
+
+    let stockBox = document.createElement('div');
+    stockBox.style.cssText = 'margin-top:10px; padding:12px; background:#221808; border:1px solid #b8860b; border-radius:8px; font-size:13px;';
+    stockBox.innerHTML = `
+        <div style="color:#ffd700; font-weight:bold; font-size:12px; letter-spacing:0.5px; border-bottom:1px solid #443311; padding-bottom:4px; margin-bottom:6px;">ESTADO DE COPIAS:</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+            <span style="color:#aaa;">Total en Colección:</span>
+            <b id="trade-stock-total" style="color:#fff;">-</b>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+            <span style="color:#aaa;">Asignadas a Barajas:</span>
+            <b id="trade-stock-decks" style="color:#81c784;">-</b>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:5px; padding-top:4px; border-top:1px dashed #554422;">
+            <span style="color:#00ffcc; font-weight:bold;">Excedente Transferible:</span>
+            <b id="trade-stock-available" style="color:#00ffcc; font-size:15px;">-</b>
+        </div>
+    `;
+    leftSide.appendChild(stockBox);
+    overlay.appendChild(leftSide);
+
+    // Panel Derecho: Encabezado, Selector de Destinatario, Filtros y Tabla
+    let rightSide = document.createElement('div');
+    rightSide.style.cssText = 'flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0;';
+    overlay.appendChild(rightSide);
+
+    // Encabezado
+    let header = document.createElement('div');
+    header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #b8860b; padding-bottom: 10px; margin-bottom: 12px;';
+    header.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:24px;">🏺</span>
+            <div>
+                <div style="font-family:VT323, monospace; color:#ffd700; font-size: 26px; text-shadow: 2px 2px 0 #000; letter-spacing:1px;">SISTEMA DE INTERCAMBIO (TRADE)</div>
+                <div style="font-size:12px; color:#aaa;">Transfiere cartas excedentes (>3 copias no asignadas a decks) a otros duelistas activos</div>
+            </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div style="background:#1b2416; border:1px solid #4caf50; border-radius:6px; padding:6px 12px; font-size:13px;">
+                👤 Duelista: <b style="color:#81c784;">${window.activeAccount || 'Invitado'}</b>
+            </div>
+            <button id="btn-trade-switch-user" style="background:#1b2838; color:#66c0f4; border:1px solid #4a90e2; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;">🔄 CAMBIAR DUELISTA</button>
+            <button id="btn-trade-exit" style="background:#8b0000; color:#fff; border:2px solid #ff4d4d; padding:8px 18px; border-radius:6px; cursor:pointer; font-weight:bold; font-family:VT323, monospace; font-size:16px;">VOLVER</button>
+        </div>
+    `;
+    rightSide.appendChild(header);
+
+    // Barra de Selección de Jugador Destinatario
+    let targetBar = document.createElement('div');
+    targetBar.style.cssText = 'background:linear-gradient(90deg, #161e2e 0%, #101520 100%); border:1px solid #3a5078; border-radius:8px; padding:10px 16px; margin-bottom:12px; display:flex; align-items:center; gap:14px; box-shadow:0 3px 8px rgba(0,0,0,0.4);';
+    targetBar.innerHTML = `
+        <span style="font-weight:bold; color:#66c0f4; font-size:13px; display:flex; align-items:center; gap:6px; white-space:nowrap;">
+            🎯 ENVIAR CARTA A:
+        </span>
+        <select id="trade-target-select" style="flex:1; max-width:320px; padding:8px 12px; background:#0b0f17; color:#fff; border:1px solid #4a6fa5; border-radius:4px; font-size:13px;">
+            <option value="">Cargando duelistas activos...</option>
+        </select>
+        <span style="color:#666; font-size:12px;">o escribir:</span>
+        <input type="text" id="trade-target-input" placeholder="Nombre exacto del duelista..." style="flex:1; max-width:260px; padding:8px 12px; background:#0b0f17; color:#fff; border:1px solid #4a6fa5; border-radius:4px; font-size:13px;">
+    `;
+    rightSide.appendChild(targetBar);
+
+    // Barra de Filtros y Búsqueda (Estilo Banca)
+    let filterBar = document.createElement('div');
+    filterBar.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px; flex-wrap:wrap;';
+    filterBar.innerHTML = `
+        <div style="display:flex; gap:10px; align-items:center;">
+            <input type="text" id="trade-search" placeholder="Buscar por nombre..." autocomplete="off" style="padding:8px 12px; border-radius:4px; border:1px solid #555; background:#222; color:#fff; font-family:'Segoe UI'; width:240px; font-size:14px;">
+            <select id="trade-f-type" style="padding:8px 10px; background:#222; color:#fff; border:1px solid #555; border-radius:4px; font-size:13px;">
+                <option value="">Todas las cartas</option>
+                <option value="MONSTER">Monstruos</option>
+                <option value="SPELL">Magias</option>
+                <option value="TRAP">Trampas</option>
+            </select>
+        </div>
+        <div id="trade-cards-counter" style="color:#00ffcc; font-weight:bold; font-size:13px; background:rgba(0,255,204,0.1); border:1px solid #00ffcc; border-radius:4px; padding:5px 12px;">
+            0 cartas disponibles para enviar
+        </div>
+    `;
+    rightSide.appendChild(filterBar);
+
+    // Contenedor de la Tabla (Banca de Trade)
+    let tableWrap = document.createElement('div');
+    tableWrap.style.cssText = 'flex:1; overflow-y:auto; border:1px solid #333; border-radius:6px; background:#16161c;';
+    tableWrap.innerHTML = `
+        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
+            <thead>
+                <tr style="background:#0d0d12; color:#ffd700; border-bottom:2px solid #b8860b; position:sticky; top:0; z-index:2;">
+                    <th style="padding:10px; width:50px;">#</th>
+                    <th style="padding:10px;">CARTA</th>
+                    <th style="padding:10px; width:120px;">TIPO</th>
+                    <th style="padding:10px; width:140px;">ATK / DEF</th>
+                    <th style="padding:10px; text-align:center; width:100px;">TOTAL</th>
+                    <th style="padding:10px; text-align:center; width:100px;">EN DECKS</th>
+                    <th style="padding:10px; text-align:center; width:110px;">DISPONIBLES</th>
+                    <th style="padding:10px; text-align:center; width:170px;">ACCIÓN</th>
+                </tr>
+            </thead>
+            <tbody id="trade-tbody"></tbody>
+        </table>
+    `;
+    rightSide.appendChild(tableWrap);
+
+    let tbody = tableWrap.querySelector('#trade-tbody');
+    let counterEl = filterBar.querySelector('#trade-cards-counter');
+    let targetSelect = targetBar.querySelector('#trade-target-select');
+    let targetInput = targetBar.querySelector('#trade-target-input');
+
+    // Cargar duelistas activos
+    async function loadActiveUsers() {
+        let options = [];
+        try {
+            let res = await fetch('/api/active-users');
+            let data = await res.json();
+            if (data && Array.isArray(data.users)) {
+                options = data.users.map(u => u.name);
+            }
+        } catch (_) {}
+
+        // Complementar con usuarios locales en localStorage
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                let k = localStorage.key(i);
+                if (k && k.startsWith('FMR_SAVE_')) {
+                    let uName = k.replace('FMR_SAVE_', '').trim();
+                    if (uName && !options.includes(uName)) options.push(uName);
+                }
+            }
+        } catch (_) {}
+
+        let myName = (window.activeAccount || '').toLowerCase().trim();
+        let filteredUsers = options.filter(n => n && n.toLowerCase().trim() !== myName);
+
+        targetSelect.innerHTML = '<option value="">-- Selecciona un duelista activo --</option>';
+        if (filteredUsers.length === 0) {
+            targetSelect.innerHTML += '<option value="" disabled>(No hay otros jugadores registrados)</option>';
+        } else {
+            filteredUsers.forEach(uName => {
+                let opt = document.createElement('option');
+                opt.value = uName;
+                opt.textContent = uName;
+                targetSelect.appendChild(opt);
+            });
+        }
+    }
+    loadActiveUsers();
+
+    targetSelect.onchange = () => {
+        if (targetSelect.value) targetInput.value = targetSelect.value;
+    };
+
+    function updatePreviewDetails(cardName, info, ownCount, inDecks, available) {
+        if (!info) return;
+        previewImg.src = info.imgUrl || 'https://i.imgur.com/vHqR8Kq.png';
+        let cardColor = info.isMonster ? '#ffd700' : (info.isTrap ? '#ff80ab' : '#4caf50');
+        
+        let pName = document.getElementById('trade-preview-name');
+        let pMeta = document.getElementById('trade-preview-meta');
+        let pStats = document.getElementById('trade-preview-stats');
+        let pDesc = document.getElementById('trade-preview-desc');
+        
+        if (pName) {
+            pName.textContent = info.name;
+            pName.style.color = cardColor;
+        }
+        if (pMeta) {
+            pMeta.textContent = `[${info.type}] ${info.attr !== '-' ? ' · ' + info.attr : ''}`;
+        }
+        if (pStats) {
+            pStats.innerHTML = info.isMonster ? `<span style="color:#ff5252;">⚔ ATK ${info.atk}</span> / <span style="color:#2196f3;">🛡 DEF ${info.def}</span>` : `<span style="color:${cardColor};">${info.type}</span>`;
+        }
+        if (pDesc) {
+            pDesc.textContent = info.desc || info.text || 'Sin descripción especial.';
+        }
+        let sTotal = document.getElementById('trade-stock-total');
+        let sDecks = document.getElementById('trade-stock-decks');
+        let sAvail = document.getElementById('trade-stock-available');
+        if (sTotal) sTotal.textContent = 'x' + ownCount;
+        if (sDecks) sDecks.textContent = 'x' + inDecks;
+        if (sAvail) sAvail.textContent = 'x' + available;
+    }
+
+    function renderTradeList() {
+        tbody.innerHTML = '';
+        let q = overlay.querySelector('#trade-search').value.toLowerCase().trim();
+        let fType = overlay.querySelector('#trade-f-type').value;
+
+        let tradeableList = [];
+        let collKeys = Object.keys(s.collection || {}).sort();
+
+        collKeys.forEach(cardName => {
+            let total = s.collection[cardName] || 0;
+            if (total <= 3) return; // REGLA: Debe tener más de 3 copias
+
+            let inDecks = getCopiesInDecks(cardName);
+            let minToKeep = Math.max(3, inDecks);
+            let available = total - minToKeep;
+            if (available <= 0) return; // REGLA: Copias que no estén en ningún deck
+
+            let meta = window.getCardMetadata ? window.getCardMetadata(cardName) : null;
+            if (!meta) return;
+
+            // Filtro de cartas no programadas
+            if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(meta)) return;
+
+            if (q && !cardName.toLowerCase().includes(q)) return;
+            if (fType === 'MONSTER' && !meta.isMonster) return;
+            if (fType === 'SPELL' && !meta.isSpell) return;
+            if (fType === 'TRAP' && !meta.isTrap) return;
+
+            tradeableList.push({
+                name: cardName,
+                meta: meta,
+                total: total,
+                inDecks: inDecks,
+                available: available
+            });
+        });
+
+        counterEl.textContent = `${tradeableList.length} carta${tradeableList.length === 1 ? '' : 's'} disponible${tradeableList.length === 1 ? '' : 's'} para enviar`;
+
+        if (tradeableList.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align:center; padding:36px; color:#888;">
+                        <div style="font-size:32px; margin-bottom:10px;">📦</div>
+                        <div style="font-size:16px; color:#ddd; font-weight:bold;">No tienes cartas transferibles disponibles</div>
+                        <div style="font-size:13px; color:#888; margin-top:6px; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.4;">
+                            Para intercambiar una carta, debes tener <b>más de 3 copias</b> en tu colección y las copias no deben estar en uso en ninguna de tus barajas.
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Seleccionar la primera por defecto para el preview
+        updatePreviewDetails(tradeableList[0].name, tradeableList[0].meta, tradeableList[0].total, tradeableList[0].inDecks, tradeableList[0].available);
+
+        tradeableList.forEach(item => {
+            let info = item.meta;
+            let cardColor = info.isMonster ? '#d4af37' : (info.isTrap ? '#ff80ab' : '#4caf50');
+
+            let tr = document.createElement('tr');
+            tr.style.cssText = 'border-bottom: 1px solid #2a2a38; transition: background 0.15s; cursor: pointer;';
+            tr.onmouseover = () => { tr.style.background = '#222230'; };
+            tr.onmouseout = () => { if (!tr.classList.contains('selected-row')) tr.style.background = 'transparent'; };
+            
+            tr.onclick = () => {
+                tbody.querySelectorAll('tr').forEach(r => {
+                    r.classList.remove('selected-row');
+                    r.style.background = 'transparent';
+                });
+                tr.classList.add('selected-row');
+                tr.style.background = '#2a2a3e';
+                updatePreviewDetails(item.name, info, item.total, item.inDecks, item.available);
+            };
+
+            let atkDef = info.isMonster ? `<span style="color:#ff5252;">${info.atk}</span> / <span style="color:#2196f3;">${info.def}</span>` : '-';
+
+            tr.innerHTML = `
+                <td style="padding:8px 10px; color:#888;">#${String(info.num).replace(/[^\d]/g, '').padStart(3, '0')}</td>
+                <td style="padding:8px 10px; font-weight:bold; color:${cardColor};">${item.name}</td>
+                <td style="padding:8px 10px; font-size:12px;">${info.type}</td>
+                <td style="padding:8px 10px;">${atkDef}</td>
+                <td style="padding:8px 10px; text-align:center; font-weight:bold; color:#fff;">x${item.total}</td>
+                <td style="padding:8px 10px; text-align:center; color:#81c784;">x${item.inDecks}</td>
+                <td style="padding:8px 10px; text-align:center; font-weight:bold; color:#00ffcc; font-size:14px;">x${item.available}</td>
+                <td style="padding:8px 10px; text-align:center;">
+                    <button class="btn-send-trade-action" style="background:linear-gradient(180deg, #00897b, #004d40); color:#fff; border:1px solid #26a69a; padding:6px 12px; border-radius:4px; font-weight:bold; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 5px rgba(0,0,0,0.5);">
+                        🔁 Enviar 1 Copia
+                    </button>
+                </td>
+            `;
+
+            let sendBtn = tr.querySelector('.btn-send-trade-action');
+            sendBtn.onclick = async (e) => {
+                e.stopPropagation();
+                let targetUser = (targetInput.value || targetSelect.value || '').trim();
+                if (!targetUser) {
+                    alert('Por favor selecciona o escribe el nombre del duelista destinatario.');
+                    targetInput.focus();
+                    return;
+                }
+                if (targetUser.toLowerCase() === (window.activeAccount || '').toLowerCase().trim()) {
+                    alert('No puedes transferirte cartas a ti mismo.');
+                    return;
+                }
+
+                let confirmed = confirm(`¿Estás seguro de que deseas transferir 1 copia de "${item.name}" al duelista "${targetUser}"?\n\nEsta carta se descontará de tu inventario y pasará a ser de su propiedad.`);
+                if (!confirmed) return;
+
+                sendBtn.disabled = true;
+                sendBtn.style.opacity = '0.5';
+                sendBtn.textContent = 'Transfiriendo...';
+
+                try {
+                    let res = await fetch('/api/trade', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            from: window.activeAccount,
+                            to: targetUser,
+                            cardName: item.name,
+                            password: window.currentPassword
+                        })
+                    });
+                    let data = await res.json();
+                    if (!res.ok || data.error) {
+                        throw new Error(data.error || 'Error del servidor en el intercambio.');
+                    }
+
+                    // Actualizar estado local del emisor
+                    s.collection[item.name] = (s.collection[item.name] || 1) - 1;
+                    if (s.collection[item.name] <= 0) delete s.collection[item.name];
+                    persistSave();
+
+                    // Si existe copia local en localStorage del receptor, actualizarla
+                    try {
+                        let recStr = origGet ? origGet('FMR_SAVE_' + targetUser) : localStorage.getItem('FMR_SAVE_' + targetUser);
+                        if (recStr) {
+                            let recSave = JSON.parse(recStr);
+                            recSave.collection = recSave.collection || {};
+                            recSave.collection[item.name] = (recSave.collection[item.name] || 0) + 1;
+                            if (origSet) origSet('FMR_SAVE_' + targetUser, JSON.stringify(recSave));
+                            else localStorage.setItem('FMR_SAVE_' + targetUser, JSON.stringify(recSave));
+                        }
+                    } catch(_) {}
+
+                    window.playViolinClick && window.playViolinClick();
+                    alert(`¡Transferencia exitosa!\n\nHas enviado 1 copia de "${item.name}" al duelista ${targetUser}.\nTe quedan ${s.collection[item.name] || 0} copias en tu colección.`);
+                    renderTradeList();
+                } catch (err) {
+                    // Fallback local: Si el servidor falla pero el receptor está guardado en este navegador
+                    let recStr = (typeof origGet === 'function' ? origGet('FMR_SAVE_' + targetUser) : null) || localStorage.getItem('FMR_SAVE_' + targetUser);
+                    if (recStr) {
+                        try {
+                            let recSave = JSON.parse(recStr);
+                            s.collection[item.name] = (s.collection[item.name] || 1) - 1;
+                            if (s.collection[item.name] <= 0) delete s.collection[item.name];
+                            persistSave();
+
+                            recSave.collection = recSave.collection || {};
+                            recSave.collection[item.name] = (recSave.collection[item.name] || 0) + 1;
+                            if (typeof origSet === 'function') origSet('FMR_SAVE_' + targetUser, JSON.stringify(recSave));
+                            else localStorage.setItem('FMR_SAVE_' + targetUser, JSON.stringify(recSave));
+
+                            window.playViolinClick && window.playViolinClick();
+                            alert(`¡Transferencia local realizada!\n\nHas enviado 1 copia de "${item.name}" al duelista ${targetUser}.\nTe quedan ${s.collection[item.name] || 0} copias en tu colección.`);
+                            renderTradeList();
+                            return;
+                        } catch(_) {}
+                    }
+                    alert('No se pudo realizar el intercambio: ' + err.message);
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.textContent = '🔁 Enviar 1 Copia';
+                }
+            };
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    overlay.querySelector('#trade-search').oninput = renderTradeList;
+    overlay.querySelector('#trade-f-type').onchange = renderTradeList;
+
+    header.querySelector('#btn-trade-switch-user').onclick = () => {
+        window.playViolinClick && window.playViolinClick();
+        window.showLoginForTrade(() => {
+            overlay.remove();
+            window.openTradeDashboard();
+        });
+    };
+
+    header.querySelector('#btn-trade-exit').onclick = () => {
+        window.playViolinClick && window.playViolinClick();
+        overlay.remove();
+    };
+
+    renderTradeList();
+    document.body.appendChild(overlay);
+};
+
 
 window.customShowPrologue = function(i) {
     // If the native code tries to show the prologue (e.g. from an old save format), we just skip it to map.
@@ -12764,7 +13350,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         
         let badge = document.createElement('div');
         badge.style.cssText = 'font-size:12px; color:#aaa; background:#111; padding:4px 10px; border-radius:12px; border:1px solid #444; margin-bottom:12px;';
-        badge.innerHTML = `Posees: <b style="color:#fff;">${ownCount}</b> / 3`;
+        badge.innerHTML = `Posees: <b style="color:#fff;">${ownCount}</b>`;
         cardBox.appendChild(badge);
         
         let chooseBtn = document.createElement('button');
@@ -12977,7 +13563,7 @@ window.customShowShop = function() {
             
             let ownCount = s.collection[item.name] || 0;
             let inDeck = counts[item.name] || 0;
-            let canBuy = (s.pm >= item.price) && (ownCount < 3);
+            let canBuy = (s.pm >= item.price);
             let canAddToDeck = (ownCount > inDeck) && (inDeck < 3);
             let canRemoveFromDeck = inDeck > 0;
             
@@ -12995,7 +13581,7 @@ window.customShowShop = function() {
                     ${atkDef}
                     <div style="margin-top:10px; color:#ffe082; font-size:13px; line-height:1.4;">${item.desc || info.desc}</div>
                     <div style="margin-top:12px; padding-top:8px; border-top:1px solid #444; font-size:12px; color:#ccc;">
-                        En Colección: <b style="color:#fff;">${ownCount}</b>/3 · En tu Deck: <b style="color:#81c784;">${inDeck}</b>
+                        En Colección: <b style="color:#fff;">${ownCount}</b> · En tu Deck: <b style="color:#81c784;">${inDeck}</b>/3
                     </div>
                 `;
             };
@@ -13010,14 +13596,14 @@ window.customShowShop = function() {
                 <td style="padding: 10px 12px;">${statDisplay}</td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold; color:#ffd700;">${item.price} PM</td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold;">
-                    <span style="color:${ownCount > 0 ? '#fff' : '#666'}">${ownCount}/3</span>
+                    <span style="color:${ownCount > 0 ? '#fff' : '#666'}">x${ownCount}</span>
                 </td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold;">
                     <span style="color:${inDeck > 0 ? '#81c784' : '#666'}">${inDeck}</span>
                 </td>
                 <td style="padding: 10px 12px; text-align:center; white-space:nowrap;">
                     <button class="shop-buy-btn" style="background:${canBuy ? 'linear-gradient(180deg, #ffd700, #b8860b)' : '#444'}; color:${canBuy ? '#000' : '#888'}; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; font-size:12px; cursor:${canBuy ? 'pointer' : 'not-allowed'}; margin-right:5px;">
-                        ${ownCount >= 3 ? 'MÁXIMO' : s.pm < item.price ? 'SIN PM' : '🛒 COMPRAR'}
+                        ${s.pm < item.price ? 'SIN PM' : '🛒 COMPRAR'}
                     </button>
                     <button class="shop-add-btn" style="background:#2e7d32; color:#fff; border:none; padding:7px 10px; border-radius:4px; font-weight:bold; font-size:12px; cursor:${canAddToDeck ? 'pointer' : 'not-allowed'}; opacity:${canAddToDeck ? '1' : '0.4'}; margin-right:4px;" title="Equipar al Deck">
                         ➕ AL DECK

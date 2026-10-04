@@ -805,6 +805,141 @@ app.delete('/api/saves/:name', requireAdmin, async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════
+//  SISTEMA DE INTERCAMBIO (TRADE) ENTRE JUGADORES ACTIVOS
+// ════════════════════════════════════════════════════════════════
+
+// Listar duelistas activos para intercambio  GET /api/active-users
+app.get('/api/active-users', async (req, res) => {
+  try {
+    const allUsers = await db.getAllUsers();
+    const activeList = allUsers
+      .filter(u => u && u.name)
+      .map(u => ({
+        name: u.name,
+        lastPlayed: u.lastPlayed || 0,
+        cardsCount: u.collection ? Object.keys(u.collection).length : 0
+      }))
+      .sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
+    res.json({ ok: true, users: activeList });
+  } catch (err) {
+    console.error('[Trade Users Error]', err);
+    res.status(500).json({ error: 'Error al obtener lista de duelistas' });
+  }
+});
+
+// Intercambio de cartas entre jugadores  POST /api/trade
+app.post('/api/trade', async (req, res) => {
+  try {
+    const { from, to, cardName, password } = req.body;
+    if (!from || !to || !cardName) {
+      return res.status(400).json({ error: 'Datos incompletos para el intercambio (from, to, cardName requeridos).' });
+    }
+    const cleanFrom = String(from).trim();
+    const cleanTo = String(to).trim();
+    const cleanCard = String(cardName).trim();
+
+    if (cleanFrom.toLowerCase() === cleanTo.toLowerCase()) {
+      return res.status(400).json({ error: 'No puedes realizar un intercambio contigo mismo.' });
+    }
+
+    const senderSave = await readSave(cleanFrom);
+    if (!senderSave) {
+      return res.status(404).json({ error: `El jugador emisor "${cleanFrom}" no existe.` });
+    }
+
+    if (password && senderSave.passwordHash) {
+      if (senderSave.passwordHash !== hashPassword(password)) {
+        return res.status(401).json({ error: 'Contraseña incorrecta del jugador emisor.' });
+      }
+    }
+
+    const receiverSave = await readSave(cleanTo);
+    if (!receiverSave) {
+      return res.status(404).json({ error: `El jugador receptor "${cleanTo}" no existe en el sistema.` });
+    }
+
+    senderSave.collection = senderSave.collection || {};
+    receiverSave.collection = receiverSave.collection || {};
+
+    const totalCopies = senderSave.collection[cleanCard] || 0;
+    if (totalCopies <= 3) {
+      return res.status(400).json({
+        error: `Solo puedes intercambiar cartas de las cuales tengas más de 3 copias. Actualmente tienes ${totalCopies} de "${cleanCard}".`
+      });
+    }
+
+    let copiesInDecks = 0;
+    if (Array.isArray(senderSave.deck)) {
+      copiesInDecks = Math.max(copiesInDecks, senderSave.deck.filter(c => c === cleanCard).length);
+    }
+    if (senderSave.decks && typeof senderSave.decks === 'object') {
+      Object.values(senderSave.decks).forEach(dArr => {
+        if (Array.isArray(dArr)) {
+          copiesInDecks = Math.max(copiesInDecks, dArr.filter(c => c === cleanCard).length);
+        }
+      });
+    }
+    if (Array.isArray(senderSave.extra)) {
+      copiesInDecks = Math.max(copiesInDecks, senderSave.extra.filter(c => c === cleanCard).length);
+    }
+
+    const minToKeep = Math.max(3, copiesInDecks);
+    const availableToTrade = totalCopies - minToKeep;
+
+    if (availableToTrade < 1) {
+      return res.status(400).json({
+        error: `No tienes copias excedentes transferibles de "${cleanCard}". Tienes ${totalCopies} en total, pero ${copiesInDecks} están asignadas a tus decks y debes conservar al menos 3.`
+      });
+    }
+
+    senderSave.collection[cleanCard] = totalCopies - 1;
+    if (senderSave.collection[cleanCard] <= 0) {
+      delete senderSave.collection[cleanCard];
+    }
+
+    receiverSave.collection[cleanCard] = (receiverSave.collection[cleanCard] || 0) + 1;
+
+    const tradeEntry = {
+      timestamp: Date.now(),
+      card: cleanCard,
+      from: cleanFrom,
+      to: cleanTo
+    };
+    senderSave.tradeHistory = senderSave.tradeHistory || [];
+    senderSave.tradeHistory.push({ ...tradeEntry, type: 'SENT' });
+    receiverSave.tradeHistory = receiverSave.tradeHistory || [];
+    receiverSave.tradeHistory.push({ ...tradeEntry, type: 'RECEIVED' });
+
+    await db.saveUser(senderSave);
+    await db.saveUser(receiverSave);
+
+    try {
+      fs.writeFileSync(savePath(cleanFrom), JSON.stringify(senderSave, null, 2), 'utf8');
+      fs.writeFileSync(savePath(cleanTo), JSON.stringify(receiverSave, null, 2), 'utf8');
+    } catch (_) {}
+
+    syncSaveToGitHub(senderSave).catch(() => {});
+    syncSaveToGitHub(receiverSave).catch(() => {});
+
+    console.log(`[Trade] Transferida carta "${cleanCard}" de ${cleanFrom} a ${cleanTo}. Restantes en emisor: ${senderSave.collection[cleanCard] || 0}`);
+
+    res.json({
+      ok: true,
+      success: true,
+      cardName: cleanCard,
+      from: cleanFrom,
+      to: cleanTo,
+      senderRemaining: senderSave.collection[cleanCard] || 0,
+      receiverTotal: receiverSave.collection[cleanCard]
+    });
+  } catch (err) {
+    console.error('[Trade Error]', err);
+    res.status(500).json({ error: 'Error procesando el intercambio: ' + err.message });
+  }
+});
+
+
+// ════════════════════════════════════════════════════════════════
 //  ADMIN AUTHENTICATION & SECURITY
 // ════════════════════════════════════════════════════════════════
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
