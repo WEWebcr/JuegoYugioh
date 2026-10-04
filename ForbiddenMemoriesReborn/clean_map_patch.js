@@ -3332,13 +3332,36 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     const NEW_REWARD_MONSTERS = [
         'Seiyaryu', 'Three-legged Zombies', 'Zera The Mant', 'Flying Penguin',
         'Millennium Shield', "Fairy's Gift", 'Black Luster Soldier', "Fiend's Mirror",
-        'Labyrinth Wall', 'Jirai Gumo', 'Shadow Ghoul', 'Wall Shadow'
+        'Labyrinth Wall', 'Jirai Gumo', 'Shadow Ghoul', 'Wall Shadow',
+        'Labyrinth Tank', 'Sanga of the Thunder', 'Kazejin', 'Suijin',
+        'Dungeon Worm', 'Monster Tamer', 'Ryu-kishin Powered', 'Swordstalker',
+        'La Jinn the Mystical Genie', 'Toon Alligator', 'Rude Kaiser', 'Parrot Dragon',
+        'Dark Rabbit', 'Bickuribox', "Harpie's Pet Dragon", 'Mystic Lamp',
+        'Pendulum Machine', 'Giltia the D. Knight', 'Launcher Spider', 'Zone Eater',
+        'Aqua Dragon', 'Sea King Dragon', 'Turu-Purun', 'Guardian of the Sea',
+        'Aqua Snake', 'Giant Red Seasnake', 'Spike Seadra', '30,000-Year White Turtle',
+        'Kappa Avenger', 'Kanikabuto', 'Zarigun', 'Millennium Golem',
+        'Destroyer Golem', 'Barrel Rock', 'Minomushi Warrior', 'Stone Ghost',
+        'Kaminari Attack', 'Tripwire Beast', 'Bolt Escargot', 'Bolt Penguin',
+        'The Immortal of Thunder', 'Electric Snake', 'Wing Eagle', 'Punished Eagle',
+        'Performance of Sword', 'Hungry Burger', 'Sengenjin', 'Skull Guardian',
+        'Tri-Horned Dragon', 'Serpent Night Dragon', 'Skull Knight', 'Cosmo Queen',
+        'Chakra', 'Crab Turtle', 'Mikazukinoyaiba'
     ];
     window.NEW_REWARD_MONSTERS = NEW_REWARD_MONSTERS;
     NEW_REWARD_MONSTERS.forEach(m => {
         if (!cardPool.includes(m)) cardPool.push(m);
     });
-    
+
+    // REGLAS ESPECIALES DE RECOMPENSAS:
+    // 1. Blue-Eyes Ultimate Dragon y Gate Guardian SOLO son recompensas de rango muy raro para Seto Kaiba y Yugi.
+    // 2. Zoa y Metalzoa también son recompensas muy raras.
+    const ULTRA_RARE_BOSS_CARDS = ['Blue-Eyes Ultimate Dragon', 'Gate Guardian'];
+    const VERY_RARE_CARDS = ['Zoa', 'Metalzoa'];
+
+    // Asegurar que NO aparezcan en el cardPool general de otros duelistas
+    cardPool = cardPool.filter(c => !ULTRA_RARE_BOSS_CARDS.includes(c) && !VERY_RARE_CARDS.includes(c));
+
     // Shuffle pool and select 3 cards
     let shuffled = [...cardPool].sort(() => 0.5 - Math.random());
     let candidates = shuffled.filter(c => (s.collection[c] || 0) < 3);
@@ -3354,13 +3377,40 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
 
     // Asegurar alta probabilidad de ofrecer los nuevos monstruos y trampas clásicas como recompensas
     if (Math.random() < 0.85 && selected3.length > 0) {
-        // Priorizar monstruos solicitados si aún no se tienen 3 copias
         let unownedMonsters = NEW_REWARD_MONSTERS.filter(m => (s.collection[m] || 0) < 3);
         let unownedTraps = NEW_REWARD_TRAPS.filter(t => (s.collection[t] || 0) < 3);
         let poolFeatured = (unownedMonsters.length > 0 && Math.random() < 0.6) ? unownedMonsters : (unownedTraps.length > 0 ? unownedTraps : NEW_REWARD_MONSTERS);
         let bonusReward = poolFeatured[Math.floor(Math.random() * poolFeatured.length)];
         if (bonusReward && !selected3.includes(bonusReward)) {
             selected3[selected3.length - 1] = bonusReward;
+        }
+    }
+
+    // APLICACIÓN DE REGLAS DE RECOMPENSAS MUY RARAS:
+    let rankStr = String(rank || '').toUpperCase();
+    let isHighRank = rankStr.includes('S') || rankStr.includes('A');
+    let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    let isKaibaOrYugi = (normalizedOpp === 'kaiba' || normalizedOpp === 'seto' || normalizedOpp === 'yugi' || normalizedOpp === 'atem');
+
+    // Blue-Eyes Ultimate Dragon y Gate Guardian: solo Seto Kaiba y Yugi, rango S o A, probabilidad muy rara (~5%)
+    if (isKaibaOrYugi && isHighRank && Math.random() < 0.06 && selected3.length > 0) {
+        let unownedBoss = ULTRA_RARE_BOSS_CARDS.filter(c => (s.collection[c] || 0) < 3);
+        let bossChoice = unownedBoss.length > 0
+            ? unownedBoss[Math.floor(Math.random() * unownedBoss.length)]
+            : ULTRA_RARE_BOSS_CARDS[Math.floor(Math.random() * ULTRA_RARE_BOSS_CARDS.length)];
+        if (bossChoice && !selected3.includes(bossChoice)) {
+            selected3[0] = bossChoice; // Posición de honor para la recompensa suprema
+        }
+    }
+
+    // Zoa y Metalzoa: recompensas muy raras (~4% de probabilidad en duelos de rango S o A)
+    if (isHighRank && Math.random() < 0.05 && selected3.length > 0) {
+        let unownedVR = VERY_RARE_CARDS.filter(c => (s.collection[c] || 0) < 3);
+        let vrChoice = unownedVR.length > 0
+            ? unownedVR[Math.floor(Math.random() * unownedVR.length)]
+            : VERY_RARE_CARDS[Math.floor(Math.random() * VERY_RARE_CARDS.length)];
+        if (vrChoice && !selected3.includes(vrChoice)) {
+            selected3[selected3.length - 1] = vrChoice;
         }
     }
     
@@ -7765,8 +7815,25 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (handCard) {
       var selName = handCard.name || handCard[0] || '';
       if (isEgyptianGod(selName)) {
-        duelToast('Los Dioses Egipcios no pueden colocarse boca abajo; requieren Invocación en Ataque tributando 3 monstruos.');
-        return;
+        var tributes = [];
+        for (var ti = 0; ti < (g.field || []).length; ti++) {
+          if (g.field[ti]) tributes.push(ti);
+        }
+        if (tributes.length < 3) {
+          duelToast('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere tributar 3 monstruos en tu campo para colocarse!');
+          if (typeof log === 'function') log('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere 3 tributos en el campo para colocarse!');
+          return;
+        }
+        // Send 3 tributes to graveyard
+        for (var k = 0; k < 3; k++) {
+          var tIdx = tributes[k];
+          var tMon = g.field[tIdx];
+          if (tMon && Array.isArray(g.grave)) {
+            g.grave.push(Object.assign({}, tMon, { faceUp: true }));
+          }
+          g.field[tIdx] = null;
+        }
+        if (typeof log === 'function') log('Tributaste 3 monstruos para colocar a ' + (handCard.name || 'Dios Egipcio') + ' en DEFENSA.');
       }
     }
     var savedEquip = Number(handCard ? (handCard._handEquipAtk || handCard.equip || 0) : 0);
@@ -7800,6 +7867,27 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
   };
   window.setMonster = window.setMonster103;
+
+  // Interceptor global en fase de captura para el botón SET (#setMonsterBtn103):
+  document.addEventListener('click', function(e) {
+    var btn = e.target && (e.target.id === 'setMonsterBtn103' || (typeof e.target.closest === 'function' && e.target.closest('#setMonsterBtn103')));
+    if (btn) {
+      var g = (typeof game !== 'undefined' && game) ? game : window.game;
+      if (!g || g.turn !== 'player') return;
+      var sel = (g.selected || []).find(function(x) { return x && x[0] === 'h'; });
+      var handCard = (sel && g.hand) ? g.hand[sel[1]] : null;
+      if (handCard && typeof isEgyptianGod === 'function' && isEgyptianGod(handCard.name || handCard[0])) {
+        var tributes = (g.field || []).filter(Boolean);
+        if (tributes.length < 3) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          duelToast('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere tributar 3 monstruos en tu campo para colocarse!');
+          if (typeof log === 'function') log('¡' + (handCard.name || 'El Dios Egipcio') + ' requiere 3 tributos en el campo para colocarse!');
+          return false;
+        }
+      }
+    }
+  }, true);
   try { setMonster103 = window.setMonster103; setMonster = window.setMonster; } catch(_) {}
 
   // AI 3-Tribute Hook & Ultra-Aggressive Summoning for Egyptian Gods

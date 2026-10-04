@@ -55,6 +55,8 @@ html = html.replace('function showMap(){', 'function showMap(){ if(window.custom
 html = html.replace('function showMain(){', 'function showMain(){ if(window.customShowMain){ window.customShowMain(); return; }');
 html = html.replace('function showPrologue(i){', 'function showPrologue(i){ if(window.customShowPrologue){ window.customShowPrologue(i); return; }');
 html = html.replace('function finishStoryDuel(win){', 'function finishStoryDuel(win){ if(!storyDuelActive||duelHandled) return; duelHandled=true; storyDuelActive=false; window.storyDuelActive=false; storyDeckReady=false; if(window.customFinishStoryDuel){ window.customFinishStoryDuel(win); return; }');
+html = html.replace("b.addEventListener('click',setMonster103);", "b.addEventListener('click',function(e){ if(typeof window.setMonster103==='function') return window.setMonster103.apply(this,arguments); return setMonster103.apply(this,arguments); });");
+html = html.replace("function setMonster103(){", "function setMonster103(){ if(window.setMonster103 && window.setMonster103!==setMonster103) return window.setMonster103.apply(this,arguments);");
 html = html.replace('function loadGame(){if(memorySave)return memorySave;try{const x=localStorage.getItem(SAVE_KEY);', 'function loadGame(){try{const k=window.activeAccount?("FMR_SAVE_"+window.activeAccount):SAVE_KEY;const x=localStorage.getItem(k)||localStorage.getItem(SAVE_KEY);if(x)memorySave=JSON.parse(x);return memorySave;}catch(_){}if(memorySave)return memorySave;try{const x=localStorage.getItem(SAVE_KEY);');
 html = html.replace('function log(t){', 'function log(t){ if(window.customLog) window.customLog(t); ');
 html = html.replace('function paint96(p){', 'function paint96(p){ if(window.onPhaseChange) window.onPhaseChange(p); ');
