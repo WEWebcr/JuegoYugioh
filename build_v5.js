@@ -2,7 +2,7 @@ const fs = require('fs');
 let html = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/FMR_V3_0_7_BANDAI1998_MENU.html', 'utf8');
 
 // 1. Fix native missing <script> tag before V3.0.5
-html = html.replace('</script>\n/* V3.0.5', '</script>\n<script>\n/* V3.0.5');
+html = html.replace(/(<\/script>\s*\r?\n)(\s*\/\*\s*V3\.0\.5)/i, (m, p1, p2) => m.includes('<script>') ? m : p1 + '<script>\n' + p2);
 
 // 1.5 Neutralize legacy background audio (menu_principal.mp3, muteAll, menuMusic)
 html = html.replace("audio=new Audio('assets/menu_principal.mp3');", "audio=null; return null;");
