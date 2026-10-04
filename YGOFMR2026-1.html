@@ -21533,13 +21533,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var trapType = null;
       var trapDesc = '';
 
-      if (val === 'CRUSH_CARD_VIRUS' || name === 'Crush Card Virus') {
+      var valUpper = String(val || '').toUpperCase();
+      var normLower = String(name || '').toLowerCase().trim();
+
+      if (valUpper === 'CRUSH_CARD_VIRUS' || normLower === 'crush card virus' || normLower === 'crush card') {
         trapType = 'CRUSH_CARD_VIRUS';
         trapDesc = 'Destruye todos los monstruos en el campo rival.';
-      } else if (val === 'NEGATE_ATTACK' || name === 'Negate Attack') {
+      } else if (valUpper === 'NEGATE_ATTACK' || normLower === 'negate attack' || normLower === 'negar el ataque') {
         trapType = 'NEGATE_ATTACK';
         trapDesc = 'Niega el ataque y termina la Battle Phase rival.';
-      } else if (val === 'WABOKU' || name === 'Waboku') {
+      } else if (valUpper === 'WABOKU' || normLower === 'waboku') {
         if (!g._wabokuActiveThisTurn) {
           trapType = 'WABOKU';
           trapDesc = 'Tus monstruos y LP no reciben daño de batalla este turno.';
@@ -21789,8 +21792,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             } else if (chosenTrap.type === 'NEGATE_ATTACK') {
               if (attackerIsGod) {
                 duelToast('¡Negate Attack falla contra Dios Egipcio!');
+                if (typeof log === 'function') log('¡Negate Attack no puede detener al Dios Egipcio ' + (e.name || 'Dios') + '!');
               } else {
                 (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
+                if (typeof window.showTrap114 === 'function') window.showTrap114('Negate Attack', '¡Ataque negado y Battle Phase rival terminada!');
                 if (typeof render === 'function') render();
                 duelToast('¡Negate Attack activado! Ataque negado y Battle Phase rival terminada.');
                 if (typeof log === 'function') log('¡Negate Attack! Niega el ataque y termina la Battle Phase.');
@@ -21799,6 +21804,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             } else if (chosenTrap.type === 'WABOKU') {
               game._wabokuActiveThisTurn = true;
               game._wabokuActiveTurn = game.turnNo;
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Waboku', '¡Tus monstruos y LP están protegidos contra daño de batalla este turno!');
               if (typeof render === 'function') render();
               duelToast('¡Waboku activado! Tus monstruos y LP están protegidos.');
               if (typeof log === 'function') log('¡Waboku activado! No habrá daño este turno, pero el rival continúa atacando.');
@@ -22112,8 +22118,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           } else if (chosenTrap.type === 'NEGATE_ATTACK') {
             if (attackerIsGod) {
               duelToast('¡Negate Attack falla contra Dios Egipcio!');
+              if (typeof log === 'function') log('¡Negate Attack no puede detener al Dios Egipcio ' + (e.name || 'Dios') + '!');
             } else {
               (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
+              if (typeof window.showTrap114 === 'function') window.showTrap114('Negate Attack', '¡Ataque negado y Battle Phase rival terminada!');
               if (typeof render === 'function') render();
               duelToast('¡Negate Attack activado! Ataque negado y Battle Phase rival terminada.');
               if (typeof log === 'function') log('¡Negate Attack! Niega el ataque y termina la Battle Phase.');
@@ -22122,6 +22130,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           } else if (chosenTrap.type === 'WABOKU') {
             game._wabokuActiveThisTurn = true;
             game._wabokuActiveTurn = game.turnNo;
+            if (typeof window.showTrap114 === 'function') window.showTrap114('Waboku', '¡Tus monstruos y LP están protegidos contra daño de batalla este turno!');
             if (typeof render === 'function') render();
             duelToast('¡Waboku activado! Tus monstruos y LP están protegidos.');
             if (typeof log === 'function') log('¡Waboku activado! No habrá daño este turno, pero el rival continúa atacando.');
@@ -22853,51 +22862,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     try { stHTML = window.stHTML; } catch(_) {}
   }
 
-  // Hook autoPlayerTrapAtEnemyBP60 as backup trap trigger
-  var prevAutoBP60 = window.autoPlayerTrapAtEnemyBP60;
+  // Disable automatic trap triggering in autoPlayerTrapAtEnemyBP60
+  // All battle traps (Negate Attack, Waboku, Mirror Force, Sakuretsu Armor, etc.)
+  // must be prompted interactively in aiBattle via promptPlayerBattleTrap ONLY when an attack is declared!
+  // If the opponent does not attack, traps remain SET and never activate when passing to End Phase.
   window.autoPlayerTrapAtEnemyBP60 = async function() {
-    if (game && game.turn === 'enemy') {
-      var ei = (game.enemy || []).findIndex(function(c) { return c && (c.pos === 'ATK' || c.kind === 'LINK'); });
-      if (ei < 0) ei = (game.enemy || []).findIndex(Boolean);
-      var attacker = ei >= 0 ? game.enemy[ei] : null;
-      var attackerIsGod = attacker && isEgyptianGod(attacker.name || attacker[0]);
-
-      var negIdx = (game.playerBack || []).findIndex(function(c) {
-        return c && c.set && (c.value === 'NEGATE_ATTACK' || c.name === 'Negate Attack');
-      });
-      if (negIdx >= 0) {
-        if (attackerIsGod) {
-          duelToast('¡Negate Attack falla! ¡El ataque del Dios Egipcio no puede ser negado!');
-          if (typeof log === 'function') log('¡Negate Attack no puede detener al Dios Egipcio ' + (attacker.name || 'Dios') + '!');
-        } else {
-          var trapN = game.playerBack[negIdx];
-          game.playerBack[negIdx] = null;
-          game.grave.push(Object.assign({}, trapN, { set: false, faceUp: true }));
-          (game.enemy || []).forEach(function(x) { if (x) x.attackedTurn = game.turnNo; });
-          if (typeof render === 'function') render();
-          if (typeof window.showTrap114 === 'function') window.showTrap114('Negate Attack', 'El ataque fue negado y la Battle Phase rival terminó.');
-          duelToast('¡Negate Attack activado! El ataque fue negado y la Battle Phase rival terminó.');
-          if (typeof log === 'function') log('¡Negate Attack! Niega el ataque y termina la Battle Phase.');
-          return true;
-        }
-      }
-      var wabIdx = (game.playerBack || []).findIndex(function(c) {
-        return c && c.set && (c.value === 'WABOKU' || c.name === 'Waboku');
-      });
-      if (wabIdx >= 0) {
-        var trapW = game.playerBack[wabIdx];
-        game.playerBack[wabIdx] = null;
-        game.grave.push(Object.assign({}, trapW, { set: false, faceUp: true }));
-        game._wabokuActiveThisTurn = true;
-        game._wabokuActiveTurn = game.turnNo;
-        if (typeof render === 'function') render();
-        if (typeof window.showTrap114 === 'function') window.showTrap114('Waboku', 'Tus monstruos y LP están protegidos este turno.');
-        duelToast('¡Waboku activado! Tus monstruos y LP están protegidos contra daño de batalla.');
-        if (typeof log === 'function') log('¡Waboku! No habrá daño ni destrucción por batalla este turno.');
-        return true;
-      }
-    }
-    if (prevAutoBP60) return await prevAutoBP60.apply(this, arguments);
     return false;
   };
 
