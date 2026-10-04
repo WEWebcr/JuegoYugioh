@@ -7056,7 +7056,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     g.battlePhaseStarted = false;
     g.duelOver = false;
     g._storyResult3000 = null;
-    g._turnStarts67 = { player: 0, enemy: 0 };
+    g._turnStarts67 = { player: (g.first === "player" ? 1 : 0), enemy: (g.first === "enemy" ? 1 : 0) };
     g._aiPlan108 = null;
 
     // Robar 5 cartas iniciales legítimas
@@ -13861,3 +13861,36 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
   };
   try { endTurn = window.endTurn; } catch(_) {}
+
+  // Robo automático de inicio de turno:
+  // - En turno 1: quien va primero ya tiene 5 cartas (no roba); quien va segundo roba hasta 6 cartas.
+  // - En turnos subsiguientes (turnNo > 1): el jugador siempre roba al inicio de su turno hasta completar 5 cartas.
+  window.startTurnDraw67 = function(side) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g || g.duelOver) return false;
+    var hand = side === 'enemy' ? g.enemyHand : g.hand;
+    var deck = side === 'enemy' ? g.enemyDeck : g.deck;
+    var label = side === 'enemy' ? 'El rival' : 'Tú';
+    g._turnStarts67 = g._turnStarts67 || { player: 0, enemy: 0 };
+    var n = g._turnStarts67[side] || 0;
+    var need = 0;
+    if (g.turnNo > 1) {
+      need = Math.max(0, 5 - (hand ? hand.length : 0));
+    } else if (n === 0) {
+      need = (g.first === side) ? 0 : Math.max(0, 6 - (hand ? hand.length : 0));
+    } else {
+      need = Math.max(0, 5 - (hand ? hand.length : 0));
+    }
+    g._turnStarts67[side] = n + 1;
+    for (var k = 0; k < need; k++) {
+      if (!deck || !deck.length) {
+        if (typeof finishDeckOut67 === 'function') finishDeckOut67(side);
+        return false;
+      }
+      hand.push(deck.pop());
+      if (typeof render === 'function') render();
+      if (typeof log === 'function') log(label + ' roba 1 carta' + (need > 1 ? ' (' + (k + 1) + '/' + need + ')' : '') + '.');
+    }
+    return true;
+  };
+  try { startTurnDraw67 = window.startTurnDraw67; } catch(_) {}

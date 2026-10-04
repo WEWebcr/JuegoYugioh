@@ -2553,7 +2553,7 @@ aiStart=function(){
    aiBattle();render();await wait50(1600);
    game.turn='player';game.handSummoned=false;game.firstTurn=false;game.turnNo++;
    enemyRunning50=false;
-   if(!startTurnDraw67('player'))return;
+   if(!(window.startTurnDraw67||startTurnDraw67)('player'))return;
    render();log('Fin del turno rival. Comienza tu turno.');playerHand50();stamp54();
  }
  beginEnemyTurn52=function(){if(!game||game.turn!=='enemy'||enemyRunning50)return;game.selected=[];showEnemyHand54(-1);setTimeout(enemyTurn54,350);};
@@ -2584,16 +2584,20 @@ aiStart=function(){
    const b=document.getElementById('handCountBadge');if(b)b.textContent=game.enemyHand.length;
  }
  function startTurnDraw67(side){
+   if(typeof window.startTurnDraw67==='function'&&window.startTurnDraw67!==startTurnDraw67){
+     return window.startTurnDraw67(side);
+   }
    if(!game||game.duelOver)return false;
    const hand=side==='enemy'?game.enemyHand:game.hand;
    const deck=side==='enemy'?game.enemyDeck:game.deck;
    const label=side==='enemy'?'El rival':'Tú';
    game._turnStarts67=game._turnStarts67||{player:0,enemy:0};
    const n=game._turnStarts67[side]||0;
-   /* Primer turno de quien inició: 5 iniciales y no roba. Primer turno del segundo: roba 1 y puede quedar en 6. */
+   /* Primer turno de quien inició: 5 iniciales y no roba. Primer turno del segundo: roba 1 y puede quedar en 6. A partir del turno 2 en adelante: roba hasta tener 5. */
    let need=0;
-   if(n===0){ need=(game.first===side)?0:1; }
-   else { need=Math.max(0,5-hand.length); }
+   if(game.turnNo > 1){ need=Math.max(0, 5 - hand.length); }
+   else if(n===0){ need=(game.first===side)?0:Math.max(0, 6 - hand.length); }
+   else { need=Math.max(0, 5 - hand.length); }
    game._turnStarts67[side]=n+1;
    for(let k=0;k<need;k++){
      if(!deck.length){
@@ -2622,14 +2626,14 @@ aiStart=function(){
    const bRes = (window.aiBattle || aiBattle)(); if (bRes && typeof bRes.then === 'function') await bRes; render(); await sleep58(1500);
    game.turn='player';game.handSummoned=false;game.battlePhaseStarted=false;game.firstTurn=false;game.turnNo++;
    running58=false;enemyRunning50=false;
-   if(!startTurnDraw67('player'))return;
+   if(!(window.startTurnDraw67||startTurnDraw67)('player'))return;
    render();log('Fin del turno rival. Comienza tu turno.');playerHand50();stamp58();
  }
  function startRival58(){
    if(!game||game.turn!=='player'||running58)return;
    game.selected=[];game.turn='enemy';
    log('Turno del rival...');
-   if(!startTurnDraw67('enemy')){running58=false;enemyRunning50=false;return;}
+   if(!(window.startTurnDraw67||startTurnDraw67)('enemy')){running58=false;enemyRunning50=false;return;}
    enemyHand58(-1);
    setTimeout(rivalTurn58,300);
  }
@@ -3693,7 +3697,7 @@ body.link-pick-zone64 .zone.linkDest64{outline:4px solid #57e6ff!important;box-s
  window.startTurnDraw67=function(side){
    if(!game||game.duelOver)return false;const hand=side==='enemy'?game.enemyHand:game.hand,deck=side==='enemy'?game.enemyDeck:game.deck,label=side==='enemy'?'El rival':'Tú';
    game._turnStarts67=game._turnStarts67||{player:0,enemy:0};const n=game._turnStarts67[side]||0;
-   let need=0;if(n===0)need=(game.first===side)?0:Math.max(0,6-hand.length);else need=Math.max(0,5-hand.length);
+   let need=0;if(game.turnNo>1)need=Math.max(0,5-hand.length);else if(n===0)need=(game.first===side)?0:Math.max(0,6-hand.length);else need=Math.max(0,5-hand.length);
    game._turnStarts67[side]=n+1;
    for(let k=0;k<need;k++){if(!deck.length){if(typeof finishDeckOut67==='function')finishDeckOut67(side);return false;}hand.push(deck.pop());render();log(label+' roba 1 carta'+(need>1?' ('+(k+1)+'/'+need+')':'')+'.');}
    return true;

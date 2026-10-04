@@ -4,7 +4,7 @@
 
 | ID | Nombre | Categoría / Tipo | ATK / DEF | Archivo de Imagen |
 |---|---|---|---|---|
-| #001 | **Blue-Eyes White Dragon** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/001.jpeg |
+| #001 | **Blue-Eyes White Dragon** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/001.jpg |
 | #002 | **Red-Eyes Black Dragon** | Monstruo (Dragon) | 2400 / 2000 | imagenescartas/Mundo1/002.jpeg |
 | #006 | **Dark Magician** | Monstruo (Spellcaster) | 2500 / 2100 | imagenescartas/Mundo1/006.jpeg |
 | #007 | **Thousand Dragon** | Fusión (Dragon) | 2400 / 2000 | imagenescartas/Mundo1/007.jpeg |
@@ -28,19 +28,19 @@
 | #053 | **Twin-Headed Thunder Dragon** | Fusión (Thunder) | 2800 / 2100 | imagenescartas/Mundo1/053.jpg |
 | #055 | **XYZ-Dragon Cannon** | Fusión (Machine) | 2800 / 2600 | imagenescartas/Mundo1/055.jpeg |
 | #056 | **Maga Oscura** | Fusión (Spellcaster) | 2000 / 1700 | imagenescartas/Mundo1/056.jpeg |
-| #057 | **Renace al Monstruo** | Magia | — | imagenescartas/Mundo1/057.jpg |
-| #058 | **Llamado de la Tumba** | Trampa | — | imagenescartas/Mundo1/058.jpeg |
-| #068 | **Harpie's Feather Duster** | Magia | — | imagenescartas/Mundo1/068.jpg |
-| #069 | **Heavy Storm** | Magia | — | imagenescartas/Mundo1/069.jpg |
-| #075 | **United We Stand** | Equipo | — | imagenescartas/Mundo1/075.jpg |
-| #076 | **Mirror Force** | Trampa | — | imagenescartas/Mundo1/076.jpeg |
-| #077 | **Trap Hole** | Trampa | — | imagenescartas/Mundo1/077.jpg |
-| #078 | **Magic Cylinder** | Trampa | — | imagenescartas/Mundo1/078.jpeg |
-| #079 | **Waboku** | Trampa | — | imagenescartas/Mundo1/079.jpg |
-| #080 | **Negate Attack** | Trampa | — | imagenescartas/Mundo1/080.jpeg |
-| #081 | **Sakuretsu Armor** | Trampa | — | imagenescartas/Mundo1/081.jpg |
-| #082 | **Torrential Tribute** | Trampa | — | imagenescartas/Mundo1/082.jpg |
-| #083 | **Dust Tornado** | Trampa | — | imagenescartas/Mundo1/083.jpeg |
+| #057 | **Renace al Monstruo** | SPELL | — | imagenescartas/Mundo1/057.jpg |
+| #058 | **Llamado de la Tumba** | TRAP | — | imagenescartas/Mundo1/058.jpeg |
+| #068 | **Harpie's Feather Duster** | SPELL | — | imagenescartas/Mundo1/068.jpg |
+| #069 | **Heavy Storm** | SPELL | — | imagenescartas/Mundo1/069.jpg |
+| #075 | **United We Stand** | EQUIP | — | imagenescartas/Mundo1/075.jpg |
+| #076 | **Mirror Force** | TRAP | — | imagenescartas/Mundo1/076.jpeg |
+| #077 | **Trap Hole** | TRAP | — | imagenescartas/Mundo1/077.jpg |
+| #078 | **Magic Cylinder** | TRAP | — | imagenescartas/Mundo1/078.jpeg |
+| #079 | **Waboku** | TRAP | — | imagenescartas/Mundo1/079.jpg |
+| #080 | **Negate Attack** | TRAP | — | imagenescartas/Mundo1/080.jpeg |
+| #081 | **Sakuretsu Armor** | TRAP | — | imagenescartas/Mundo1/081.jpg |
+| #082 | **Torrential Tribute** | TRAP | — | imagenescartas/Mundo1/082.jpg |
+| #083 | **Dust Tornado** | TRAP | — | imagenescartas/Mundo1/083.jpeg |
 | #088 | **Acrobat Monkey** | Monstruo (Beast-Warrior) | 1000 / 1000 | imagenescartas/Mundo1/088.jpg |
 | #089 | **Beastking of the Swamps** | Monstruo (Aqua) | 1590 / 1510 | imagenescartas/Mundo1/089.jpg |
 | #090 | **Exiled Force** | Monstruo (Warrior) | 1000 / 1000 | imagenescartas/Mundo1/090.jpg |
@@ -59,11 +59,11 @@
 | #103 | **Ryu Senshi** | Monstruo (Warrior) | 2600 / 2200 | imagenescartas/Mundo1/103.jpg |
 | #104 | **Super Robolady** | Monstruo (Machine) | 2100 / 2000 | imagenescartas/Mundo1/104.jpg |
 | #105 | **Super Roboyarou** | Monstruo (Machine) | 2500 / 1800 | imagenescartas/Mundo1/105.jpg |
-| #108 | **Fusion Weapon** | Equipo | — | imagenescartas/Mundo1/108.jpg |
-| #109 | **Graceful Charity** | Magia | — | imagenescartas/Mundo1/109.png |
-| #110 | **Limiter Removal** | Magia | — | imagenescartas/Mundo1/110.jpg |
-| #111 | **Pot of Greed** | Magia | — | imagenescartas/Mundo1/111.png |
-| #112 | **Scapegoat** | Magia | — | imagenescartas/Mundo1/112.jpg |
+| #108 | **Fusion Weapon** | EQUIP | — | imagenescartas/Mundo1/108.jpg |
+| #109 | **Graceful Charity** | SPELL | — | imagenescartas/Mundo1/109.png |
+| #110 | **Limiter Removal** | SPELL | — | imagenescartas/Mundo1/110.jpg |
+| #111 | **Pot of Greed** | SPELL | — | imagenescartas/Mundo1/111.png |
+| #112 | **Scapegoat** | SPELL | — | imagenescartas/Mundo1/112.jpg |
 | #115 | **Tiger Axe** | Monstruo (Beast-Warrior) | 1300 / 1100 | imagenescartas/Mundo1/115.jpg |
 | #116 | **Black Skull Dragon** | Fusión (Dragon) | 3200 / 2500 | imagenescartas/Mundo1/116.jpg |
 | #117 | **Darkfire Dragon** | Fusión (Dragon) | 1500 / 1250 | imagenescartas/Mundo1/117.jpg |
@@ -129,14 +129,14 @@
 | #181 | **Petit Moth** | Monstruo (Insect) | 300 / 200 | imagenescartas/Mundo1/181.jpg |
 | #182 | **Metamorphosed Insect Queen** | Monstruo (Insect) | 2800 / 2400 | imagenescartas/Mundo1/182.jpg |
 | #183 | **Cocoon of Evolution** | Monstruo (Insect) | 0 / 2000 | imagenescartas/Mundo1/183.jpg |
-| #184 | **Gaia Power** | Magia | 0 / 0 | imagenescartas/Mundo1/184.jpg |
-| #185 | **Insect Armor with Laser Cannon** | Equipo | 700 / 700 | imagenescartas/Mundo1/185.jpg |
-| #186 | **Insect Barrier** | Magia | 0 / 0 | imagenescartas/Mundo1/186.jpg |
-| #187 | **Insect Imitation** | Magia | 0 / 0 | imagenescartas/Mundo1/187.jpg |
-| #188 | **Insect Neglect** | Magia | 0 / 0 | imagenescartas/Mundo1/188.jpg |
-| #189 | **Jade Insect Whistle** | Magia | 0 / 0 | imagenescartas/Mundo1/189.jpg |
-| #190 | **Multiplication of Ants** | Magia | 0 / 0 | imagenescartas/Mundo1/190.jpg |
-| #191 | **DNA Surgery** | Trampa | 0 / 0 | imagenescartas/Mundo1/191.jpg |
+| #184 | **Gaia Power** | SPELL | 0 / 0 | imagenescartas/Mundo1/184.jpg |
+| #185 | **Insect Armor with Laser Cannon** | EQUIP | 700 / 700 | imagenescartas/Mundo1/185.jpg |
+| #186 | **Insect Barrier** | SPELL | 0 / 0 | imagenescartas/Mundo1/186.jpg |
+| #187 | **Insect Imitation** | SPELL | 0 / 0 | imagenescartas/Mundo1/187.jpg |
+| #188 | **Insect Neglect** | SPELL | 0 / 0 | imagenescartas/Mundo1/188.jpg |
+| #189 | **Jade Insect Whistle** | SPELL | 0 / 0 | imagenescartas/Mundo1/189.jpg |
+| #190 | **Multiplication of Ants** | SPELL | 0 / 0 | imagenescartas/Mundo1/190.jpg |
+| #191 | **DNA Surgery** | TRAP | 0 / 0 | imagenescartas/Mundo1/191.jpg |
 | #192 | **Perfectly Ultimate Great Moth** | Monstruo (Insect) | 3500 / 3000 | imagenescartas/Mundo1/192.jpg |
 | #193 | **Amazoness Archer** | Monstruo (Warrior) | 1400 / 1000 | imagenescartas/Mundo1/193.jpg |
 | #194 | **Amazoness Blowpiper** | Monstruo (Warrior) | 800 / 1500 | imagenescartas/Mundo1/194.jpg |
@@ -152,18 +152,18 @@
 | #204 | **Harpie's Pet Baby Dragon** | Monstruo (Dragon) | 1200 / 600 | imagenescartas/Mundo1/204.jpg |
 | #205 | **Sky Scout** | Monstruo (Winged Beast) | 1800 / 600 | imagenescartas/Mundo1/205.jpg |
 | #206 | **The Unfriendly Amazon** | Monstruo (Warrior) | 2000 / 1000 | imagenescartas/Mundo1/206.jpg |
-| #207 | **Amazoness Fighting Spirit** | Magia | 0 / 0 | imagenescartas/Mundo1/207.jpg |
-| #208 | **Amazoness Heirloom** | Magia | 0 / 0 | imagenescartas/Mundo1/208.jpg |
-| #209 | **Amazoness Spellcaster** | Magia | 0 / 0 | imagenescartas/Mundo1/209.jpg |
-| #210 | **Cyber Shield** | Equipo | 500 / 500 | imagenescartas/Mundo1/210.jpg |
-| #211 | **Elegant Egotist** | Equipo | 500 / 500 | imagenescartas/Mundo1/211.jpg |
-| #212 | **Harpie Lady Phoenix Formation** | Magia | 0 / 0 | imagenescartas/Mundo1/212.jpg |
-| #213 | **Harpies' Hunting Ground** | Magia | 0 / 0 | imagenescartas/Mundo1/213.jpg |
-| #214 | **Triangle Ecstasy Spark** | Magia | 0 / 0 | imagenescartas/Mundo1/214.jpg |
-| #215 | **Amazoness Archers** | Trampa | 0 / 0 | imagenescartas/Mundo1/215.jpg |
-| #216 | **Amazoness Willpower** | Trampa | 0 / 0 | imagenescartas/Mundo1/216.jpg |
-| #217 | **Hysteric Party** | Trampa | 0 / 0 | imagenescartas/Mundo1/217.jpg |
-| #218 | **Mirror Wall** | Trampa | 0 / 0 | imagenescartas/Mundo1/218.jpg |
+| #207 | **Amazoness Fighting Spirit** | SPELL | 0 / 0 | imagenescartas/Mundo1/207.jpg |
+| #208 | **Amazoness Heirloom** | SPELL | 0 / 0 | imagenescartas/Mundo1/208.jpg |
+| #209 | **Amazoness Spellcaster** | SPELL | 0 / 0 | imagenescartas/Mundo1/209.jpg |
+| #210 | **Cyber Shield** | EQUIP | 500 / 500 | imagenescartas/Mundo1/210.jpg |
+| #211 | **Elegant Egotist** | EQUIP | 500 / 500 | imagenescartas/Mundo1/211.jpg |
+| #212 | **Harpie Lady Phoenix Formation** | SPELL | 0 / 0 | imagenescartas/Mundo1/212.jpg |
+| #213 | **Harpies' Hunting Ground** | SPELL | 0 / 0 | imagenescartas/Mundo1/213.jpg |
+| #214 | **Triangle Ecstasy Spark** | SPELL | 0 / 0 | imagenescartas/Mundo1/214.jpg |
+| #215 | **Amazoness Archers** | TRAP | 0 / 0 | imagenescartas/Mundo1/215.jpg |
+| #216 | **Amazoness Willpower** | TRAP | 0 / 0 | imagenescartas/Mundo1/216.jpg |
+| #217 | **Hysteric Party** | TRAP | 0 / 0 | imagenescartas/Mundo1/217.jpg |
+| #218 | **Mirror Wall** | TRAP | 0 / 0 | imagenescartas/Mundo1/218.jpg |
 | #219 | **Harpie's Pet Dragon** | Monstruo (Dragon) | 2000 / 2500 | imagenescartas/Mundo1/219.jpg |
 | #220 | **Alligator's Sword** | Monstruo (Beast) | 1500 / 1200 | imagenescartas/Mundo1/220.jpg |
 | #221 | **Axe Raider** | Monstruo (Warrior) | 1700 / 1150 | imagenescartas/Mundo1/221.jpg |
@@ -177,23 +177,23 @@
 | #229 | **Panther Warrior** | Monstruo (Beast-Warrior) | 2000 / 1600 | imagenescartas/Mundo1/229.jpg |
 | #230 | **Rocket Warrior** | Monstruo (Warrior) | 1500 / 1300 | imagenescartas/Mundo1/230.jpg |
 | #231 | **Time Wizard** | Monstruo (Spellcaster) | 500 / 400 | imagenescartas/Mundo1/231.jpg |
-| #232 | **Chaos Greed** | Magia | — | imagenescartas/Mundo1/232.jpg |
-| #233 | **Foolish Burial** | Magia | — | imagenescartas/Mundo1/233.jpg |
-| #234 | **Giant Trunade** | Magia | — | imagenescartas/Mundo1/234.jpg |
-| #235 | **Lightning Blade** | Magia | — | imagenescartas/Mundo1/235.jpg |
-| #236 | **Premature Burial** | Magia | — | imagenescartas/Mundo1/236.jpg |
-| #237 | **Riryoku** | Magia | — | imagenescartas/Mundo1/237.jpg |
-| #238 | **The Claw of Hermos** | Magia | — | imagenescartas/Mundo1/238.jpg |
-| #239 | **Bottomless Trap Hole** | Trampa | — | imagenescartas/Mundo1/239.jpg |
-| #240 | **Drop Off** | Trampa | — | imagenescartas/Mundo1/240.jpg |
-| #241 | **Fairy Box** | Trampa | — | imagenescartas/Mundo1/241.jpg |
-| #242 | **Gamble** | Trampa | — | imagenescartas/Mundo1/242.jpg |
-| #243 | **Graverobber** | Trampa | — | imagenescartas/Mundo1/243.jpg |
-| #244 | **Kunai with Chain** | Trampa | — | imagenescartas/Mundo1/244.jpg |
-| #245 | **Magical Arm Shield** | Trampa | — | imagenescartas/Mundo1/245.jpg |
-| #246 | **Metalmorph** | Trampa | — | imagenescartas/Mundo1/246.jpg |
-| #247 | **Skull Dice** | Trampa | — | imagenescartas/Mundo1/247.jpg |
-| #248 | **Trap Hole of Spikes** | Trampa | — | imagenescartas/Mundo1/248.jpg |
+| #232 | **Chaos Greed** | SPELL | — | imagenescartas/Mundo1/232.jpg |
+| #233 | **Foolish Burial** | SPELL | — | imagenescartas/Mundo1/233.jpg |
+| #234 | **Giant Trunade** | SPELL | — | imagenescartas/Mundo1/234.jpg |
+| #235 | **Lightning Blade** | SPELL | — | imagenescartas/Mundo1/235.jpg |
+| #236 | **Premature Burial** | SPELL | — | imagenescartas/Mundo1/236.jpg |
+| #237 | **Riryoku** | SPELL | — | imagenescartas/Mundo1/237.jpg |
+| #238 | **The Claw of Hermos** | SPELL | — | imagenescartas/Mundo1/238.jpg |
+| #239 | **Bottomless Trap Hole** | TRAP | — | imagenescartas/Mundo1/239.jpg |
+| #240 | **Drop Off** | TRAP | — | imagenescartas/Mundo1/240.jpg |
+| #241 | **Fairy Box** | TRAP | — | imagenescartas/Mundo1/241.jpg |
+| #242 | **Gamble** | TRAP | — | imagenescartas/Mundo1/242.jpg |
+| #243 | **Graverobber** | TRAP | — | imagenescartas/Mundo1/243.jpg |
+| #244 | **Kunai with Chain** | TRAP | — | imagenescartas/Mundo1/244.jpg |
+| #245 | **Magical Arm Shield** | TRAP | — | imagenescartas/Mundo1/245.jpg |
+| #246 | **Metalmorph** | TRAP | — | imagenescartas/Mundo1/246.jpg |
+| #247 | **Skull Dice** | TRAP | — | imagenescartas/Mundo1/247.jpg |
+| #248 | **Trap Hole of Spikes** | TRAP | — | imagenescartas/Mundo1/248.jpg |
 | #249 | **Alligator's Sword Dragon** | Fusión (Dragon) | 1700 / 1500 | imagenescartas/Mundo1/249.jpg |
 | #250 | **Red-Eyes Black Dragon Sword** | Fusión (Dragon) | 2400 / 2000 | imagenescartas/Mundo1/250.jpg |
 | #251 | **Blue-Eyes Toon Dragon** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/251.jpg |
@@ -208,17 +208,17 @@
 | #260 | **Toon Masked Sorcerer** | Monstruo (Spellcaster) | 900 / 1400 | imagenescartas/Mundo1/260.jpg |
 | #261 | **Toon Mermaid** | Monstruo (Aqua) | 1400 / 1500 | imagenescartas/Mundo1/261.jpg |
 | #262 | **Toon Summoned Skull** | Monstruo (Fiend) | 2500 / 1200 | imagenescartas/Mundo1/262.jpg |
-| #263 | **Card of Sanctity** | Magia | — | imagenescartas/Mundo1/263.jpg |
-| #264 | **Cost Down** | Magia | — | imagenescartas/Mundo1/264.jpg |
-| #265 | **Fissure** | Magia | — | imagenescartas/Mundo1/265.jpg |
-| #266 | **Shine Palace** | Magia | — | imagenescartas/Mundo1/266.jpg |
-| #267 | **Snatch Steal** | Magia | — | imagenescartas/Mundo1/267.jpg |
-| #268 | **Toon Table of Contents** | Magia | — | imagenescartas/Mundo1/268.jpg |
-| #269 | **Toon World** | Magia | — | imagenescartas/Mundo1/269.jpg |
-| #270 | **Jar of Greed** | Trampa | — | imagenescartas/Mundo1/270.jpg |
-| #271 | **Solemn Judgment** | Trampa | — | imagenescartas/Mundo1/271.jpg |
-| #272 | **Toon Defense** | Trampa | — | imagenescartas/Mundo1/272.jpg |
-| #273 | **Ultimate Offering** | Trampa | — | imagenescartas/Mundo1/273.jpg |
+| #263 | **Card of Sanctity** | SPELL | — | imagenescartas/Mundo1/263.jpg |
+| #264 | **Cost Down** | SPELL | — | imagenescartas/Mundo1/264.jpg |
+| #265 | **Fissure** | SPELL | — | imagenescartas/Mundo1/265.jpg |
+| #266 | **Shine Palace** | SPELL | — | imagenescartas/Mundo1/266.jpg |
+| #267 | **Snatch Steal** | SPELL | — | imagenescartas/Mundo1/267.jpg |
+| #268 | **Toon Table of Contents** | SPELL | — | imagenescartas/Mundo1/268.jpg |
+| #269 | **Toon World** | SPELL | — | imagenescartas/Mundo1/269.jpg |
+| #270 | **Jar of Greed** | TRAP | — | imagenescartas/Mundo1/270.jpg |
+| #271 | **Solemn Judgment** | TRAP | — | imagenescartas/Mundo1/271.jpg |
+| #272 | **Toon Defense** | TRAP | — | imagenescartas/Mundo1/272.jpg |
+| #273 | **Ultimate Offering** | TRAP | — | imagenescartas/Mundo1/273.jpg |
 | #274 | **Curse Necrofear** | Monstruo (Fiend) | 2800 / 2200 | imagenescartas/Mundo1/274.jpg |
 | #275 | **Dark Necrofear** | Monstruo (Fiend) | 2200 / 2800 | imagenescartas/Mundo1/275.jpg |
 | #276 | **Dark Ruler Ha Des** | Monstruo (Fiend) | 2450 / 1600 | imagenescartas/Mundo1/276.jpg |
@@ -236,61 +236,61 @@
 | #288 | **Sangan** | Monstruo (Fiend) | 1000 / 600 | imagenescartas/Mundo1/288.jpg |
 | #289 | **Spirit Reaper** | Monstruo (Zombie) | 300 / 200 | imagenescartas/Mundo1/289.jpg |
 | #290 | **The Earl of Demise** | Monstruo (Fiend) | 2000 / 700 | imagenescartas/Mundo1/290.jpg |
-| #291 | **Change of Heart** | Magia | — | imagenescartas/Mundo1/291.jpg |
-| #292 | **Dark Sanctuary** | Magia | — | imagenescartas/Mundo1/292.jpg |
-| #293 | **Dark Spirit's Mastery** | Magia | — | imagenescartas/Mundo1/293.jpg |
-| #294 | **Exchange** | Magia | — | imagenescartas/Mundo1/294.jpg |
-| #295 | **Mage Power** | Magia | — | imagenescartas/Mundo1/295.jpg |
-| #296 | **Mystical Space Typhoon** | Magia | — | imagenescartas/Mundo1/296.jpg |
-| #297 | **Spirit Message "A"** | Magia | — | imagenescartas/Mundo1/297.jpg |
-| #298 | **Spirit Message "I"** | Magia | — | imagenescartas/Mundo1/298.jpg |
-| #299 | **Spirit Message "L"** | Magia | — | imagenescartas/Mundo1/299.jpg |
-| #300 | **Spirit Message "N"** | Magia | — | imagenescartas/Mundo1/300.jpg |
-| #301 | **Legendary Sword** | Equipo | 500 / 500 | imagenescartas/Mundo1/301.jpg |
-| #302 | **Sword of Dark Destruction** | Equipo | 500 / 500 | imagenescartas/Mundo1/302.jpg |
-| #303 | **Dark Energy** | Equipo | 500 / 500 | imagenescartas/Mundo1/303.jpg |
-| #304 | **Axe of Despair** | Equipo | 1000 / 0 | imagenescartas/Mundo1/304.jpg |
-| #305 | **Laser Cannon Armor** | Equipo | 500 / 500 | imagenescartas/Mundo1/305.jpg |
-| #307 | **Elf's Light** | Equipo | 500 / 500 | imagenescartas/Mundo1/307.jpg |
-| #308 | **Beast Fangs** | Equipo | 500 / 500 | imagenescartas/Mundo1/308.jpg |
-| #309 | **Steel Shell** | Equipo | 500 / 500 | imagenescartas/Mundo1/309.jpg |
-| #310 | **Vile Germs** | Equipo | 500 / 500 | imagenescartas/Mundo1/310.jpg |
-| #311 | **Black Pendant** | Equipo | 500 / 0 | imagenescartas/Mundo1/311.jpg |
-| #312 | **Silver Bow and Arrow** | Equipo | 500 / 500 | imagenescartas/Mundo1/312.jpg |
-| #313 | **Horn of Light** | Equipo | 0 / 800 | imagenescartas/Mundo1/313.jpg |
-| #314 | **Horn of the Unicorn** | Equipo | 700 / 700 | imagenescartas/Mundo1/314.jpg |
-| #315 | **Dragon Treasure** | Equipo | 500 / 500 | imagenescartas/Mundo1/315.jpg |
-| #316 | **Electro-whip** | Equipo | 500 / 500 | imagenescartas/Mundo1/316.jpg |
-| #319 | **Mystical Moon** | Equipo | 500 / 500 | imagenescartas/Mundo1/319.jpg |
-| #320 | **Stop Defense** | Magia | — | imagenescartas/Mundo1/320.jpg |
-| #321 | **Malevolent Nuzzler** | Equipo | 700 / 700 | imagenescartas/Mundo1/321.jpg |
-| #322 | **Violet Crystal** | Equipo | 500 / 500 | imagenescartas/Mundo1/322.jpg |
-| #323 | **Book of Secret Arts** | Equipo | 500 / 500 | imagenescartas/Mundo1/323.jpg |
-| #324 | **Invigoration** | Equipo | 500 / 500 | imagenescartas/Mundo1/324.jpg |
-| #325 | **Machine Conversion Factory** | Equipo | 500 / 500 | imagenescartas/Mundo1/325.jpg |
-| #326 | **Raise Body Heat** | Equipo | 500 / 500 | imagenescartas/Mundo1/326.jpg |
-| #327 | **Follow Wind** | Equipo | 500 / 500 | imagenescartas/Mundo1/327.jpg |
-| #328 | **Power of Kaishin** | Equipo | 500 / 500 | imagenescartas/Mundo1/328.jpg |
-| #329 | **Dragon Capture Jar** | Magia | 2300 / 0 | imagenescartas/Mundo1/329.jpg |
-| #330 | **Forest** | Magia | 900 / 1400 | imagenescartas/Mundo1/330.jpg |
-| #331 | **Wasteland** | Magia | 1400 / 1500 | imagenescartas/Mundo1/331.jpg |
-| #332 | **Mountain** | Magia | 2500 / 1200 | imagenescartas/Mundo1/332.jpg |
-| #333 | **Sogen** | Magia | — | imagenescartas/Mundo1/333.jpg |
-| #334 | **Umi** | Magia | — | imagenescartas/Mundo1/334.jpg |
-| #335 | **Yami** | Magia | — | imagenescartas/Mundo1/335.jpg |
-| #336 | **Dark Hole** | Magia | — | imagenescartas/Mundo1/336.jpg |
-| #337 | **Raigeki** | Magia | — | imagenescartas/Mundo1/337.jpg |
-| #338 | **Mooyan Curry** | Magia | — | imagenescartas/Mundo1/338.jpg |
-| #339 | **Red Medicine** | Magia | — | imagenescartas/Mundo1/339.jpg |
-| #340 | **Goblin's Secret Remedy** | Magia | — | imagenescartas/Mundo1/340.jpg |
-| #341 | **Soul of the Pure** | Magia | — | imagenescartas/Mundo1/341.jpg |
-| #342 | **Dian Keto the Cure Master** | Magia | — | imagenescartas/Mundo1/342.jpg |
-| #343 | **Sparks** | Magia | — | imagenescartas/Mundo1/343.jpg |
-| #344 | **Hinotama** | Magia | 2800 / 2200 | imagenescartas/Mundo1/344.jpg |
-| #345 | **Final Flame** | Magia | 2200 / 2800 | imagenescartas/Mundo1/345.jpg |
-| #346 | **Ookazi** | Magia | 2450 / 1600 | imagenescartas/Mundo1/346.jpg |
-| #347 | **Tremendous Fire** | Magia | 1600 / 0 | imagenescartas/Mundo1/347.jpg |
-| #348 | **Swords of Revealing Light** | Magia | — | imagenescartas/Mundo1/348.jpg |
+| #291 | **Change of Heart** | SPELL | — | imagenescartas/Mundo1/291.jpg |
+| #292 | **Dark Sanctuary** | SPELL | — | imagenescartas/Mundo1/292.jpg |
+| #293 | **Dark Spirit's Mastery** | SPELL | — | imagenescartas/Mundo1/293.jpg |
+| #294 | **Exchange** | SPELL | — | imagenescartas/Mundo1/294.jpg |
+| #295 | **Mage Power** | SPELL | — | imagenescartas/Mundo1/295.jpg |
+| #296 | **Mystical Space Typhoon** | SPELL | — | imagenescartas/Mundo1/296.jpg |
+| #297 | **Spirit Message "A"** | SPELL | — | imagenescartas/Mundo1/297.jpg |
+| #298 | **Spirit Message "I"** | SPELL | — | imagenescartas/Mundo1/298.jpg |
+| #299 | **Spirit Message "L"** | SPELL | — | imagenescartas/Mundo1/299.jpg |
+| #300 | **Spirit Message "N"** | SPELL | — | imagenescartas/Mundo1/300.jpg |
+| #301 | **Legendary Sword** | EQUIP | 500 / 500 | imagenescartas/Mundo1/301.jpg |
+| #302 | **Sword of Dark Destruction** | EQUIP | 500 / 500 | imagenescartas/Mundo1/302.jpg |
+| #303 | **Dark Energy** | EQUIP | 500 / 500 | imagenescartas/Mundo1/303.jpg |
+| #304 | **Axe of Despair** | EQUIP | 1000 / 0 | imagenescartas/Mundo1/304.jpg |
+| #305 | **Laser Cannon Armor** | EQUIP | 500 / 500 | imagenescartas/Mundo1/305.jpg |
+| #307 | **Elf's Light** | EQUIP | 500 / 500 | imagenescartas/Mundo1/307.jpg |
+| #308 | **Beast Fangs** | EQUIP | 500 / 500 | imagenescartas/Mundo1/308.jpg |
+| #309 | **Steel Shell** | EQUIP | 500 / 500 | imagenescartas/Mundo1/309.jpg |
+| #310 | **Vile Germs** | EQUIP | 500 / 500 | imagenescartas/Mundo1/310.jpg |
+| #311 | **Black Pendant** | EQUIP | 500 / 0 | imagenescartas/Mundo1/311.jpg |
+| #312 | **Silver Bow and Arrow** | EQUIP | 500 / 500 | imagenescartas/Mundo1/312.jpg |
+| #313 | **Horn of Light** | EQUIP | 0 / 800 | imagenescartas/Mundo1/313.jpg |
+| #314 | **Horn of the Unicorn** | EQUIP | 700 / 700 | imagenescartas/Mundo1/314.jpg |
+| #315 | **Dragon Treasure** | EQUIP | 500 / 500 | imagenescartas/Mundo1/315.jpg |
+| #316 | **Electro-whip** | EQUIP | 500 / 500 | imagenescartas/Mundo1/316.jpg |
+| #319 | **Mystical Moon** | EQUIP | 500 / 500 | imagenescartas/Mundo1/319.jpg |
+| #320 | **Stop Defense** | SPELL | — | imagenescartas/Mundo1/320.jpg |
+| #321 | **Malevolent Nuzzler** | EQUIP | 700 / 700 | imagenescartas/Mundo1/321.jpg |
+| #322 | **Violet Crystal** | EQUIP | 500 / 500 | imagenescartas/Mundo1/322.jpg |
+| #323 | **Book of Secret Arts** | EQUIP | 500 / 500 | imagenescartas/Mundo1/323.jpg |
+| #324 | **Invigoration** | EQUIP | 500 / 500 | imagenescartas/Mundo1/324.jpg |
+| #325 | **Machine Conversion Factory** | EQUIP | 500 / 500 | imagenescartas/Mundo1/325.jpg |
+| #326 | **Raise Body Heat** | EQUIP | 500 / 500 | imagenescartas/Mundo1/326.jpg |
+| #327 | **Follow Wind** | EQUIP | 500 / 500 | imagenescartas/Mundo1/327.jpg |
+| #328 | **Power of Kaishin** | EQUIP | 500 / 500 | imagenescartas/Mundo1/328.jpg |
+| #329 | **Dragon Capture Jar** | SPELL | 2300 / 0 | imagenescartas/Mundo1/329.jpg |
+| #330 | **Forest** | SPELL | 900 / 1400 | imagenescartas/Mundo1/330.jpg |
+| #331 | **Wasteland** | SPELL | 1400 / 1500 | imagenescartas/Mundo1/331.jpg |
+| #332 | **Mountain** | SPELL | 2500 / 1200 | imagenescartas/Mundo1/332.jpg |
+| #333 | **Sogen** | SPELL | — | imagenescartas/Mundo1/333.jpg |
+| #334 | **Umi** | SPELL | — | imagenescartas/Mundo1/334.jpg |
+| #335 | **Yami** | SPELL | — | imagenescartas/Mundo1/335.jpg |
+| #336 | **Dark Hole** | SPELL | — | imagenescartas/Mundo1/336.jpg |
+| #337 | **Raigeki** | SPELL | — | imagenescartas/Mundo1/337.jpg |
+| #338 | **Mooyan Curry** | SPELL | — | imagenescartas/Mundo1/338.jpg |
+| #339 | **Red Medicine** | SPELL | — | imagenescartas/Mundo1/339.jpg |
+| #340 | **Goblin's Secret Remedy** | SPELL | — | imagenescartas/Mundo1/340.jpg |
+| #341 | **Soul of the Pure** | SPELL | — | imagenescartas/Mundo1/341.jpg |
+| #342 | **Dian Keto the Cure Master** | SPELL | — | imagenescartas/Mundo1/342.jpg |
+| #343 | **Sparks** | SPELL | — | imagenescartas/Mundo1/343.jpg |
+| #344 | **Hinotama** | SPELL | 2800 / 2200 | imagenescartas/Mundo1/344.jpg |
+| #345 | **Final Flame** | SPELL | 2200 / 2800 | imagenescartas/Mundo1/345.jpg |
+| #346 | **Ookazi** | SPELL | 2450 / 1600 | imagenescartas/Mundo1/346.jpg |
+| #347 | **Tremendous Fire** | SPELL | 1600 / 0 | imagenescartas/Mundo1/347.jpg |
+| #348 | **Swords of Revealing Light** | SPELL | — | imagenescartas/Mundo1/348.jpg |
 | #358 | **Seiyaryu** | Monstruo (Dragon) | 2500 / 2300 | imagenescartas/Mundo1/358.jpg |
 | #359 | **Three-legged Zombies** | Monstruo (Zombie) | 1100 / 800 | imagenescartas/Mundo1/359.jpg |
 | #360 | **Zera The Mant** | Monstruo (Fiend) | 2800 / 2300 | imagenescartas/Mundo1/360.jpg |
@@ -336,19 +336,19 @@
 | #402 | **Swarm of Locusts** | Monstruo (Insect) | 1000 / 500 | imagenescartas/Mundo1/402.jpg |
 | #403 | **Swarm of Scarabs** | Monstruo (Insect) | 500 / 1000 | imagenescartas/Mundo1/403.jpg |
 | #404 | **Wandering Mummy** | Monstruo (Zombie) | 1500 / 1500 | imagenescartas/Mundo1/404.jpg |
-| #405 | **Temple of the Kings** | Magia | — | imagenescartas/Mundo1/405.jpg |
-| #406 | **Apophis the Swamp Deity** | Trampa | — | imagenescartas/Mundo1/406.jpg |
-| #407 | **Call of the Haunted** | Trampa | — | imagenescartas/Mundo1/407.jpg |
-| #408 | **Curse of Anubis** | Trampa | — | imagenescartas/Mundo1/408.jpg |
-| #409 | **Embodiment of Apophis** | Trampa | — | imagenescartas/Mundo1/409.jpg |
-| #410 | **Judgment of Anubis** | Trampa | — | imagenescartas/Mundo1/410.jpg |
-| #411 | **Magic Jammer** | Trampa | — | imagenescartas/Mundo1/411.jpg |
-| #412 | **Ordeal of a Traveler** | Trampa | — | imagenescartas/Mundo1/412.jpg |
-| #413 | **Raigeki Break** | Trampa | — | imagenescartas/Mundo1/413.jpg |
-| #414 | **Statue of the Wicked** | Trampa | — | imagenescartas/Mundo1/414.jpg |
+| #405 | **Temple of the Kings** | SPELL | — | imagenescartas/Mundo1/405.jpg |
+| #406 | **Apophis the Swamp Deity** | TRAP | — | imagenescartas/Mundo1/406.jpg |
+| #407 | **Call of the Haunted** | TRAP | — | imagenescartas/Mundo1/407.jpg |
+| #408 | **Curse of Anubis** | TRAP | — | imagenescartas/Mundo1/408.jpg |
+| #409 | **Embodiment of Apophis** | TRAP | — | imagenescartas/Mundo1/409.jpg |
+| #410 | **Judgment of Anubis** | TRAP | — | imagenescartas/Mundo1/410.jpg |
+| #411 | **Magic Jammer** | TRAP | — | imagenescartas/Mundo1/411.jpg |
+| #412 | **Ordeal of a Traveler** | TRAP | — | imagenescartas/Mundo1/412.jpg |
+| #413 | **Raigeki Break** | TRAP | — | imagenescartas/Mundo1/413.jpg |
+| #414 | **Statue of the Wicked** | TRAP | — | imagenescartas/Mundo1/414.jpg |
 | #415 | **Reaper on the Nightmare** | Fusión (Zombie) | 800 / 600 | imagenescartas/Mundo1/415.jpg |
 | #416 | **Blade Knight** | Monstruo (Warrior) | 1600 / 1000 | imagenescartas/Mundo1/416.jpg |
-| #417 | **Blue-Eyes White Dragon** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/417.jpg |
+| #417 | **Blue-Eyes White Dragon (Alt)** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/417.jpg |
 | #418 | **Chaos Emperor Dragon - Envoy of the End** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/418.jpg |
 | #419 | **Des Feral Imp** | Monstruo (Reptile) | 1600 / 1800 | imagenescartas/Mundo1/419.jpg |
 | #420 | **Different Dimension Dragon** | Monstruo (Dragon) | 1200 / 1500 | imagenescartas/Mundo1/420.jpg |
@@ -364,15 +364,15 @@
 | #430 | **X-Head Cannon** | Monstruo (Machine) | 1800 / 1500 | imagenescartas/Mundo1/430.jpg |
 | #431 | **Y-Dragon Head** | Monstruo (Machine) | 1500 / 1600 | imagenescartas/Mundo1/431.jpg |
 | #432 | **Z-Metal Tank** | Monstruo (Machine) | 1500 / 1300 | imagenescartas/Mundo1/432.jpg |
-| #433 | **Card of Demise** | Magia | — | imagenescartas/Mundo1/433.jpg |
-| #434 | **Enemy Controller** | Magia | — | imagenescartas/Mundo1/434.jpg |
-| #435 | **Ring of Defense** | Magia | — | imagenescartas/Mundo1/435.jpg |
-| #436 | **Shrink** | Magia | — | imagenescartas/Mundo1/436.jpg |
-| #437 | **Soul Exchange** | Magia | — | imagenescartas/Mundo1/437.jpg |
-| #438 | **The Fang of Critias** | Magia | — | imagenescartas/Mundo1/438.jpg |
-| #439 | **The Flute of Summoning Dragon** | Magia | — | imagenescartas/Mundo1/439.jpg |
-| #440 | **White Dragon Ritual** | Magia | — | imagenescartas/Mundo1/440.jpg |
-| #441 | **Crush Card Virus** | Trampa | — | imagenescartas/Mundo1/441.jpg |
+| #433 | **Card of Demise** | SPELL | — | imagenescartas/Mundo1/433.jpg |
+| #434 | **Enemy Controller** | SPELL | — | imagenescartas/Mundo1/434.jpg |
+| #435 | **Ring of Defense** | SPELL | — | imagenescartas/Mundo1/435.jpg |
+| #436 | **Shrink** | SPELL | — | imagenescartas/Mundo1/436.jpg |
+| #437 | **Soul Exchange** | SPELL | — | imagenescartas/Mundo1/437.jpg |
+| #438 | **The Fang of Critias** | SPELL | — | imagenescartas/Mundo1/438.jpg |
+| #439 | **The Flute of Summoning Dragon** | SPELL | — | imagenescartas/Mundo1/439.jpg |
+| #440 | **White Dragon Ritual** | SPELL | — | imagenescartas/Mundo1/440.jpg |
+| #441 | **Crush Card Virus** | TRAP | — | imagenescartas/Mundo1/441.jpg |
 | #442 | **Aqua Dragon** | Monstruo (Sea Serpent) | 2250 / 1900 | imagenescartas/Mundo1/442.jpg |
 | #443 | **Sea King Dragon** | Monstruo (Sea Serpent) | 2000 / 1700 | imagenescartas/Mundo1/443.jpg |
 | #444 | **Turu-Purun** | Monstruo (Aqua) | 450 / 500 | imagenescartas/Mundo1/444.jpg |
@@ -401,13 +401,13 @@
 | #467 | **Obnoxious Celtic Guard** | Monstruo (Warrior) | 1400 / 1200 | imagenescartas/Mundo1/467.jpg |
 | #468 | **Queen's Knight** | Monstruo (Warrior) | 1500 / 1600 | imagenescartas/Mundo1/468.jpg |
 | #469 | **Skilled Dark Magician** | Monstruo (Spellcaster) | 1900 / 1700 | imagenescartas/Mundo1/469.jpg |
-| #470 | **Dark Magic Curtain** | Magia | — | imagenescartas/Mundo1/470.jpg |
-| #471 | **Fiend's Sanctuary** | Magia | — | imagenescartas/Mundo1/471.jpg |
-| #472 | **Magic Formula** | Magia | — | imagenescartas/Mundo1/472.jpg |
-| #473 | **Thousand Knives** | Magia | — | imagenescartas/Mundo1/473.jpg |
-| #474 | **Black Illusion** | Trampa | — | imagenescartas/Mundo1/474.jpg |
-| #475 | **Dark Renewal** | Trampa | — | imagenescartas/Mundo1/475.jpg |
-| #476 | **Soul Rope** | Trampa | — | imagenescartas/Mundo1/476.jpg |
+| #470 | **Dark Magic Curtain** | SPELL | — | imagenescartas/Mundo1/470.jpg |
+| #471 | **Fiend's Sanctuary** | SPELL | — | imagenescartas/Mundo1/471.jpg |
+| #472 | **Magic Formula** | SPELL | — | imagenescartas/Mundo1/472.jpg |
+| #473 | **Thousand Knives** | SPELL | — | imagenescartas/Mundo1/473.jpg |
+| #474 | **Black Illusion** | TRAP | — | imagenescartas/Mundo1/474.jpg |
+| #475 | **Dark Renewal** | TRAP | — | imagenescartas/Mundo1/475.jpg |
+| #476 | **Soul Rope** | TRAP | — | imagenescartas/Mundo1/476.jpg |
 | #477 | **Amulet Dragon** | Fusión (Dragon) | 2900 / 2500 | imagenescartas/Mundo1/477.jpg |
 | #478 | **Arcana Knight Joker** | Fusión (Warrior) | 3800 / 2500 | imagenescartas/Mundo1/478.jpg |
 | #479 | **Chimera the Flying Mythical Beast** | Fusión (Beast) | 2100 / 1800 | imagenescartas/Mundo1/479.jpg |
@@ -425,11 +425,11 @@
 | #491 | **Right Leg of the Forbidden One** | Monstruo (Spellcaster) | 200 / 300 | imagenescartas/Mundo1/491.jpg |
 | #492 | **Rock Ogre Grotto #1** | Monstruo (Rock) | 800 / 1200 | imagenescartas/Mundo1/492.jpg |
 | #493 | **Tainted Wisdom** | Monstruo (Fiend) | 1250 / 800 | imagenescartas/Mundo1/493.jpg |
-| #494 | **Contract with Exodia** | Magia | — | imagenescartas/Mundo1/494.jpg |
-| #495 | **Painful Choice** | Magia | — | imagenescartas/Mundo1/495.jpg |
-| #496 | **Polymerization** | Magia | — | imagenescartas/Mundo1/496.jpg |
-| #497 | **Remove Trap** | Magia | — | imagenescartas/Mundo1/497.jpg |
-| #498 | **Obliterate!!!** | Trampa | — | imagenescartas/Mundo1/498.jpg |
+| #494 | **Contract with Exodia** | SPELL | — | imagenescartas/Mundo1/494.jpg |
+| #495 | **Painful Choice** | SPELL | — | imagenescartas/Mundo1/495.jpg |
+| #496 | **Polymerization** | SPELL | — | imagenescartas/Mundo1/496.jpg |
+| #497 | **Remove Trap** | SPELL | — | imagenescartas/Mundo1/497.jpg |
+| #498 | **Obliterate!!!** | TRAP | — | imagenescartas/Mundo1/498.jpg |
 | #499 | **Skull Knight** | Monstruo (Spellcaster) | 2650 / 2250 | imagenescartas/Mundo1/499.jpg |
 | #500 | **Amphibian Beast** | Monstruo (Fish) | 2400 / 2000 | imagenescartas/Mundo1/500.jpg |
 | #501 | **Deep Sweeper** | Monstruo (Fish) | 1600 / 1300 | imagenescartas/Mundo1/501.jpg |
@@ -449,20 +449,20 @@
 | #515 | **The Legendary Fisherman** | Monstruo (Warrior) | 1850 / 1600 | imagenescartas/Mundo1/515.jpg |
 | #516 | **The Legendary Fisherman II** | Monstruo (Warrior) | 2200 / 1800 | imagenescartas/Mundo1/516.jpg |
 | #517 | **Uminotaurus** | Monstruo (Aqua) | 1700 / 1000 | imagenescartas/Mundo1/517.jpg |
-| #518 | **A Legendary Ocean** | Magia | — | imagenescartas/Mundo1/518.jpg |
-| #519 | **Dark-Piercing Light** | Magia | — | imagenescartas/Mundo1/519.jpg |
-| #520 | **Fury of Kairyu-Shin** | Magia | — | imagenescartas/Mundo1/520.jpg |
-| #521 | **Hydro Pressure Cannon** | Magia | — | imagenescartas/Mundo1/521.jpg |
-| #522 | **Rage of Kairyu-Shin** | Magia | — | imagenescartas/Mundo1/522.jpg |
-| #523 | **Salvage** | Magia | — | imagenescartas/Mundo1/523.jpg |
-| #524 | **Steel Shell** | Equipo | 500 / 500 | imagenescartas/Mundo1/524.jpg |
-| #525 | **Swords of Concealing Light** | Magia | — | imagenescartas/Mundo1/525.jpg |
-| #526 | **Umi** | Magia | — | imagenescartas/Mundo1/526.jpg |
-| #527 | **Abyss-strom** | Trampa | — | imagenescartas/Mundo1/527.jpg |
-| #528 | **Aegis of the Ocean Dragon Lord** | Trampa | — | imagenescartas/Mundo1/528.jpg |
-| #529 | **Shattered Axe** | Trampa | — | imagenescartas/Mundo1/529.jpg |
-| #530 | **Spiritual Water Art - Aoi** | Trampa | — | imagenescartas/Mundo1/530.jpg |
-| #531 | **Tornado Wall** | Trampa | — | imagenescartas/Mundo1/531.jpg |
+| #518 | **A Legendary Ocean** | SPELL | — | imagenescartas/Mundo1/518.jpg |
+| #519 | **Dark-Piercing Light** | SPELL | — | imagenescartas/Mundo1/519.jpg |
+| #520 | **Fury of Kairyu-Shin** | SPELL | — | imagenescartas/Mundo1/520.jpg |
+| #521 | **Hydro Pressure Cannon** | SPELL | — | imagenescartas/Mundo1/521.jpg |
+| #522 | **Rage of Kairyu-Shin** | SPELL | — | imagenescartas/Mundo1/522.jpg |
+| #523 | **Salvage** | SPELL | — | imagenescartas/Mundo1/523.jpg |
+| #524 | **Steel Shell** | EQUIP | 500 / 500 | imagenescartas/Mundo1/524.jpg |
+| #525 | **Swords of Concealing Light** | SPELL | — | imagenescartas/Mundo1/525.jpg |
+| #526 | **Umi** | SPELL | — | imagenescartas/Mundo1/526.jpg |
+| #527 | **Abyss-strom** | TRAP | — | imagenescartas/Mundo1/527.jpg |
+| #528 | **Aegis of the Ocean Dragon Lord** | TRAP | — | imagenescartas/Mundo1/528.jpg |
+| #529 | **Shattered Axe** | TRAP | — | imagenescartas/Mundo1/529.jpg |
+| #530 | **Spiritual Water Art - Aoi** | TRAP | — | imagenescartas/Mundo1/530.jpg |
+| #531 | **Tornado Wall** | TRAP | — | imagenescartas/Mundo1/531.jpg |
 | #532 | **Gemini Elf** | Monstruo (Spellcaster) | 1900 / 900 | imagenescartas/Mundo1/532.jpg |
 | #533 | **Kwagar Hercules** | Fusión (Insect) | 1900 / 1700 | imagenescartas/Mundo1/533.jpg |
 | #534 | **Minar** | Monstruo (Insect) | 850 / 750 | imagenescartas/Mundo1/534.jpg |
@@ -582,47 +582,47 @@
 | #648 | **Machine Attacker** | Monstruo (Machine) | 1600 / 1300 | imagenescartas/Mundo1/648.jpg |
 | #649 | **Hibikime** | Monstruo (Warrior) | 1450 / 1000 | imagenescartas/Mundo1/649.jpg |
 | #650 | **Whiptail Crow** | Monstruo (Fiend) | 1650 / 1600 | imagenescartas/Mundo1/650.jpg |
-| #651 | **Kunai with Chain** | Trampa | — | imagenescartas/Mundo1/651.jpg |
-| #652 | **Magical Labyrinth** | Magia | 1000 / 1000 | imagenescartas/Mundo1/652.jpg |
-| #653 | **Warrior Elimination** | Magia | 1000 / 1000 | imagenescartas/Mundo1/653.jpg |
-| #654 | **Salamandra** | Magia | 1000 / 1000 | imagenescartas/Mundo1/654.jpg |
-| #655 | **Cursebreaker** | Magia | 1000 / 1000 | imagenescartas/Mundo1/655.jpg |
-| #656 | **Eternal Rest** | Magia | 1000 / 1000 | imagenescartas/Mundo1/656.jpg |
-| #657 | **Megamorph** | Magia | 1000 / 1000 | imagenescartas/Mundo1/657.jpg |
-| #658 | **Metalmorph** | Trampa | — | imagenescartas/Mundo1/658.jpg |
-| #659 | **Winged Trumpeter** | Magia | 1000 / 1000 | imagenescartas/Mundo1/659.jpg |
-| #660 | **Stain Storm** | Magia | 1000 / 1000 | imagenescartas/Mundo1/660.jpg |
-| #661 | **Crush Card** | Trampa | 1000 / 1000 | imagenescartas/Mundo1/661.jpg |
-| #662 | **Eradicating Aerosol** | Magia | 1000 / 1000 | imagenescartas/Mundo1/662.jpg |
-| #663 | **Breath of Light** | Magia | 1000 / 1000 | imagenescartas/Mundo1/663.jpg |
-| #664 | **Eternal Draught** | Magia | 1000 / 1000 | imagenescartas/Mundo1/664.jpg |
+| #651 | **Kunai with Chain** | TRAP | — | imagenescartas/Mundo1/651.jpg |
+| #652 | **Magical Labyrinth** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/652.jpg |
+| #653 | **Warrior Elimination** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/653.jpg |
+| #654 | **Salamandra** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/654.jpg |
+| #655 | **Cursebreaker** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/655.jpg |
+| #656 | **Eternal Rest** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/656.jpg |
+| #657 | **Megamorph** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/657.jpg |
+| #658 | **Metalmorph** | TRAP | — | imagenescartas/Mundo1/658.jpg |
+| #659 | **Winged Trumpeter** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/659.jpg |
+| #660 | **Stain Storm** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/660.jpg |
+| #661 | **Crush Card** | TRAP | 1000 / 1000 | imagenescartas/Mundo1/661.jpg |
+| #662 | **Eradicating Aerosol** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/662.jpg |
+| #663 | **Breath of Light** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/663.jpg |
+| #664 | **Eternal Draught** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/664.jpg |
 | #665 | **Curse of Millennium Shield** | Monstruo (Warrior) | 0 / 3000 | imagenescartas/Mundo1/665.jpg |
 | #666 | **Yamadron Ritual** | Monstruo (Dragon) | 1600 / 1800 | imagenescartas/Mundo1/666.jpg |
 | #667 | **Gate Guardian Ritual** | Monstruo (Warrior) | 3750 / 3400 | imagenescartas/Mundo1/667.jpg |
-| #668 | **Bright Castle** | Magia | 1000 / 1000 | imagenescartas/Mundo1/668.jpg |
-| #669 | **Shadow Spell** | Trampa | — | imagenescartas/Mundo1/669.jpg |
-| #670 | **Black Luster Ritual** | Magia | 1000 / 1000 | imagenescartas/Mundo1/670.jpg |
-| #671 | **Zera Ritual** | Magia | 1000 / 1000 | imagenescartas/Mundo1/671.jpg |
-| #672 | **Harpie’s Feather Duster** | Magia | 1000 / 1000 | imagenescartas/Mundo1/672.jpg |
-| #673 | **War-lion Ritual** | Magia | 1000 / 1000 | imagenescartas/Mundo1/673.jpg |
-| #674 | **Beastry Mirror Ritual** | Magia | 1000 / 1000 | imagenescartas/Mundo1/674.jpg |
+| #668 | **Bright Castle** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/668.jpg |
+| #669 | **Shadow Spell** | TRAP | — | imagenescartas/Mundo1/669.jpg |
+| #670 | **Black Luster Ritual** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/670.jpg |
+| #671 | **Zera Ritual** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/671.jpg |
+| #672 | **Harpie’s Feather Duster** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/672.jpg |
+| #673 | **War-lion Ritual** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/673.jpg |
+| #674 | **Beastry Mirror Ritual** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/674.jpg |
 | #675 | **Ultimate Dragon** | Fusión (Dragon) | 4500 / 3800 | imagenescartas/Mundo1/675.jpg |
-| #676 | **Commencement Dance** | Magia | 1000 / 1000 | imagenescartas/Mundo1/676.jpg |
-| #677 | **Hamburger Recipe** | Magia | 1000 / 1000 | imagenescartas/Mundo1/677.jpg |
+| #676 | **Commencement Dance** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/676.jpg |
+| #677 | **Hamburger Recipe** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/677.jpg |
 | #678 | **Revival of Sennen Genjin** | Monstruo (Beast-Warrior) | 2750 / 2500 | imagenescartas/Mundo1/678.jpg |
-| #679 | **Novox’s Prayer** | Magia | 1000 / 1000 | imagenescartas/Mundo1/679.jpg |
+| #679 | **Novox’s Prayer** | SPELL | 1000 / 1000 | imagenescartas/Mundo1/679.jpg |
 | #680 | **Curse of Tri-Horned Dragon** | Monstruo (Dragon) | 2850 / 2350 | imagenescartas/Mundo1/680.jpg |
-| #681 | **House of Adhesive Tape** | Trampa | 1000 / 1000 | imagenescartas/Mundo1/681.jpg |
-| #682 | **Eatgaboon** | Trampa | — | imagenescartas/Mundo1/682.jpg |
-| #683 | **Bear Trap** | Trampa | — | imagenescartas/Mundo1/683.jpg |
-| #684 | **Invisible Wire** | Trampa | — | imagenescartas/Mundo1/684.jpg |
-| #685 | **Acid Trap Hole** | Trampa | — | imagenescartas/Mundo1/685.jpg |
-| #686 | **Widespread Ruin** | Trampa | — | imagenescartas/Mundo1/686.jpg |
-| #687 | **Goblin Fan** | Trampa | — | imagenescartas/Mundo1/687.jpg |
-| #688 | **Bad Reaction to Simochi** | Trampa | — | imagenescartas/Mundo1/688.jpg |
-| #689 | **Reverse Trap** | Trampa | — | imagenescartas/Mundo1/689.jpg |
-| #690 | **Fake Trap** | Trampa | — | imagenescartas/Mundo1/690.jpg |
-| #700 | **Fortress Whale's Oath** | Magia | — | imagenescartas/Mundo1/700.jpg |
+| #681 | **House of Adhesive Tape** | TRAP | 1000 / 1000 | imagenescartas/Mundo1/681.jpg |
+| #682 | **Eatgaboon** | TRAP | — | imagenescartas/Mundo1/682.jpg |
+| #683 | **Bear Trap** | TRAP | — | imagenescartas/Mundo1/683.jpg |
+| #684 | **Invisible Wire** | TRAP | — | imagenescartas/Mundo1/684.jpg |
+| #685 | **Acid Trap Hole** | TRAP | — | imagenescartas/Mundo1/685.jpg |
+| #686 | **Widespread Ruin** | TRAP | — | imagenescartas/Mundo1/686.jpg |
+| #687 | **Goblin Fan** | TRAP | — | imagenescartas/Mundo1/687.jpg |
+| #688 | **Bad Reaction to Simochi** | TRAP | — | imagenescartas/Mundo1/688.jpg |
+| #689 | **Reverse Trap** | TRAP | — | imagenescartas/Mundo1/689.jpg |
+| #690 | **Fake Trap** | TRAP | — | imagenescartas/Mundo1/690.jpg |
+| #700 | **Fortress Whale's Oath** | SPELL | — | imagenescartas/Mundo1/700.jpg |
 | #701 | **Performance of Sword** | Monstruo (Warrior) | 1950 / 1850 | imagenescartas/Mundo1/701.jpg |
 | #702 | **Hungry Burger** | Monstruo (Warrior) | 2000 / 1850 | imagenescartas/Mundo1/702.jpg |
 | #703 | **Sengenjin** | Monstruo (Beast-Warrior) | 2750 / 2500 | imagenescartas/Mundo1/703.jpg |
@@ -659,28 +659,28 @@
 | #744 | **Lekunga** | Monstruo (Plant) | 1700 / 500 | imagenescartas/Mundo1/744.jpg |
 | #745 | **Lord Poison** | Monstruo (Plant) | 1500 / 1000 | imagenescartas/Mundo1/745.jpg |
 | #746 | **Magical Reflect Slime** | Monstruo (Aqua) | 700 / 1200 | imagenescartas/Mundo1/746.jpg |
-| #750 | **The Dark Door** | Magia | — | imagenescartas/Mundo1/750.jpg |
-| #751 | **The Shallow Grave** | Magia | — | imagenescartas/Mundo1/751.jpg |
-| #752 | **Dark Spirit of the Silent** | Trampa | — | imagenescartas/Mundo1/752.jpg |
-| #753 | **Destiny Board** | Trampa | — | imagenescartas/Mundo1/753.jpg |
-| #754 | **Sentence of Doom** | Trampa | — | imagenescartas/Mundo1/754.jpg |
-| #755 | **Zoma the Spirit** | Trampa | — | imagenescartas/Mundo1/755.jpg |
+| #750 | **The Dark Door** | SPELL | — | imagenescartas/Mundo1/750.jpg |
+| #751 | **The Shallow Grave** | SPELL | — | imagenescartas/Mundo1/751.jpg |
+| #752 | **Dark Spirit of the Silent** | TRAP | — | imagenescartas/Mundo1/752.jpg |
+| #753 | **Destiny Board** | TRAP | — | imagenescartas/Mundo1/753.jpg |
+| #754 | **Sentence of Doom** | TRAP | — | imagenescartas/Mundo1/754.jpg |
+| #755 | **Zoma the Spirit** | TRAP | — | imagenescartas/Mundo1/755.jpg |
 | #756 | **The Winged Dragon of Ra** | Monstruo (Divine-Beast) | 5000 / 5000 | imagenescartas/Mundo1/756.jpg |
-| #757 | **Card of Safe Return** | Magia | — | imagenescartas/Mundo1/757.jpg |
-| #758 | **Jam Breeding Machine** | Magia | — | imagenescartas/Mundo1/758.jpg |
-| #759 | **Left Arm Offering** | Magia | — | imagenescartas/Mundo1/759.jpg |
-| #760 | **Machine Duplication** | Magia | — | imagenescartas/Mundo1/760.jpg |
-| #761 | **Magical Stone Excavation** | Magia | — | imagenescartas/Mundo1/761.jpg |
-| #762 | **Nightmare's Steelcage** | Magia | — | imagenescartas/Mundo1/762.jpg |
-| #763 | **Coffin Seller** | Trampa | — | imagenescartas/Mundo1/763.jpg |
-| #764 | **Dark Spell Regeneration** | Trampa | — | imagenescartas/Mundo1/764.jpg |
-| #765 | **Fiend's Hand Mirror** | Trampa | — | imagenescartas/Mundo1/765.jpg |
-| #766 | **Hidden Soldiers** | Trampa | — | imagenescartas/Mundo1/766.jpg |
-| #767 | **Jam Defender** | Trampa | — | imagenescartas/Mundo1/767.jpg |
-| #768 | **Metal Reflect Slime** | Trampa | — | imagenescartas/Mundo1/768.jpg |
-| #769 | **Nightmare Wheel** | Trampa | — | imagenescartas/Mundo1/769.jpg |
-| #770 | **Relieve Monster** | Trampa | — | imagenescartas/Mundo1/770.jpg |
-| #771 | **Rope of Life** | Trampa | — | imagenescartas/Mundo1/771.jpg |
+| #757 | **Card of Safe Return** | SPELL | — | imagenescartas/Mundo1/757.jpg |
+| #758 | **Jam Breeding Machine** | SPELL | — | imagenescartas/Mundo1/758.jpg |
+| #759 | **Left Arm Offering** | SPELL | — | imagenescartas/Mundo1/759.jpg |
+| #760 | **Machine Duplication** | SPELL | — | imagenescartas/Mundo1/760.jpg |
+| #761 | **Magical Stone Excavation** | SPELL | — | imagenescartas/Mundo1/761.jpg |
+| #762 | **Nightmare's Steelcage** | SPELL | — | imagenescartas/Mundo1/762.jpg |
+| #763 | **Coffin Seller** | TRAP | — | imagenescartas/Mundo1/763.jpg |
+| #764 | **Dark Spell Regeneration** | TRAP | — | imagenescartas/Mundo1/764.jpg |
+| #765 | **Fiend's Hand Mirror** | TRAP | — | imagenescartas/Mundo1/765.jpg |
+| #766 | **Hidden Soldiers** | TRAP | — | imagenescartas/Mundo1/766.jpg |
+| #767 | **Jam Defender** | TRAP | — | imagenescartas/Mundo1/767.jpg |
+| #768 | **Metal Reflect Slime** | TRAP | — | imagenescartas/Mundo1/768.jpg |
+| #769 | **Nightmare Wheel** | TRAP | — | imagenescartas/Mundo1/769.jpg |
+| #770 | **Relieve Monster** | TRAP | — | imagenescartas/Mundo1/770.jpg |
+| #771 | **Rope of Life** | TRAP | — | imagenescartas/Mundo1/771.jpg |
 | #772 | **Egyptian God Slime** | Fusión (Aqua) | 3000 / 3000 | imagenescartas/Mundo1/772.jpg |
 | #773 | **Humanoid Worm Drake** | Fusión (Aqua) | 2200 / 2000 | imagenescartas/Mundo1/773.jpg |
 | #774 | **Obelisk the Tormentor** | Monstruo (Divine-Beast) | 5000 / 5000 | imagenescartas/Mundo1/774.jpg |
@@ -690,16 +690,16 @@
 | #778 | **Chiron the Mage** | Monstruo (Beast-Warrior) | 1800 / 1000 | imagenescartas/Mundo1/778.jpg |
 | #779 | **Giant Rex** | Monstruo (Dinosaur) | 2000 / 1200 | imagenescartas/Mundo1/779.jpg |
 | #780 | **Gradius** | Monstruo (Machine) | 1200 / 800 | imagenescartas/Mundo1/780.jpg |
-| #781 | **Cyclon Laser** | Magia | — | imagenescartas/Mundo1/781.jpg |
-| #782 | **Mirror of Yata** | Magia | — | imagenescartas/Mundo1/782.jpg |
-| #783 | **Orb of Yasaka** | Magia | — | imagenescartas/Mundo1/783.jpg |
-| #784 | **Sebek's Blessing** | Magia | — | imagenescartas/Mundo1/784.jpg |
-| #785 | **Spiritual Energy Settle Machine** | Magia | — | imagenescartas/Mundo1/785.jpg |
-| #786 | **Spiritual Entanglement** | Magia | — | imagenescartas/Mundo1/786.jpg |
-| #787 | **Spring of Rebirth** | Magia | — | imagenescartas/Mundo1/787.jpg |
-| #788 | **Sword of Kusanagi** | Magia | — | imagenescartas/Mundo1/788.jpg |
-| #789 | **Tribute to the Doomed** | Magia | — | imagenescartas/Mundo1/789.jpg |
-| #790 | **Legacy of Yata-Garasu** | Trampa | — | imagenescartas/Mundo1/790.jpg |
+| #781 | **Cyclon Laser** | SPELL | — | imagenescartas/Mundo1/781.jpg |
+| #782 | **Mirror of Yata** | SPELL | — | imagenescartas/Mundo1/782.jpg |
+| #783 | **Orb of Yasaka** | SPELL | — | imagenescartas/Mundo1/783.jpg |
+| #784 | **Sebek's Blessing** | SPELL | — | imagenescartas/Mundo1/784.jpg |
+| #785 | **Spiritual Energy Settle Machine** | SPELL | — | imagenescartas/Mundo1/785.jpg |
+| #786 | **Spiritual Entanglement** | SPELL | — | imagenescartas/Mundo1/786.jpg |
+| #787 | **Spring of Rebirth** | SPELL | — | imagenescartas/Mundo1/787.jpg |
+| #788 | **Sword of Kusanagi** | SPELL | — | imagenescartas/Mundo1/788.jpg |
+| #789 | **Tribute to the Doomed** | SPELL | — | imagenescartas/Mundo1/789.jpg |
+| #790 | **Legacy of Yata-Garasu** | TRAP | — | imagenescartas/Mundo1/790.jpg |
 | #791 | **Agido** | Monstruo (Fairy) | 1500 / 1300 | imagenescartas/Mundo1/791.jpg |
 | #792 | **Agido the Ancient Sentinel** | Monstruo (Fairy) | 1500 / 1300 | imagenescartas/Mundo1/792.jpg |
 | #793 | **Airknight Parshath** | Monstruo (Fairy) | 1900 / 1400 | imagenescartas/Mundo1/793.jpg |
@@ -715,22 +715,22 @@
 | #803 | **Wingweaver** | Monstruo (Fairy) | 2750 / 2400 | imagenescartas/Mundo1/803.jpg |
 | #804 | **Zolga** | Monstruo (Fairy) | 1700 / 1200 | imagenescartas/Mundo1/804.jpg |
 | #805 | **Zolga the Prophet** | Monstruo (Fairy) | 1700 / 1200 | imagenescartas/Mundo1/805.jpg |
-| #806 | **Cestus of Dagla** | Magia | — | imagenescartas/Mundo1/806.jpg |
-| #807 | **Dragged Down into the Grave** | Magia | — | imagenescartas/Mundo1/807.jpg |
-| #808 | **Gold Sarcophagus** | Magia | — | imagenescartas/Mundo1/808.jpg |
-| #809 | **Spell Reproduction** | Magia | — | imagenescartas/Mundo1/809.jpg |
-| #810 | **Blast Held by a Tribute** | Trampa | — | imagenescartas/Mundo1/810.jpg |
-| #811 | **Blast Held by Destiny** | Trampa | — | imagenescartas/Mundo1/811.jpg |
-| #812 | **Exchange of Despair and Hope** | Trampa | — | imagenescartas/Mundo1/812.jpg |
-| #813 | **Exchange of the Spirit** | Trampa | — | imagenescartas/Mundo1/813.jpg |
-| #814 | **Gravekeeper's Trap** | Trampa | — | imagenescartas/Mundo1/814.jpg |
-| #815 | **Muko** | Trampa | — | imagenescartas/Mundo1/815.jpg |
+| #806 | **Cestus of Dagla** | SPELL | — | imagenescartas/Mundo1/806.jpg |
+| #807 | **Dragged Down into the Grave** | SPELL | — | imagenescartas/Mundo1/807.jpg |
+| #808 | **Gold Sarcophagus** | SPELL | — | imagenescartas/Mundo1/808.jpg |
+| #809 | **Spell Reproduction** | SPELL | — | imagenescartas/Mundo1/809.jpg |
+| #810 | **Blast Held by a Tribute** | TRAP | — | imagenescartas/Mundo1/810.jpg |
+| #811 | **Blast Held by Destiny** | TRAP | — | imagenescartas/Mundo1/811.jpg |
+| #812 | **Exchange of Despair and Hope** | TRAP | — | imagenescartas/Mundo1/812.jpg |
+| #813 | **Exchange of the Spirit** | TRAP | — | imagenescartas/Mundo1/813.jpg |
+| #814 | **Gravekeeper's Trap** | TRAP | — | imagenescartas/Mundo1/814.jpg |
+| #815 | **Muko** | TRAP | — | imagenescartas/Mundo1/815.jpg |
 | #816 | **A Man with Wdjat** | Monstruo (Spellcaster) | 1600 / 1600 | imagenescartas/Mundo1/816.jpg |
-| #817 | **Dragon's Rage** | Trampa | — | imagenescartas/Mundo1/817.jpg |
-| #818 | **Interdimensional Matter Transporter** | Trampa | — | imagenescartas/Mundo1/818.jpg |
-| #819 | **Ring of Destruction** | Trampa | — | imagenescartas/Mundo1/819.jpg |
-| #820 | **Shadow Spell** | Trampa | — | imagenescartas/Mundo1/820.jpg |
-| #821 | **Tyrant Wing** | Trampa | — | imagenescartas/Mundo1/821.jpg |
+| #817 | **Dragon's Rage** | TRAP | — | imagenescartas/Mundo1/817.jpg |
+| #818 | **Interdimensional Matter Transporter** | TRAP | — | imagenescartas/Mundo1/818.jpg |
+| #819 | **Ring of Destruction** | TRAP | — | imagenescartas/Mundo1/819.jpg |
+| #820 | **Shadow Spell** | TRAP | — | imagenescartas/Mundo1/820.jpg |
+| #821 | **Tyrant Wing** | TRAP | — | imagenescartas/Mundo1/821.jpg |
 | #822 | **Doom Virus Dragon** | Fusión (Dragon) | 1900 / 1500 | imagenescartas/Mundo1/822.jpg |
 | #823 | **Tyrant Burst Dragon** | Fusión (Dragon) | 2900 / 2500 | imagenescartas/Mundo1/823.jpg |
 | #824 | **XY-Dragon Cannon** | Fusión (Machine) | 2200 / 1900 | imagenescartas/Mundo1/824.jpg |
