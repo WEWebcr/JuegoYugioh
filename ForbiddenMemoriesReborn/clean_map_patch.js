@@ -4236,45 +4236,57 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         cardPool = ['Dark Magician', 'Blue-Eyes White Dragon', 'Summoned Skull', 'Red-Eyes Black Dragon', 'Celtic Guardian'];
     }
 
-    const NEW_REWARD_TRAPS = [
-        'Eatgaboon', 'Bear Trap', 'Invisible Wire', 'Acid Trap Hole',
-        'Widespread Ruin', 'Goblin Fan', 'Bad Reaction to Simochi',
-        'Reverse Trap', 'Fake Trap'
-    ];
-    window.NEW_REWARD_TRAPS = NEW_REWARD_TRAPS;
-    NEW_REWARD_TRAPS.forEach(t => {
-        if (!cardPool.includes(t)) cardPool.push(t);
-    });
-
-    const NEW_REWARD_MONSTERS = [
-        'Seiyaryu', 'Three-legged Zombies', 'Zera The Mant', 'Flying Penguin',
-        'Millennium Shield', "Fairy's Gift", 'Black Luster Soldier', "Fiend's Mirror",
-        'Labyrinth Wall', 'Jirai Gumo', 'Shadow Ghoul', 'Wall Shadow',
-        'Labyrinth Tank', 'Sanga of the Thunder', 'Kazejin', 'Suijin',
-        'Dungeon Worm', 'Monster Tamer', 'Ryu-kishin Powered', 'Swordstalker',
-        'La Jinn the Mystical Genie', 'Toon Alligator', 'Rude Kaiser', 'Parrot Dragon',
-        'Dark Rabbit', 'Bickuribox', "Harpie's Pet Dragon", 'Mystic Lamp',
-        'Pendulum Machine', 'Giltia the D. Knight', 'Launcher Spider', 'Zone Eater',
-        'Aqua Dragon', 'Sea King Dragon', 'Turu-Purun', 'Guardian of the Sea',
-        'Aqua Snake', 'Giant Red Seasnake', 'Spike Seadra', '30,000-Year White Turtle',
-        'Kappa Avenger', 'Kanikabuto', 'Zarigun', 'Millennium Golem',
-        'Destroyer Golem', 'Barrel Rock', 'Minomushi Warrior', 'Stone Ghost',
-        'Kaminari Attack', 'Tripwire Beast', 'Bolt Escargot', 'Bolt Penguin',
-        'The Immortal of Thunder', 'Electric Snake', 'Wing Eagle', 'Punished Eagle',
-        'Performance of Sword', 'Hungry Burger', 'Sengenjin', 'Skull Guardian',
-        'Tri-Horned Dragon', 'Serpent Night Dragon', 'Skull Knight', 'Cosmo Queen',
-        'Meteor Dragon', 'Firewing Pegasus', 'Psycho-Puppet', 'Garma Sword', 'Javelin Beetle', 'Fortress Whale', 'Dokurorider', 'Mask of Shine & Dark',
-        'Summoned Skull', 'Meteor B. Dragon'
-    ];
-    window.NEW_REWARD_MONSTERS = NEW_REWARD_MONSTERS;
-    NEW_REWARD_MONSTERS.forEach(m => {
-        if (!cardPool.includes(m)) cardPool.push(m);
-    });
-
     let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    if (normalizedOpp === 'joey' || normalizedOpp === 'pegasus') {
-        if (!cardPool.includes('Summoned Skull')) cardPool.push('Summoned Skull');
-        if (!cardPool.includes('Meteor B. Dragon')) cardPool.push('Meteor B. Dragon');
+    const GX_OPPONENTS_SET = new Set(['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster']);
+    let isGXOpponent = GX_OPPONENTS_SET.has(normalizedOpp);
+
+    // Si es un duelista de GX, incluimos su Extra Deck y garantizamos cartas temáticas de su arquetipo
+    if (isGXOpponent) {
+        if (oppDeck && Array.isArray(oppDeck.extraDeck || oppDeck.extra_deck)) {
+            let extraList = oppDeck.extraDeck || oppDeck.extra_deck;
+            extraList.forEach(ec => { if (!cardPool.includes(ec)) cardPool.push(ec); });
+        }
+    } else {
+        // En Mundo 1 (DM) mantenemos las cartas de drop clásico
+        const NEW_REWARD_TRAPS = [
+            'Eatgaboon', 'Bear Trap', 'Invisible Wire', 'Acid Trap Hole',
+            'Widespread Ruin', 'Goblin Fan', 'Bad Reaction to Simochi',
+            'Reverse Trap', 'Fake Trap'
+        ];
+        window.NEW_REWARD_TRAPS = NEW_REWARD_TRAPS;
+        NEW_REWARD_TRAPS.forEach(t => {
+            if (!cardPool.includes(t)) cardPool.push(t);
+        });
+
+        const NEW_REWARD_MONSTERS = [
+            'Seiyaryu', 'Three-legged Zombies', 'Zera The Mant', 'Flying Penguin',
+            'Millennium Shield', "Fairy's Gift", 'Black Luster Soldier', "Fiend's Mirror",
+            'Labyrinth Wall', 'Jirai Gumo', 'Shadow Ghoul', 'Wall Shadow',
+            'Labyrinth Tank', 'Sanga of the Thunder', 'Kazejin', 'Suijin',
+            'Dungeon Worm', 'Monster Tamer', 'Ryu-kishin Powered', 'Swordstalker',
+            'La Jinn the Mystical Genie', 'Toon Alligator', 'Rude Kaiser', 'Parrot Dragon',
+            'Dark Rabbit', 'Bickuribox', "Harpie's Pet Dragon", 'Mystic Lamp',
+            'Pendulum Machine', 'Giltia the D. Knight', 'Launcher Spider', 'Zone Eater',
+            'Aqua Dragon', 'Sea King Dragon', 'Turu-Purun', 'Guardian of the Sea',
+            'Aqua Snake', 'Giant Red Seasnake', 'Spike Seadra', '30,000-Year White Turtle',
+            'Kappa Avenger', 'Kanikabuto', 'Zarigun', 'Millennium Golem',
+            'Destroyer Golem', 'Barrel Rock', 'Minomushi Warrior', 'Stone Ghost',
+            'Kaminari Attack', 'Tripwire Beast', 'Bolt Escargot', 'Bolt Penguin',
+            'The Immortal of Thunder', 'Electric Snake', 'Wing Eagle', 'Punished Eagle',
+            'Performance of Sword', 'Hungry Burger', 'Sengenjin', 'Skull Guardian',
+            'Tri-Horned Dragon', 'Serpent Night Dragon', 'Skull Knight', 'Cosmo Queen',
+            'Meteor Dragon', 'Firewing Pegasus', 'Psycho-Puppet', 'Garma Sword', 'Javelin Beetle', 'Fortress Whale', 'Dokurorider', 'Mask of Shine & Dark',
+            'Summoned Skull', 'Meteor B. Dragon'
+        ];
+        window.NEW_REWARD_MONSTERS = NEW_REWARD_MONSTERS;
+        NEW_REWARD_MONSTERS.forEach(m => {
+            if (!cardPool.includes(m)) cardPool.push(m);
+        });
+
+        if (normalizedOpp === 'joey' || normalizedOpp === 'pegasus') {
+            if (!cardPool.includes('Summoned Skull')) cardPool.push('Summoned Skull');
+            if (!cardPool.includes('Meteor B. Dragon')) cardPool.push('Meteor B. Dragon');
+        }
     }
 
     // REGLAS ESPECIALES DE RECOMPENSAS:
@@ -4299,54 +4311,78 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         }
     }
 
-    // Asegurar alta probabilidad de ofrecer los nuevos monstruos y trampas clásicas como recompensas
-    if (Math.random() < 0.85 && selected3.length > 0) {
-        let unownedMonsters = NEW_REWARD_MONSTERS.filter(m => (s.collection[m] || 0) < 3);
-        let unownedTraps = NEW_REWARD_TRAPS.filter(t => (s.collection[t] || 0) < 3);
-        let poolFeatured = (unownedMonsters.length > 0 && Math.random() < 0.6) ? unownedMonsters : (unownedTraps.length > 0 ? unownedTraps : NEW_REWARD_MONSTERS);
-        let bonusReward = poolFeatured[Math.floor(Math.random() * poolFeatured.length)];
-        if (bonusReward && !selected3.includes(bonusReward)) {
-            selected3[selected3.length - 1] = bonusReward;
-        }
-    }
-
-    // APLICACIÓN DE REGLAS DE RECOMPENSAS MUY RARAS:
     let rankStr = String(rank || '').toUpperCase();
     let isHighRank = rankStr.includes('S') || rankStr.includes('A');
-    let isKaibaOrYugi = (normalizedOpp === 'kaiba' || normalizedOpp === 'seto' || normalizedOpp === 'yugi' || normalizedOpp === 'atem');
 
-    // Blue-Eyes Ultimate Dragon y Gate Guardian: solo Seto Kaiba y Yugi, rango S o A, probabilidad muy rara (~5%)
-    if (isKaibaOrYugi && isHighRank && Math.random() < 0.06 && selected3.length > 0) {
-        let unownedBoss = ULTRA_RARE_BOSS_CARDS.filter(c => (s.collection[c] || 0) < 3);
-        let bossChoice = unownedBoss.length > 0
-            ? unownedBoss[Math.floor(Math.random() * unownedBoss.length)]
-            : ULTRA_RARE_BOSS_CARDS[Math.floor(Math.random() * ULTRA_RARE_BOSS_CARDS.length)];
-        if (bossChoice && !selected3.includes(bossChoice)) {
-            selected3[0] = bossChoice; // Posición de honor para la recompensa suprema
+    // RECOMPENSAS GX EXCLUSIVAS Y JEFES SUPREMOS:
+    if (isGXOpponent) {
+        // En GX, si el rango es S o A (o 65% de probabilidad), garantizamos al menos 1 carta estrella o Fusión del deck del rival
+        let gxBossPool = [];
+        if (oppDeck && Array.isArray(oppDeck.extraDeck || oppDeck.extra_deck) && (oppDeck.extraDeck || oppDeck.extra_deck).length > 0) {
+            gxBossPool = [...new Set(oppDeck.extraDeck || oppDeck.extra_deck)];
         }
-    }
-
-    // Zoa y Metalzoa: recompensas muy raras (~4% de probabilidad en duelos de rango S o A)
-    if (isHighRank && Math.random() < 0.05 && selected3.length > 0) {
-        let unownedVR = VERY_RARE_CARDS.filter(c => (s.collection[c] || 0) < 3);
-        let vrChoice = unownedVR.length > 0
-            ? unownedVR[Math.floor(Math.random() * unownedVR.length)]
-            : VERY_RARE_CARDS[Math.floor(Math.random() * VERY_RARE_CARDS.length)];
-        if (vrChoice && !selected3.includes(vrChoice)) {
-            selected3[selected3.length - 1] = vrChoice;
+        // Si no tiene Extra Deck (ej. Bastion), usar sus cartas más poderosas
+        if (gxBossPool.length === 0 && oppDeck && oppDeck.cards) {
+            gxBossPool = oppDeck.cards.filter(c => ['Water Dragon', 'Hydrogeddon', 'Oxygeddon', 'Ancient Gear Golem', 'Dark Armed Dragon', 'Armed Dragon LV7', 'Destiny HERO - Plasma'].includes(c));
         }
-    }
+        if (gxBossPool.length > 0) {
+            let unownedBoss = gxBossPool.filter(c => (s.collection[c] || 0) < 3);
+            let bossChoice = unownedBoss.length > 0
+                ? unownedBoss[Math.floor(Math.random() * unownedBoss.length)]
+                : gxBossPool[Math.floor(Math.random() * gxBossPool.length)];
+            let bossChance = isHighRank ? 0.90 : 0.65;
+            if (Math.random() < bossChance && bossChoice && !selected3.includes(bossChoice) && selected3.length > 0) {
+                selected3[0] = bossChoice; // Posición de honor
+            }
+        }
+    } else {
+        // Asegurar alta probabilidad de ofrecer los nuevos monstruos y trampas clásicas como recompensas en DM
+        if (Math.random() < 0.85 && selected3.length > 0 && Array.isArray(window.NEW_REWARD_MONSTERS)) {
+            let unownedMonsters = (window.NEW_REWARD_MONSTERS || []).filter(m => (s.collection[m] || 0) < 3);
+            let unownedTraps = (window.NEW_REWARD_TRAPS || []).filter(t => (s.collection[t] || 0) < 3);
+            let poolFeatured = (unownedMonsters.length > 0 && Math.random() < 0.6) ? unownedMonsters : (unownedTraps.length > 0 ? unownedTraps : window.NEW_REWARD_MONSTERS);
+            let bonusReward = poolFeatured[Math.floor(Math.random() * poolFeatured.length)];
+            if (bonusReward && !selected3.includes(bonusReward)) {
+                selected3[selected3.length - 1] = bonusReward;
+            }
+        }
 
-    // RECOMPENSAS DESTACADAS DE JOEY Y PEGASUS: Summoned Skull y Meteor B. Dragon (3500 ATK)
-    if ((normalizedOpp === 'joey' || normalizedOpp === 'pegasus') && selected3.length > 0) {
-        let jpPool = ['Summoned Skull', 'Meteor B. Dragon'];
-        let unownedJP = jpPool.filter(c => (s.collection[c] || 0) < 3);
-        let jpChoice = unownedJP.length > 0
-            ? unownedJP[Math.floor(Math.random() * unownedJP.length)]
-            : jpPool[Math.floor(Math.random() * jpPool.length)];
-        let jpChance = isHighRank ? 0.85 : 0.55;
-        if (Math.random() < jpChance && jpChoice && !selected3.includes(jpChoice)) {
-            selected3[selected3.length - 1] = jpChoice;
+        // APLICACIÓN DE REGLAS DE RECOMPENSAS MUY RARAS:
+        let isKaibaOrYugi = (normalizedOpp === 'kaiba' || normalizedOpp === 'seto' || normalizedOpp === 'yugi' || normalizedOpp === 'atem');
+
+        // Blue-Eyes Ultimate Dragon y Gate Guardian: solo Seto Kaiba y Yugi, rango S o A, probabilidad muy rara (~5%)
+        if (isKaibaOrYugi && isHighRank && Math.random() < 0.06 && selected3.length > 0) {
+            let unownedBoss = ULTRA_RARE_BOSS_CARDS.filter(c => (s.collection[c] || 0) < 3);
+            let bossChoice = unownedBoss.length > 0
+                ? unownedBoss[Math.floor(Math.random() * unownedBoss.length)]
+                : ULTRA_RARE_BOSS_CARDS[Math.floor(Math.random() * ULTRA_RARE_BOSS_CARDS.length)];
+            if (bossChoice && !selected3.includes(bossChoice)) {
+                selected3[0] = bossChoice; // Posición de honor para la recompensa suprema
+            }
+        }
+
+        // Zoa y Metalzoa: recompensas muy raras (~4% de probabilidad en duelos de rango S o A)
+        if (isHighRank && Math.random() < 0.05 && selected3.length > 0) {
+            let unownedVR = VERY_RARE_CARDS.filter(c => (s.collection[c] || 0) < 3);
+            let vrChoice = unownedVR.length > 0
+                ? unownedVR[Math.floor(Math.random() * unownedVR.length)]
+                : VERY_RARE_CARDS[Math.floor(Math.random() * VERY_RARE_CARDS.length)];
+            if (vrChoice && !selected3.includes(vrChoice)) {
+                selected3[selected3.length - 1] = vrChoice;
+            }
+        }
+
+        // RECOMPENSAS DESTACADAS DE JOEY Y PEGASUS: Summoned Skull y Meteor B. Dragon (3500 ATK)
+        if ((normalizedOpp === 'joey' || normalizedOpp === 'pegasus') && selected3.length > 0) {
+            let jpPool = ['Summoned Skull', 'Meteor B. Dragon'];
+            let unownedJP = jpPool.filter(c => (s.collection[c] || 0) < 3);
+            let jpChoice = unownedJP.length > 0
+                ? unownedJP[Math.floor(Math.random() * unownedJP.length)]
+                : jpPool[Math.floor(Math.random() * jpPool.length)];
+            let jpChance = isHighRank ? 0.85 : 0.55;
+            if (Math.random() < jpChance && jpChoice && !selected3.includes(jpChoice)) {
+                selected3[selected3.length - 1] = jpChoice;
+            }
         }
     }
     
@@ -8360,6 +8396,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     g._storyResult3000 = null;
     g._turnStarts67 = { player: (g.first === "player" ? 1 : 0), enemy: (g.first === "enemy" ? 1 : 0) };
     g._aiPlan108 = null;
+
+    // Para que los rivales de GX jueguen siempre con sus cartas de mayor ataque posible e impacto en mano:
+    var normalizedOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    var isGXOpp = ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(normalizedOppKey) || !isWorld1Duel();
+    if (isGXOpp && Array.isArray(g.enemyDeck)) {
+      g.enemyDeck.sort(function(a, b) {
+        var aScore = (typeof getCardStats === 'function' ? (getCardStats(a).atk || 0) : (a.atk || a[4] || 0));
+        var bScore = (typeof getCardStats === 'function' ? (getCardStats(b).atk || 0) : (b.atk || b[4] || 0));
+        var aName = (a.name || a[0] || '').toLowerCase();
+        var bName = (b.name || b[0] || '').toLowerCase();
+        var topCards = ['pot of greed', 'graceful charity', 'raigeki', 'limiter removal', 'mirror force', 'united we stand', 'mage power', 'heavy storm', 'call of the haunted'];
+        if (topCards.includes(aName)) aScore += 3000;
+        if (topCards.includes(bName)) bScore += 3000;
+        return aScore - bScore;
+      });
+    }
 
     // Robar 5 cartas iniciales legítimas
     for (var h = 0; h < 5; h++) {
@@ -12526,6 +12578,100 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    // A0.1 IA AGRESIVA ACTIVA MAGIAS DESDE LA MANO (Robo y Destrucción Masiva)
+    var isGXOpponentDuel = ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(opp) || (window.storyDuelActive && !isWorld1Duel());
+    
+    // Pot of Greed
+    var potIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Pot of Greed' || (c.value && c.value === 'POT_OF_GREED')); });
+    if (potIdx >= 0) {
+      var pCard = game.enemyHand.splice(potIdx, 1)[0];
+      game.enemyGrave.push(Object.assign({}, pCard, { faceUp: true, set: false }));
+      for (var d = 0; d < 2; d++) {
+        if (game.enemyDeck.length) game.enemyHand.push(game.enemyDeck.pop());
+      }
+      if (window.playDrawSound) window.playDrawSound();
+      duelToast('¡' + opp.toUpperCase() + ' activa Pot of Greed y roba 2 cartas!');
+      if (typeof log === 'function') log('¡El rival activa Pot of Greed y roba 2 cartas!');
+      if (typeof render === 'function') render();
+    }
+
+    // Graceful Charity
+    var charIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Graceful Charity' || (c.value && c.value === 'GRACEFUL_CHARITY')); });
+    if (charIdx >= 0) {
+      var gcCard = game.enemyHand.splice(charIdx, 1)[0];
+      game.enemyGrave.push(Object.assign({}, gcCard, { faceUp: true, set: false }));
+      for (var d = 0; d < 3; d++) {
+        if (game.enemyDeck.length) game.enemyHand.push(game.enemyDeck.pop());
+      }
+      for (var disc = 0; disc < 2; disc++) {
+        if (game.enemyHand.length > 0) {
+          game.enemyHand.sort(function(a, b) {
+            var aScore = (typeof getCardStats === 'function' ? getCardStats(a).atk : (a.atk || 0));
+            var bScore = (typeof getCardStats === 'function' ? getCardStats(b).atk : (b.atk || 0));
+            return aScore - bScore;
+          });
+          game.enemyGrave.push(game.enemyHand.shift());
+        }
+      }
+      if (window.playDrawSound) window.playDrawSound();
+      duelToast('¡' + opp.toUpperCase() + ' activa Graceful Charity! Roba 3 y descarta 2.');
+      if (typeof log === 'function') log('¡El rival activa Graceful Charity!');
+      if (typeof render === 'function') render();
+    }
+
+    // Raigeki (aniquilar monstruos del jugador si tiene presencia en campo)
+    var raigekiIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Raigeki' || (c.value && c.value === 'RAIGEKI')); });
+    if (raigekiIdx >= 0 && (game.field || []).some(Boolean)) {
+      var rCard = game.enemyHand.splice(raigekiIdx, 1)[0];
+      game.enemyGrave.push(Object.assign({}, rCard, { faceUp: true, set: false }));
+      var killedP = 0;
+      for (var pi = 0; pi < (game.field || []).length; pi++) {
+        if (game.field[pi]) {
+          game.grave.push(game.field[pi]);
+          game.field[pi] = null;
+          killedP++;
+        }
+      }
+      if (window.playDestroySound) window.playDestroySound();
+      duelToast('⚡ ¡' + opp.toUpperCase() + ' activa RAIGEKI y destruye tus monstruos!');
+      if (typeof log === 'function') log('¡' + opp.toUpperCase() + ' activa Raigeki y destruye ' + killedP + ' monstruos del jugador!');
+      if (typeof render === 'function') render();
+    }
+
+    // Heavy Storm (barrer cartas mágicas y trampas del jugador si tiene)
+    var hsIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Heavy Storm' || (c.value && c.value === 'HEAVY_STORM')); });
+    if (hsIdx >= 0 && (game.playerBack || []).some(Boolean)) {
+      var hsCard = game.enemyHand.splice(hsIdx, 1)[0];
+      game.enemyGrave.push(Object.assign({}, hsCard, { faceUp: true, set: false }));
+      for (var pb = 0; pb < (game.playerBack || []).length; pb++) {
+        if (game.playerBack[pb]) { game.grave.push(game.playerBack[pb]); game.playerBack[pb] = null; }
+      }
+      for (var eb = 0; eb < (game.enemyBack || []).length; eb++) {
+        if (game.enemyBack[eb]) { game.enemyGrave.push(game.enemyBack[eb]); game.enemyBack[eb] = null; }
+      }
+      if (window.playDestroySound) window.playDestroySound();
+      duelToast('🌪️ ¡' + opp.toUpperCase() + ' activa HEAVY STORM y barre las Magias y Trampas!');
+      if (typeof log === 'function') log('¡' + opp.toUpperCase() + ' activa Heavy Storm y destruye todas las Magias y Trampas!');
+      if (typeof render === 'function') render();
+    }
+
+    // Limiter Removal para Máquinas (Zane, Syrus, Crowler)
+    var lrIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Limiter Removal' || (c.value && c.value === 'LIMITER_REMOVAL')); });
+    if (lrIdx >= 0) {
+      var machs = (game.enemy || []).filter(function(m) { return m && (m.type === 'Machine' || (m[2] && String(m[2]).toLowerCase().includes('machine'))); });
+      if (machs.length > 0) {
+        var lrCard = game.enemyHand.splice(lrIdx, 1)[0];
+        game.enemyGrave.push(Object.assign({}, lrCard, { faceUp: true, set: false }));
+        machs.forEach(function(m) {
+          m.atk = (m.atk || 0) * 2;
+        });
+        if (window.playDestroySound) window.playDestroySound();
+        duelToast('⚙️⚡ ¡' + opp.toUpperCase() + ' activa LIMITER REMOVAL! ¡Duplica el ATK de sus Máquinas!');
+        if (typeof log === 'function') log('¡Limiter Removal! ' + opp.toUpperCase() + ' duplica el ATK de sus monstruos Máquina.');
+        if (typeof render === 'function') render();
+      }
+    }
+
     // A. Colocar Trampas en la fila trasera
     for (var h = game.enemyHand.length - 1; h >= 0; h--) {
       var c = game.enemyHand[h];
@@ -12806,7 +12952,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           else if (pm.pos === 'DEF' && sAtk > Number(pm.def || pm.tempDefense || 0)) canBeatAnyTarget = true;
         });
 
-        if (playerMonsters.length === 0) {
+        if (isGXOpponentDuel) {
+          // IA ULTRA AGRESIVA GX: Los duelistas de la Academia van a la ofensiva total
+          if (sAtk >= 400 || sAtk >= sDef) {
+            summoned.pos = 'ATK';
+          } else {
+            summoned.pos = 'DEF';
+          }
+        } else if (playerMonsters.length === 0) {
           // Campo jugador vacío: atacar directamente a menos que sea extremadamente débil
           if (sAtk >= 1000 || sAtk >= sDef) {
             summoned.pos = 'ATK';
@@ -12819,8 +12972,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           if (sAtk >= playerMaxAtk || canBeatAnyTarget) {
             summoned.pos = 'ATK'; // Agresivo: busca combate
           } else {
-            // Prudente: El jugador tiene monstruos superiores (ej. Crimson Sunbird 3000 ATK > sAtk)
-            // ¡NUNCA exponer un monstruo débil en ATAQUE ante atacantes superiores!
+            // Prudente: El jugador tiene monstruos superiores
             summoned.pos = 'DEF';
           }
         }
