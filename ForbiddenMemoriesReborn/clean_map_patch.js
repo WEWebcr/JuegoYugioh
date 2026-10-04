@@ -3328,6 +3328,16 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     NEW_REWARD_TRAPS.forEach(t => {
         if (!cardPool.includes(t)) cardPool.push(t);
     });
+
+    const NEW_REWARD_MONSTERS = [
+        'Seiyaryu', 'Three-legged Zombies', 'Zera The Mant', 'Flying Penguin',
+        'Millennium Shield', "Fairy's Gift", 'Black Luster Soldier', "Fiend's Mirror",
+        'Labyrinth Wall', 'Jirai Gumo', 'Shadow Ghoul', 'Wall Shadow'
+    ];
+    window.NEW_REWARD_MONSTERS = NEW_REWARD_MONSTERS;
+    NEW_REWARD_MONSTERS.forEach(m => {
+        if (!cardPool.includes(m)) cardPool.push(m);
+    });
     
     // Shuffle pool and select 3 cards
     let shuffled = [...cardPool].sort(() => 0.5 - Math.random());
@@ -3342,14 +3352,15 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         }
     }
 
-    // Asegurar alta probabilidad de ofrecer una de las nuevas trampas clásicas como recompensa
-    if (Math.random() < 0.65 && selected3.length > 0) {
+    // Asegurar alta probabilidad de ofrecer los nuevos monstruos y trampas clásicas como recompensas
+    if (Math.random() < 0.85 && selected3.length > 0) {
+        // Priorizar monstruos solicitados si aún no se tienen 3 copias
+        let unownedMonsters = NEW_REWARD_MONSTERS.filter(m => (s.collection[m] || 0) < 3);
         let unownedTraps = NEW_REWARD_TRAPS.filter(t => (s.collection[t] || 0) < 3);
-        let bonusTrap = unownedTraps.length > 0
-            ? unownedTraps[Math.floor(Math.random() * unownedTraps.length)]
-            : NEW_REWARD_TRAPS[Math.floor(Math.random() * NEW_REWARD_TRAPS.length)];
-        if (bonusTrap && !selected3.includes(bonusTrap)) {
-            selected3[selected3.length - 1] = bonusTrap;
+        let poolFeatured = (unownedMonsters.length > 0 && Math.random() < 0.6) ? unownedMonsters : (unownedTraps.length > 0 ? unownedTraps : NEW_REWARD_MONSTERS);
+        let bonusReward = poolFeatured[Math.floor(Math.random() * poolFeatured.length)];
+        if (bonusReward && !selected3.includes(bonusReward)) {
+            selected3[selected3.length - 1] = bonusReward;
         }
     }
     
@@ -7044,6 +7055,33 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         return { atk: 500, def: 500 };
       }
     }
+    // 4. Bosque (Forest)
+    else if (fb === 'FOREST' || fb === 'FIELD_FOREST') {
+      if (t.includes('insect') || t.includes('insecto') || t.includes('beast') || t.includes('bestia') || t.includes('plant') || t.includes('planta')) {
+        return { atk: 500, def: 500 };
+      }
+    }
+    // 5. Wasteland (Tierra Yerma)
+    else if (fb === 'WASTELAND' || fb === 'FIELD_WASTELAND') {
+      if (t.includes('dinosaur') || t.includes('dinosaurio') || t.includes('zombie') || t.includes('zombi') || t.includes('rock') || t.includes('roca')) {
+        return { atk: 500, def: 500 };
+      }
+    }
+    // 6. Sogen (Pradera de Guerreros)
+    else if (fb === 'SOGEN' || fb === 'FIELD_SOGEN') {
+      if (t.includes('warrior') || t.includes('guerrero')) {
+        return { atk: 500, def: 500 };
+      }
+    }
+    // 7. Umi (Océano)
+    else if (fb === 'UMI' || fb === 'FIELD_UMI') {
+      if (t.includes('aqua') || t.includes('acu') || t.includes('fish') || t.includes('pez') || t.includes('sea serpent') || t.includes('serpiente') || t.includes('thunder') || t.includes('trueno')) {
+        return { atk: 500, def: 500 };
+      }
+      if (t.includes('machine') || t.includes('máquina') || t.includes('maquina') || t.includes('pyro') || t.includes('fuego')) {
+        return { atk: -400, def: -400 };
+      }
+    }
     return { atk: 0, def: 0 };
   };
 
@@ -7195,6 +7233,26 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       badge.innerHTML = '🌑 CAMPO ACTIVO: <span style="color:#ce93d8;">YAMI</span> <span style="font-size:11px;color:#bbb;margin-left:6px;">(+500 Demonios/Magos | -400 Hadas)</span>';
       badge.style.borderColor = '#9c27b0';
       badge.style.boxShadow = '0 0 12px rgba(156,39,176,0.4)';
+    } else if (fb === 'FOREST' || fb === 'FIELD_FOREST') {
+      badge.style.display = 'block';
+      badge.innerHTML = '🌲 CAMPO ACTIVO: <span style="color:#81c784;">BOSQUE</span> <span style="font-size:11px;color:#bbb;margin-left:6px;">(+500 Insecto, Bestia, Planta)</span>';
+      badge.style.borderColor = '#4caf50';
+      badge.style.boxShadow = '0 0 12px rgba(76,175,80,0.4)';
+    } else if (fb === 'WASTELAND' || fb === 'FIELD_WASTELAND') {
+      badge.style.display = 'block';
+      badge.innerHTML = '🏜️ CAMPO ACTIVO: <span style="color:#ffb74d;">TIERRA YERMA</span> <span style="font-size:11px;color:#bbb;margin-left:6px;">(+500 Dinosaurio, Zombi, Roca)</span>';
+      badge.style.borderColor = '#ff9800';
+      badge.style.boxShadow = '0 0 12px rgba(255,152,0,0.4)';
+    } else if (fb === 'SOGEN' || fb === 'FIELD_SOGEN') {
+      badge.style.display = 'block';
+      badge.innerHTML = '⚔️ CAMPO ACTIVO: <span style="color:#ffd54f;">SOGEN</span> <span style="font-size:11px;color:#bbb;margin-left:6px;">(+500 Guerreros y Bestias-Guerrero)</span>';
+      badge.style.borderColor = '#ffc107';
+      badge.style.boxShadow = '0 0 12px rgba(255,193,7,0.4)';
+    } else if (fb === 'UMI' || fb === 'FIELD_UMI') {
+      badge.style.display = 'block';
+      badge.innerHTML = '🌊 CAMPO ACTIVO: <span style="color:#4dd0e1;">UMI</span> <span style="font-size:11px;color:#bbb;margin-left:6px;">(+500 Agua, Pez, Trueno | -400 Máq/Fuego)</span>';
+      badge.style.borderColor = '#00bcd4';
+      badge.style.boxShadow = '0 0 12px rgba(0,188,212,0.4)';
     } else {
       badge.style.display = 'none';
       if (typeof window.updateFieldBoardTheme === 'function') window.updateFieldBoardTheme(null);
@@ -8454,12 +8512,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var equipNames = [
       'Axe of Despair', 'Black Pendant', 'Horn of the Unicorn', 'Dragon Treasure',
       'Garra del Dragón', 'United We Stand', 'Fusion Weapon', 'Malevolent Nuzzler',
-      'Sword of Dark Destruction', 'Dark Energy', 'Invigoration', 'Electro-Whip',
+      'Sword of Dark Destruction', 'Dark Energy', 'Invigoration', 'Electro-Whip', 'Electro-whip',
       'Cyber Shield', 'Mystical Moon', 'Silver Bow and Arrow', 'Book of Secret Arts',
       'Elf\'s Light', 'Beast Fangs', 'Steel Shell', 'Vile Germs', 'Shine Palace',
       'Salamandra', 'Kunai with Chain', 'Megamorph', 'Sword of Kusanagi', 'Cestus of Dagla',
       'Magic Formula', 'Cyclon Laser', 'Mirror of Yata', 'Orb of Yasaka', 'Shattered Axe',
-      'Mage Power', 'Poder del Mago'
+      'Mage Power', 'Poder del Mago', 'Legendary Sword', 'Laser Cannon Armor',
+      'Insect Armor with Laser Cannon', 'Horn of Light', 'Elegant Egotist',
+      'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin', 'Violet Crystal'
     ];
     if (equipNames.includes(name)) return true;
     if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER'].includes(val)) return true;
@@ -8476,10 +8536,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var def = 0;
     if (name === 'Axe of Despair' || val === 'AXE_DESPAIR') {
       atk = 1000; def = 0;
-    } else if (name === 'Black Pendant' || val === 'BLACK_PENDANT') {
-      atk = 500; def = 0;
+    } else if (name === 'Insect Armor with Laser Cannon' || val === 'EQUIP_INSECT_HEAVY') {
+      atk = 700; def = 700;
     } else if (name === 'Horn of the Unicorn' || val === 'HORN_UNICORN') {
       atk = 700; def = 700;
+    } else if (name === 'Malevolent Nuzzler' || val === 'MALEVOLENT_NUZZLER') {
+      atk = 700; def = 700;
+    } else if (name === 'Horn of Light' || val === 'EQUIP_HORN_LIGHT') {
+      atk = 0; def = 800;
+    } else if (name === 'Black Pendant' || val === 'BLACK_PENDANT') {
+      atk = 500; def = 0;
     } else if (name === 'Dragon Treasure' || val === 'DRAGON_TREASURE' || name === 'Garra del Dragón' || val === 'EQUIP_DRAGON') {
       atk = 500; def = 500;
     } else if (name === 'United We Stand' || val === 'UNITED_WE_STAND') {
@@ -8506,12 +8572,68 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     var eqName = (eqCard.name || eqCard[0] || '').trim();
     var eqVal = eqCard.value || '';
-    var monType = target.type || target[2] || '';
+    var monType = (target.type || target[2] || '').toLowerCase();
+    var monAttr = (target.attr || target[3] || '').toUpperCase();
     var monKind = target.kind || (target.materials && target.materials.length ? 'FUSION' : '');
     var monLevel = Number(target.level ?? target[1] ?? 0);
 
     if (eqVal === 'DRAGON_TREASURE' || eqName === 'Dragon Treasure' || eqVal === 'EQUIP_DRAGON' || eqName === 'Garra del Dragón') {
-      return monType === 'Dragon';
+      return monType.includes('dragon') || monType.includes('dragón');
+    }
+    if (eqVal === 'EQUIP_WARRIOR' || eqName === 'Legendary Sword') {
+      return monType.includes('warrior') || monType.includes('guerrero');
+    }
+    if (eqVal === 'EQUIP_DARK' || eqName === 'Sword of Dark Destruction') {
+      return monAttr === 'DARK' || monType.includes('fiend') || monType.includes('demonio') || monType.includes('spellcaster') || monType.includes('mago');
+    }
+    if (eqVal === 'EQUIP_FIEND' || eqName === 'Dark Energy') {
+      return monType.includes('fiend') || monType.includes('demonio');
+    }
+    if (eqVal === 'EQUIP_INSECT' || eqName === 'Laser Cannon Armor' || eqVal === 'EQUIP_INSECT_HEAVY' || eqName === 'Insect Armor with Laser Cannon') {
+      return monType.includes('insect') || monType.includes('insecto');
+    }
+    if (eqVal === 'EQUIP_LIGHT' || eqName === "Elf's Light") {
+      return monAttr === 'LIGHT' || monType.includes('fairy') || monType.includes('hada') || monType.includes('spellcaster') || monType.includes('mago');
+    }
+    if (eqVal === 'EQUIP_BEAST' || eqName === 'Beast Fangs') {
+      return monType.includes('beast') || monType.includes('bestia');
+    }
+    if (eqVal === 'EQUIP_WATER' || eqName === 'Steel Shell' || eqVal === 'EQUIP_KAISHIN' || eqName === 'Power of Kaishin') {
+      return monAttr === 'WATER' || monType.includes('aqua') || monType.includes('pez') || monType.includes('fish') || monType.includes('sea serpent');
+    }
+    if (eqVal === 'EQUIP_PLANT' || eqName === 'Vile Germs') {
+      return monType.includes('plant') || monType.includes('planta');
+    }
+    if (eqVal === 'EQUIP_FAIRY' || eqName === 'Silver Bow and Arrow') {
+      return monType.includes('fairy') || monType.includes('hada');
+    }
+    if (eqVal === 'EQUIP_THUNDER' || eqName === 'Electro-whip') {
+      return monType.includes('thunder') || monType.includes('trueno');
+    }
+    if (eqVal === 'CYBER_SHIELD' || eqName === 'Cyber Shield' || eqVal === 'ELEGANT_EGOTIST' || eqName === 'Elegant Egotist') {
+      var tName = (target.name || target[0] || '').toLowerCase();
+      return tName.includes('harpie') || monType.includes('winged beast') || monType.includes('bestia alada') || monType.includes('warrior') || monType.includes('guerrero');
+    }
+    if (eqVal === 'EQUIP_MOON' || eqName === 'Mystical Moon') {
+      return monType.includes('beast-warrior') || monType.includes('guerrero-bestia') || monType.includes('winged beast') || monType.includes('bestia alada');
+    }
+    if (eqVal === 'EQUIP_ZOMBIE' || eqName === 'Violet Crystal') {
+      return monType.includes('zombie') || monType.includes('zombi');
+    }
+    if (eqVal === 'EQUIP_SPELLCASTER' || eqName === 'Book of Secret Arts') {
+      return monType.includes('spellcaster') || monType.includes('mago') || monType.includes('conjur');
+    }
+    if (eqVal === 'EQUIP_EARTH' || eqName === 'Invigoration') {
+      return monAttr === 'EARTH' || monType.includes('rock') || monType.includes('roca') || monType.includes('warrior') || monType.includes('guerrero');
+    }
+    if (eqVal === 'EQUIP_MACHINE' || eqName === 'Machine Conversion Factory') {
+      return monType.includes('machine') || monType.includes('máquina') || monType.includes('maquina');
+    }
+    if (eqVal === 'EQUIP_DINO' || eqName === 'Raise Body Heat') {
+      return monType.includes('dinosaur') || monType.includes('dinosaurio') || monType.includes('reptil') || monType.includes('reptile');
+    }
+    if (eqVal === 'EQUIP_WINGED_BEAST' || eqName === 'Follow Wind') {
+      return monType.includes('winged beast') || monType.includes('bestia alada');
     }
     if (eqVal === 'FUSION_WEAPON' || eqName === 'Fusion Weapon') {
       return (monKind === 'FUSION' || target.isFusion) && (monLevel <= 6);
@@ -9572,6 +9694,131 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof render === 'function') render();
       duelToast('🔮 ¡Campo activo: Pueblo Secreto de los Magos! Magos reciben +500 ATK/DEF.');
       if (typeof log === 'function') log('🔮 ¡Campo activo: Pueblo Secreto de los Magos! Magos reciben +500 ATK y +500 DEF.');
+      return;
+    }
+    if (vUpperHand === 'FIELD_FOREST' || nUpperHand === 'FOREST' || nUpperHand === 'BOSQUE') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'FOREST';
+      g.activeField = 'Bosque';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🌲 ¡Campo activo: Bosque! Insectos, Bestias y Plantas reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('🌲 ¡Campo activo: Bosque! Insectos, Bestias y Plantas reciben +500 ATK y +500 DEF.');
+      return;
+    }
+    if (vUpperHand === 'FIELD_WASTELAND' || nUpperHand === 'WASTELAND' || nUpperHand === 'TIERRA YERMA') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'WASTELAND';
+      g.activeField = 'Tierra Yerma';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🏜️ ¡Campo activo: Tierra Yerma! Dinosaurios, Zombis y Rocas reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('🏜️ ¡Campo activo: Tierra Yerma! Dinosaurios, Zombis y Rocas reciben +500 ATK y +500 DEF.');
+      return;
+    }
+    if (vUpperHand === 'FIELD_SOGEN' || nUpperHand === 'SOGEN') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'SOGEN';
+      g.activeField = 'Sogen';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('⚔️ ¡Campo activo: Sogen! Guerreros y Bestias-Guerrero reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('⚔️ ¡Campo activo: Sogen! Guerreros y Bestias-Guerrero reciben +500 ATK y +500 DEF.');
+      return;
+    }
+    if (vUpperHand === 'FIELD_UMI' || nUpperHand === 'UMI') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.fieldBoost = 'UMI';
+      g.activeField = 'Umi';
+      if (typeof window.syncFieldStats === 'function') window.syncFieldStats();
+      if (typeof window.updateFieldIndicator === 'function') window.updateFieldIndicator();
+      if (typeof render === 'function') render();
+      duelToast('🌊 ¡Campo activo: Umi! Monstruos de Agua, Pez y Trueno reciben +500 ATK/DEF (Máquinas y Fuego -400).');
+      if (typeof log === 'function') log('🌊 ¡Campo activo: Umi! Monstruos de Agua, Pez y Trueno reciben +500 ATK/DEF (Máquinas y Fuego -400).');
+      return;
+    }
+
+    // STOP DEFENSE (#320)
+    if (val === 'STOP_DEFENSE' || nUpperHand === 'STOP DEFENSE' || nUpperHand.includes('DETENER LA DEFENSA')) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var defTargets = 0;
+      (g.enemy || []).forEach(function(em) {
+        if (em && (em.pos === 'DEF' || em.faceDown || em.faceDownSet103)) {
+          em.pos = 'ATK';
+          em.faceDown = false;
+          em.faceDownSet103 = false;
+          em.faceUp = true;
+          defTargets++;
+        }
+      });
+      if (typeof render === 'function') render();
+      duelToast('🛡️➡️⚔️ ¡Stop Defense activado! ' + defTargets + ' monstruo(s) rivales obligados a pasar a ATAQUE.');
+      if (typeof log === 'function') log('Stop Defense: obliga a ' + defTargets + ' monstruo(s) rivales en defensa a pasar a modo de ATAQUE.');
+      return;
+    }
+
+    // DRAGON CAPTURE JAR (#329)
+    if (val === 'DRAGON_CAPTURE_JAR' || nUpperHand === 'DRAGON CAPTURE JAR' || nUpperHand.includes('JARRA DE CAPTURA')) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var dragonsCaught = 0;
+      (g.enemy || []).forEach(function(em) {
+        if (em && (em.type || em[2] || '').toLowerCase().includes('dragon')) {
+          em.pos = 'DEF';
+          dragonsCaught++;
+        }
+      });
+      if (typeof render === 'function') render();
+      duelToast('🏺 ¡Dragon Capture Jar activado! ' + dragonsCaught + ' dragón(es) rivales encerrados en DEFENSA.');
+      if (typeof log === 'function') log('Dragon Capture Jar: atrapa a ' + dragonsCaught + ' dragón(es) rivales forzándolos a posición defensiva.');
+      return;
+    }
+
+    // HEALING SPELLS (#338 - #342)
+    var healAmt = 0;
+    if (val === 'HEAL_500' || nUpperHand === 'MOOYAN CURRY') healAmt = 500;
+    else if (val === 'HEAL_500_RED' || nUpperHand === 'RED MEDICINE') healAmt = 500;
+    else if (val === 'HEAL_1000' || nUpperHand === "GOBLIN'S SECRET REMEDY" || nUpperHand === 'GOBLINS SECRET REMEDY') healAmt = 1000;
+    else if (val === 'HEAL_1000_SOUL' || nUpperHand === 'SOUL OF THE PURE') healAmt = 1000;
+    else if (val === 'HEAL_2000' || nUpperHand === 'DIAN KETO THE CURE MASTER' || nUpperHand.includes('DIAN KETO')) healAmt = 2000;
+
+    if (healAmt > 0) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.plp = (g.plp || 8000) + healAmt;
+      if (typeof render === 'function') render();
+      duelToast('💚 ¡' + cName + ' activado! Recuperas +' + healAmt + ' LP (Total: ' + g.plp + ' LP).');
+      if (typeof log === 'function') log(cName + ': recuperas +' + healAmt + ' LP. Puntos de vida actuales: ' + g.plp + '.');
+      return;
+    }
+
+    // BURN SPELLS (#343 - #347)
+    var burnAmt = 0, selfBurn = 0;
+    if (val === 'BURN_200' || nUpperHand === 'SPARKS') burnAmt = 200;
+    else if (val === 'BURN_500' || nUpperHand === 'HINOTAMA') burnAmt = 500;
+    else if (val === 'BURN_600' || nUpperHand === 'FINAL FLAME') burnAmt = 600;
+    else if (val === 'BURN_800' || nUpperHand === 'OOKAZI') burnAmt = 800;
+    else if (val === 'BURN_1000' || nUpperHand === 'TREMENDOUS FIRE') { burnAmt = 1000; selfBurn = 500; }
+
+    if (burnAmt > 0) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.elp = Math.max(0, (g.elp || 8000) - burnAmt);
+      if (selfBurn > 0) g.plp = Math.max(0, (g.plp || 8000) - selfBurn);
+      if (window.playDestroySound) window.playDestroySound();
+      if (typeof render === 'function') render();
+      var burnMsg = '🔥 ¡' + cName + ' causa ' + burnAmt + ' de daño directo al rival!';
+      if (selfBurn > 0) burnMsg += ' (Recibes ' + selfBurn + ' de daño).';
+      duelToast(burnMsg);
+      if (typeof log === 'function') log(burnMsg);
       return;
     }
 
