@@ -3660,18 +3660,16 @@ const POWERFUL_SHOP_CARDS = [
     { name: 'Koumori Dragon', price: 500, tier: 'DRAGÓN OSCURO', desc: 'Dragón murciélago sombrío (ATK 1500 / DEF 1200).' },
 
     // TRUENO (THUNDER)
-    { name: 'Kaminarikozou', price: 150, tier: 'TRUENO FUSIÓN', desc: 'Espíritu eléctrico. ¡Fusiónalo con cualquier Dragón para crear al Dragón Trueno Bicéfalo! (ATK 700 / DEF 600).' },
-    { name: 'Lala Li-Oon', price: 150, tier: 'TRUENO FUSIÓN', desc: 'Criatura de nubes de tormenta para fusiones eléctricas (ATK 600 / DEF 600).' },
-    { name: 'Mega Thunderball', price: 200, tier: 'TRUENO FUSIÓN', desc: 'Esfera rodante de alto voltaje (ATK 750 / DEF 600).' },
+    { name: 'Kaminarikozou', price: 150, tier: 'TRUENO BÁSICO', desc: 'Espíritu eléctrico. ¡Fusiónalo con cualquier Dragón para crear al Dragón Trueno Bicéfalo! (ATK 700 / DEF 600).' },
+    { name: 'Lala Li-Oon', price: 150, tier: 'TRUENO BÁSICO', desc: 'Criatura de nubes de tormenta para fusiones eléctricas (ATK 600 / DEF 600).' },
+    { name: 'Mega Thunderball', price: 200, tier: 'TRUENO BÁSICO', desc: 'Esfera rodante de alto voltaje (ATK 750 / DEF 600).' },
     { name: 'Electric Lizard', price: 300, tier: 'TRUENO COMBATE', desc: 'Reptil electrificado (ATK 850 / DEF 800).' },
     { name: 'Tripwire Beast', price: 400, tier: 'TRUENO COMBATE', desc: 'Bestia eléctrica de gran impacto (ATK 1200 / DEF 1300).' },
 
     // AGUA (AQUA / FISH)
     { name: 'Frog the Jam', price: 150, tier: 'AGUA BÁSICA', desc: 'Rana anfibia para fusiones acuáticas (ATK 700 / DEF 500).' },
     { name: 'Root Water', price: 250, tier: 'AGUA COMBATE', desc: 'Anfibio azul de las profundidades marinas (ATK 1000 / DEF 1000).' },
-    { name: 'Enchanting Mermaid', price: 350, tier: 'AGUA HECHICERA', desc: 'Sirena marina para fusiones con roca y guerrero (ATK 1200 / DEF 900).' },
     { name: 'Water Omotics', price: 400, tier: 'AGUA DONCELLA', desc: 'Doncella de agua (ATK 1400 / DEF 1200).' },
-    { name: 'Amazon of the Seas', price: 450, tier: 'AGUA GUERRERA', desc: 'Guerrera de los mares (ATK 1300 / DEF 1400).' },
 
     // GUERRERO (WARRIOR)
     { name: 'Kagemusha of the Blue Flame', price: 200, tier: 'GUERRERO SOMBRA', desc: 'Guerrero sombra de la llama azul (ATK 800 / DEF 400).' },
@@ -3681,9 +3679,7 @@ const POWERFUL_SHOP_CARDS = [
     { name: 'Celtic Guardian', price: 450, tier: 'GUERRERO ÉLITE', desc: 'Elfo guerrero clásico con rápida espada (ATK 1400 / DEF 1200).' },
 
     // PIEDRA (ROCK)
-    { name: 'Dissolverock', price: 200, tier: 'ROCA LAVA', desc: 'Roca fundida. ¡Fusiónala con Hadas/Femeninas para crear a Mystical Sand de 2100 ATK! (ATK 900 / DEF 1000).' },
     { name: 'Stone Armadiller', price: 250, tier: 'ROCA BLINDADA', desc: 'Armadillo de piedra impenetrable (ATK 1000 / DEF 1200).' },
-    { name: 'Stone Ghost', price: 350, tier: 'ROCA ESPECTRAL', desc: 'Espíritu ancestral de piedra (ATK 1200 / DEF 1000).' },
     { name: 'Sand Stone', price: 450, tier: 'ROCA DESIERTO', desc: 'Guardián rocoso del desierto (ATK 1300 / DEF 1600).' },
     { name: 'Giant Soldier of Stone', price: 500, tier: 'ROCA COLOSAL', desc: 'Guardián legendario de roca sólida con 2000 DEF (ATK 1300 / DEF 2000).' },
 
@@ -3697,23 +3693,15 @@ const POWERFUL_SHOP_CARDS = [
     // --- MONSTRUOS NEUTROS DE ALTO PODER (SIN DIOSES NI CARTAS ICÓNICAS) ---
     { name: 'Gate Guardian', price: 70000, tier: 'LEVIATÁN', desc: 'Guardián del laberinto legendario con 3750 ATK / 3400 DEF. Poder aplastante en combate.' },
     { name: 'Cosmo Queen', price: 60000, tier: 'REINA CÓSMICA', desc: 'Reina soberana del cosmos con 2900 ATK / 2450 DEF.' },
-    { name: 'Twin-Headed Thunder Dragon', price: 52000, tier: 'TRUENO FUSIÓN', desc: 'Dragón trueno bicéfalo con 2800 ATK / 2100 DEF. El pilar legendario de Forbidden Memories.' },
     { name: 'Wingweaver', price: 48000, tier: 'HADA SUPREMA', desc: 'Hada guerrera de seis alas con 2750 ATK / 2400 DEF.' },
-    { name: 'Skull Knight', price: 44000, tier: 'CABALLERO OSCURO', desc: 'Caballero hechicero con 2650 ATK / 2250 DEF. Uno de los mayores atacantes neutrales.' },
     { name: 'Sanga of the Thunder', price: 40000, tier: 'ELEMENTAL TRUENO', desc: 'Espíritu ancestral del rayo con 2600 ATK / 2200 DEF.' },
-    { name: 'Ryu Senshi', price: 36000, tier: 'GUERRERO DRAGÓN', desc: 'Guerrero fusionado implacable con 2600 ATK / 2200 DEF.' },
     { name: 'Suijin', price: 35000, tier: 'ELEMENTAL AGUA', desc: 'Guardián acuático ancestral con 2500 ATK / 2400 DEF.' },
     { name: 'Cyber-Tech Alligator', price: 34000, tier: 'MÁQUINA CIBER', desc: 'Caimán cibernético mejorado con 2500 ATK / 1600 DEF.' },
-    { name: 'Super Roboyarou', price: 33000, tier: 'MÁQUINA FUSIÓN', desc: 'Robot combatiente blindado con 2500 ATK / 1800 DEF.' },
     { name: 'Kazejin', price: 32000, tier: 'ELEMENTAL VIENTO', desc: 'Guardián del viento ancestral con 2400 ATK / 2200 DEF.' },
     { name: 'Sword Hunter', price: 30000, tier: 'CAZADOR DE ESPADAS', desc: 'Guerrero recolector de armas enemigas con 2450 ATK / 1700 DEF.' },
     { name: 'Goblin Attack Force', price: 28000, tier: 'FUERZA DE ÉLITE', desc: 'Fuerza de asalto de nivel 4 con un demoledor ataque de 2300 ATK.' },
     { name: 'Luster Dragon #2', price: 27000, tier: 'DRAGÓN BRILLANTE', desc: 'Majestuoso dragón esmeralda con 2400 ATK / 1400 DEF.' },
-    { name: 'Crimson Sunbird', price: 24000, tier: 'AVE DE FUEGO', desc: 'Fénix carmesí solar con 2300 ATK / 1800 DEF.' },
     { name: 'The Fiend Megacyber', price: 22000, tier: 'GUERRERO CIBER', desc: 'Guerrero cibernético que refuerza el campo con 2200 ATK / 1200 DEF.' },
-    { name: 'Flame Cerebrus', price: 20000, tier: 'BESTIA DE FUEGO', desc: 'Can cerbero llameante con 2100 ATK / 1800 DEF.' },
-    { name: 'B. Dragon Jungle King', price: 20000, tier: 'DRAGÓN SELVÁTICO', desc: 'Dragón selvático venenoso con 2100 ATK / 1800 DEF.' },
-    { name: 'Mystical Sand', price: 18000, tier: 'ROCA MÍSTICA', desc: 'Hechicera de arena y piedra con 2100 ATK / 1700 DEF.' },
     { name: 'Giant Rex', price: 16000, tier: 'DINOSAURIO', desc: 'Tiranosaurio jurásico prehistórico con 2000 ATK / 1200 DEF.' },
 
     // --- MAGIAS DEVASTADORAS ---
@@ -3723,6 +3711,7 @@ const POWERFUL_SHOP_CARDS = [
     { name: 'Swords of Revealing Light', price: 42000, tier: 'MAGIA DE CONTROL', desc: 'Espadas de luz sagrada que bloquean todos los ataques del oponente durante 3 turnos.' },
     { name: 'Change of Heart', price: 38000, tier: 'MAGIA DE CONTROL', desc: 'Toma el control del monstruo más poderoso del oponente.' },
     { name: 'Dark Hole', price: 35000, tier: 'MAGIA DESTRUCTIVA', desc: 'Vórtice abisal que absorbe y destruye a todos los monstruos en el campo.' },
+    { name: 'Mystical Space Typhoon', price: 4000, tier: 'MAGIA RÁPIDA', desc: 'Destruye 1 carta Mágica o Trampa en el campo.' },
     { name: 'Axe of Despair', price: 25000, tier: 'EQUIPO PODEROSO', desc: 'Hacha maldita que otorga +1000 ATK de forma permanente al monstruo equipado.' },
     { name: 'Dragon Treasure', price: 14000, tier: 'EQUIPO DRAGÓN', desc: 'Tesoro ancestral que incrementa el ATK y la DEF de un dragón en +500 puntos.' },
 
@@ -3735,6 +3724,7 @@ const POWERFUL_SHOP_CARDS = [
     { name: 'Trap Hole', price: 15000, tier: 'TRAMPA CLÁSICA', desc: 'Agujero trampa que destruye inmediatamente a cualquier monstruo invocado con 1000+ ATK.' },
     { name: 'Widespread Ruin', price: 12000, tier: 'TRAMPA DEVASTADORA', desc: 'Destruye al monstruo rival en posición de ataque con mayor ATK al ser atacado.' },
     { name: 'Acid Trap Hole', price: 5000, tier: 'TRAMPA CLÁSICA', desc: 'Disuelve y destruye de inmediato al monstruo atacante o invocado del rival.' },
+    { name: 'Dust Tornado', price: 4000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye 1 carta Mágica, Trampa o Equipo del rival.' },
     { name: 'Invisible Wire', price: 3000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye al monstruo enemigo si su ATK es 2000 o menor.' },
     { name: 'Bear Trap', price: 1500, tier: 'TRAMPA CLÁSICA', desc: 'Destruye al monstruo enemigo si su ATK es 1500 o menor.' },
     { name: 'Eatgaboon', price: 1000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye al monstruo enemigo si su ATK es 1000 o menor.' },
@@ -3760,12 +3750,25 @@ window.getCardMetadata = function(name) {
         else if (window.CUSTOM_LOCAL_IMAGES[padded + '.png']) imgUrl = window.CUSTOM_LOCAL_IMAGES[padded + '.png'];
     }
     
-    // Check known special monsters first (Gate Guardian, Sanga, Suijin, Kazejin)
+    // Check known special monsters first (Gate Guardian, Sanga, Suijin, Kazejin, and classic field monsters)
     const KNOWN_SPECIAL_MONSTERS = {
         'Gate Guardian': { type: 'Warrior', attr: 'DARK', atk: 3750, def: 3400, desc: 'Guardián del laberinto legendario con 3750 ATK / 3400 DEF. Poder aplastante en combate.' },
         'Sanga of the Thunder': { type: 'Thunder', attr: 'LIGHT', atk: 2600, def: 2200, desc: 'Espíritu ancestral del rayo con 2600 ATK / 2200 DEF.' },
         'Suijin': { type: 'Aqua', attr: 'WATER', atk: 2500, def: 2400, desc: 'Guardián acuático ancestral con 2500 ATK / 2400 DEF.' },
-        'Kazejin': { type: 'Spellcaster', attr: 'WIND', atk: 2400, def: 2200, desc: 'Guardián del viento ancestral con 2400 ATK / 2200 DEF.' }
+        'Kazejin': { type: 'Spellcaster', attr: 'WIND', atk: 2400, def: 2200, desc: 'Guardián del viento ancestral con 2400 ATK / 2200 DEF.' },
+        'One-Eyed White Dragon': { type: 'Dragon', attr: 'WIND', atk: 1300, def: 1000, desc: 'Dragón blanco de combate (ATK 1300 / DEF 1000).' },
+        'One-eyed Shield Dragon': { type: 'Dragon', attr: 'WIND', atk: 1300, def: 1000, desc: 'Dragón blanco de combate (ATK 1300 / DEF 1000).' },
+        'Kaminarikozou': { type: 'Thunder', attr: 'WIND', atk: 700, def: 600, desc: 'Espíritu eléctrico. ¡Fusiónalo con cualquier Dragón para crear al Dragón Trueno Bicéfalo! (ATK 700 / DEF 600).' },
+        'Lala Li-Oon': { type: 'Thunder', attr: 'WIND', atk: 600, def: 600, desc: 'Criatura de nubes de tormenta para fusiones eléctricas (ATK 600 / DEF 600).' },
+        'Root Water': { type: 'Fish', attr: 'WATER', atk: 1000, def: 1000, desc: 'Anfibio azul de las profundidades marinas (ATK 1000 / DEF 1000).' },
+        'Water Omotics': { type: 'Aqua', attr: 'WATER', atk: 1400, def: 1200, desc: 'Doncella de agua (ATK 1400 / DEF 1200).' },
+        'Kagemusha of the Blue Flame': { type: 'Warrior', attr: 'EARTH', atk: 800, def: 400, desc: 'Guerrero sombra de la llama azul (ATK 800 / DEF 400).' },
+        'Masaki the Legendary Swordsman': { type: 'Warrior', attr: 'EARTH', atk: 1100, def: 1100, desc: 'Espadachín legendario de mil batallas (ATK 1100 / DEF 1100).' },
+        'Stone Armadiller': { type: 'Rock', attr: 'EARTH', atk: 1000, def: 1200, desc: 'Armadillo de piedra impenetrable (ATK 1000 / DEF 1200).' },
+        'Sand Stone': { type: 'Rock', attr: 'EARTH', atk: 1300, def: 1600, desc: 'Guardián rocoso del desierto (ATK 1300 / DEF 1600).' },
+        'Dancing Elf': { type: 'Fairy', attr: 'WIND', atk: 300, def: 200, desc: 'Hada elemental femenina para fusiones mágicas tempranas (ATK 300 / DEF 200).' },
+        'Key Mace': { type: 'Fairy', attr: 'LIGHT', atk: 400, def: 800, desc: 'Pequeña hada bondadosa con maza dorada (ATK 400 / DEF 800).' },
+        'Lunar Queen Elzaim': { type: 'Fairy', attr: 'LIGHT', atk: 750, def: 1100, desc: 'Hechicera lunar que bendice el campo (ATK 750 / DEF 1100).' }
     };
     if (KNOWN_SPECIAL_MONSTERS[name]) {
         let sp = KNOWN_SPECIAL_MONSTERS[name];
@@ -3889,7 +3892,7 @@ window.PROGRAMMED_ST_NAMES = new Set([
   'sparks', 'final flame', 'tremendous fire', 'swords of revealing light',
   'swords of concealing light', 'espadas de luz reveladora', 'espadas de luz ocultadora',
   'raigeki', 'dark hole', "harpie's feather duster", 'harpies feather duster', 'heavy storm', 'tormenta pesada',
-  'mystical space typhoon', 'change of heart', 'scapegoat', 'limiter removal',
+  'mystical space typhoon', 'mystical space typhonne', 'change of heart', 'scapegoat', 'limiter removal',
   'cybernetic zone', 'cybernetic fusion support', 'card of demise',
 
   // Campos
@@ -4441,7 +4444,23 @@ window.customShowShop = function() {
             'fusion weapon'
         ]);
 
-        let activeShopCards = [...POWERFUL_SHOP_CARDS];
+        // Helper: Verificar si una carta es monstruo FUSIÓN para excluirla de la tienda (solo cartas para usar al campo)
+        function isFusionOrExtra(nameOrCard) {
+            if (!nameOrCard) return false;
+            let n = (typeof nameOrCard === 'string' ? nameOrCard : (nameOrCard.name || '')).trim();
+            let norm = n.toLowerCase();
+            // Los materiales base para fusiones NO son monstruos fusión (se juegan directamente en mano/campo)
+            if (['kaminarikozou', 'lala li-oon', 'mega thunderball', 'petit dragon', 'baby dragon'].includes(norm)) return false;
+            if (typeof window.isFusionMonster === 'function' && window.isFusionMonster(nameOrCard)) return true;
+            if (window.FUSION_MONSTER_NAMES && window.FUSION_MONSTER_NAMES.has(n)) return true;
+            if (typeof nameOrCard === 'object') {
+                if (nameOrCard.kind === 'FUSION' || nameOrCard.type === 'Fusion' || (nameOrCard.tags && Array.isArray(nameOrCard.tags) && nameOrCard.tags.includes('FUSION'))) return true;
+                if (nameOrCard.tier && nameOrCard.tier.includes('FUSIÓN')) return true;
+            }
+            return false;
+        }
+
+        let activeShopCards = [...POWERFUL_SHOP_CARDS].filter(item => !isFusionOrExtra(item));
         // Enforce equip pricing in POWERFUL_SHOP_CARDS
         activeShopCards.forEach(item => {
             let n = item.name.toLowerCase().trim();
@@ -4451,6 +4470,23 @@ window.customShowShop = function() {
             } else if (SPECIFIC_EQUIPS.has(n)) {
                 item.price = 10000;
                 item.tier = 'EQUIPO ESPECÍFICO (10k)';
+            }
+        });
+
+        // Garantizar Mystical Space Typhoon y Dust Tornado a 4000 DP
+        const REQUIRED_SHOP_ST = [
+            { name: 'Mystical Space Typhoon', price: 4000, tier: 'MAGIA RÁPIDA', desc: 'Destruye 1 carta Mágica o Trampa en el campo.' },
+            { name: 'Dust Tornado', price: 4000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye 1 carta Mágica, Trampa o Equipo del rival.' }
+        ];
+        REQUIRED_SHOP_ST.forEach(req => {
+            let norm = req.name.toLowerCase().trim();
+            let found = activeShopCards.find(x => x.name.toLowerCase().trim() === norm);
+            if (found) {
+                found.price = req.price;
+                found.tier = req.tier;
+                found.desc = req.desc;
+            } else {
+                activeShopCards.push(req);
             }
         });
 
@@ -4484,6 +4520,7 @@ window.customShowShop = function() {
                         }
                     }
                 } else if (c.price && c.price > 0 && !existingNames.has(norm)) {
+                    if (isFusionOrExtra(c)) return; // REGLA: No poner monstruos fusión en la tienda
                     if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(c)) return;
                     activeShopCards.push({
                         name: c.name,
@@ -9137,7 +9174,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     "Spike Seadra","Stone D.","Stone Ghost","Sword Arm of Dragon","The Immortal of Thunder",
     "Thousand Dragon","Thunder Dragon","Tiger Axe","Tripwire Beast","Turtle Tiger","Twin-Headed Thunder Dragon",
     "Tyrant Burst Dragon","Ultimate Dragon","Ushi Oni","Warrior of Tradition","Wood Remains","XY-Dragon Cannon",
-    "XYZ-Dragon Cannon","XZ-Tank Cannon","YZ-Tank Dragon","Zombie Warrior"
+    "XYZ-Dragon Cannon","XZ-Tank Cannon","YZ-Tank Dragon","Zombie Warrior",
+    "Super Roboyarou","Super Robolady","Ryu Senshi"
   ]);
 
   function isFusionMonster(c) {
@@ -9146,8 +9184,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (c.kind === 'SPELL' || c.kind === 'TRAP' || c.kind === 'EQUIP') return false;
     if (c.type === 'SPELL' || c.type === 'TRAP' || c.type === 'EQUIP') return false;
     if (c.isFusion || c._isFused || c.kind === 'FUSION' || c.type === 'Fusion') return true;
+    if (c.text && String(c.text).toUpperCase().startsWith('FUSION:')) return true;
+    if (c.desc && String(c.desc).toUpperCase().startsWith('FUSION:')) return true;
     if (Array.isArray(c.materials) && c.materials.length > 0) return true;
-    var name = c.name || c[0] || '';
+    var name = c.name || c[0] || (typeof c === 'string' ? c : '');
     if (window.FUSION_MONSTER_NAMES && window.FUSION_MONSTER_NAMES.has(name)) return true;
     return false;
   }
