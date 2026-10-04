@@ -361,7 +361,9 @@
     "kind": "EQUIP",
     "value": "UNITED_WE_STAND",
     "text": "Gana 500 ATK/DEF por cada monstruo boca arriba que controlas, maximo 2000.",
-    "image": "imagenescartas/Mundo1/075.jpg"
+    "image": "imagenescartas/Mundo1/075.jpg",
+    "price": 20000,
+    "tier": "EQUIPO GENERAL"
   },
   {
     "id": 76,
@@ -651,7 +653,9 @@
     "kind": "EQUIP",
     "value": "FUSION_WEAPON",
     "text": "Monstruo de Fusion Nivel 6 o inferior gana 1500 ATK y 500 DEF.",
-    "image": "imagenescartas/Mundo1/108.jpg"
+    "image": "imagenescartas/Mundo1/108.jpg",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 109,
@@ -1542,8 +1546,8 @@
     "targetType": "Insect",
     "atk": 700,
     "def": 700,
-    "price": 6000,
-    "tier": "EQUIPO INSECTO",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo pesada. Confiere +700 ATK y +700 DEF a un monstruo de Tipo Insecto.",
     "image": "imagenescartas/Mundo1/185.jpg"
   },
@@ -1898,8 +1902,8 @@
     "sign2": "PLUTON",
     "value": "CYBER_SHIELD",
     "targetType": "Winged Beast",
-    "price": 4000,
-    "tier": "EQUIPO ARPIA"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 211,
@@ -1916,8 +1920,8 @@
     "sign2": "SOL",
     "value": "ELEGANT_EGOTIST",
     "targetType": "Winged Beast",
-    "price": 5000,
-    "tier": "EQUIPO ARPIA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de las Arpías. Multiplica su presencia aumentando el ATK y DEF de un monstruo Alado en 500 puntos."
   },
   {
@@ -2566,7 +2570,9 @@
     "kind": "SPELL",
     "value": "SHINE_PALACE",
     "text": "Equip only to a LIGHT monster. It gains 700 ATK.",
-    "image": "imagenescartas/Mundo1/266.jpg"
+    "image": "imagenescartas/Mundo1/266.jpg",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 267,
@@ -2900,7 +2906,9 @@
     "kind": "SPELL",
     "value": "MAGE_POWER",
     "text": "The equipped monster gains 500 ATK and DEF for each Spell/Trap Card you control.",
-    "image": "imagenescartas/Mundo1/295.jpg"
+    "image": "imagenescartas/Mundo1/295.jpg",
+    "price": 20000,
+    "tier": "EQUIPO GENERAL"
   },
   {
     "id": 296,
@@ -2951,8 +2959,8 @@
     "targetType": "Warrior",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO GUERRERO",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Aumenta el ATK y la DEF de un monstruo Tipo Guerrero en 500 puntos.",
     "image": "imagenescartas/Mundo1/301.jpg"
   },
@@ -2966,8 +2974,8 @@
     "targetAttr": "DARK",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO OSCURIDAD",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Aumenta el ATK y DEF de un monstruo de Tipo Demonio o atributo OSCURIDAD en 500 puntos.",
     "image": "imagenescartas/Mundo1/302.jpg"
   },
@@ -2980,8 +2988,8 @@
     "targetType": "Fiend",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO DEMONIO",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Incrementa el ATK y la DEF de un monstruo Tipo Demonio en 500 puntos.",
     "image": "imagenescartas/Mundo1/303.jpg"
   },
@@ -2995,8 +3003,8 @@
     "targetType": "ALL",
     "atk": 1000,
     "def": 0,
-    "price": 25000,
-    "tier": "EQUIPO PODEROSO",
+    "price": 20000,
+    "tier": "EQUIPO GENERAL",
     "image": "imagenescartas/Mundo1/304.jpg"
   },
   {
@@ -3008,8 +3016,8 @@
     "targetType": "Insect",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO INSECTO",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Incrementa el ATK y la DEF de un monstruo de Tipo Insecto en 500 puntos.",
     "image": "imagenescartas/Mundo1/305.jpg"
   },
@@ -3023,8 +3031,8 @@
     "targetAttr": "LIGHT",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO LUZ",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Aumenta el ATK y DEF de un monstruo de atributo LUZ o Tipo Hada en 500 puntos.",
     "image": "imagenescartas/Mundo1/307.jpg"
   },
@@ -3037,8 +3045,8 @@
     "targetType": "Beast",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO BESTIA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Incrementa el ATK y la DEF de un monstruo Bestia o Guerrero-Bestia en 500 puntos.",
     "image": "imagenescartas/Mundo1/308.jpg"
   },
@@ -3052,8 +3060,8 @@
     "targetAttr": "WATER",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO AGUA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Incrementa el ATK y la DEF de un monstruo de AGUA, Acuático o Pez en 500 puntos.",
     "image": "imagenescartas/Mundo1/309.jpg"
   },
@@ -3066,8 +3074,8 @@
     "targetType": "Plant",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO PLANTA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Aumenta el ATK y la DEF de un monstruo de Tipo Planta en 500 puntos.",
     "image": "imagenescartas/Mundo1/310.jpg"
   },
@@ -3081,8 +3089,8 @@
     "targetType": "ALL",
     "atk": 500,
     "def": 0,
-    "price": 10000,
-    "tier": "EQUIPO",
+    "price": 20000,
+    "tier": "EQUIPO GENERAL",
     "image": "imagenescartas/Mundo1/311.jpg"
   },
   {
@@ -3094,8 +3102,8 @@
     "targetType": "Fairy",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO HADA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Incrementa el ATK y DEF de un monstruo Tipo Hada en 500 puntos.",
     "image": "imagenescartas/Mundo1/312.jpg"
   },
@@ -3108,8 +3116,8 @@
     "targetType": "ALL",
     "atk": 0,
     "def": 800,
-    "price": 4000,
-    "tier": "EQUIPO DEFENSA",
+    "price": 20000,
+    "tier": "EQUIPO GENERAL",
     "text": "Carta Mágica de Equipo. Otorga una poderosa defensa de +800 DEF a cualquier monstruo equipado.",
     "image": "imagenescartas/Mundo1/313.jpg"
   },
@@ -3123,8 +3131,8 @@
     "targetType": "ALL",
     "atk": 700,
     "def": 700,
-    "price": 18000,
-    "tier": "EQUIPO PODEROSO",
+    "price": 20000,
+    "tier": "EQUIPO GENERAL",
     "image": "imagenescartas/Mundo1/314.jpg"
   },
   {
@@ -3137,8 +3145,8 @@
     "targetType": "Dragon",
     "atk": 500,
     "def": 500,
-    "price": 14000,
-    "tier": "EQUIPO DRAGÓN",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "image": "imagenescartas/Mundo1/315.jpg"
   },
   {
@@ -3156,8 +3164,8 @@
     "sign2": "MARTE",
     "value": "EQUIP_THUNDER",
     "targetType": "Thunder",
-    "price": 3000,
-    "tier": "EQUIPO TRUENO",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Aumenta el ATK y la DEF de un monstruo Tipo Trueno en 500 puntos."
   },
   {
@@ -3175,8 +3183,8 @@
     "sign2": "SOL",
     "value": "EQUIP_MOON",
     "targetType": "Beast-Warrior",
-    "price": 3000,
-    "tier": "EQUIPO BESTIA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Aumenta el ATK y DEF de un monstruo Guerrero-Bestia o Bestia Alada en 500 puntos."
   },
   {
@@ -3205,8 +3213,8 @@
     "sign2": "JUPITER",
     "value": "MALEVOLENT_NUZZLER",
     "targetType": "ALL",
-    "price": 16000,
-    "tier": "EQUIPO PODEROSO"
+    "price": 20000,
+    "tier": "EQUIPO GENERAL"
   },
   {
     "id": 322,
@@ -3223,8 +3231,8 @@
     "sign2": "SOL",
     "value": "EQUIP_ZOMBIE",
     "targetType": "Zombie",
-    "price": 3000,
-    "tier": "EQUIPO ZOMBI"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 323,
@@ -3241,8 +3249,8 @@
     "sign2": "MERCURIO",
     "value": "EQUIP_SPELLCASTER",
     "targetType": "Spellcaster",
-    "price": 4000,
-    "tier": "EQUIPO MAGO"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 324,
@@ -3260,8 +3268,8 @@
     "value": "EQUIP_EARTH",
     "targetType": "Rock",
     "targetAttr": "EARTH",
-    "price": 3000,
-    "tier": "EQUIPO TIERRA"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 325,
@@ -3278,8 +3286,8 @@
     "sign2": "MARTE",
     "value": "EQUIP_MACHINE",
     "targetType": "Machine",
-    "price": 3000,
-    "tier": "EQUIPO MÁQUINA"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 326,
@@ -3296,8 +3304,8 @@
     "sign2": "MARTE",
     "value": "EQUIP_DINO",
     "targetType": "Dinosaur",
-    "price": 3000,
-    "tier": "EQUIPO DINO"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 327,
@@ -3314,8 +3322,8 @@
     "sign2": "VENUS",
     "value": "EQUIP_WINGED_BEAST",
     "targetType": "Winged Beast",
-    "price": 3000,
-    "tier": "EQUIPO ALADO"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 328,
@@ -3332,8 +3340,8 @@
     "sign2": "LUNA",
     "value": "EQUIP_KAISHIN",
     "targetType": "Aqua",
-    "price": 3000,
-    "tier": "EQUIPO AGUA"
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 329,
@@ -5790,8 +5798,8 @@
     "targetAttr": "WATER",
     "atk": 500,
     "def": 500,
-    "price": 3000,
-    "tier": "EQUIPO AGUA",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
     "text": "Carta Mágica de Equipo. Incrementa el ATK y la DEF de un monstruo de AGUA, Acuático o Pez en 500 puntos.",
     "image": "imagenescartas/Mundo1/524.jpg"
   },
@@ -7647,9 +7655,10 @@
     "def": 1000,
     "text": "Equip only to a FIRE monster. It gains 700 ATK.",
     "image": "imagenescartas/Mundo1/654.jpg",
-    "price": 2000,
+    "price": 10000,
     "sign1": "SOL",
-    "sign2": "LUNA"
+    "sign2": "LUNA",
+    "tier": "EQUIPO ESPECÍFICO"
   },
   {
     "id": 655,
@@ -7690,11 +7699,12 @@
     "level": 4,
     "atk": 1000,
     "def": 1000,
-    "text": "While your LP is lower than your opponent's, the equipped monster's ATK becomes double its original ATK. While your LP is higher, the equipped monster's ATK becomes half its original ATK.",
+    "text": "Mientras tus LP sean menores que los de tu adversario, el ATK del monstruo equipado se convierte en el doble de su ATK original. Mientras tus LP sean mayores, el ATK del monstruo equipado se convierte en la mitad de su ATK original.",
     "image": "imagenescartas/Mundo1/657.jpg",
-    "price": 2000,
+    "price": 20000,
     "sign1": "SOL",
-    "sign2": "LUNA"
+    "sign2": "LUNA",
+    "tier": "EQUIPO GENERAL"
   },
   {
     "id": 658,

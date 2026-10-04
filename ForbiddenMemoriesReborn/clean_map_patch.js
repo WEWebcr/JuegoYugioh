@@ -3864,7 +3864,7 @@ window.PROGRAMMED_ST_NAMES = new Set([
   'laser cannon armor', 'insect armor with laser cannon', 'horn of light',
   'machine conversion factory', 'raise body heat', 'follow wind', 'power of kaishin',
   'violet crystal', 'shine palace', 'salamandra', 'mage power', 'poder del mago',
-  'crush card', 'tyrant wing',
+  'crush card', 'tyrant wing', 'megamorph', 'megamorfo',
 
   // Magias normales, rápidas y continuas
   'pot of greed', 'graceful charity', 'renace al monstruo', 'monster reborn', 'fissure',
@@ -3919,6 +3919,22 @@ window.isCardProgrammed = function(cardOrName) {
   if (val && (val.startsWith('FIELD_') || val.startsWith('HEAL_') || val.startsWith('BURN_') || val.startsWith('EQUIP_'))) return true;
   return false;
 };
+
+window.isFieldSpell = function(c) {
+  if (!c) return false;
+  var name = (c.name || c[0] || '').trim().toLowerCase();
+  var val = (c.value || '').toUpperCase();
+  var type = String(c.type || c.kind || '').toLowerCase();
+  if (type.includes('field') || type.includes('campo')) return true;
+  if (val.startsWith('FIELD_')) return true;
+  var fieldNames = [
+    'mountain', 'montaña', 'montana', 'yami', 'umi', 'forest', 'bosque',
+    'wasteland', 'yermo', 'sogen', 'pueblo secreto de los magos',
+    'spellcaster village', 'a legendary ocean'
+  ];
+  return fieldNames.includes(name);
+};
+
 
 window.cleanSaveCollection = function(s) {
   if (!s) return s;
@@ -4338,9 +4354,12 @@ window.customShowShop = function() {
     filterBar.innerHTML = `
         <input type="text" id="shop-search" placeholder="Buscar por nombre..." autocomplete="off" style="padding: 8px 14px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; font-family:'Segoe UI'; width: 240px; font-size: 14px;">
         <select id="shop-filter-type" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 14px;">
-            <option value="">Todas las cartas (${POWERFUL_SHOP_CARDS.length})</option>
+            <option value="">Todas las cartas</option>
             <option value="MONSTER">Solo Monstruos</option>
-            <option value="SPELL">Solo Magias</option>
+            <option value="SPELL">Todas las Magias</option>
+            <option value="SPELL_NORMAL">Magias Normales</option>
+            <option value="SPELL_FIELD">Magias de Campo</option>
+            <option value="SPELL_EQUIP">Magias de Equipo</option>
             <option value="TRAP">Solo Trampas</option>
         </select>
     `;
@@ -4389,11 +4408,66 @@ window.customShowShop = function() {
         let query = (searchInput.value || '').toLowerCase();
         let fType = typeSelect.value || '';
         
+        const GENERAL_EQUIPS = new Set([
+            'axe of despair', 'united we stand', 'mage power', 'poder del mago',
+            'malevolent nuzzler', 'horn of the unicorn', 'black pendant',
+            'horn of light', 'megamorph', 'megamorfo'
+        ]);
+        const SPECIFIC_EQUIPS = new Set([
+            'dragon treasure', 'garra del dragón', 'garra del dragon',
+            'legendary sword', 'sword of dark destruction', 'dark energy',
+            "elf's light", 'elfs light', 'shine palace', 'salamandra',
+            'beast fangs', 'mystical moon', 'follow wind', 'cyber shield',
+            'elegant egotist', 'electro-whip', 'book of secret arts',
+            'violet crystal', 'invigoration', 'machine conversion factory',
+            'raise body heat', 'laser cannon armor', 'insect armor with laser cannon',
+            'silver bow and arrow', 'vile germs', 'steel shell', 'power of kaishin',
+            'fusion weapon'
+        ]);
+
         let activeShopCards = [...POWERFUL_SHOP_CARDS];
-        let existingNames = new Set(activeShopCards.map(c => c.name.toLowerCase()));
+        // Enforce equip pricing in POWERFUL_SHOP_CARDS
+        activeShopCards.forEach(item => {
+            let n = item.name.toLowerCase().trim();
+            if (GENERAL_EQUIPS.has(n)) {
+                item.price = 20000;
+                item.tier = 'EQUIPO GENERAL (20k)';
+            } else if (SPECIFIC_EQUIPS.has(n)) {
+                item.price = 10000;
+                item.tier = 'EQUIPO ESPECÍFICO (10k)';
+            }
+        });
+
+        let existingNames = new Set(activeShopCards.map(c => c.name.toLowerCase().trim()));
+
+        // Ensure ALL Equip cards exist in the shop
         if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
             window.CARDS_DATA.forEach(c => {
-                if (c && c.name && c.price && c.price > 0 && !existingNames.has(c.name.toLowerCase())) {
+                if (!c || !c.name) return;
+                let norm = c.name.toLowerCase().trim();
+                let isGen = GENERAL_EQUIPS.has(norm);
+                let isSpec = SPECIFIC_EQUIPS.has(norm);
+                let isEq = isGen || isSpec || (typeof window.isEquipSpell === 'function' && window.isEquipSpell(c));
+
+                if (isEq) {
+                    let eqPrice = isGen ? 20000 : 10000;
+                    let eqTier = isGen ? 'EQUIPO GENERAL (20k)' : 'EQUIPO ESPECÍFICO (10k)';
+                    if (!existingNames.has(norm)) {
+                        activeShopCards.push({
+                            name: c.name,
+                            price: eqPrice,
+                            tier: eqTier,
+                            desc: c.text || c.desc || 'Carta Mágica de Equipo'
+                        });
+                        existingNames.add(norm);
+                    } else {
+                        let existing = activeShopCards.find(x => x.name.toLowerCase().trim() === norm);
+                        if (existing) {
+                            existing.price = eqPrice;
+                            existing.tier = eqTier;
+                        }
+                    }
+                } else if (c.price && c.price > 0 && !existingNames.has(norm)) {
                     if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(c)) return;
                     activeShopCards.push({
                         name: c.name,
@@ -4401,7 +4475,7 @@ window.customShowShop = function() {
                         tier: c.tier || (c.kind === 'MONSTER' ? (c.atk >= 2500 ? 'ÉLITE ADMIN' : 'TIENDA') : 'MAGIA/TRAMPA'),
                         desc: c.text || c.desc || (c.kind === 'MONSTER' ? `Monstruo ${c.type || ''} (ATK ${c.atk || 0} / DEF ${c.def || 0})` : 'Efecto especial')
                     });
-                    existingNames.add(c.name.toLowerCase());
+                    existingNames.add(norm);
                 }
             });
         }
@@ -4414,8 +4488,15 @@ window.customShowShop = function() {
         activeShopCards.forEach(item => {
             let info = window.getCardMetadata(item.name);
             if (query && !item.name.toLowerCase().includes(query)) return;
+            let isField = typeof window.isFieldSpell === 'function' ? window.isFieldSpell(info) : false;
+            let isEquip = typeof window.isEquipSpell === 'function' ? window.isEquipSpell(info) : (GENERAL_EQUIPS.has(item.name.toLowerCase().trim()) || SPECIFIC_EQUIPS.has(item.name.toLowerCase().trim()));
+            let isSpell = info.isSpell || isField || isEquip;
+
             if (fType === 'MONSTER' && !info.isMonster) return;
-            if (fType === 'SPELL' && !info.isSpell) return;
+            if (fType === 'SPELL' && !isSpell) return;
+            if (fType === 'SPELL_NORMAL' && (!isSpell || isField || isEquip)) return;
+            if (fType === 'SPELL_FIELD' && (!isSpell || !isField)) return;
+            if (fType === 'SPELL_EQUIP' && (!isSpell || !isEquip)) return;
             if (fType === 'TRAP' && !info.isTrap) return;
             
             let ownCount = s.collection[item.name] || 0;
@@ -4449,7 +4530,7 @@ window.customShowShop = function() {
             tr.innerHTML = `
                 <td style="padding: 10px 12px; color: #888;">#${String(info.num).replace(/[^\d]/g, '').padStart(3, '0')}</td>
                 <td style="padding: 10px 12px; font-weight: bold; color: ${cardColor};">${info.name}</td>
-                <td style="padding: 10px 12px; font-size:13px;">${info.type}</td>
+                <td style="padding: 10px 12px; font-size:13px;">${info.isMonster ? info.type : (info.isTrap ? 'Trampa' : (isField ? 'Magia (Campo)' : (isEquip ? 'Magia (Equipo)' : 'Magia (Normal)')))}</td>
                 <td style="padding: 10px 12px;">${statDisplay}</td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold; color:#ffd700;">${item.price} PM</td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold;">
@@ -7177,7 +7258,10 @@ window.customShowCollection = function() {
         <select id="f-cardtype" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
             <option value="">Todas las cartas</option>
             <option value="MONSTER">Solo Monstruos</option>
-            <option value="SPELL">Solo Magias</option>
+            <option value="SPELL">Todas las Magias</option>
+            <option value="SPELL_NORMAL">Magias Normales</option>
+            <option value="SPELL_FIELD">Magias de Campo</option>
+            <option value="SPELL_EQUIP">Magias de Equipo</option>
             <option value="TRAP">Solo Trampas</option>
         </select>
         <select id="f-attr" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
@@ -7289,9 +7373,16 @@ window.customShowCollection = function() {
             
             // Filters
             if (q && !norm.includes(q)) return;
+            let isField = typeof window.isFieldSpell === 'function' ? window.isFieldSpell(c) : false;
+            let isEquip = typeof window.isEquipSpell === 'function' ? window.isEquipSpell(c) : false;
+            let isSpell = !c.isMonster && (c.type === 'SPELL' || c.kind === 'SPELL' || isField || isEquip) && c.type !== 'TRAP' && c.kind !== 'TRAP';
+
             if (fCard === 'MONSTER' && !c.isMonster) return;
-            if (fCard === 'SPELL' && c.type !== 'SPELL') return;
-            if (fCard === 'TRAP' && c.type !== 'TRAP') return;
+            if (fCard === 'SPELL' && !isSpell) return;
+            if (fCard === 'SPELL_NORMAL' && (!isSpell || isField || isEquip)) return;
+            if (fCard === 'SPELL_FIELD' && (!isSpell || !isField)) return;
+            if (fCard === 'SPELL_EQUIP' && (!isSpell || !isEquip)) return;
+            if (fCard === 'TRAP' && (c.type !== 'TRAP' && c.kind !== 'TRAP')) return;
             if (fAttr && c.attr !== fAttr) return;
             if (fType && c.type !== fType) return;
             if (fAtk > -1 && (!c.isMonster || c.atk < fAtk)) return;
@@ -7319,7 +7410,7 @@ window.customShowCollection = function() {
             let colorType = c.isMonster ? '#fff' : (c.type==='SPELL' ? '#4da6ff' : '#ff4d4d');
             if (isUnowned) colorType = '#666';
             
-            let displayType = c.isMonster ? `${c.type} / ${c.attr}` : (c.type==='SPELL' ? 'Magia' : 'Trampa');
+            let displayType = c.isMonster ? `${c.type} / ${c.attr}` : ((c.type === 'TRAP' || c.kind === 'TRAP') ? 'Trampa' : (isField ? 'Magia (Campo)' : (isEquip ? 'Magia (Equipo)' : 'Magia (Normal)')));
             let displayStats = c.isMonster ? `<span style="color:${isUnowned?'#666':'#ff4d4d'}">${c.atk}</span> / <span style="color:${isUnowned?'#666':'#4da6ff'}">${c.def}</span>` : '-';
             
             tr.innerHTML = `
@@ -9809,7 +9900,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   }
   window.isEquipSpell = isEquipSpell;
 
-  function getEquipStats(eqCard) {
+  function getEquipStats(eqCard, target) {
     var name = (eqCard && (eqCard.name || eqCard[0]) || '').trim();
     var val = (eqCard && eqCard.value) || '';
     var atk = 500;
@@ -9841,6 +9932,21 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       atk = stCount * 500;
       def = stCount * 500;
+    } else if (name === 'Megamorph' || val === 'MEGAMORPH' || name === 'Megamorfo') {
+      var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+      var plp = (g && g.plp != null) ? g.plp : 8000;
+      var elp = (g && g.elp != null) ? g.elp : 8000;
+      var baseAtk = (target && target.atk != null) ? Number(target.atk) : 1000;
+      if (plp < elp) {
+        atk = baseAtk;
+        def = 0;
+      } else if (plp > elp) {
+        atk = -Math.floor(baseAtk / 2);
+        def = 0;
+      } else {
+        atk = 0;
+        def = 0;
+      }
     }
     return { atk: atk, def: def };
   }
@@ -9918,6 +10024,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (eqVal === 'FUSION_WEAPON' || eqName === 'Fusion Weapon') {
       return isFusionMonster(target) && (getMonsterLevel(target) <= 6) && (getMonsterLevel(target) > 0);
     }
+    if (eqVal === 'MEGAMORPH' || eqName === 'Megamorph' || eqName === 'Megamorfo') {
+      return true;
+    }
     return true;
   }
 
@@ -9974,7 +10083,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var box = document.createElement('div');
     box.style.cssText = "width:480px;max-width:92vw;max-height:85vh;display:flex;flex-direction:column;background:linear-gradient(145deg, #231b12, #100b07);border:3px solid #ffd700;border-radius:10px;padding:20px;box-shadow:0 0 35px #000;box-sizing:border-box;";
 
-    var eqStats = getEquipStats(eqCard);
+    var eqStats = getEquipStats(eqCard, target && target.card ? target.card : null);
     var boostStr = '+' + eqStats.atk + ' ATK' + (eqStats.def ? ' / +' + eqStats.def + ' DEF' : '');
 
     var headerHTML = '<h3 style="color:#ffd700;font-size:24px;margin:0 0 6px;text-align:center;letter-spacing:1px;text-shadow:0 0 8px #ffb300;">' +
