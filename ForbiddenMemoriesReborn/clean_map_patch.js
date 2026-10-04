@@ -4960,7 +4960,7 @@ window.customFinishStoryDuel = function(win) {
 
     var mainCards = catalog.filter(function(c) {
       var k = c.kind || c.type || '';
-      return k !== 'FUSION' && k !== 'LINK' && c.type !== 'Divine-Beast';
+      return k !== 'FUSION' && k !== 'LINK' && c.type !== 'Divine-Beast' && c.type !== 'Ritual';
     });
 
     // 1. As / Jefe
@@ -4998,17 +4998,35 @@ window.customFinishStoryDuel = function(win) {
     pickRandom(others, 3);
     pickRandom(anyLowMonster, 28 - deck.length);
 
-    // 4. Mágicas / Equipos
-    var excludedSpells = ['Raigeki', 'Dark Hole', "Harpie's Feather Duster", 'Heavy Storm'];
+    // 4. Mágicas / Equipos completamente programados
+    var PROGRAMMED_STARTER_SPELLS = [
+      'Axe of Despair', 'Black Pendant', 'Horn of the Unicorn', 'Dragon Treasure',
+      'Malevolent Nuzzler', 'Sword of Dark Destruction', 'Dark Energy', 'Invigoration',
+      'Electro-whip', 'Cyber Shield', 'Mystical Moon', 'Silver Bow and Arrow',
+      'Book of Secret Arts', "Elf's Light", 'Beast Fangs', 'Steel Shell', 'Vile Germs',
+      'Kunai with Chain', 'Fusion Weapon', 'United We Stand', 'Legendary Sword',
+      'Laser Cannon Armor', 'Insect Armor with Laser Cannon', 'Horn of Light',
+      'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin',
+      'Violet Crystal', 'Shine Palace', 'Salamandra',
+      'Pot of Greed', 'Graceful Charity', 'Renace al Monstruo', 'Fissure', 'Stop Defense',
+      'Dragon Capture Jar', 'Dian Keto the Cure Master', 'Soul of the Pure',
+      "Goblin's Secret Remedy", 'Red Medicine', 'Mooyan Curry', 'Ookazi', 'Hinotama',
+      'Sparks', 'Final Flame', 'Tremendous Fire',
+      'Mountain', 'Yami', 'Umi', 'Forest', 'Wasteland', 'Sogen', 'Swords of Revealing Light'
+    ];
     var spellPool = mainCards.filter(function(c) {
-      return (c.kind === 'SPELL' || c.kind === 'EQUIP') && excludedSpells.indexOf(c.name) < 0;
+      return (c.kind === 'SPELL' || c.kind === 'EQUIP') && PROGRAMMED_STARTER_SPELLS.indexOf(c.name) >= 0;
     });
     pickRandom(spellPool, 6);
 
-    // 5. Trampas
-    var excludedTraps = ['Mirror Force', 'Crush Card Virus'];
+    // 5. Trampas completamente programadas
+    var PROGRAMMED_STARTER_TRAPS = [
+      'Trap Hole', 'Acid Trap Hole', 'Sakuretsu Armor', 'Waboku', 'Dust Tornado',
+      'Negate Attack', 'Widespread Ruin', 'Eatgaboon', 'Bear Trap', 'Invisible Wire',
+      'Threatening Roar'
+    ];
     var trapPool = mainCards.filter(function(c) {
-      return c.kind === 'TRAP' && excludedTraps.indexOf(c.name) < 0;
+      return c.kind === 'TRAP' && PROGRAMMED_STARTER_TRAPS.indexOf(c.name) >= 0;
     });
     pickRandom(trapPool, 6);
 
@@ -8805,12 +8823,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       'Magic Formula', 'Cyclon Laser', 'Mirror of Yata', 'Orb of Yasaka', 'Shattered Axe',
       'Mage Power', 'Poder del Mago', 'Legendary Sword', 'Laser Cannon Armor',
       'Insect Armor with Laser Cannon', 'Horn of Light', 'Elegant Egotist',
-      'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin', 'Violet Crystal'
+      'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin', 'Violet Crystal',
+      'Lightning Blade'
     ];
     if (equipNames.includes(name)) return true;
     if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER'].includes(val)) return true;
     var desc = (c.text || c.desc || '').toLowerCase();
-    if ((desc.includes('equipa a') || desc.includes('monstruo equipado')) && kind !== 'TRAP') return true;
+    if ((desc.includes('equipa a') || desc.includes('monstruo equipado') || desc.includes('equipped with this card') || desc.includes('equip to')) && kind !== 'TRAP') return true;
     return false;
   }
   window.isEquipSpell = isEquipSpell;
@@ -10179,7 +10198,41 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       window.resolveFissure(null, i);
       return;
     }
-    if (prevActivateHand) return prevActivateHand.apply(this, arguments);
+    if (val === 'CYBERNETIC_ZONE' || nUpperHand.includes('CYBERNETIC ZONE')) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var boostedMachines = 0;
+      (g.player || []).forEach(function(pm) {
+        if (pm && (pm.type === 'Machine' || (pm[2] && String(pm[2]).toLowerCase().includes('machine')))) {
+          pm.atk = (pm.atk || 0) + 500;
+          pm.def = (pm.def || 0) + 500;
+          boostedMachines++;
+        }
+      });
+      if (typeof render === 'function') render();
+      duelToast('⚙️ ¡Cybernetic Zone activado! ' + boostedMachines + ' máquina(s) reciben +500 ATK/DEF.');
+      if (typeof log === 'function') log('Cybernetic Zone otorga +500 ATK y +500 DEF a los monstruos Máquina.');
+      return;
+    }
+    if (val === 'CYBER_FUSION_SUPPORT' || nUpperHand.includes('CYBERNETIC FUSION SUPPORT')) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      g.plp = Math.max(100, (g.plp || 8000) - 1000);
+      for (var cd = 0; cd < 1; cd++) { if (g.deck.length) g.hand.push(g.deck.pop()); }
+      if (typeof render === 'function') render();
+      duelToast('⚡ ¡Cybernetic Fusion Support activado! Pagas 1000 LP y robas 1 carta.');
+      if (typeof log === 'function') log('Cybernetic Fusion Support activado: pagas 1000 LP y robas 1 carta.');
+      return;
+    }
+    var prevHandLen = g.hand.length;
+    if (prevActivateHand) prevActivateHand.apply(this, arguments);
+    if (g.hand && g.hand.length === prevHandLen && g.hand[i] === c && c.kind !== 'TRAP') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      if (typeof render === 'function') render();
+      duelToast('✨ ¡' + (c.name || 'Magia') + ' activada!');
+      if (typeof log === 'function') log(c.name + ' ha sido activada y enviada al Cementerio.');
+    }
   };
   try { activateSTFromHand = window.activateSTFromHand; } catch(_) {}
 

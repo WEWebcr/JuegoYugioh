@@ -50,7 +50,7 @@ function generateForbiddenMemoriesStarterDeck(customCatalog) {
   // Filtrar solo cartas legales de baraja principal (excluir FUSION, LINK, Divine-Beast / Dioses Egipcios)
   const mainCards = catalog.filter(c => {
     const k = c.kind || c.type || '';
-    return k !== 'FUSION' && k !== 'LINK' && c.type !== 'Divine-Beast';
+    return k !== 'FUSION' && k !== 'LINK' && c.type !== 'Divine-Beast' && c.type !== 'Ritual';
   });
 
   // 1. CARTA AS / JEFE DE LA BARAJA (1 carta)
@@ -91,21 +91,44 @@ function generateForbiddenMemoriesStarterDeck(customCatalog) {
   pickRandom(others, 3);
   pickRandom(anyLowMonster, 28 - deck.length);
 
-  // 4. MÁGICAS Y EQUIPOS (6 cartas)
-  // Excluir limpiadores de campo totales para balance del inicio
-  const excludedSpells = ['Raigeki', 'Dark Hole', "Harpie's Feather Duster", 'Heavy Storm'];
+  // 4. MÁGICAS Y EQUIPOS PROGRAMADOS (6 cartas)
+  // ÚNICAMENTE cartas de magia y equipo completamente programadas y funcionales en el motor de duelo
+  const PROGRAMMED_STARTER_SPELLS = [
+    // Equipos clásicos con soporte funcional
+    'Axe of Despair', 'Black Pendant', 'Horn of the Unicorn', 'Dragon Treasure',
+    'Malevolent Nuzzler', 'Sword of Dark Destruction', 'Dark Energy', 'Invigoration',
+    'Electro-whip', 'Cyber Shield', 'Mystical Moon', 'Silver Bow and Arrow',
+    'Book of Secret Arts', "Elf's Light", 'Beast Fangs', 'Steel Shell', 'Vile Germs',
+    'Kunai with Chain', 'Fusion Weapon', 'United We Stand', 'Legendary Sword',
+    'Laser Cannon Armor', 'Insect Armor with Laser Cannon', 'Horn of Light',
+    'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin',
+    'Violet Crystal', 'Shine Palace', 'Salamandra',
+    // Magias normales / utilitarias totalmente implementadas
+    'Pot of Greed', 'Graceful Charity', 'Renace al Monstruo', 'Fissure', 'Stop Defense',
+    'Dragon Capture Jar', 'Dian Keto the Cure Master', 'Soul of the Pure',
+    "Goblin's Secret Remedy", 'Red Medicine', 'Mooyan Curry', 'Ookazi', 'Hinotama',
+    'Sparks', 'Final Flame', 'Tremendous Fire',
+    // Campos implementados (+500 stats)
+    'Mountain', 'Yami', 'Umi', 'Forest', 'Wasteland', 'Sogen', 'Swords of Revealing Light'
+  ];
+
   const spellPool = mainCards.filter(c =>
     (c.kind === 'SPELL' || c.kind === 'EQUIP') &&
-    !excludedSpells.includes(c.name)
+    PROGRAMMED_STARTER_SPELLS.includes(c.name)
   );
   pickRandom(spellPool, 6);
 
-  // 5. TRAMPAS (6 cartas)
-  // Excluir limpiadores masivos como Mirror Force o Crush Card del deck inicial
-  const excludedTraps = ['Mirror Force', 'Crush Card Virus'];
+  // 5. TRAMPAS PROGRAMADAS (6 cartas)
+  // ÚNICAMENTE trampas que tienen lógica de activación implementada
+  const PROGRAMMED_STARTER_TRAPS = [
+    'Trap Hole', 'Acid Trap Hole', 'Sakuretsu Armor', 'Waboku', 'Dust Tornado',
+    'Negate Attack', 'Widespread Ruin', 'Eatgaboon', 'Bear Trap', 'Invisible Wire',
+    'Threatening Roar'
+  ];
+
   const trapPool = mainCards.filter(c =>
     c.kind === 'TRAP' &&
-    !excludedTraps.includes(c.name)
+    PROGRAMMED_STARTER_TRAPS.includes(c.name)
   );
   pickRandom(trapPool, 6);
 
