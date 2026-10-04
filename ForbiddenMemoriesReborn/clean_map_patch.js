@@ -3346,7 +3346,8 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         'The Immortal of Thunder', 'Electric Snake', 'Wing Eagle', 'Punished Eagle',
         'Performance of Sword', 'Hungry Burger', 'Sengenjin', 'Skull Guardian',
         'Tri-Horned Dragon', 'Serpent Night Dragon', 'Skull Knight', 'Cosmo Queen',
-        'Chakra', 'Crab Turtle', 'Mikazukinoyaiba'
+        'Chakra', 'Crab Turtle', 'Mikazukinoyaiba',
+        'Meteor Dragon', 'Firewing Pegasus', 'Psycho-Puppet', 'Garma Sword', 'Javelin Beetle', 'Fortress Whale', 'Dokurorider', 'Mask of Shine & Dark'
     ];
     window.NEW_REWARD_MONSTERS = NEW_REWARD_MONSTERS;
     NEW_REWARD_MONSTERS.forEach(m => {
