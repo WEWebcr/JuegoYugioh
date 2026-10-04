@@ -1360,11 +1360,56 @@ app.get('/api/deck/:character', (req, res) => {
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+function getEgyptianGodType(cardName) {
+  if (!cardName) return null;
+  const n = String(cardName).trim().toLowerCase();
+  if (n === 'slifer the sky dragon' || n === 'slifer el dragón del cielo' || n === 'slifer el dragon del cielo') {
+    return 'slifer';
+  }
+  if (n === 'obelisk the tormentor' || n === 'obelisco el atormentador') {
+    return 'obelisk';
+  }
+  if (n === 'the winged dragon of ra' || n === 'winged dragon of ra' || n === 'el dragón alado de ra' || n === 'el dragon alado de ra') {
+    return 'ra';
+  }
+  return null;
+}
+
 app.post('/api/deck/:character', requireAdmin, (req, res) => {
   const char = String(req.params.character).replace(/[^a-z0-9_]/g, '').toLowerCase();
   const data = req.body;
   if (!data || !Array.isArray(data.cards)) return res.status(400).json({ error: 'cards[] requerido' });
   if (data.cards.length < 40 || data.cards.length > 60) return res.status(400).json({ error: 'El deck debe tener entre 40 y 60 cartas. Tiene: ' + data.cards.length });
+
+  // Validar límite de copias (máx 3) y restricción estricta de Dioses Egipcios
+  const counts = {};
+  let godCount = 0;
+  for (const card of data.cards) {
+    counts[card] = (counts[card] || 0) + 1;
+    if (counts[card] > 3) {
+      return res.status(400).json({ error: `La carta "${card}" excede el máximo permitido de 3 copias.` });
+    }
+    const god = getEgyptianGodType(card);
+    if (god) {
+      godCount++;
+      if (godCount > 1) {
+        return res.status(400).json({ error: 'Solo se permite un máximo de 1 Dios Egipcio por deck.' });
+      }
+      if (char === 'yugi' && god !== 'slifer') {
+        return res.status(400).json({ error: 'Yugi solo puede tener a Slifer the Sky Dragon como Dios Egipcio.' });
+      }
+      if (char === 'kaiba' && god !== 'obelisk') {
+        return res.status(400).json({ error: 'Kaiba solo puede tener a Obelisk the Tormentor como Dios Egipcio.' });
+      }
+      if (char === 'marik' && god !== 'ra') {
+        return res.status(400).json({ error: 'Marik solo puede tener a The Winged Dragon of Ra como Dios Egipcio.' });
+      }
+      if (char !== 'yugi' && char !== 'kaiba' && char !== 'marik') {
+        return res.status(400).json({ error: `El personaje "${char}" no puede tener Dioses Egipcios. Solo Yugi (Slifer), Kaiba (Obelisk) y Marik (Ra) están autorizados.` });
+      }
+    }
+  }
+
   const file = path.join(ROOT, 'data', 'decks', char + '.json');
   try {
     const dir = path.dirname(file);

@@ -58,6 +58,11 @@ textarea{resize:vertical;min-height:60px}
 .deck-slot .stats-fusion{color:#ea80fc;}
 .deck-slot .remove{background:none;border:none;color:#ff5555;cursor:pointer;font-size:1.1rem;padding:0 4px;line-height:1;border-radius:3px;}
 .deck-slot .remove:hover{background:rgba(255,85,85,.2);color:#ff8888;}
+.deck-qty-controls{display:inline-flex;align-items:center;gap:3px;background:#0d0d1b;padding:2px 4px;border-radius:4px;border:1px solid #3d3d5c;margin-left:4px;}
+.qty-btn{background:#1e1e36;border:1px solid #4a4a6a;color:#ffd700;width:22px;height:22px;line-height:1;border-radius:3px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:.9rem;padding:0;transition:.15s;}
+.qty-btn:hover:not(:disabled){background:#ffd700;color:#000;border-color:#ffd700;}
+.qty-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.deck-qty-badge{font-size:.8rem;font-weight:bold;color:#ffd700;min-width:24px;text-align:center;padding:0 2px;}
 .deck-counter{color:#ffd700;font-weight:bold;font-size:.9rem;margin-bottom:8px}
 .deck-counter.ok{color:#44ff88}
 .deck-counter.err{color:#ff4444}
@@ -794,6 +799,42 @@ async function loadCharDeck() {
   renderDeckCatalog();
 }
 
+function getEgyptianGodType(cardName) {
+  if (!cardName) return null;
+  var n = String(cardName).trim().toLowerCase();
+  if (n === 'slifer the sky dragon' || n === 'slifer el dragón del cielo' || n === 'slifer el dragon del cielo') {
+    return 'slifer';
+  }
+  if (n === 'obelisk the tormentor' || n === 'obelisco el atormentador') {
+    return 'obelisk';
+  }
+  if (n === 'the winged dragon of ra' || n === 'winged dragon of ra' || n === 'el dragón alado de ra' || n === 'el dragon alado de ra') {
+    return 'ra';
+  }
+  return null;
+}
+
+function checkGodAllowedForChar(char, cardName) {
+  var god = getEgyptianGodType(cardName);
+  if (!god) return { allowed: true };
+  if (char === 'yugi') {
+    if (god !== 'slifer') {
+      return { allowed: false, msg: 'Yugi solo puede tener a Slifer the Sky Dragon como Dios Egipcio.' };
+    }
+  } else if (char === 'kaiba') {
+    if (god !== 'obelisk') {
+      return { allowed: false, msg: 'Kaiba solo puede tener a Obelisk the Tormentor como Dios Egipcio.' };
+    }
+  } else if (char === 'marik') {
+    if (god !== 'ra') {
+      return { allowed: false, msg: 'Marik solo puede tener a The Winged Dragon of Ra como Dios Egipcio.' };
+    }
+  } else {
+    return { allowed: false, msg: 'Este personaje no puede tener Dioses Egipcios. Solo Yugi (Slifer), Kaiba (Obelisk) y Marik (Ra) pueden poseerlos.' };
+  }
+  return { allowed: true, isGod: true };
+}
+
 function renderDeck() {
   var el = document.getElementById('deckSlots');
   var counter = document.getElementById('deckCounter');
@@ -805,23 +846,65 @@ function renderDeck() {
   var typeFilter = (document.getElementById('deckListTypeFilter') ? document.getElementById('deckListTypeFilter').value : '').trim();
 
   var mCount = 0, sCount = 0, tCount = 0;
-  var items = [];
+  var groupMap = {};
+  var groupList = [];
 
   for (var i = 0; i < currentDeck.length; i++) {
     var name = currentDeck[i];
     var c = getCardInfo(name);
     var kind = c ? (c.kind || 'MONSTER') : 'MONSTER';
-    var attr = c ? (c.attr || '') : '';
-    var type = c ? (c.type || '') : '';
 
     if (kind === 'MONSTER') mCount++;
     else if (kind === 'SPELL' || kind === 'EQUIP') sCount++;
     else if (kind === 'TRAP') tCount++;
 
+    if (!groupMap[name]) {
+      groupMap[name] = {
+        name: name,
+        qty: 1,
+        card: c,
+        kind: kind,
+        attr: c ? (c.attr || '') : '',
+        type: c ? (c.type || '') : '',
+        atk: (c && c.atk != null) ? c.atk : -1,
+        level: (c && c.level != null) ? c.level : 0
+      };
+      groupList.push(groupMap[name]);
+    } else {
+      groupMap[name].qty++;
+    }
+  }
+
+  // Ordenar lista agrupada de manera visual y ordenada: Monstruos (por ATK/Nivel), Magias, Equipos, Trampas, Fusiones
+  var kindOrder = { 'MONSTER': 1, 'SPELL': 2, 'EQUIP': 3, 'TRAP': 4, 'FUSION': 5 };
+  groupList.sort(function(a, b) {
+    var ordA = kindOrder[a.kind] || 99;
+    var ordB = kindOrder[b.kind] || 99;
+    if (ordA !== ordB) return ordA - ordB;
+    if (a.kind === 'MONSTER') {
+      if (b.atk !== a.atk) return b.atk - a.atk;
+      if (b.level !== a.level) return b.level - a.level;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  var items = [];
+  for (var j = 0; j < groupList.length; j++) {
+    var item = groupList[j];
+    var name = item.name;
+    var c = item.card;
+    var kind = item.kind;
+    var attr = item.attr;
+    var type = item.type;
+    var qty = item.qty;
+
     if (q && !name.toLowerCase().includes(q)) continue;
     if (kFilter && kind !== kFilter) continue;
     if (attrFilter && (!attr || attr.toLowerCase() !== attrFilter.toLowerCase())) continue;
     if (typeFilter && (!type || type.toLowerCase() !== typeFilter.toLowerCase())) continue;
+
+    var isGod = !!getEgyptianGodType(name);
+    var maxCopies = isGod ? 1 : 3;
 
     var kindBadge = '';
     var statsHtml = '';
@@ -858,6 +941,9 @@ function renderDeck() {
       statsHtml = '';
     }
 
+    var esc = name.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    var canAddMore = (qty < maxCopies) && (currentDeck.length < 60);
+
     items.push(
       '<div class="deck-slot">' +
         '<div class="slot-main">' +
@@ -866,13 +952,18 @@ function renderDeck() {
         '</div>' +
         '<div class="slot-info">' +
           statsHtml +
-          '<button class="remove" onclick="removeFromDeck(' + i + ')" title="Quitar del deck">✕</button>' +
+          '<div class="deck-qty-controls">' +
+            '<button class="qty-btn" onclick="changeDeckQty(\'' + esc + '\', -1)" title="Reducir 1 copia">-</button>' +
+            '<span class="deck-qty-badge" title="Cantidad en el deck">x' + qty + '</span>' +
+            '<button class="qty-btn" onclick="changeDeckQty(\'' + esc + '\', 1)" title="Aumentar 1 copia"' + (canAddMore ? '' : ' disabled') + '>+</button>' +
+          '</div>' +
+          '<button class="remove" onclick="removeCardAll(\'' + esc + '\')" title="Eliminar todas las copias">✕</button>' +
         '</div>' +
       '</div>'
     );
   }
 
-  var filterNotice = (q || kFilter || attrFilter || typeFilter) ? ' (mostrando ' + items.length + ')' : '';
+  var filterNotice = (q || kFilter || attrFilter || typeFilter) ? ' (mostrando ' + items.length + ' tipos)' : '';
   counter.innerHTML = n + ' / 40-60 cartas' + filterNotice + ' ' +
     '<span style="font-size:.8rem;font-weight:normal;color:#aaa;margin-left:8px;">(' +
       '<span style="color:#ff8888;">⚔ ' + mCount + ' Monstruos</span> • ' +
@@ -895,7 +986,7 @@ function renderDeckCatalog() {
     if (q && !c.name.toLowerCase().includes(q)) return false;
     if (k && c.kind !== k) return false;
     if (attrFilter && (!c.attr || c.attr.toLowerCase() !== attrFilter.toLowerCase())) return false;
-    if (typeFilter && (!c.type || c.type.toLowerCase() !== typeFilter.toLowerCase())) return false;
+    if (typeFilter && (!type || type.toLowerCase() !== typeFilter.toLowerCase())) return false;
     return true;
   });
 
@@ -932,15 +1023,60 @@ function renderDeckCatalog() {
   }).join('');
 }
 
-function addToDeck(name) {
-  if(currentDeck.length>=60){alert('El deck ya tiene el máximo de 60 cartas');return;}
-  var copies=currentDeck.filter(function(n){return n===name;}).length;
-  if(copies>=3){alert('Máximo 3 copias de la misma carta');return;}
-  currentDeck.push(name);
+function changeDeckQty(name, delta) {
+  var charSelect = document.getElementById('charSelect');
+  var char = charSelect ? charSelect.value : '';
+
+  if (delta > 0) {
+    if (currentDeck.length >= 60) {
+      alert('El deck ya tiene el máximo permitido de 60 cartas.');
+      return;
+    }
+    var godCheck = checkGodAllowedForChar(char, name);
+    if (!godCheck.allowed) {
+      alert(godCheck.msg);
+      return;
+    }
+    var currentCopies = currentDeck.filter(function(n) { return n === name; }).length;
+    var maxAllowed = godCheck.isGod ? 1 : 3;
+    if (currentCopies >= maxAllowed) {
+      alert(godCheck.isGod 
+        ? 'Solo se permite 1 copia del Dios Egipcio por deck.' 
+        : 'Máximo 3 copias permitidas de la misma carta.');
+      return;
+    }
+    if (godCheck.isGod) {
+      var otherGod = currentDeck.some(function(n) { return !!getEgyptianGodType(n); });
+      if (otherGod) {
+        alert('Solo se permite 1 Dios Egipcio en total en el deck.');
+        return;
+      }
+    }
+    currentDeck.push(name);
+  } else if (delta < 0) {
+    var idx = currentDeck.lastIndexOf(name);
+    if (idx !== -1) {
+      currentDeck.splice(idx, 1);
+    }
+  }
   renderDeck();
 }
 
-function removeFromDeck(idx) { currentDeck.splice(idx,1); renderDeck(); }
+function removeCardAll(name) {
+  currentDeck = currentDeck.filter(function(n) { return n !== name; });
+  renderDeck();
+}
+
+function addToDeck(name) {
+  changeDeckQty(name, 1);
+}
+
+function removeFromDeck(idx) {
+  if (idx >= 0 && idx < currentDeck.length) {
+    currentDeck.splice(idx, 1);
+    renderDeck();
+  }
+}
 
 async function saveDeck() {
   var btn = document.getElementById('btnSaveDeck');
@@ -958,6 +1094,31 @@ async function saveDeck() {
   if (currentDeck.length < 40 || currentDeck.length > 60) {
     showMsg('deckMsg', 'El deck de ' + charName + ' debe tener entre 40 y 60 cartas (actual: ' + currentDeck.length + ')', 'err');
     return;
+  }
+
+  // Validar copias máximas (3) y Dioses Egipcios
+  var counts = {};
+  var godCount = 0;
+  for (var i = 0; i < currentDeck.length; i++) {
+    var cardName = currentDeck[i];
+    counts[cardName] = (counts[cardName] || 0) + 1;
+    if (counts[cardName] > 3) {
+      showMsg('deckMsg', 'La carta "' + cardName + '" supera el límite de 3 copias.', 'err');
+      return;
+    }
+    var god = getEgyptianGodType(cardName);
+    if (god) {
+      godCount++;
+      if (godCount > 1) {
+        showMsg('deckMsg', 'Solo se permite 1 Dios Egipcio en total por deck.', 'err');
+        return;
+      }
+      var godCheck = checkGodAllowedForChar(char, cardName);
+      if (!godCheck.allowed) {
+        showMsg('deckMsg', godCheck.msg, 'err');
+        return;
+      }
+    }
   }
 
   if (btn) {
