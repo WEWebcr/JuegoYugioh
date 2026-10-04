@@ -148,6 +148,12 @@ window.cleanAllOverlays = function() {
     document.querySelectorAll('#custom-reward-choice-overlay').forEach(el => el.remove());
     document.querySelectorAll('#custom-dialog-fullscreen').forEach(el => el.remove());
     document.querySelectorAll('#relic-celebration-modal').forEach(el => el.remove());
+    let camp = document.getElementById('campaign3000');
+    if (camp) {
+        camp.innerHTML = '';
+        camp.classList.add('hidden');
+        camp.style.display = 'none';
+    }
 };
 
 window.persistUserSave = function(s) {
@@ -2890,6 +2896,14 @@ window.openFreeDuelMenu = function() {
     window.isFreeDuelMode = true;
     if (window.cleanAllOverlays) window.cleanAllOverlays();
     if (window.hideDuelBoard) window.hideDuelBoard();
+    let camp = document.getElementById('campaign3000');
+    if (camp) {
+        camp.innerHTML = '';
+        camp.classList.add('hidden');
+        camp.style.display = 'none';
+    }
+    if (typeof hideShell === 'function') hideShell();
+    if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
     
     let overlay = document.createElement('div');
     overlay.id = 'custom-freeduel-menu';
@@ -2959,6 +2973,14 @@ window.openFreeDuelMenu = function() {
                 window.isFreeDuelMode = true;
                 if (window.cleanAllOverlays) window.cleanAllOverlays();
                 else overlay.remove();
+                let cCamp = document.getElementById('campaign3000');
+                if (cCamp) {
+                    cCamp.innerHTML = '';
+                    cCamp.classList.add('hidden');
+                    cCamp.style.display = 'none';
+                }
+                if (typeof hideShell === 'function') hideShell();
+                if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
                 window.lastDuelOpponent = cid;
                 // Disable native music and play minijefes.mp3
                 if (window.FMRMusic302) {
@@ -4753,7 +4775,7 @@ window.customFinishStoryDuel = function(win) {
         }
         if (typeof window.updateFieldBoardTheme === 'function') window.updateFieldBoardTheme(null);
     }
-    if (window.nativeAPI.showShell) window.nativeAPI.showShell();
+    // Do not call showShell here to avoid campaign3000 overlay sticking over duel rewards/dialogs
     
     if (!win) {
         s.losses = s.losses || {};
@@ -6836,8 +6858,31 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
   };
 
+  window.showDuelBoard = function() {
+    let w = document.getElementById('duelBoardWrapper');
+    if (w) { w.style.display = 'block'; }
+    let t = document.getElementById('duelTopHeader');
+    if (t) { t.style.display = ''; }
+    let camp = document.getElementById('campaign3000');
+    if (camp) {
+      camp.innerHTML = '';
+      camp.classList.add('hidden');
+      camp.style.display = 'none';
+    }
+    if (typeof hideShell === 'function') hideShell();
+    if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
+  };
+
   window.beginStoryDuel = function(id) {
     if (window.cleanAllOverlays) window.cleanAllOverlays();
+    let camp = document.getElementById('campaign3000');
+    if (camp) {
+      camp.innerHTML = '';
+      camp.classList.add('hidden');
+      camp.style.display = 'none';
+    }
+    if (typeof hideShell === 'function') hideShell();
+    if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
     if (window.showDuelBoard) window.showDuelBoard();
     window._customDuelFinishing = false;
     
