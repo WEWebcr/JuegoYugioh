@@ -50,6 +50,10 @@ console.log('NATIVE API INJECTED:', Object.keys(window.nativeAPI));
 
 html = html.replace(target, injection);
 
+// 3.1 Intercept newGame to avoid default Tristan deck
+html = html.replace('function newGame(){', 'function newGame(){ if(window.customNewGame && (window.storyDuelActive || (typeof storyDuelActive!=="undefined" && storyDuelActive))){ return window.customNewGame(); }');
+html = html.replace('onclick="newGame()"', 'onclick="if(window.customNewGame && (window.storyDuelActive || (typeof storyDuelActive!=="undefined" && storyDuelActive))) window.customNewGame(); else newGame();"');
+
 // 3. Intercept functions
 html = html.replace('function showMap(){', 'function showMap(){ if(window.customShowMap && !window.forceNativeMap){ window.customShowMap(); return; }');
 html = html.replace('function showMain(){', 'function showMain(){ if(window.customShowMain){ window.customShowMain(); return; }');

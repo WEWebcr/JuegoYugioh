@@ -6822,7 +6822,20 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     });
   };
 
-  var origBeginStoryDuel = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
+  // DUEL INITIALIZATION OVERHAUL:
+  // Previene que newGame() inyecte las 48 cartas de Tristan o que installStoryDecks use fallbacks viejos de DB.
+  window.customNewGame = function() {
+    if (window.storyDuelActive || (typeof storyDuelActive !== 'undefined' && storyDuelActive)) {
+      if (typeof window.installStoryDecks === 'function') {
+        window.installStoryDecks();
+        return;
+      }
+    }
+    if (typeof origNewGameBase === 'function') {
+      return origNewGameBase();
+    }
+  };
+
   window.beginStoryDuel = function(id) {
     if (window.cleanAllOverlays) window.cleanAllOverlays();
     if (window.showDuelBoard) window.showDuelBoard();
@@ -6841,120 +6854,151 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (window.nativeAPI && window.nativeAPI.setStoryDuelActive) window.nativeAPI.setStoryDuelActive(true);
     if (window.nativeAPI && window.nativeAPI.setStoryDeckReady) window.nativeAPI.setStoryDeckReady(false);
     
-    var res;
-    if (typeof origBeginStoryDuel === 'function') {
-      res = origBeginStoryDuel(normId);
-    }
-    
-    // Safety fallback: ensure installStoryDecks triggers even if timers get interrupted
-    setTimeout(function() {
-      if (!window.storyDeckReady && window.storyDuelActive) {
-        if (typeof window.installStoryDecks === 'function') window.installStoryDecks();
-      }
-    }, 1450);
-    
-    return res;
+    // Instalar DIRECTAMENTE los decks limpios sin pasar por newGame() de Tristan
+    window.installStoryDecks();
   };
   if (!window.nativeAPI) window.nativeAPI = {};
   window.nativeAPI.beginStoryDuel = window.beginStoryDuel;
 
-  var origInstall = window.installStoryDecks;
   window.installStoryDecks = function() {
-    var rawOpp = (window.storyOpponent || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
+    var rawOpp = (window.storyOpponent || window.lastDuelOpponent || 'tristan').toLowerCase().replace(/[^a-z0-9_]/g, '');
     var opp = rawOpp === 'seto' ? 'kaiba' : (rawOpp === 'gozaburo' ? 'kosaburo' : rawOpp);
-    
-    var expectedEnemyDeck = (window['_serverDeck_' + opp]) ||
-                            (window['_serverDeck_' + rawOpp]) ||
-                            (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]) && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]).cards);
 
-    if (expectedEnemyDeck && Array.isArray(expectedEnemyDeck) && expectedEnemyDeck.length >= 40) {
-      if (typeof STORY_DECKS !== 'undefined') {
-        STORY_DECKS[opp] = expectedEnemyDeck.slice();
-        STORY_DECKS[rawOpp] = expectedEnemyDeck.slice();
-        console.log('[Duel] Usando deck oficial para ' + opp + ' (' + expectedEnemyDeck.length + ' cartas)');
-      }
-    }
-    
-    if (origInstall) {
-      try { origInstall.apply(this, arguments); } catch(err) { console.warn('[installStoryDecks origInstall warning]', err); }
+    console.log('[installStoryDecks] Instalando decks oficiales para duelo contra:', opp);
+
+    // 1. Obtener la baraja oficial del rival
+    var enemyCardNames = (window['_serverDeck_' + opp]) ||
+                         (window['_serverDeck_' + rawOpp]) ||
+                         (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]) && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]).cards) ||
+                         (typeof STORY_DECKS !== 'undefined' && (STORY_DECKS[opp] || STORY_DECKS[rawOpp])) ||
+                         (window.CHARACTER_DECKS && window.CHARACTER_DECKS.tristan && window.CHARACTER_DECKS.tristan.cards);
+
+    if (!enemyCardNames || !Array.isArray(enemyCardNames) || enemyCardNames.length === 0) {
+      console.warn('[installStoryDecks] No se encontró baraja para ' + opp + ', usando fallback');
+      enemyCardNames = (window.CHARACTER_DECKS && window.CHARACTER_DECKS.tristan && window.CHARACTER_DECKS.tristan.cards) || [];
     }
 
-    // 1. Verificación y auto-reparación de la baraja del RIVAL
-    if (typeof game !== 'undefined' && game && expectedEnemyDeck && Array.isArray(expectedEnemyDeck) && expectedEnemyDeck.length >= 40) {
-      var needsFix = false;
-      var totalEnemyCards = (game.enemyDeck ? game.enemyDeck.length : 0) + (game.enemyHand ? game.enemyHand.length : 0);
-      if (totalEnemyCards < 40) {
-        needsFix = true;
-      } else if (opp !== 'tristan') {
-        var firstExpected = expectedEnemyDeck[0];
-        var hasExpected = (game.enemyDeck || []).concat(game.enemyHand || []).some(function(c) {
-          return c && (c.name === firstExpected || (c[0] && c[0] === firstExpected));
-        });
-        if (!hasExpected) needsFix = true;
-      }
-      if (needsFix) {
-        console.log('[installStoryDecks] Auto-instalando deck exacto de ' + opp + ' desde CHARACTER_DECKS.');
-        var cardResolver = window.resolveGameCard || function(n) { return { name: n, atk: 1500, def: 1200, pos: 'ATK', faceUp: true }; };
-        var builtCards = expectedEnemyDeck.map(cardResolver).filter(Boolean);
-        if (builtCards.length >= 40) {
-          for (var i = builtCards.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var tmp = builtCards[i]; builtCards[i] = builtCards[j]; builtCards[j] = tmp;
-          }
-          game.enemyDeck = builtCards.slice();
-          game.enemyHand = [];
-          for (var h = 0; h < 5; h++) {
-            if (game.enemyDeck.length > 0) game.enemyHand.push(game.enemyDeck.pop());
-          }
-        }
-      }
-    }
-
-    // 2. Verificación y auto-reparación de la baraja del JUGADOR
+    // 2. Obtener la baraja oficial del jugador desde su save activo
     var sSave = (window.nativeAPI && window.nativeAPI.loadGame && window.nativeAPI.loadGame()) ||
                 (typeof loadGame === 'function' && loadGame()) ||
                 window.memorySave;
-    if (typeof game !== 'undefined' && game && sSave) {
-      var expectedPlayerDeck = (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40) ?
-                               sSave.decks[sSave.activeDeck] :
-                               (Array.isArray(sSave.deck) && sSave.deck.length === 40 ? sSave.deck : null);
-      if (expectedPlayerDeck) {
-        var pNeedsFix = false;
-        var totalPlayerCards = (game.deck ? game.deck.length : 0) + (game.hand ? game.hand.length : 0);
-        if (totalPlayerCards < 40) {
-          pNeedsFix = true;
-        } else {
-          var firstPCard = expectedPlayerDeck[0];
-          var playerHasFirst = (game.deck || []).concat(game.hand || []).some(function(c) {
-            return c && (c.name === firstPCard || (c[0] && c[0] === firstPCard));
-          });
-          if (!playerHasFirst) pNeedsFix = true;
-        }
-        if (pNeedsFix) {
-          console.log('[installStoryDecks] Auto-instalando deck del jugador desde save activo (' + (sSave.activeDeck || 'Principal') + ').');
-          var cardResolverP = window.resolveGameCard || function(n) { return { name: n, atk: 1500, def: 1200, pos: 'ATK', faceUp: true }; };
-          var builtP = expectedPlayerDeck.map(cardResolverP).filter(Boolean);
-          if (builtP.length >= 40) {
-            for (var pi = builtP.length - 1; pi > 0; pi--) {
-              var pj = Math.floor(Math.random() * (pi + 1));
-              var pTmp = builtP[pi]; builtP[pi] = builtP[pj]; builtP[pj] = pTmp;
-            }
-            game.deck = builtP.slice();
-            game.hand = [];
-            for (var ph = 0; ph < 5; ph++) {
-              if (game.deck.length > 0) game.hand.push(game.deck.pop());
-            }
-          }
-        }
+    
+    var playerCardNames = null;
+    if (sSave) {
+      if (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40) {
+        playerCardNames = sSave.decks[sSave.activeDeck];
+      } else if (Array.isArray(sSave.deck) && sSave.deck.length === 40) {
+        playerCardNames = sSave.deck;
       }
+    }
+    if (!playerCardNames || playerCardNames.length !== 40) {
+      if (window.DEFAULT_DECK && Array.isArray(window.DEFAULT_DECK) && window.DEFAULT_DECK.length === 40) {
+        playerCardNames = window.DEFAULT_DECK;
+      } else if (sSave && Array.isArray(sSave.deck) && sSave.deck.length > 0) {
+        playerCardNames = sSave.deck.slice(0, 40);
+      }
+    }
+
+    var cardResolver = window.resolveGameCard || function(n) { return { name: n, atk: 1500, def: 1200, pos: 'ATK', faceUp: true }; };
+
+    // 3. Resolver cartas usando resolveGameCard (CARDS_DATA + FMR_ST_POOL_V1 + DB + mappings)
+    var builtEnemy = (enemyCardNames || []).map(cardResolver).filter(Boolean);
+    var builtPlayer = (playerCardNames || []).map(cardResolver).filter(Boolean);
+
+    // Asegurar 40 cartas exactas sin elementos nulos
+    while (builtEnemy.length < 40 && builtEnemy.length > 0) {
+      builtEnemy.push(Object.assign({}, builtEnemy[Math.floor(Math.random() * builtEnemy.length)]));
+    }
+    while (builtPlayer.length < 40 && builtPlayer.length > 0) {
+      builtPlayer.push(Object.assign({}, builtPlayer[Math.floor(Math.random() * builtPlayer.length)]));
+    }
+    builtEnemy = builtEnemy.slice(0, 40);
+    builtPlayer = builtPlayer.slice(0, 40);
+
+    // 4. Barajar con algoritmo Fisher-Yates
+    function shuf(arr) {
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+      }
+      return arr;
+    }
+    shuf(builtEnemy);
+    shuf(builtPlayer);
+
+    // 5. Configurar el estado de duelo en game
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (!g) {
+      g = {
+        pendingAction: null, pendingTarget: null, linkMaterialModes: {},
+        plp: 8000, elp: 8000, hand: [], enemyHand: [],
+        extra: [], extraUsed: [],
+        field: Array(5).fill(null), enemy: Array(5).fill(null),
+        playerBack: Array(5).fill(null), enemyBack: Array(5).fill(null),
+        linkZones: [null, null], enemyLinkZones: [null, null],
+        linkField: null, enemyLinkField: null,
+        grave: [], enemyGrave: [],
+        turn: 'player', selected: [], deck: [], enemyDeck: [],
+        handSummoned: false, battlePhaseStarted: false,
+        first: 'player', firstTurn: true, turnNo: 1, duelOver: false
+      };
+      if (typeof game !== 'undefined') game = g;
+      window.game = g;
+    }
+
+    g.deck = builtPlayer.slice();
+    g.enemyDeck = builtEnemy.slice();
+    g.hand = [];
+    g.enemyHand = [];
+    g.field = Array(5).fill(null);
+    g.enemy = Array(5).fill(null);
+    g.playerBack = Array(5).fill(null);
+    g.enemyBack = Array(5).fill(null);
+    g.linkZones = [null, null];
+    g.enemyLinkZones = [null, null];
+    g.linkField = null;
+    g.enemyLinkField = null;
+    g.grave = [];
+    g.enemyGrave = [];
+    g.selected = [];
+    g.plp = 8000;
+    g.elp = 8000;
+    g.turnNo = 1;
+    g.turn = 'player';
+    g.first = 'player';
+    g.firstTurn = true;
+    g.handSummoned = false;
+    g.battlePhaseStarted = false;
+    g.duelOver = false;
+    g._storyResult3000 = null;
+    g._turnStarts67 = { player: 0, enemy: 0 };
+    g._aiPlan108 = null;
+
+    // Robar 5 cartas iniciales legítimas
+    for (var h = 0; h < 5; h++) {
+      if (g.deck.length > 0) g.hand.push(g.deck.pop());
+      if (g.enemyDeck.length > 0) g.enemyHand.push(g.enemyDeck.pop());
     }
 
     window.storyDeckReady = true;
     try { storyDeckReady = true; } catch(_) {}
     window.duelHandled = false;
     try { duelHandled = false; } catch(_) {}
+
+    // Encabezado del duelo en el tablero
+    var oppDisplayName = (window.DUELISTS_NAMES && window.DUELISTS_NAMES[opp]) || opp.toUpperCase();
+    var hud = document.getElementById('campaignDuelHud3000');
+    if (hud) hud.textContent = 'MUNDO 1 · ' + oppDisplayName;
+    var topHeader = document.getElementById('duelTopHeader');
+    if (topHeader) {
+      var b = topHeader.querySelector('b');
+      if (b) b.textContent = 'MUNDO 1 · ' + oppDisplayName;
+    }
+
     if (typeof showLoading === 'function') showLoading(false);
     if (typeof render === 'function') render();
+    if (typeof log === 'function') log('Decks oficiales listos: ' + oppDisplayName + ' (40) vs ' + ((sSave && sSave.name) || 'Jugador') + ' (40)');
+    console.log('[installStoryDecks] Instalación completada sin mezclas de Tristan.');
 
     // Guaranteed God card in opening hand for Marik, Kaiba, and Yugi on Turn 1
     var yugiChosenGod = null;
