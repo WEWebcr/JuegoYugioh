@@ -7,7 +7,7 @@
 | #001 | **Blue-Eyes White Dragon** | Monstruo (Dragon) | 3000 / 2500 | imagenescartas/Mundo1/001.jpg |
 | #002 | **Red-Eyes Black Dragon** | Monstruo (Dragon) | 2400 / 2000 | imagenescartas/Mundo1/002.jpeg |
 | #006 | **Dark Magician** | Monstruo (Spellcaster) | 2500 / 2100 | imagenescartas/Mundo1/006.jpeg |
-| #007 | **Thousand Dragon** | Fusión (Dragon) | 2400 / 2000 | imagenescartas/Mundo1/007.jpeg |
+| #009 | **Insect Armor with Laser Cannon** | EQUIP | 700 / 700 | imagenescartas/Mundo1/009.jpg |
 | #010 | **Harpie Lady** | Monstruo (Winged Beast) | 1300 / 1400 | imagenescartas/Mundo1/010.jpeg |
 | #013 | **Summoned Skull** | Monstruo (Fiend) | 2500 / 1200 | imagenescartas/Mundo1/013.jpg |
 | #015 | **Winged Dragon, Guardian of the Fortress #1** | Monstruo (Dragon) | 1400 / 1200 | imagenescartas/Mundo1/015.jpg |

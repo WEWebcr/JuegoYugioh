@@ -60,6 +60,18 @@
     "tier": "FUSIÓN CLÁSICA"
   },
   {
+    "id": 9,
+    "name": "Insect Armor with Laser Cannon",
+    "kind": "EQUIP",
+    "type": "Equip",
+    "value": "EQUIP_INSECT_HEAVY",
+    "targetType": "Insect",
+    "price": 10000,
+    "tier": "EQUIPO ESPECÍFICO",
+    "text": "Carta Mágica de Equipo pesada. Confiere +700 ATK y +700 DEF a un monstruo de Tipo Insecto.",
+    "image": "imagenescartas/Mundo1/009.jpg"
+  },
+  {
     "id": 10,
     "name": "Harpie Lady",
     "kind": "MONSTER",
