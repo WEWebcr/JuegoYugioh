@@ -55,8 +55,26 @@ html = html.replace(target, injection);
 
 // 3.1 Intercept newGame to avoid default Tristan deck
 html = html.replace("['Sword of Dark Destruction',4,'Warrior','DARK',1000,1000],", "");
-html = html.replace('function newGame(){', 'function newGame(){ if(window.customNewGame && (window.storyDuelActive || (typeof storyDuelActive!=="undefined" && storyDuelActive))){ return window.customNewGame(); }');
-html = html.replace('onclick="newGame()"', 'onclick="if(window.customNewGame && (window.storyDuelActive || (typeof storyDuelActive!=="undefined" && storyDuelActive))) window.customNewGame(); else newGame();"');
+html = html.replace('function newGame(){', 'function newGame(){ if(window.customNewGame){ return window.customNewGame(); }');
+html = html.replace(/onclick="newGame\(\)"/g, 'onclick="if(window.customNewGame) window.customNewGame(); else newGame();"');
+html = html.replace('newGame=function(){', 'newGame=function(){ if(window.customNewGame) return window.customNewGame();');
+html = html.replace('function freshGame53(){', 'function freshGame53(){ if(window.customNewGame) return window.customNewGame();');
+
+// 3.1.2 Replace hardcoded DEFAULT_DECK of Tristan in base HTML
+html = html.replace(/const DEFAULT_DECK = [\s\S]*?;\s*const TRISTAN_DECK/m, function() {
+    return 'const DEFAULT_DECK = (typeof window !== "undefined" && typeof window.generateForbiddenMemoriesStarterDeck === "function") ? window.generateForbiddenMemoriesStarterDeck() : [\n' +
+    '  "Baby Dragon", "Petit Dragon", "Koumori Dragon", "Thunder Dragon",\n' +
+    '  "Celtic Guardian", "Zanki", "Beaver Warrior", "Battle Ox",\n' +
+    '  "Mystical Elf", "Flame Manipulator", "Feral Imp", "Dark Magician",\n' +
+    '  "Giant Soldier of Stone", "Silver Fang", "Man-Eater Bug", "Dragon Zombie",\n' +
+    '  "Curse of Dragon", "Gaia the Fierce Knight", "Summoned Skull", "Meteor Dragon",\n' +
+    '  "Beastking of the Swamps", "Baby Dragon", "Petit Dragon", "Celtic Guardian",\n' +
+    '  "Battle Ox", "Silver Fang", "Mystical Elf", "Feral Imp",\n' +
+    '  "Mountain", "Dragon Treasure", "Black Pendant", "Horn of the Unicorn",\n' +
+    '  "Axe of Despair", "Pot of Greed", "Renace al Monstruo", "Fissure",\n' +
+    '  "Trap Hole", "Waboku", "Sakuretsu Armor", "Dust Tornado"\n' +
+    '];\nconst TRISTAN_DECK';
+});
 
 // 3. Intercept functions
 html = html.replace('function showMap(){', 'function showMap(){ if(window.customShowMap && !window.forceNativeMap){ window.customShowMap(); return; }');
