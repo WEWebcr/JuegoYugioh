@@ -660,7 +660,10 @@ const portraitMap = {
     // GX characters (Mundo 2)
     'CHUMLEY': 'Chumley.jpg', 'SYRUS': 'Syrus.png', 'JADEN': 'Jaden.png',
     'BASTION': 'Bastion.png', 'ALEXIS': 'Alexis.png', 'CHAZZ': 'Chazz.png',
-    'ZANE': 'Zane.png', 'CROWLER': 'Crowler.png', 'ASTER': 'Aster.png'
+    'ZANE': 'Zane.png', 'CROWLER': 'Crowler.png', 'ASTER': 'Aster.png',
+    // 5D's characters (Mundo 3)
+    'TRUDGE': 'Trudge.png', 'LEO': 'Leo.png', 'AKIZA': 'Akiza.png',
+    'CROW': 'Crow.png', 'JACK': 'Jack.png', 'YUSEI': 'Yusei.png'
 };
 
 const dialogPortraitMap = {
@@ -692,7 +695,14 @@ const dialogPortraitMap = {
     'CHAZZ': 'Chazz.png',
     'ZANE': 'Zane.png',
     'CROWLER': 'Crowler.png',
-    'ASTER': 'Aster.png'
+    'ASTER': 'Aster.png',
+    // 5D's characters (Mundo 3)
+    'TRUDGE': 'Trudge.png',
+    'LEO': 'Leo.png',
+    'AKIZA': 'Akiza.png',
+    'CROW': 'Crow.png',
+    'JACK': 'Jack.png',
+    'YUSEI': 'Yusei.png'
 };
 
 window.DUELISTS_NAMES = {
@@ -721,7 +731,14 @@ window.DUELISTS_NAMES = {
     'chazz': 'Chazz Princeton',
     'zane': 'Zane Truesdale',
     'crowler': 'Dr. Vellian Crowler',
-    'aster': 'Aster Phoenix'
+    'aster': 'Aster Phoenix',
+    // 5D's characters (Mundo 3)
+    'trudge': 'Tetsu Trudge',
+    'leo': 'Leo (Rua)',
+    'akiza': 'Akiza Izinski',
+    'crow': 'Crow Hogan',
+    'jack': 'Jack Atlas',
+    'yusei': 'Yusei Fudo'
 };
 
 const introDialog = [
@@ -3027,6 +3044,57 @@ const MAP_EDGES_GX = [
     ['gx1', 'gx_shop']
 ];
 
+// ════════════════════════════════════════════════════════════════
+//  NODOS Y RUTA DEL MAPA MUNDO 3: NEO DOMINO CITY (5D's)
+// ════════════════════════════════════════════════════════════════
+window.CUSTOM_NODES_5D = [
+    { id: '5d_1', left: '50%', top: '84%', label: 'TRUDGE', char: 'TRUDGE', req: [] },
+    { id: '5d_2', left: '35%', top: '72%', label: 'LEO', char: 'LEO', req: ['trudge'] },
+    { id: '5d_3', left: '65%', top: '60%', label: 'AKIZA', char: 'AKIZA', req: ['leo'] },
+    { id: '5d_4', left: '35%', top: '48%', label: 'CROW', char: 'CROW', req: ['akiza'] },
+    { id: '5d_5', left: '65%', top: '34%', label: 'JACK ATLAS', char: 'JACK', req: ['crow'] },
+    { id: '5d_6', left: '50%', top: '18%', label: 'YUSEI FUDO', char: 'YUSEI', req: ['jack'] },
+    { id: '5d_shop', left: '88%', top: '84%', label: 'TIENDA 5D', char: 'ABUELO', req: [] }
+];
+
+const MAP_EDGES_5D = [
+    ['5d_1', '5d_2'],
+    ['5d_2', '5d_3'],
+    ['5d_3', '5d_4'],
+    ['5d_4', '5d_5'],
+    ['5d_5', '5d_6'],
+    ['5d_1', '5d_shop']
+];
+
+window.generate5DStarterDeck = function() {
+    return [
+      "Junk Synchron", "Junk Synchron", "Junk Synchron",
+      "Jutte Fighter", "Jutte Fighter",
+      "Dark Resonator", "Dark Resonator",
+      "Speed Warrior", "Speed Warrior", "Speed Warrior",
+      "Sonic Chick", "Sonic Chick", "Sonic Chick",
+      "Quillbolt Hedgehog", "Quillbolt Hedgehog", "Quillbolt Hedgehog",
+      "Twin-Shield Defender", "Twin-Shield Defender", "Twin-Shield Defender",
+      "Assault Dog", "Assault Dog", "Assault Dog",
+      "Vice Dragon", "Vice Dragon",
+      "Botanical Lion", "Botanical Lion",
+      "Fissure", "Dark Hole", "Swords of Revealing Light",
+      "Red Medicine", "Red Medicine",
+      "Dian Keto the Cure Master", "Dian Keto the Cure Master",
+      "Trap Hole", "Trap Hole",
+      "Waboku", "Waboku",
+      "Sakuretsu Armor", "Dust Tornado", "United We Stand"
+    ];
+};
+
+window.generate5DExtraDeck = function() {
+    return [
+      "Junk Warrior", "Junk Warrior",
+      "Goyo Guardian",
+      "Stardust Dragon"
+    ];
+};
+
 window.customShowMap = function() {
     window.isFreeDuelMode = false;
     if (window.cleanAllOverlays) window.cleanAllOverlays();
@@ -3046,24 +3114,51 @@ window.customShowMap = function() {
         else if (window.memorySave) s = window.memorySave;
     } catch(e) {}
     
+    let is5D = ((s.world || 1) === 3);
     let isGX = ((s.world || 1) === 2);
-    let nodes = isGX ? window.CUSTOM_NODES_GX : window.CUSTOM_NODES;
-    let edges = isGX ? MAP_EDGES_GX : MAP_EDGES;
-    let cleared = isGX 
-        ? (Array.isArray(s.clearedGX) ? s.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []))
-        : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : []);
-    let curActiveDeck = (s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || [];
+
+    // Inicializar Starter Deck y Colección para Mundo 3 si entra por primera vez
+    if (is5D) {
+        s.decksMundo3 = s.decksMundo3 || {};
+        if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40) {
+            s.decksMundo3['Principal'] = window.generate5DStarterDeck();
+            s.decksMundo3['Extra'] = window.generate5DExtraDeck();
+            s.activeDeckMundo3 = 'Principal';
+            s.collectionMundo3 = s.collectionMundo3 || {};
+            s.decksMundo3['Principal'].forEach(n => {
+                s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Principal'].filter(x => x === n).length);
+            });
+            s.decksMundo3['Extra'].forEach(n => {
+                s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Extra'].filter(x => x === n).length);
+            });
+            if (window.persistUserSave) window.persistUserSave(s);
+            else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+        }
+    }
+
+    let nodes = is5D ? window.CUSTOM_NODES_5D : (isGX ? window.CUSTOM_NODES_GX : window.CUSTOM_NODES);
+    let edges = is5D ? MAP_EDGES_5D : (isGX ? MAP_EDGES_GX : MAP_EDGES);
+    let cleared = is5D
+        ? (Array.isArray(s.cleared5D) ? s.cleared5D.map(x => String(x).toLowerCase()) : [])
+        : (isGX 
+            ? (Array.isArray(s.clearedGX) ? s.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []))
+            : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : []));
+    let curActiveDeck = is5D
+        ? ((s.decksMundo3 && s.activeDeckMundo3 && s.decksMundo3[s.activeDeckMundo3]) || (s.decksMundo3 && s.decksMundo3['Principal']) || [])
+        : ((s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || []);
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
     
     const MILLENNIUM_ITEMS = window.getMillenniumItems(s);
     const unlockedCount = MILLENNIUM_ITEMS.filter(it => it.unlocked).length;
     
-    // Contenedor principal del Mapa con imagen de ruinas egipcias o academia GX
+    // Contenedor principal del Mapa con imagen temática según el Mundo
     let map = document.createElement('div');
     map.id = 'map-container-overlay';
-    let mapBg = isGX 
-        ? 'linear-gradient(180deg, rgba(4,14,32,0.85) 0%, rgba(8,24,56,0.92) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #030a18;'
-        : 'linear-gradient(180deg, rgba(8,5,2,0.72) 0%, rgba(18,12,5,0.84) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #0a0600;';
+    let mapBg = is5D
+        ? 'linear-gradient(180deg, rgba(3,10,22,0.88) 0%, rgba(5,18,36,0.94) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #020814;'
+        : (isGX 
+            ? 'linear-gradient(180deg, rgba(4,14,32,0.85) 0%, rgba(8,24,56,0.92) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #030a18;'
+            : 'linear-gradient(180deg, rgba(8,5,2,0.72) 0%, rgba(18,12,5,0.84) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #0a0600;');
     map.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: ' + mapBg + ' overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; font-family:"Segoe UI", sans-serif;';
     
     let mapStage = document.createElement('div');
@@ -3121,23 +3216,35 @@ window.customShowMap = function() {
     // ── 1. BARRA SUPERIOR HUD ESTILO KAME GAME ─────────────────────
     let topBar = document.createElement('div');
     topBar.id = 'map-top-bar';
-    topBar.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:62px; background:linear-gradient(180deg, rgba(10,6,2,0.96) 0%, rgba(22,14,5,0.92) 80%, rgba(22,14,5,0) 100%); border-bottom:2px solid ' + (isGX ? '#00b0ff' : '#b8860b') + '; box-shadow:0 4px 20px rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-sizing:border-box;';
+    let topBarBorder = is5D ? '#00e5ff' : (isGX ? '#00b0ff' : '#b8860b');
+    topBar.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:62px; background:linear-gradient(180deg, rgba(10,6,2,0.96) 0%, rgba(22,14,5,0.92) 80%, rgba(22,14,5,0) 100%); border-bottom:2px solid ' + topBarBorder + '; box-shadow:0 4px 20px rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-sizing:border-box;';
     
     // 1.1 Left: Título y Logo
     let brandWrap = document.createElement('div');
     brandWrap.id = 'map-brand-wrap';
     brandWrap.style.cssText = 'display:flex; align-items:center; gap:10px; cursor:pointer;';
+    let brandIcon = is5D ? '🏍️' : (isGX ? '🎓' : '☥');
+    let brandGlow = is5D ? '#00e5ff' : (isGX ? '#00e5ff' : '#ffd700');
+    let brandTitle = is5D ? 'NEO DOMINO CITY · YU-GI-OH! 5D\'S' : (isGX ? 'ACADEMIA DE DUELOS · YU-GI-OH! GX' : 'CAMPAÑA · EL REINO DE LOS DUELOS');
+    let brandSubtitle = is5D ? 'Autopista de Duelo · Invocación por Sincronía' : (isGX ? 'Dormitorios Slifer Red, Ra Yellow y Obelisk Blue' : 'Ruta Sagrada hacia la Puerta del Nuevo Mundo');
     brandWrap.innerHTML = `
-        <div style="font-size:26px; filter:drop-shadow(0 0 8px ${isGX ? '#00e5ff' : '#ffd700'}); line-height:1;">${isGX ? '🎓' : '☥'}</div>
+        <div style="font-size:26px; filter:drop-shadow(0 0 8px ${brandGlow}); line-height:1;">${brandIcon}</div>
         <div>
-            <div class="map-brand-title" style="font-family:'Cinzel', serif, 'Times New Roman'; font-size:15px; font-weight:900; color:${isGX ? '#00e5ff' : '#ffd700'}; letter-spacing:1.5px; text-shadow:0 2px 6px rgba(0,0,0,0.8);">${isGX ? 'ACADEMIA DE DUELOS · YU-GI-OH! GX' : 'CAMPAÑA · EL REINO DE LOS DUELOS'}</div>
-            <div class="map-brand-subtitle" style="font-size:10px; color:${isGX ? '#80d8ff' : '#d4af37'}; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">${isGX ? 'Dormitorios Slifer Red, Ra Yellow y Obelisk Blue' : 'Ruta Sagrada hacia la Puerta del Nuevo Mundo'}</div>
+            <div class="map-brand-title" style="font-family:'Cinzel', serif, 'Times New Roman'; font-size:15px; font-weight:900; color:${brandGlow}; letter-spacing:1.5px; text-shadow:0 2px 6px rgba(0,0,0,0.8);">${brandTitle}</div>
+            <div class="map-brand-subtitle" style="font-size:10px; color:${is5D ? '#80d8ff' : (isGX ? '#80d8ff' : '#d4af37')}; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">${brandSubtitle}</div>
         </div>
     `;
     topBar.appendChild(brandWrap);
     
-    // 1.2 Center: Reliquias o Estado de la Academia GX
-    if (isGX) {
+    // 1.2 Center: Estado de Campaña
+    if (is5D) {
+        let fiveDBar = document.createElement('div');
+        fiveDBar.id = 'map-relics-bar';
+        fiveDBar.style.cssText = 'display:flex; align-items:center; gap:8px; background:rgba(0,20,40,0.75); padding:4px 14px; border-radius:20px; border:1px solid #00e5ff; box-shadow:0 0 10px rgba(0,229,255,0.3);';
+        let fiveDClearedCount = cleared.filter(c => ['trudge','leo','akiza','crow','jack','yusei'].includes(c)).length;
+        fiveDBar.innerHTML = `<span style="font-size:16px;">🏍️</span><span style="font-size:12px; font-weight:bold; color:#00e5ff; font-family:'Segoe UI', sans-serif;">NEO DOMINO: ${fiveDClearedCount} / 6 DERROTADOS</span>`;
+        topBar.appendChild(fiveDBar);
+    } else if (isGX) {
         let gxBar = document.createElement('div');
         gxBar.id = 'map-relics-bar';
         gxBar.style.cssText = 'display:flex; align-items:center; gap:8px; background:rgba(0,15,35,0.75); padding:4px 14px; border-radius:20px; border:1px solid #00b0ff; box-shadow:0 0 10px rgba(0,176,255,0.3);';
@@ -3170,12 +3277,12 @@ window.customShowMap = function() {
     actionsWrap.id = 'map-actions-wrap';
     actionsWrap.style.cssText = 'display:flex; align-items:center; gap:10px;';
 
-    // Botón Viaje Interdimensional entre Mundos
+    // Botón Viaje Interdimensional entre Mundos (Ciclo de 3 Mundos: DM -> GX -> 5D's -> DM)
     let btnSwitchWorld = document.createElement('button');
     btnSwitchWorld.className = 'map-top-action-btn';
-    if (isGX) {
-        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #2b1f0c 0%, #150f05 100%); border: 1.5px solid #ffd700; color: #fff8cc; font-weight:bold;';
-        btnSwitchWorld.innerHTML = '<span>🏛️</span><span>MUNDO 1: DM</span>';
+    if (is5D) {
+        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #102030 0%, #050d18 100%); border: 1.5px solid #00e5ff; color: #80d8ff; font-weight:bold; box-shadow:0 0 10px rgba(0,229,255,0.4);';
+        btnSwitchWorld.innerHTML = '<span>🏍️</span><span>MUNDO 3: 5D\'s</span>';
         btnSwitchWorld.onclick = () => {
             if (window.playViolinClick) window.playViolinClick();
             s.world = 1;
@@ -3183,9 +3290,19 @@ window.customShowMap = function() {
             else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             window.customShowMap();
         };
-    } else {
+    } else if (isGX) {
         btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #0d324d 0%, #061625 100%); border: 1.5px solid #00e5ff; color: #e1f5fe; font-weight:bold; box-shadow:0 0 10px rgba(0,229,255,0.4);';
         btnSwitchWorld.innerHTML = '<span>🎓</span><span>MUNDO 2: GX</span>';
+        btnSwitchWorld.onclick = () => {
+            if (window.playViolinClick) window.playViolinClick();
+            s.world = 3;
+            if (window.persistUserSave) window.persistUserSave(s);
+            else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            window.customShowMap();
+        };
+    } else {
+        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #2b1f0c 0%, #150f05 100%); border: 1.5px solid #ffd700; color: #fff8cc; font-weight:bold;';
+        btnSwitchWorld.innerHTML = '<span>🏛️</span><span>MUNDO 1: DM</span>';
         btnSwitchWorld.onclick = () => {
             if (window.playViolinClick) window.playViolinClick();
             s.world = 2;
@@ -3446,12 +3563,13 @@ window.customShowMap = function() {
                         try {
                             let sCheck = JSON.parse(sCheckStr);
                             if (sCheck) {
-                                if (sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
-                                    sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
-                                    if (window.persistUserSave) window.persistUserSave(sCheck);
-                                }
-                                if (sCheck.deck && sCheck.deck.length !== 40) {
-                                    alert(`⚠️ DECK ACTIVO NO VÁLIDO (${sCheck.deck.length}/40) ⚠️\n\nTu Deck Activo ("${sCheck.activeDeck || 'Principal'}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
+                                let is5DCheck = (sCheck.world === 3);
+                                let curCheckDeck = is5DCheck 
+                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                    : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
+                                let curDeckName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
+                                if (curCheckDeck && curCheckDeck.length !== 40) {
+                                    alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                                     if (window.customShowDeckEditor) window.customShowDeckEditor();
                                     return;
                                 }
@@ -3489,12 +3607,13 @@ window.customShowMap = function() {
                 try {
                     let sCheck = JSON.parse(sCheckStr);
                     if (sCheck) {
-                        if (sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
-                            sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
-                            if (window.persistUserSave) window.persistUserSave(sCheck);
-                        }
-                        if (sCheck.deck && sCheck.deck.length !== 40) {
-                            alert(`⚠️ DECK ACTIVO NO VÁLIDO (${sCheck.deck.length}/40) ⚠️\n\nTu Deck Activo ("${sCheck.activeDeck || 'Principal'}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
+                        let is5DCheck = (sCheck.world === 3);
+                        let curCheckDeck = is5DCheck 
+                            ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                            : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
+                        let curDeckName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
+                        if (curCheckDeck && curCheckDeck.length !== 40) {
+                            alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                             if (window.customShowDeckEditor) window.customShowDeckEditor();
                             return;
                         }
@@ -3587,6 +3706,18 @@ window.customShowMap = function() {
                         introLines = [{ role: 'system', speaker: 'CROWLER', text: '¡Na-no-ne! ¡¿Quién se cree este novato para desafiar al mismísimo Dr. Crowler?! ¡Te enseñaré modales con mis Mecanismos Antiguos!' }];
                     } else if (charKey === 'aster') {
                         introLines = [{ role: 'system', speaker: 'ASTER', text: 'El destino ya ha escrito el final de este combate. Mis Héroes del Destino nunca fallan.' }];
+                    } else if (charKey === 'trudge') {
+                        introLines = [{ role: 'system', speaker: 'TRUDGE', text: '¡Alto ahí, escoria de Satélite! Estás violando las reglas del Sector de Seguridad. ¡Te enseñaré la ley con mis oficiales y el Guardián Goyo!' }];
+                    } else if (charKey === 'leo') {
+                        introLines = [{ role: 'system', speaker: 'LEO', text: '¡Hola! ¡Soy Leo! Luna me dijo que tuviera cuidado, ¡pero mis Morfotrónicos y el Dragón Taladro de Poder están listos para la acción!' }];
+                    } else if (charKey === 'akiza') {
+                        introLines = [{ role: 'system', speaker: 'AKIZA', text: '¿Te atreves a desafiar a la Bruja de la Rosa Negra? Mis espinas no perdonan... ¡Contempla la furia de mi Dragón de la Rosa Negra!' }];
+                    } else if (charKey === 'crow') {
+                        introLines = [{ role: 'system', speaker: 'CROW', text: '¡Ey, amigo! ¡Siente la ráfaga de viento negro! ¡Mis Alanegra y el Dragón de Alas Negras te dejarán atrás en el asfalto!' }];
+                    } else if (charKey === 'jack') {
+                        introLines = [{ role: 'system', speaker: 'JACK', text: '¡Solo hay un Rey en Neo Domino, y ese soy yo! ¡Arrodíllate ante el poder absoluto de mi Dragón Rojo Archidemonio!' }];
+                    } else if (charKey === 'yusei') {
+                        introLines = [{ role: 'system', speaker: 'YUSEI', text: 'Los lazos con nuestras cartas nunca se romperán si creemos en el mañana. ¡Aceleremos el duelo! ¡Vamos, Dragón de Polvo de Estrellas!' }];
                     }
                     
                     window.playCustomMusic('dialogos.mp3');
@@ -4271,10 +4402,14 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
 
     let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const GX_OPPONENTS_SET = new Set(['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster']);
-    let isGXOpponent = GX_OPPONENTS_SET.has(normalizedOpp);
+    const FIVE_D_OPPONENTS_SET = new Set(['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei']);
+    let is5DOpponent = FIVE_D_OPPONENTS_SET.has(normalizedOpp) || (s && s.world === 3);
+    let isGXOpponent = !is5DOpponent && GX_OPPONENTS_SET.has(normalizedOpp);
 
-    // Si es un duelista de GX, sus recompensas provienen 100% de su baraja principal (sin cartas de Extra Deck)
-    if (isGXOpponent) {
+    // En Mundo 3 (5D's), recompensas provienen de la baraja principal y del Extra Deck del rival
+    if (is5DOpponent) {
+        cardPool = [...new Set([...(oppDeck && oppDeck.cards ? oppDeck.cards : []), ...(oppDeck && oppDeck.extraDeck ? oppDeck.extraDeck : [])])];
+    } else if (isGXOpponent) {
         // cardPool ya contiene oppDeck.cards (su baraja principal para reforzar decks)
     } else {
         // En Mundo 1 (DM) mantenemos las cartas de drop clásico
@@ -4329,8 +4464,9 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     cardPool = cardPool.filter(c => !ULTRA_RARE_BOSS_CARDS.includes(c) && !VERY_RARE_CARDS.includes(c));
 
     // Shuffle pool and select 3 cards
+    let curCollection = is5DOpponent ? (s.collectionMundo3 || {}) : (s.collection || {});
     let shuffled = [...cardPool].sort(() => 0.5 - Math.random());
-    let candidates = shuffled.filter(c => (s.collection[c] || 0) < 3);
+    let candidates = shuffled.filter(c => (curCollection[c] || 0) < 3);
     if (candidates.length < 3) candidates = shuffled;
     
     let selected3 = candidates.slice(0, 3);
@@ -4347,8 +4483,28 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     s.wins = s.wins || {};
     let oppWins = (s.wins[normalizedOpp] || 0);
 
-    // RECOMPENSAS GX EXCLUSIVAS (SOLO CARTAS DE BARAJA PRINCIPAL PARA REFORZAR EL DECK):
-    if (isGXOpponent) {
+    // RECOMPENSAS 5D'S EXCLUSIVAS (CARTAS INSIGNIA Y SYNCHROS SUPREMOS):
+    if (is5DOpponent) {
+        if (isHighRank && selected3.length > 0) {
+            let boss5DMap = {
+                trudge: ['Goyo Guardian', 'Stygian Security'],
+                leo: ['Power Tool Dragon', 'Morphtronic Celfon'],
+                akiza: ['Black Rose Dragon', 'Twilight Rose Knight'],
+                crow: ['Black-Winged Dragon', 'Blackwing - Armor Master', 'Blackwing - Gale the Whirlwind'],
+                jack: ['Red Dragon Archfiend', 'Dark Resonator'],
+                yusei: ['Stardust Dragon', 'Junk Berserker', 'Nitro Warrior', 'Shooting Star Dragon', 'Formula Synchron']
+            };
+            let possibleBosses = boss5DMap[normalizedOpp] || [];
+            let unowned5DBoss = possibleBosses.filter(c => (curCollection[c] || 0) < 3);
+            let chosen5DBoss = unowned5DBoss.length > 0 
+                ? unowned5DBoss[Math.floor(Math.random() * unowned5DBoss.length)]
+                : (possibleBosses.length > 0 ? possibleBosses[Math.floor(Math.random() * possibleBosses.length)] : null);
+            let boss5DChance = oppWins <= 1 ? (rankStr.includes('S') ? 0.35 : 0.15) : (rankStr.includes('S') ? 0.65 : 0.35);
+            if (Math.random() < boss5DChance && chosen5DBoss && !selected3.includes(chosen5DBoss)) {
+                selected3[0] = chosen5DBoss;
+            }
+        }
+    } else if (isGXOpponent) {
         let gxBossPool = [];
         // Seleccionar las cartas más poderosas y útiles de la baraja principal del rival (monstruos de alto ATK y magias clave)
         if (oppDeck && Array.isArray(oppDeck.cards)) {
@@ -4471,7 +4627,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     selected3.forEach(cardName => {
         let info = window.getCardMetadata(cardName);
         let cardColor = info.isMonster ? '#d4af37' : (info.isTrap ? '#ff80ab' : '#4caf50');
-        let ownCount = s.collection[cardName] || 0;
+        let ownCount = is5DOpponent ? ((s.collectionMundo3 && s.collectionMundo3[cardName]) || 0) : ((s.collection && s.collection[cardName]) || 0);
         
         let cardBox = document.createElement('div');
         cardBox.style.cssText = 'background: rgba(22, 22, 32, 0.95); border: 2px solid #a67c00; border-radius: 10px; padding: 16px; width: 240px; display:flex; flex-direction:column; align-items:center; box-shadow: 0 8px 25px rgba(0,0,0,0.8); transition: transform 0.2s, box-shadow 0.2s; box-sizing:border-box;';
@@ -4525,8 +4681,13 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             let curSaveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
             let curStr = origGet(curSaveKey) || origGet('FMR_REBORN_STORY_V3000');
             let freshSave = curStr ? JSON.parse(curStr) : s;
-            freshSave.collection = freshSave.collection || {};
-            freshSave.collection[cardName] = (freshSave.collection[cardName] || 0) + 1;
+            if (is5DOpponent || freshSave.world === 3) {
+                freshSave.collectionMundo3 = freshSave.collectionMundo3 || {};
+                freshSave.collectionMundo3[cardName] = (freshSave.collectionMundo3[cardName] || 0) + 1;
+            } else {
+                freshSave.collection = freshSave.collection || {};
+                freshSave.collection[cardName] = (freshSave.collection[cardName] || 0) + 1;
+            }
             freshSave.wins = freshSave.wins || {};
             freshSave.wins[normalizedOpp] = (freshSave.wins[normalizedOpp] || 0) + 1;
             
@@ -5917,6 +6078,12 @@ window.customFinishStoryDuel = function(win) {
         if (id === 'tristan') lossLines = [{ role: 'system', speaker: 'TRISTAN_INTRO', text: 'Jaja, te falta mucho para vencerme.' }];
         else if (id === 'mako') lossLines = [{ role: 'system', speaker: 'MAKO', text: '¡El mar no perdona a los débiles! Vuelve cuando puedas nadar contra la corriente.' }];
         else if (id === 'kosaburo') lossLines = [{ role: 'system', speaker: 'KOSABURO', text: '¡Necios! ¡Nadie puede oponerse al poder absoluto de Exodia Necross!' }];
+        else if (id === 'trudge') lossLines = [{ role: 'system', speaker: 'TRUDGE', text: '¡A la celda de detención! No tienes lo necesario para escapar de la patrulla del Sector de Seguridad.' }];
+        else if (id === 'leo') lossLines = [{ role: 'system', speaker: 'LEO', text: '¡Sííí! ¡Mis Morfotrónicos ganaron! ¡Le voy a contar a Luna de mi gran victoria!' }];
+        else if (id === 'akiza') lossLines = [{ role: 'system', speaker: 'AKIZA', text: 'Las rosas marchitas caen... Tu corazón no fue lo suficientemente fuerte contra mis poderes psíquicos.' }];
+        else if (id === 'crow') lossLines = [{ role: 'system', speaker: 'CROW', text: '¡Demasiado lento en la pista! Las Alanegra vuelan más rápido que cualquier otro duelista.' }];
+        else if (id === 'jack') lossLines = [{ role: 'system', speaker: 'JACK', text: '¡Ja, ja, ja! ¿Creíste que podías destronar al Rey? ¡Vuelve a Satélite con las manos vacías!' }];
+        else if (id === 'yusei') lossLines = [{ role: 'system', speaker: 'YUSEI', text: 'Fue un buen duelo. Afina tu baraja y sincroniza tus monstruos, volveremos a encontrarnos en la pista.' }];
         
         window.playCustomMusic('dialogos.mp3');
         window.renderCustomStoryDialog(lossLines, 0, () => {
@@ -5936,6 +6103,11 @@ window.customFinishStoryDuel = function(win) {
         if (gxDuelists.includes(id) && !s.clearedGX.includes(id)) {
             s.clearedGX.push(id);
         }
+        if (!s.cleared5D) s.cleared5D = [];
+        var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+        if (fiveDDuelists.includes(id) && !s.cleared5D.includes(id)) {
+            s.cleared5D.push(id);
+        }
         if (!s.unlocked) s.unlocked = [];
         if (!s.unlocked.includes(id)) s.unlocked.push(id);
         const storyNextMap = { 
@@ -5943,7 +6115,8 @@ window.customFinishStoryDuel = function(win) {
             pegasus: 'bakura', bakura: 'noah', noah: 'kosaburo', kosaburo: 'ishizu', 
             ishizu: 'odion', odion: 'marik', marik: 'kaiba', kaiba: 'yugi', yugi: 'atem',
             chumley: 'syrus', syrus: 'jaden', jaden: 'bastion', bastion: 'alexis',
-            alexis: 'chazz', chazz: 'zane', zane: 'crowler', crowler: 'aster'
+            alexis: 'chazz', chazz: 'zane', zane: 'crowler', crowler: 'aster',
+            trudge: 'leo', leo: 'akiza', akiza: 'crow', crow: 'jack', jack: 'yusei'
         };
         const nextOpp = storyNextMap[id] || (typeof STORY_UNLOCK_NEXT !== 'undefined' && STORY_UNLOCK_NEXT[id]);
         if (nextOpp && !s.unlocked.includes(nextOpp)) s.unlocked.push(nextOpp);
@@ -6033,6 +6206,21 @@ window.customFinishStoryDuel = function(win) {
             winLines = [{ role: 'system', speaker: 'CROWLER', text: '¡Mamma Mia! ¡Un alumno desafiando a un doctor en duelos y ganando de esta forma! ¡Qué humillación para el Obelisk Blue!' }];
         } else if (id === 'aster') {
             winLines = [{ role: 'system', speaker: 'ASTER', text: 'El destino nunca se equivoca... pero hoy demostraste que tu convicción puede torcer el hilo del futuro de mis Héroes del Destino. ¡Gran victoria!' }];
+        } else if (id === 'trudge') {
+            winLines = [{ role: 'system', speaker: 'TRUDGE', text: '¡Imposible...! ¿Un duelista de Satélite superó al Sector de Seguridad? Tienes habilidades reales en el Turbo Duelo.' }];
+        } else if (id === 'leo') {
+            winLines = [{ role: 'system', speaker: 'LEO', text: '¡Guau, eres increíblemente fuerte! Luna tenía razón sobre ti. ¡Sigue avanzando hacia la cumbre de Neo Domino!' }];
+        } else if (id === 'akiza') {
+            winLines = [{ role: 'system', speaker: 'AKIZA', text: 'Pudiste calmar la tempestad de mi Rosa Negra con la pureza de tu duelo... Gracias. Ahora veo la luz en las cartas.' }];
+        } else if (id === 'crow') {
+            winLines = [{ role: 'system', speaker: 'CROW', text: '¡Qué velocidad y qué sincronía! Eres de los mejores que he visto en las calles. ¡Jack y Yusei van a alucinar contigo!' }];
+        } else if (id === 'jack') {
+            winLines = [{ role: 'system', speaker: 'JACK', text: '¿Derrotado...? ¡No aceptaré esto como el final! Has demostrado ser digno de retar al verdadero campeón. ¡Adelante hacia Yusei!' }];
+        } else if (id === 'yusei') {
+            winLines = [
+                { role: 'system', speaker: 'YUSEI', text: '¡Un duelo legendario! Tus monstruos de Sincronía y tu espíritu han conectado con el corazón de todos en Neo Domino.' },
+                { role: 'system', speaker: 'YUSEI', text: 'Has conquistado el Gran Prix de Sincronía. ¡El camino hacia el futuro de los Turbo Duelos brilla gracias a ti!' }
+            ];
         }
         
         // Show 3-card reward choice screen for the defeated character
@@ -6198,31 +6386,60 @@ window.customShowDeckEditor = function() {
     if (!sStr) return;
     let s = JSON.parse(sStr);
     
+    let is5D = ((s.world || 1) === 3);
+
     const generatedDeck = (typeof window.generateForbiddenMemoriesStarterDeck === 'function') ? window.generateForbiddenMemoriesStarterDeck() : null;
     const DEF = (generatedDeck && generatedDeck.length === 40) ? generatedDeck : (window.DEFAULT_DECK || []);
     
-    s.collection = s.collection || {};
-    s.decks = s.decks || {};
-    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
-    if (!s.deck || s.deck.length === 0) {
-        s.deck = [...DEF];
-        DEF.forEach(n => s.collection[n] = Math.max(s.collection[n] || 0, DEF.filter(x => x === n).length));
-    }
-    if (Object.keys(s.decks).length === 0) {
-        s.decks['Deck 1'] = [...s.deck];
-    }
-    if (!s.activeDeck || !s.decks[s.activeDeck]) {
-        s.activeDeck = Object.keys(s.decks)[0] || 'Deck 1';
-    }
-    if (s.decks[s.activeDeck]) {
-        s.deck = [...s.decks[s.activeDeck]];
+    if (is5D) {
+        s.decksMundo3 = s.decksMundo3 || {};
+        s.collectionMundo3 = s.collectionMundo3 || {};
+        if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40) {
+            s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
+            s.decksMundo3['Extra'] = window.generate5DExtraDeck ? window.generate5DExtraDeck() : [];
+            s.activeDeckMundo3 = 'Principal';
+            s.decksMundo3['Principal'].forEach(n => {
+                s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Principal'].filter(x => x === n).length);
+            });
+            s.decksMundo3['Extra'].forEach(n => {
+                s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Extra'].filter(x => x === n).length);
+            });
+        }
+        s.decks = s.decksMundo3;
+        s.collection = s.collectionMundo3;
+        s.activeDeck = s.activeDeckMundo3 || 'Principal';
+        s.extra = s.decksMundo3['Extra'] || [];
+    } else {
+        s.collection = s.collection || {};
+        s.decks = s.decks || {};
+        if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
+        if (!s.deck || s.deck.length === 0) {
+            s.deck = [...DEF];
+            DEF.forEach(n => s.collection[n] = Math.max(s.collection[n] || 0, DEF.filter(x => x === n).length));
+        }
+        if (Object.keys(s.decks).length === 0) {
+            s.decks['Deck 1'] = [...s.deck];
+        }
+        if (!s.activeDeck || !s.decks[s.activeDeck]) {
+            s.activeDeck = Object.keys(s.decks)[0] || 'Deck 1';
+        }
+        if (s.decks[s.activeDeck]) {
+            s.deck = [...s.decks[s.activeDeck]];
+        }
     }
     
     let currentDeckKey = s.activeDeck;
 
     function persistSave() {
-        if (s.decks && s.activeDeck && s.decks[s.activeDeck]) {
-            s.deck = [...s.decks[s.activeDeck]];
+        if (is5D) {
+            s.decksMundo3 = s.decks;
+            s.activeDeckMundo3 = s.activeDeck;
+            s.collectionMundo3 = s.collection;
+            s.decksMundo3['Extra'] = s.extra;
+        } else {
+            if (s.decks && s.activeDeck && s.decks[s.activeDeck]) {
+                s.deck = [...s.decks[s.activeDeck]];
+            }
         }
         if (window.persistUserSave) {
             window.persistUserSave(s);
@@ -6334,13 +6551,14 @@ window.customShowDeckEditor = function() {
     let globalNum = 1;
     
     function isAdvanced(c) {
-        let kind = c.kind || (c[6] && typeof c[6] === 'string' ? c[6] : null);
+        let kind = String(c.kind || (c[6] && typeof c[6] === 'string' ? c[6] : '')).toUpperCase();
+        if (is5D && kind === 'SYNCHRO') return false;
         return kind === 'LINK' || kind === 'XYZ' || kind === 'SYNCHRO' || kind === 'PENDULUM';
     }
     
     function isExtraDeck(c) {
-        // En este juego clasico FMR no hay Extra Deck:
-        // Todas las cartas se pueden equipar y usar en la Baraja Principal de 40 cartas
+        let kind = String((c && c.kind) || (c && c[6]) || '').toUpperCase();
+        if (is5D && kind === 'SYNCHRO') return true;
         return false;
     }
 
@@ -6751,9 +6969,10 @@ window.customShowDeckEditor = function() {
             titleEl.textContent = `⚔️ ${currentDeckKey.toUpperCase()}` + (currentDeckKey === s.activeDeck ? ' ⭐ (ACTIVO)' : '');
         }
 
-        document.getElementById('deck-count').innerHTML = `
-            ${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 cartas
-        `;
+        let exLen = (s.extra || []).length;
+        document.getElementById('deck-count').innerHTML = is5D 
+            ? `${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 cartas · <span style="color:#00e5ff">Extra: ${exLen}/15</span>`
+            : `${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 cartas`;
 
         let statusBadge = document.getElementById('deck-status-badge');
         if (statusBadge) {
@@ -6775,8 +6994,8 @@ window.customShowDeckEditor = function() {
             }
         }
 
-        // Migrar cualquier carta residual en s.extra a la colección
-        if (s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
+        // Migrar cualquier carta residual en s.extra a la colección (solo en Mundos clásicos)
+        if (!is5D && s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
             s.collection = s.collection || {};
             s.extra.forEach(n => { if (n) s.collection[n] = (s.collection[n] || 0) + 1; });
             s.extra = [];
@@ -6785,7 +7004,7 @@ window.customShowDeckEditor = function() {
 
         // Render 1: TOP TABLE (Cartas actualmente en el DECK SELECCIONADO)
         deckTbody.innerHTML = '';
-        let deckUnique = Array.from(new Set(currentDeck)).filter(n => cardDict[n]);
+        let deckUnique = Array.from(new Set([...currentDeck, ...(is5D ? (s.extra || []) : [])])).filter(n => cardDict[n]);
         deckUnique.sort((a, b) => (parseInt(String(cardDict[a].num).replace(/[^\d]/g, ''), 10) || 0) - (parseInt(String(cardDict[b].num).replace(/[^\d]/g, ''), 10) || 0));
 
         let deckRowsRendered = 0;
@@ -6798,7 +7017,7 @@ window.customShowDeckEditor = function() {
 
             deckRowsRendered++;
             let ownCount = s.collection[name] || inDeck;
-            let cardColor = info.isMonster ? (info.isExtra ? '#9c27b0' : '#d4af37') : (info.type === 'TRAP' ? '#ff80ab' : '#4caf50');
+            let cardColor = info.isMonster ? (info.isExtra ? '#00e5ff' : '#d4af37') : (info.type === 'TRAP' ? '#ff80ab' : '#4caf50');
 
             let tr = document.createElement('tr');
             tr.style.cssText = 'border-bottom: 1px solid #223344; transition: background 0.15s; cursor: pointer;';
@@ -6810,7 +7029,7 @@ window.customShowDeckEditor = function() {
                 <td style="padding: 6px 10px;">${info.type}</td>
                 <td style="padding: 6px 10px;">${info.isMonster ? `<span style="color:#ff5252">${info.atk}</span>/<span style="color:#2196f3">${info.def}</span>` : '-'}</td>
                 <td style="padding: 6px 10px; text-align:center;">
-                    <span style="background:${info.isExtra ? '#4a148c' : '#0d47a1'}; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">${info.isExtra ? 'EXTRA' : 'PRINCIPAL'}</span>
+                    <span style="background:${info.isExtra ? '#004d40' : '#0d47a1'}; color:${info.isExtra ? '#00e5ff' : '#fff'}; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; border:1px solid ${info.isExtra ? '#00e5ff' : '#1976d2'};">${info.isExtra ? 'EXTRA' : 'PRINCIPAL'}</span>
                 </td>
                 <td style="padding: 6px 10px; text-align:center; font-weight:bold;">
                     <span style="color:#4caf50;">x${inDeck}</span> <span style="color:#888; font-size:11px;">(Total: ${ownCount})</span>
@@ -6825,6 +7044,18 @@ window.customShowDeckEditor = function() {
             let benchBtn = tr.querySelector('.bench-btn');
             benchBtn.onclick = (e) => {
                 e.stopPropagation();
+                if (info.isExtra) {
+                    let arr = s.extra || [];
+                    let idx = arr.indexOf(name);
+                    if (idx >= 0) {
+                        arr.splice(idx, 1);
+                        persistSave();
+                        window.playHoverSound && window.playHoverSound();
+                        renderDeckBar();
+                        renderRows();
+                    }
+                    return;
+                }
                 let arr = currentDeck;
                 let idx = arr.indexOf(name);
                 if (idx >= 0) {
@@ -6866,7 +7097,7 @@ window.customShowDeckEditor = function() {
             if (name === 'Renace al Monstruo' || name === 'Raigeki' || name === 'Dark Hole' || name === 'Llamado de la Tumba' || name === 'Fusión') maxC = 1;
             let canAddMore = (inDeck < maxC);
 
-            let cardColor = info.isMonster ? (info.isExtra ? '#9c27b0' : '#d4af37') : (info.type === 'TRAP' ? '#ff80ab' : '#4caf50');
+            let cardColor = info.isMonster ? (info.isExtra ? '#00e5ff' : '#d4af37') : (info.type === 'TRAP' ? '#ff80ab' : '#4caf50');
 
             let tr = document.createElement('tr');
             tr.style.cssText = 'border-bottom: 1px solid #3d301c; transition: background 0.15s; cursor: pointer;';
@@ -6878,7 +7109,7 @@ window.customShowDeckEditor = function() {
                 <td style="padding: 6px 10px;">${info.type}</td>
                 <td style="padding: 6px 10px;">${info.isMonster ? `<span style="color:#ff5252">${info.atk}</span>/<span style="color:#2196f3">${info.def}</span>` : '-'}</td>
                 <td style="padding: 6px 10px; text-align:center;">
-                    <span style="background:${info.isExtra ? '#4a148c' : '#332600'}; color:${info.isExtra ? '#fff' : '#ffd700'}; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; border:1px solid #665000;">${info.isExtra ? 'EXTRA' : 'PRINCIPAL'}</span>
+                    <span style="background:${info.isExtra ? '#004d40' : '#332600'}; color:${info.isExtra ? '#00e5ff' : '#ffd700'}; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; border:1px solid ${info.isExtra ? '#00e5ff' : '#665000'};">${info.isExtra ? 'EXTRA' : 'PRINCIPAL'}</span>
                 </td>
                 <td style="padding: 6px 10px; text-align:center; font-weight:bold;">
                     <span style="color:#ffd700;">x${inBench}</span> <span style="color:#888; font-size:11px;">(Total: ${ownCount})</span>
@@ -6895,6 +7126,20 @@ window.customShowDeckEditor = function() {
                 e.stopPropagation();
                 if (!canAddMore) {
                     alert('Ya tienes el límite máximo permitido (' + maxC + ') de ' + name + ' en este Deck.');
+                    return;
+                }
+
+                if (info.isExtra) {
+                    s.extra = s.extra || [];
+                    if (s.extra.length >= 15) {
+                        alert('El Extra Deck no puede exceder las 15 cartas.');
+                        return;
+                    }
+                    s.extra.push(name);
+                    persistSave();
+                    window.playHoverSound && window.playHoverSound();
+                    renderDeckBar();
+                    renderRows();
                     return;
                 }
 
@@ -8382,19 +8627,48 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
                 (typeof loadGame === 'function' && loadGame()) ||
                 window.memorySave;
     
+    var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+    var is5DDuel = fiveDDuelists.includes(opp) || (sSave && sSave.world === 3);
     var playerCardNames = null;
-    if (sSave) {
-      if (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40) {
-        playerCardNames = sSave.decks[sSave.activeDeck];
-      } else if (Array.isArray(sSave.deck) && sSave.deck.length === 40) {
-        playerCardNames = sSave.deck;
+    var playerExtraNames = [];
+    var enemyExtraNames = [];
+
+    if (is5DDuel) {
+      if (sSave && sSave.decksMundo3) {
+        var aKey = sSave.activeDeckMundo3 || 'Principal';
+        if (Array.isArray(sSave.decksMundo3[aKey]) && sSave.decksMundo3[aKey].length === 40) {
+          playerCardNames = sSave.decksMundo3[aKey];
+        } else if (Array.isArray(sSave.decksMundo3['Principal']) && sSave.decksMundo3['Principal'].length === 40) {
+          playerCardNames = sSave.decksMundo3['Principal'];
+        }
+        if (Array.isArray(sSave.decksMundo3['Extra'])) {
+          playerExtraNames = sSave.decksMundo3['Extra'];
+        }
       }
-    }
-    if (!playerCardNames || playerCardNames.length !== 40) {
-      if (window.DEFAULT_DECK && Array.isArray(window.DEFAULT_DECK) && window.DEFAULT_DECK.length === 40) {
-        playerCardNames = window.DEFAULT_DECK;
-      } else if (sSave && Array.isArray(sSave.deck) && sSave.deck.length > 0) {
-        playerCardNames = sSave.deck.slice(0, 40);
+      if (!playerCardNames || playerCardNames.length !== 40) {
+        playerCardNames = typeof window.generate5DStarterDeck === 'function' ? window.generate5DStarterDeck() : [];
+      }
+      if (!playerExtraNames || playerExtraNames.length === 0) {
+        playerExtraNames = typeof window.generate5DExtraDeck === 'function' ? window.generate5DExtraDeck() : [];
+      }
+      var oppDeckObj = (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]));
+      if (oppDeckObj && Array.isArray(oppDeckObj.extraDeck)) {
+        enemyExtraNames = oppDeckObj.extraDeck;
+      }
+    } else {
+      if (sSave) {
+        if (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40) {
+          playerCardNames = sSave.decks[sSave.activeDeck];
+        } else if (Array.isArray(sSave.deck) && sSave.deck.length === 40) {
+          playerCardNames = sSave.deck;
+        }
+      }
+      if (!playerCardNames || playerCardNames.length !== 40) {
+        if (window.DEFAULT_DECK && Array.isArray(window.DEFAULT_DECK) && window.DEFAULT_DECK.length === 40) {
+          playerCardNames = window.DEFAULT_DECK;
+        } else if (sSave && Array.isArray(sSave.deck) && sSave.deck.length > 0) {
+          playerCardNames = sSave.deck.slice(0, 40);
+        }
       }
     }
 
@@ -8460,6 +8734,19 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     g.grave = [];
     g.enemyGrave = [];
     g.selected = [];
+    if (is5DDuel) {
+      g.extra = (playerExtraNames || []).map(cardResolver).filter(Boolean);
+      g.enemyExtra = (enemyExtraNames || []).map(cardResolver).filter(Boolean);
+      g.extraUsed = [];
+      g._currentWorld = 3;
+      window.currentWorld = 3;
+    } else {
+      g.extra = [];
+      g.enemyExtra = [];
+      g.extraUsed = [];
+      g._currentWorld = (sSave && sSave.world === 2) ? 2 : 1;
+      window.currentWorld = g._currentWorld;
+    }
     g.plp = 8000;
     g.elp = 8000;
     g.turnNo = 1;
@@ -14569,10 +14856,193 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { activateSetCard = window.activateSetCard; } catch(_) {}
 
-  // 7. Extra Deck blocker (Desactivado en Mundo 1 y Mundo 2: solo fusiones al estilo clasico FMR)
-  var prevAiExtraMaster = window.aiExtraSummon;
+  // 7. Extra Deck & Sincronía en Mundo 3 (5D's) / Bloqueado en Mundo 1 y Mundo 2 (Solo fusiones al estilo FMR)
+  window.isTunerMonster = function(c) {
+    if (!c) return false;
+    if (c.isTuner === true) return true;
+    var name = (c.name || c[0] || '').trim();
+    var type = (c.type || c[2] || '').toLowerCase();
+    var frame = (c.frameType || '').toLowerCase();
+    if (type.includes('tuner') || frame.includes('tuner')) return true;
+    var TUNER_NAMES = [
+      'Junk Synchron', 'Nitro Synchron', 'Dark Resonator', 'Flare Resonator',
+      'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North',
+      'Twilight Rose Knight', 'Jutte Fighter', 'Debris Dragon', 'Formula Synchron'
+    ];
+    return TUNER_NAMES.includes(name);
+  };
+
+  // Validación de invocación por Sincronía
+  window.extraEligible = function(c) {
+    if (typeof game === 'undefined' || !game) return false;
+    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) return false;
+    if (game.turn !== 'player' || (game.extraUsed && game.extraUsed.includes(c.name))) return false;
+    
+    // Solo Synchro monsters en Mundo 3
+    var kind = (c.kind || '').toUpperCase();
+    if (kind !== 'SYNCHRO') return false;
+
+    // Obtener monstruos seleccionados del campo del jugador
+    var selField = (game.selected || [])
+      .filter(x => x && x[0] === 'f')
+      .map(x => ({ idx: x[1], card: game.field[x[1]] }))
+      .filter(x => x.card && !x.card.faceDown && !x.card.faceDownSet103);
+
+    // Regla de Sincronía: al menos 2 monstruos (1 Tuner + 1 o más no-Tuners)
+    if (selField.length < 2) return false;
+
+    var tuners = selField.filter(x => window.isTunerMonster(x.card));
+    var nonTuners = selField.filter(x => !window.isTunerMonster(x.card));
+
+    // Exactamente 1 Tuner y al menos 1 no-Tuner
+    if (tuners.length !== 1 || nonTuners.length < 1) return false;
+
+    // La suma de niveles debe coincidir exactamente con el nivel del monstruo Sincro
+    var sumLevels = selField.reduce(function(sum, x) {
+      return sum + (Number(x.card.level) || Number(x.card[1]) || 0);
+    }, 0);
+
+    return sumLevels === Number(c.level || c[1] || 0);
+  };
+
+  // Invocación por Sincronía del Jugador
+  window.extraClick = function(i) {
+    if (typeof game === 'undefined' || !game) return;
+    var c = game.extra && game.extra[i];
+    if (!c) return;
+
+    if (!window.extraEligible(c)) {
+      if (typeof log === 'function') log('Esa carta no puede sincronizarse con los materiales seleccionados.');
+      if (typeof duelToast === 'function') duelToast('Selecciona 1 Tuner + 1 o más no-Tuners cuyo nivel sume ' + (c.level || 0));
+      return;
+    }
+
+    var selIndices = (game.selected || []).filter(x => x && x[0] === 'f').map(x => x[1]);
+    selIndices.sort((a, b) => b - a);
+
+    // Enviar materiales al cementerio
+    selIndices.forEach(idx => {
+      var mat = game.field[idx];
+      if (mat) {
+        game.grave.push(mat);
+        game.field[idx] = null;
+      }
+    });
+
+    // Encontrar slot libre en el campo
+    var slot = game.field.findIndex(x => !x);
+    if (slot < 0) slot = selIndices[0];
+
+    var sc = JSON.parse(JSON.stringify(c));
+    sc.pos = 'ATK';
+    sc.faceUp = true;
+    sc.summonedTurn = game.turnNo;
+    game.field[slot] = sc;
+
+    game.extraUsed = game.extraUsed || [];
+    game.extraUsed.push(c.name);
+    game.selected = [];
+
+    // Remover del Extra Deck del jugador
+    game.extra.splice(i, 1);
+
+    if (typeof closePile === 'function') closePile();
+    if (typeof render === 'function') render();
+    if (typeof log === 'function') log('¡SINCRONIZACIÓN! ⚡ ' + sc.name + ' (Nv ' + sc.level + ') invocada al campo. ¡Materiales al Cementerio!');
+    if (typeof duelToast === 'function') duelToast('¡Sincronización! ' + sc.name);
+    if (window.playViolinClick) window.playViolinClick();
+  };
+
+  // Invocación por Sincronía de la IA rival en Mundo 3
   window.aiExtraSummon = function() {
-    return;
+    if (typeof game === 'undefined' || !game) return;
+    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) return;
+
+    if (!Array.isArray(game.enemyExtra) || game.enemyExtra.length === 0) return;
+
+    // Buscar monstruos boca arriba en el campo enemigo
+    var eMonsters = [];
+    (game.enemy || []).forEach(function(c, idx) {
+      if (c && !c.faceDown && !c.faceDownSet103) eMonsters.push({ idx: idx, card: c });
+    });
+    if (eMonsters.length < 2) return;
+
+    var tuners = eMonsters.filter(x => window.isTunerMonster(x.card));
+    if (tuners.length === 0) return;
+
+    var nonTuners = eMonsters.filter(x => !window.isTunerMonster(x.card));
+    if (nonTuners.length === 0) return;
+
+    // Buscar si alguna combinación de 1 Tuner + 1 o más no-Tuners suma el nivel de un Synchro del Extra Deck
+    for (var t = 0; t < tuners.length; t++) {
+      var tunerObj = tuners[t];
+      var tLvl = Number(tunerObj.card.level || tunerObj.card[1] || 0);
+
+      // Probar 1 Tuner + 1 no-Tuner
+      for (var nt = 0; nt < nonTuners.length; nt++) {
+        var ntObj = nonTuners[nt];
+        var ntLvl = Number(ntObj.card.level || ntObj.card[1] || 0);
+        var comboSum = tLvl + ntLvl;
+
+        var synchroIdx = game.enemyExtra.findIndex(sc => Number(sc.level || sc[1] || 0) === comboSum && (sc.kind || '').toUpperCase() === 'SYNCHRO');
+        if (synchroIdx >= 0) {
+          var targetSynchro = game.enemyExtra[synchroIdx];
+          // Enviar materiales al cementerio enemigo
+          game.enemyGrave.push(tunerObj.card, ntObj.card);
+          game.enemy[tunerObj.idx] = null;
+          game.enemy[ntObj.idx] = null;
+
+          var freeSlot = game.enemy.findIndex(x => !x);
+          if (freeSlot < 0) freeSlot = tunerObj.idx;
+
+          var sc = JSON.parse(JSON.stringify(targetSynchro));
+          sc.pos = 'ATK';
+          sc.faceUp = true;
+          sc.summonedTurn = game.turnNo;
+          game.enemy[freeSlot] = sc;
+          game.enemyExtra.splice(synchroIdx, 1);
+
+          if (typeof log === 'function') log('¡Sincronía Rival! ⚡ El rival sincroniza a ' + sc.name + ' (Nivel ' + sc.level + ').');
+          if (typeof duelToast === 'function') duelToast('¡Sincronía Rival! ' + sc.name);
+          if (typeof render === 'function') render();
+          return;
+        }
+      }
+
+      // Probar 1 Tuner + 2 no-Tuners si hay al menos 2 no-tuners
+      if (nonTuners.length >= 2) {
+        for (var i = 0; i < nonTuners.length; i++) {
+          for (var j = i + 1; j < nonTuners.length; j++) {
+            var sum3 = tLvl + Number(nonTuners[i].card.level || 0) + Number(nonTuners[j].card.level || 0);
+            var sIdx = game.enemyExtra.findIndex(sc => Number(sc.level || sc[1] || 0) === sum3 && (sc.kind || '').toUpperCase() === 'SYNCHRO');
+            if (sIdx >= 0) {
+              var tSynchro = game.enemyExtra[sIdx];
+              game.enemyGrave.push(tunerObj.card, nonTuners[i].card, nonTuners[j].card);
+              game.enemy[tunerObj.idx] = null;
+              game.enemy[nonTuners[i].idx] = null;
+              game.enemy[nonTuners[j].idx] = null;
+
+              var fSlot = game.enemy.findIndex(x => !x);
+              if (fSlot < 0) fSlot = tunerObj.idx;
+
+              var sc3 = JSON.parse(JSON.stringify(tSynchro));
+              sc3.pos = 'ATK';
+              sc3.faceUp = true;
+              sc3.summonedTurn = game.turnNo;
+              game.enemy[fSlot] = sc3;
+              game.enemyExtra.splice(sIdx, 1);
+
+              if (typeof log === 'function') log('¡Sincronía Rival! ⚡ El rival sincroniza a ' + sc3.name + ' (Nivel ' + sc3.level + ').');
+              if (typeof duelToast === 'function') duelToast('¡Sincronía Rival! ' + sc3.name);
+              if (typeof render === 'function') render();
+              return;
+            }
+          }
+        }
+      }
+    }
   };
   try { aiExtraSummon = window.aiExtraSummon; } catch(_) {}
 
@@ -14584,9 +15054,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
   var prevOpenPileMaster = window.openPile;
   window.openPile = function(kind) {
+    var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
     if (kind === 'extra' || kind === 'enemyExtra') {
-      duelToast('En este mundo solo se permiten Fusiones al estilo FMR.');
-      return;
+      if (!is5D) {
+        if (typeof duelToast === 'function') duelToast('En este mundo solo se permiten Fusiones al estilo FMR.');
+        return;
+      }
     }
     if (prevOpenPileMaster) return prevOpenPileMaster.apply(this, arguments);
   };

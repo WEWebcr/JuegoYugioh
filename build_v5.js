@@ -158,6 +158,11 @@ try {
 } catch(e) {
     console.log('Mundo2 images folder error:', e.message);
 }
+try {
+    scanDirRecursive('C:/Deploy/proyectoygo/imagenescartas/Mundo3');
+} catch(e) {
+    console.log('Mundo3 images folder error:', e.message);
+}
 
 // Ensure every card in cardsData with an image property is registered by ID and name
 if (Array.isArray(cardsData)) {
