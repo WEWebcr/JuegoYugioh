@@ -13263,6 +13263,36 @@ window.cleanSaveCollection = function(s) {
       }
     }
   }
+  // Migrar cualquier carta que haya quedado en Extra Deck a la coleccion / banca principal
+  if (s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
+    s.collection = s.collection || {};
+    s.extra.forEach(function(cardName) {
+      if (cardName) {
+        s.collection[cardName] = (s.collection[cardName] || 0) + 1;
+        modified = true;
+      }
+    });
+    s.extra = [];
+    modified = true;
+  }
+  if (s.decks && typeof s.decks === 'object') {
+    Object.keys(s.decks).forEach(function(dk) {
+      if (dk.endsWith('_extra')) {
+        var exList = s.decks[dk];
+        if (Array.isArray(exList)) {
+          exList.forEach(function(cName) {
+            if (cName) {
+              s.collection[cName] = (s.collection[cName] || 0) + 1;
+              modified = true;
+            }
+          });
+        }
+        delete s.decks[dk];
+        modified = true;
+      }
+    });
+  }
+
   var defaultFillers = ['Celtic Guardian', 'Silver Fang', 'Mammoth Graveyard', 'Feral Imp', 'Winged Dragon, Guardian of the Fortress #1'];
   function sanitizeDeck(deckArr) {
     if (!Array.isArray(deckArr)) return deckArr;
@@ -13389,12 +13419,9 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     const GX_OPPONENTS_SET = new Set(['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster']);
     let isGXOpponent = GX_OPPONENTS_SET.has(normalizedOpp);
 
-    // Si es un duelista de GX, incluimos su Extra Deck y garantizamos cartas temáticas de su arquetipo
+    // Si es un duelista de GX, sus recompensas provienen 100% de su baraja principal (sin cartas de Extra Deck)
     if (isGXOpponent) {
-        if (oppDeck && Array.isArray(oppDeck.extraDeck || oppDeck.extra_deck)) {
-            let extraList = oppDeck.extraDeck || oppDeck.extra_deck;
-            extraList.forEach(ec => { if (!cardPool.includes(ec)) cardPool.push(ec); });
-        }
+        // cardPool ya contiene oppDeck.cards (su baraja principal para reforzar decks)
     } else {
         // En Mundo 1 (DM) mantenemos las cartas de drop clásico
         const NEW_REWARD_TRAPS = [
@@ -13466,15 +13493,20 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     s.wins = s.wins || {};
     let oppWins = (s.wins[normalizedOpp] || 0);
 
-    // RECOMPENSAS GX EXCLUSIVAS Y JEFES SUPREMOS:
+    // RECOMPENSAS GX EXCLUSIVAS (SOLO CARTAS DE BARAJA PRINCIPAL PARA REFORZAR EL DECK):
     if (isGXOpponent) {
         let gxBossPool = [];
-        if (oppDeck && Array.isArray(oppDeck.extraDeck || oppDeck.extra_deck) && (oppDeck.extraDeck || oppDeck.extra_deck).length > 0) {
-            gxBossPool = [...new Set(oppDeck.extraDeck || oppDeck.extra_deck)];
-        }
-        // Si no tiene Extra Deck (ej. Bastion), usar sus cartas más poderosas
-        if (gxBossPool.length === 0 && oppDeck && oppDeck.cards) {
-            gxBossPool = oppDeck.cards.filter(c => ['Water Dragon', 'Hydrogeddon', 'Oxygeddon', 'Ancient Gear Golem', 'Dark Armed Dragon', 'Armed Dragon LV7', 'Destiny HERO - Plasma'].includes(c));
+        // Seleccionar las cartas más poderosas y útiles de la baraja principal del rival (monstruos de alto ATK y magias clave)
+        if (oppDeck && Array.isArray(oppDeck.cards)) {
+            gxBossPool = oppDeck.cards.filter(c => {
+                var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(c) : null;
+                var atk = (meta && meta.atk !== '-' && meta.atk !== undefined) ? Number(meta.atk) : 0;
+                var isKeySpellTrap = ['Pot of Greed', 'Graceful Charity', 'Heavy Storm', 'Limiter Removal', 'Raigeki', 'Mirror Force', 'Negate Attack', 'Magic Cylinder', 'Sakuretsu Armor', 'Power Bond', 'Skyscraper', 'Reinforcement of the Army'].includes(c);
+                return (atk >= 2000) || isKeySpellTrap;
+            });
+            if (gxBossPool.length === 0) {
+                gxBossPool = oppDeck.cards.slice(0, 5);
+            }
         }
 
         // Si es el primer duelo que se le gana (oppWins <= 1), la probabilidad de dar una carta jefe/fusión es muy baja (5% con S, 2% con A, 0% con otros)
@@ -15453,10 +15485,9 @@ window.customShowDeckEditor = function() {
     }
     
     function isExtraDeck(c) {
-        if (!c) return false;
-        let tags = c.tags || (c[8] || []);
-        let kind = c.kind || (c[6] && typeof c[6] === 'string' ? c[6] : null) || c.type;
-        return kind === 'FUSION' || tags.includes('FUSION') || (typeof kind === 'string' && kind.toLowerCase().includes('fusion'));
+        // En este juego clasico FMR no hay Extra Deck:
+        // Todas las cartas se pueden equipar y usar en la Baraja Principal de 40 cartas
+        return false;
     }
 
     if (window.FMR_CARD_META) {
@@ -15867,9 +15898,7 @@ window.customShowDeckEditor = function() {
         }
 
         document.getElementById('deck-count').innerHTML = `
-            ${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 
-            <span style="color:#aaa; font-size:12px; margin:0 8px;">|</span> 
-            EXTRA: <span style="color:${s.extra.length <= 15 ? '#2196f3' : '#f44336'}">${s.extra.length}</span>/15
+            ${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 cartas
         `;
 
         let statusBadge = document.getElementById('deck-status-badge');
@@ -15892,9 +15921,17 @@ window.customShowDeckEditor = function() {
             }
         }
 
+        // Migrar cualquier carta residual en s.extra a la colección
+        if (s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
+            s.collection = s.collection || {};
+            s.extra.forEach(n => { if (n) s.collection[n] = (s.collection[n] || 0) + 1; });
+            s.extra = [];
+            persistSave();
+        }
+
         // Render 1: TOP TABLE (Cartas actualmente en el DECK SELECCIONADO)
         deckTbody.innerHTML = '';
-        let deckUnique = Array.from(new Set(currentDeck.concat(s.extra))).filter(n => cardDict[n]);
+        let deckUnique = Array.from(new Set(currentDeck)).filter(n => cardDict[n]);
         deckUnique.sort((a, b) => (parseInt(String(cardDict[a].num).replace(/[^\d]/g, ''), 10) || 0) - (parseInt(String(cardDict[b].num).replace(/[^\d]/g, ''), 10) || 0));
 
         let deckRowsRendered = 0;
@@ -15934,7 +15971,7 @@ window.customShowDeckEditor = function() {
             let benchBtn = tr.querySelector('.bench-btn');
             benchBtn.onclick = (e) => {
                 e.stopPropagation();
-                let arr = info.isExtra ? s.extra : currentDeck;
+                let arr = currentDeck;
                 let idx = arr.indexOf(name);
                 if (idx >= 0) {
                     arr.splice(idx, 1);
@@ -16004,18 +16041,6 @@ window.customShowDeckEditor = function() {
                 e.stopPropagation();
                 if (!canAddMore) {
                     alert('Ya tienes el límite máximo permitido (' + maxC + ') de ' + name + ' en este Deck.');
-                    return;
-                }
-
-                if (info.isExtra) {
-                    if (s.extra.length >= 15) {
-                        alert('Tu Extra Deck ya tiene el límite de 15 cartas.');
-                        return;
-                    }
-                    s.extra.push(name);
-                    persistSave();
-                    window.playHoverSound && window.playHoverSound();
-                    renderRows();
                     return;
                 }
 
@@ -16835,7 +16860,7 @@ window.getGlobalCardDict = function() {
             let cdKind = String(cd.kind || '').toUpperCase();
             let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
             if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
-                cardEntry = { num, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: cdKind === 'FUSION', text: cd.text || cd.desc || '' };
+                cardEntry = { num, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: false, text: cd.text || cd.desc || '' };
             } else {
                 cardEntry = { num, name: cd.name, type: cd.type || cd.kind || (cdKind === 'TRAP' ? 'TRAP' : 'SPELL'), isMonster: false, atk: '-', def: '-', text: cd.text || cd.desc || '', isExtra: false };
             }
@@ -16847,7 +16872,7 @@ window.getGlobalCardDict = function() {
                 let meta = window.FMR_CARD_META && (window.FMR_CARD_META[name] || window.FMR_CARD_META[normName]);
                 let mKind = meta ? String(meta.kind || '').toUpperCase() : '';
                 if (meta && mKind !== 'SPELL' && mKind !== 'TRAP' && mKind !== 'EQUIP' && mKind !== 'FIELD') {
-                    cardEntry = { num, name, type: meta.type, attr: meta.attr, atk: meta.atk, def: meta.def, isMonster: true, isExtra: meta.kind === 'FUSION', text: meta.desc || '' };
+                    cardEntry = { num, name, type: meta.type, attr: meta.attr, atk: meta.atk, def: meta.def, isMonster: true, isExtra: false, text: meta.desc || '' };
                 } else {
                     let dbCard = typeof DB !== 'undefined' && Array.isArray(DB) && DB.find(x => x && (x[0] === name || (x[0] && x[0].toLowerCase().trim() === normName)));
                     if (dbCard) {
