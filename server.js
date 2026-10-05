@@ -1085,7 +1085,8 @@ app.get('/api/settings/wallpaper', (req, res) => {
   const settings = getAppSettings();
   res.json({
     ok: true,
-    wallpaper: settings.wallpaper || 'ImagenesPersonajes/PortadaPrincipal.jpeg'
+    wallpaper: settings.wallpaper || 'ImagenesPersonajes/PortadaPrincipal.jpeg',
+    updatedAt: settings.updatedAt || Date.now()
   });
 });
 

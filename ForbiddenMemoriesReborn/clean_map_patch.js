@@ -1814,20 +1814,66 @@ window.renderPS1Keyboard = function(onComplete) {
     }
 };
 
-window.getMainWallpaper = function() {
-    return window._customMainWallpaper || localStorage.getItem('FMR_MAIN_WALLPAPER') || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+window.applyMainWallpaper = function(rawUrl, updatedAt) {
+    if (!rawUrl) rawUrl = 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+    window._customMainWallpaper = rawUrl;
+    var stamp = updatedAt || window._customMainWallpaperStamp || Date.now();
+    window._customMainWallpaperStamp = stamp;
+    try {
+        localStorage.setItem('FMR_MAIN_WALLPAPER', rawUrl);
+        localStorage.setItem('FMR_MAIN_WALLPAPER_STAMP', String(stamp));
+    } catch(_) {}
+
+    var urlWithBust = rawUrl;
+    if (!rawUrl.startsWith('data:') && !rawUrl.includes('?')) {
+        urlWithBust = rawUrl + '?v=' + stamp;
+    }
+
+    var styleTag = document.getElementById('fmr-dynamic-wallpaper-style');
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'fmr-dynamic-wallpaper-style';
+        document.head.appendChild(styleTag);
+    }
+    styleTag.textContent = 
+        '#campaign3000, #campaign3000:has(.campHero3000), body:has(#campaign3000:not(.hidden)) {\n' +
+        '    background: url("' + urlWithBust + '") center / cover no-repeat, #070503 !important;\n' +
+        '    background-image: url("' + urlWithBust + '") !important;\n' +
+        '}\n' +
+        'body:has(#campaign3000.hidden) {\n' +
+        '    background-image: none !important;\n' +
+        '}\n';
+
+    var camp = document.getElementById('campaign3000');
+    if (camp) {
+        camp.style.setProperty('background', 'url("' + urlWithBust + '") center / cover no-repeat, #070503', 'important');
+        camp.style.setProperty('background-image', 'url("' + urlWithBust + '")', 'important');
+    }
+    return urlWithBust;
 };
 
+window.getMainWallpaper = function() {
+    var raw = window._customMainWallpaper || localStorage.getItem('FMR_MAIN_WALLPAPER') || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+    var stamp = window._customMainWallpaperStamp || localStorage.getItem('FMR_MAIN_WALLPAPER_STAMP') || '';
+    if (stamp && !raw.startsWith('data:') && !raw.includes('?')) {
+        return raw + '?v=' + stamp;
+    }
+    return raw;
+};
+
+// Inicializar inmediatamente con el wallpaper guardado o por defecto
+try {
+    var savedWall = localStorage.getItem('FMR_MAIN_WALLPAPER') || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+    var savedStamp = localStorage.getItem('FMR_MAIN_WALLPAPER_STAMP') || '';
+    window.applyMainWallpaper(savedWall, savedStamp);
+} catch(_) {}
+
+// Sincronizar desde el servidor (settings.json)
 try {
     if (typeof fetch === 'function') {
         fetch('/api/settings/wallpaper').then(function(r) { return r.json(); }).then(function(d) {
             if (d && d.wallpaper) {
-                window._customMainWallpaper = d.wallpaper;
-                try { localStorage.setItem('FMR_MAIN_WALLPAPER', d.wallpaper); } catch(_) {}
-                var camp = document.getElementById('campaign3000');
-                if (camp && camp.style.display !== 'none' && !camp.classList.contains('hidden')) {
-                    camp.style.background = 'url("' + d.wallpaper + '") center / cover no-repeat, #000';
-                }
+                window.applyMainWallpaper(d.wallpaper, d.updatedAt || Date.now());
             }
         }).catch(function() {});
     }
@@ -1845,8 +1891,14 @@ window.customShowMain = function() {
     camp.classList.remove('hidden');
     camp.style.display = '';
     camp.innerHTML = '';
-    var bgWallpaper = (typeof window.getMainWallpaper === 'function') ? window.getMainWallpaper() : 'ImagenesPersonajes/PortadaPrincipal.jpeg';
-    camp.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: url("' + bgWallpaper + '") center / cover no-repeat, #000; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;';
+
+    var activeUrl = window.getMainWallpaper();
+    var rawWall = window._customMainWallpaper || localStorage.getItem('FMR_MAIN_WALLPAPER') || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+    window.applyMainWallpaper(rawWall, window._customMainWallpaperStamp);
+
+    camp.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;';
+    camp.style.setProperty('background', 'url("' + activeUrl + '") center / cover no-repeat, #070503', 'important');
+    camp.style.setProperty('background-image', 'url("' + activeUrl + '")', 'important');
     
     let clickOverlay = document.createElement('div');
     clickOverlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; justify-content:center; align-items:center; color:#ffcc00; font-family:VT323, monospace; font-size:24px; cursor:pointer;';

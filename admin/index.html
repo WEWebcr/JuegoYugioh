@@ -679,7 +679,7 @@ async function loadWallpapers() {
           var isActive = (w.path === curPath || (w.filename.toLowerCase() === 'portadaprincipal.jpeg' && curPath.toLowerCase().includes('portadaprincipal')));
           return '<div style="background:#1a140c; border:2px solid ' + (isActive ? '#ffd700' : '#443') + '; border-radius:8px; padding:8px; display:flex; flex-direction:column; gap:6px; cursor:pointer; position:relative; box-shadow:' + (isActive ? '0 0 12px rgba(255,215,0,0.5)' : 'none') + ';" onclick="selectWallpaper(\'' + w.path + '\')">' +
             (isActive ? '<div style="position:absolute; top:4px; right:4px; background:#ffd700; color:#000; font-weight:bold; font-size:9px; padding:2px 5px; border-radius:4px; z-index:2;">ACTIVA</div>' : '') +
-            '<img src="/' + w.path + '" style="width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:4px; background:#000;">' +
+            '<img src="/' + w.path + '?t=' + Date.now() + '" style="width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:4px; background:#000;">' +
             '<div style="color:#eee; font-size:11px; font-weight:bold; line-height:1.2; text-align:center;">' + w.name + '</div>' +
             '<button type="button" class="btn btn-sm ' + (isActive ? 'btn-gold' : '') + '" style="width:100%; font-size:10px; padding:4px;" onclick="event.stopPropagation(); selectWallpaper(\'' + w.path + '\')">' + (isActive ? '✓ Seleccionada' : 'Seleccionar') + '</button>' +
           '</div>';

@@ -14,6 +14,9 @@ html = html.replace(/function stopMusic\(\)\{[\s\S]*?catch\(e\)\{\}\}/, "functio
 html = html.replace(/menuMusic\(\);/g, "void 0;");
 html = html.replace(/stopMusic\(\);/g, "void 0;");
 
+// 1.6 Neutralize hardcoded base64 world1 background to allow dynamic admin wallpaper
+html = html.replace(/<style id="fmr-v303-world1-visual">[\s\S]*?<\/style>/i, '<style id="fmr-v303-world1-visual">/* base64 background neutralized for dynamic admin wallpaper */</style>');
+
 // 2. Inject nativeAPI
 let target = '[80,400,1200,3000,6000,10000,15000,22000].forEach(t=>setTimeout(stamp,t));';
 let injection = target + `
