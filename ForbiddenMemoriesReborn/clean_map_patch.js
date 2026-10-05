@@ -1796,6 +1796,25 @@ window.renderPS1Keyboard = function(onComplete) {
     }
 };
 
+window.getMainWallpaper = function() {
+    return window._customMainWallpaper || localStorage.getItem('FMR_MAIN_WALLPAPER') || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+};
+
+try {
+    if (typeof fetch === 'function') {
+        fetch('/api/settings/wallpaper').then(function(r) { return r.json(); }).then(function(d) {
+            if (d && d.wallpaper) {
+                window._customMainWallpaper = d.wallpaper;
+                try { localStorage.setItem('FMR_MAIN_WALLPAPER', d.wallpaper); } catch(_) {}
+                var camp = document.getElementById('campaign3000');
+                if (camp && camp.style.display !== 'none' && !camp.classList.contains('hidden')) {
+                    camp.style.background = 'url("' + d.wallpaper + '") center / cover no-repeat, #000';
+                }
+            }
+        }).catch(function() {});
+    }
+} catch(_) {}
+
 window.customShowMain = function() {
     if (window.nativeAPI && window.nativeAPI.showShell) window.nativeAPI.showShell();
     
@@ -1808,7 +1827,8 @@ window.customShowMain = function() {
     camp.classList.remove('hidden');
     camp.style.display = '';
     camp.innerHTML = '';
-    camp.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: url("ImagenesPersonajes/PortadaPrincipal.jpeg") center / cover no-repeat, #000; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;';
+    var bgWallpaper = (typeof window.getMainWallpaper === 'function') ? window.getMainWallpaper() : 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+    camp.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: url("' + bgWallpaper + '") center / cover no-repeat, #000; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;';
     
     let clickOverlay = document.createElement('div');
     clickOverlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; justify-content:center; align-items:center; color:#ffcc00; font-family:VT323, monospace; font-size:24px; cursor:pointer;';

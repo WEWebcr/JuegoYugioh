@@ -132,6 +132,7 @@ textarea{resize:vertical;min-height:60px}
   <div class="tab" onclick="showTab('decks')">Decks</div>
   <div class="tab" onclick="showTab('saves')">Partidas</div>
   <div class="tab" onclick="showTab('users')">Usuarios & Regalías</div>
+  <div class="tab" onclick="showTab('wallpaper')">🖼️ Pantalla Principal</div>
 </div>
 
 <!-- PANEL 1: CATALOGO DE CARTAS Y TIENDA -->
@@ -518,6 +519,57 @@ textarea{resize:vertical;min-height:60px}
   </div>
 </div>
 
+<!-- PANEL 5: PANTALLA PRINCIPAL (WALLPAPER) -->
+<div class="panel" id="panel-wallpaper">
+  <h2>🖼️ CONFIGURACIÓN DE PANTALLA PRINCIPAL DEL JUEGO</h2>
+  <div style="display:grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 24px; align-items: start;">
+    
+    <!-- LADO IZQUIERDO: VISTA PREVIA ACTUAL -->
+    <div class="card" style="text-align:center;">
+      <h2>VISTA PREVIA ACTUAL</h2>
+      <div style="position:relative; width:100%; aspect-ratio:9/16; max-height:480px; margin:0 auto; border-radius:12px; overflow:hidden; border:2px solid #ffd700; box-shadow:0 0 24px rgba(255,215,0,0.35); background:#000; display:flex; align-items:center; justify-content:center;">
+        <img id="currentWallpaperPreview" src="/ImagenesPersonajes/PortadaPrincipal.jpeg" style="width:100%; height:100%; object-fit:cover;">
+        <div style="position:absolute; bottom:10px; left:10px; right:10px; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); padding:8px 12px; border-radius:8px; border:1px solid #d4af37; text-align:left;">
+          <div style="color:#ffd700; font-weight:bold; font-size:13px;" id="currentWallpaperName">Pantalla Principal Activa</div>
+          <div style="color:#8ce8ff; font-size:11px; word-break:break-all;" id="currentWallpaperPath">ImagenesPersonajes/PortadaPrincipal.jpeg</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LADO DERECHO: OPCIONES DE CAMBIO -->
+    <div class="card">
+      <h2>CAMBIAR PANTALLA PRINCIPAL</h2>
+      <p style="color:#bbb; font-size:0.88rem; margin-bottom:16px;">
+        Selecciona una de las portadas disponibles o sube una imagen personalizada desde tu computadora para que sea la pantalla principal al iniciar el juego.
+      </p>
+
+      <div style="background:#1e1710; border:1px solid #d4af37; border-radius:8px; padding:14px; margin-bottom:18px;">
+        <label style="font-weight:bold; color:#ffd700; display:block; margin-bottom:6px;">📁 Subir nueva imagen desde tu equipo:</label>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="file" id="wallpaperFileInput" accept="image/*" style="display:none;" onchange="handleWallpaperPicked(this)">
+          <button class="btn btn-gold" type="button" onclick="document.getElementById('wallpaperFileInput').click()">Examinar archivo...</button>
+          <span id="wallpaperFileName" style="color:#aaa; font-size:0.85rem;">Ningún archivo seleccionado</span>
+        </div>
+        <div id="wallpaperUploadStatus" style="font-size:0.85rem; color:#4fc3f7; margin-top:8px;"></div>
+      </div>
+
+      <div style="background:#1e1710; border:1px solid #443; border-radius:8px; padding:14px; margin-bottom:20px;">
+        <label style="font-weight:bold; color:#ffd700; display:block; margin-bottom:6px;">🔗 O ingresar ruta o URL de imagen:</label>
+        <div style="display:flex; gap:10px;">
+          <input id="wallpaperCustomUrl" placeholder="Ej: ImagenesPersonajes/PortadaBondsBeyondTime.jpg" style="flex:1;">
+          <button class="btn btn-gold" onclick="saveCustomWallpaperUrl()">Guardar</button>
+        </div>
+      </div>
+
+      <h3 style="color:#ffd700; font-size:1.1rem; border-top:1px solid #333; padding-top:14px; margin-top:14px;">Portadas del Juego Disponibles</h3>
+      <div id="wallpaperGallery" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:12px; max-height:420px; overflow-y:auto; padding-right:6px; margin-top:10px;">
+        <!-- Se llena dinámicamente -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
 var allCards = [];
 var currentDeck = [];
@@ -600,12 +652,101 @@ function initAdmin() {
 }
 
 function showTab(name) {
-  var tabs = ['cards','decks','saves','users'];
+  var tabs = ['cards','decks','saves','users','wallpaper'];
   document.querySelectorAll('.tab').forEach(function(t,i){ t.classList.toggle('active', tabs[i]===name); });
   document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('active', p.id==='panel-'+name); });
   if(name==='decks'){ loadAllCards().then(function(){ renderDeckCatalog(); loadCharDeck(); }); }
   if(name==='saves') loadSaves();
   if(name==='users') loadUsers();
+  if(name==='wallpaper') loadWallpapers();
+}
+
+// ── PANTALLA PRINCIPAL / WALLPAPERS ──────────────────────────────
+async function loadWallpapers() {
+  try {
+    var r = await fetch('/api/admin/wallpapers', { headers: adminHeaders() });
+    var d = await r.json();
+    if (d.ok) {
+      var curPath = d.activeWallpaper || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+      var preview = document.getElementById('currentWallpaperPreview');
+      if (preview) preview.src = '/' + curPath + '?t=' + Date.now();
+      var pathElem = document.getElementById('currentWallpaperPath');
+      if (pathElem) pathElem.textContent = curPath;
+      
+      var gallery = document.getElementById('wallpaperGallery');
+      if (gallery && d.wallpapers) {
+        gallery.innerHTML = d.wallpapers.map(function(w) {
+          var isActive = (w.path === curPath || (w.filename.toLowerCase() === 'portadaprincipal.jpeg' && curPath.toLowerCase().includes('portadaprincipal')));
+          return '<div style="background:#1a140c; border:2px solid ' + (isActive ? '#ffd700' : '#443') + '; border-radius:8px; padding:8px; display:flex; flex-direction:column; gap:6px; cursor:pointer; position:relative; box-shadow:' + (isActive ? '0 0 12px rgba(255,215,0,0.5)' : 'none') + ';" onclick="selectWallpaper(\'' + w.path + '\')">' +
+            (isActive ? '<div style="position:absolute; top:4px; right:4px; background:#ffd700; color:#000; font-weight:bold; font-size:9px; padding:2px 5px; border-radius:4px; z-index:2;">ACTIVA</div>' : '') +
+            '<img src="/' + w.path + '" style="width:100%; aspect-ratio:9/16; object-fit:cover; border-radius:4px; background:#000;">' +
+            '<div style="color:#eee; font-size:11px; font-weight:bold; line-height:1.2; text-align:center;">' + w.name + '</div>' +
+            '<button type="button" class="btn btn-sm ' + (isActive ? 'btn-gold' : '') + '" style="width:100%; font-size:10px; padding:4px;" onclick="event.stopPropagation(); selectWallpaper(\'' + w.path + '\')">' + (isActive ? '✓ Seleccionada' : 'Seleccionar') + '</button>' +
+          '</div>';
+        }).join('');
+      }
+    }
+  } catch (err) {
+    console.error('Error cargando wallpapers:', err);
+  }
+}
+
+async function selectWallpaper(path) {
+  try {
+    var r = await fetch('/api/admin/wallpaper', {
+      method: 'POST',
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ wallpaper: path })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      alert('¡Pantalla principal actualizada exitosamente!');
+      loadWallpapers();
+    } else {
+      alert('Error al cambiar pantalla principal: ' + (d.error || 'Desconocido'));
+    }
+  } catch (err) {
+    alert('Error de conexión: ' + err.message);
+  }
+}
+
+async function saveCustomWallpaperUrl() {
+  var url = (document.getElementById('wallpaperCustomUrl').value || '').trim();
+  if (!url) {
+    alert('Por favor ingresa una ruta o URL válida');
+    return;
+  }
+  selectWallpaper(url);
+}
+
+function handleWallpaperPicked(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  document.getElementById('wallpaperFileName').textContent = file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+  var status = document.getElementById('wallpaperUploadStatus');
+  status.textContent = 'Subiendo imagen y configurando como pantalla principal...';
+
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var base64 = e.target.result;
+    try {
+      var r = await fetch('/api/admin/wallpaper', {
+        method: 'POST',
+        headers: adminHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ filename: file.name, base64Data: base64 })
+      });
+      var d = await r.json();
+      if (d.ok) {
+        status.textContent = '✓ ¡Nueva pantalla principal guardada con éxito!';
+        loadWallpapers();
+      } else {
+        status.textContent = '✗ Error: ' + (d.error || 'No se pudo guardar');
+      }
+    } catch (err) {
+      status.textContent = '✗ Error al subir: ' + err.message;
+    }
+  };
+  reader.readAsDataURL(file);
 }
 
 // ── CARTAS & EXAMINAR IMAGEN ─────────────────────────────────────

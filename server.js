@@ -1050,6 +1050,146 @@ app.post('/api/upload-image', requireAdmin, (req, res) => {
 });
 
 // ════════════════════════════════════════════════════════════════
+//  GESTIÓN DE PANTALLA PRINCIPAL / WALLPAPERS
+// ════════════════════════════════════════════════════════════════
+const SETTINGS_FILE = path.join(ROOT, 'data', 'settings.json');
+
+function getAppSettings() {
+  try {
+    if (fs.existsSync(SETTINGS_FILE)) {
+      const raw = fs.readFileSync(SETTINGS_FILE, 'utf8').replace(/^\uFEFF/, '');
+      return JSON.parse(raw) || {};
+    }
+  } catch (err) {
+    console.warn('[Settings] Error leyendo settings.json:', err.message);
+  }
+  return {
+    wallpaper: 'ImagenesPersonajes/PortadaPrincipal.jpeg'
+  };
+}
+
+function saveAppSettings(settings) {
+  try {
+    const dir = path.dirname(SETTINGS_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error('[Settings] Error guardando settings.json:', err.message);
+    return false;
+  }
+}
+
+// Endpoint público para que el juego cliente conozca la pantalla principal activa
+app.get('/api/settings/wallpaper', (req, res) => {
+  const settings = getAppSettings();
+  res.json({
+    ok: true,
+    wallpaper: settings.wallpaper || 'ImagenesPersonajes/PortadaPrincipal.jpeg'
+  });
+});
+
+// Endpoint administrativo para listar fondos disponibles
+app.get('/api/admin/wallpapers', requireAdmin, (req, res) => {
+  try {
+    const settings = getAppSettings();
+    const activeWallpaper = settings.wallpaper || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
+    const imgDir = path.join(ROOT, 'ImagenesPersonajes');
+    const list = [];
+
+    const KNOWN_LABELS = {
+      'portadaprincipal.jpeg': 'Pantalla Principal Activa',
+      'portadabondsbeyondtime.jpg': 'Lazos a Través del Tiempo (Yugi, Jaden & Yusei)',
+      'portadaoriginal_retro.jpeg': 'Clásica Retro (Forbidden Memories PS1)',
+      'portadasecundaria.jpeg': 'Portada Secundaria (Duelo de Élite)',
+      'portadatercera.jpeg': 'Portada Tercera (Duelo Sombrío)',
+      'map_bg_m1.jpg': 'Mapa Mundo 1 (Ciudad Domino)',
+      'map_bg_gx.jpg': 'Mapa Mundo 2 (Academia de Duelos GX)',
+      'map_bg_5d.jpg': 'Mapa Mundo 3 (Nueva Ciudad Domino 5D\'s)'
+    };
+
+    if (fs.existsSync(imgDir)) {
+      const files = fs.readdirSync(imgDir);
+      files.forEach(f => {
+        const lower = f.toLowerCase();
+        if (lower.startsWith('portada') || lower.startsWith('map_bg')) {
+          const relPath = `ImagenesPersonajes/${f}`;
+          list.push({
+            filename: f,
+            path: relPath,
+            name: KNOWN_LABELS[lower] || f.replace(/_/g, ' ').replace(/\.[^.]+$/, ''),
+            active: (relPath === activeWallpaper)
+          });
+        }
+      });
+    }
+
+    res.json({
+      ok: true,
+      activeWallpaper,
+      wallpapers: list
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Endpoint administrativo para cambiar la pantalla principal
+app.post('/api/admin/wallpaper', requireAdmin, (req, res) => {
+  try {
+    const { wallpaper, base64Data } = req.body || {};
+    let finalWallpaper = (wallpaper || '').trim();
+
+    if (base64Data) {
+      const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      let ext = '.jpg';
+      let dataBuffer;
+      if (matches && matches.length === 3) {
+        const mime = matches[1].toLowerCase();
+        if (mime.includes('png')) ext = '.png';
+        else if (mime.includes('jpeg') || mime.includes('jpg')) ext = '.jpg';
+        else if (mime.includes('webp')) ext = '.webp';
+        dataBuffer = Buffer.from(matches[2], 'base64');
+      } else {
+        dataBuffer = Buffer.from(base64Data, 'base64');
+      }
+
+      const imgDir = path.join(ROOT, 'ImagenesPersonajes');
+      if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
+
+      const safeFile = `portada_custom_${Date.now()}${ext}`;
+      const targetPath = path.join(imgDir, safeFile);
+      fs.writeFileSync(targetPath, dataBuffer);
+
+      finalWallpaper = `ImagenesPersonajes/${safeFile}`;
+    }
+
+    if (!finalWallpaper) {
+      return res.status(400).json({ error: 'Debes seleccionar una imagen o ingresar una ruta.' });
+    }
+
+    // Copiamos a PortadaPrincipal.jpeg para compatibilidad con código directo y offline
+    const fullLocalPath = path.join(ROOT, finalWallpaper);
+    const mainPortadaPath = path.join(ROOT, 'ImagenesPersonajes', 'PortadaPrincipal.jpeg');
+    if (fs.existsSync(fullLocalPath) && fullLocalPath !== mainPortadaPath) {
+      try {
+        fs.copyFileSync(fullLocalPath, mainPortadaPath);
+      } catch (_) {}
+    }
+
+    const settings = getAppSettings();
+    settings.wallpaper = finalWallpaper;
+    settings.updatedAt = Date.now();
+    saveAppSettings(settings);
+
+    res.json({ ok: true, wallpaper: finalWallpaper });
+  } catch (err) {
+    console.error('[Admin Wallpaper] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ════════════════════════════════════════════════════════════════
 //  GESTION DE USUARIOS / REGALIAS
 // ════════════════════════════════════════════════════════════════
 
