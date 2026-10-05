@@ -663,7 +663,8 @@ const portraitMap = {
     'ZANE': 'Zane.png', 'CROWLER': 'Crowler.png', 'ASTER': 'Aster.png',
     // 5D's characters (Mundo 3)
     'TRUDGE': 'Trudge.png', 'LEO': 'Leo.png', 'AKIZA': 'Akiza.png',
-    'CROW': 'Crow.png', 'JACK': 'Jack.png', 'YUSEI': 'Yusei.png'
+    'CROW': 'Crow.png', 'JACK': 'Jack.png', 'YUSEI': 'Yusei.png',
+    'RALLY': 'Rally.png'
 };
 
 const dialogPortraitMap = {
@@ -702,7 +703,8 @@ const dialogPortraitMap = {
     'AKIZA': 'Akiza.png',
     'CROW': 'Crow.png',
     'JACK': 'Jack.png',
-    'YUSEI': 'Yusei.png'
+    'YUSEI': 'Yusei.png',
+    'RALLY': 'Rally.png'
 };
 
 window.DUELISTS_NAMES = {
@@ -738,7 +740,8 @@ window.DUELISTS_NAMES = {
     'akiza': 'Akiza Izinski',
     'crow': 'Crow Hogan',
     'jack': 'Jack Atlas',
-    'yusei': 'Yusei Fudo'
+    'yusei': 'Yusei Fudo',
+    'rally': 'Rally Dawson'
 };
 
 const introDialog = [
@@ -3054,7 +3057,7 @@ window.CUSTOM_NODES_5D = [
     { id: '5d_4', left: '35%', top: '48%', label: 'CROW', char: 'CROW', req: ['akiza'] },
     { id: '5d_5', left: '65%', top: '34%', label: 'JACK ATLAS', char: 'JACK', req: ['crow'] },
     { id: '5d_6', left: '50%', top: '18%', label: 'YUSEI FUDO', char: 'YUSEI', req: ['jack'] },
-    { id: '5d_shop', left: '88%', top: '84%', label: 'TIENDA 5D', char: 'ABUELO', req: [] }
+    { id: '5d_shop', left: '88%', top: '84%', label: 'TIENDA 5D', char: 'RALLY', req: [] }
 ];
 
 const MAP_EDGES_5D = [
@@ -3442,7 +3445,7 @@ window.customShowMap = function() {
         
         let fChar = (fNode.char || '').toLowerCase();
         if (fChar === 'seto') fChar = 'kaiba';
-        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop') || cleared.includes(fChar);
+        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop' || fNode.id === '5d_shop') || cleared.includes(fChar);
         
         let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', fNode.left); line.setAttribute('y1', fNode.top);
@@ -3472,7 +3475,7 @@ window.customShowMap = function() {
         if (cid === 'seto') cid = 'kaiba';
         
         let isUnlocked = true;
-        if (n.id === 'n13' || n.id === 'gx_shop' || cid === 'abuelo' || cid === 'atem' || !n.req || n.req.length === 0) {
+        if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || cid === 'abuelo' || cid === 'atem' || cid === 'rally' || !n.req || n.req.length === 0) {
             isUnlocked = true;
         } else {
             isUnlocked = n.req.every(r => cleared.includes(r.toLowerCase()));
@@ -3513,7 +3516,7 @@ window.customShowMap = function() {
             
             // 3.2 Etiqueta inferior de estado
             let labelText = isCleared ? `<span style="color:#a3e9a4">✓ ${n.label}</span>` : (!isUnlocked ? '???' : n.label);
-            if (n.id === 'n13' || n.id === 'gx_shop') labelText = '🏪 TIENDA';
+            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop') labelText = '🏪 TIENDA';
             if (n.id === 'n14') labelText = unlockedCount >= 7 ? '🌌 NUEVO MUNDO' : `🔒 PUERTA (${unlockedCount}/7)`;
             
             btn.innerHTML = `
@@ -3535,7 +3538,7 @@ window.customShowMap = function() {
             if (window.playViolinClick) window.playViolinClick();
             
             // Caso Tienda
-            if (n.id === 'n13' || n.id === 'gx_shop') {
+            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop') {
                 if (window.openCustomShopMenu) window.openCustomShopMenu();
                 return;
             }
@@ -3798,14 +3801,14 @@ window.openFreeDuelMenu = function() {
         }
     } catch(e) {}
     
-    let allNodes = [...(window.CUSTOM_NODES || []), ...(window.CUSTOM_NODES_GX || [])];
+    let allNodes = [...(window.CUSTOM_NODES || []), ...(window.CUSTOM_NODES_GX || []), ...(window.CUSTOM_NODES_5D || [])];
     let seenChars = new Set();
     allNodes.forEach(n => {
-        if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop') return;
+        if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop' || n.id === '5d_shop') return;
         let cid = n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase();
         if (seenChars.has(cid)) return;
         seenChars.add(cid);
-        let isDefeated = cleared.includes(cid) || (saved && Array.isArray(saved.clearedGX) && saved.clearedGX.map(x => String(x).toLowerCase()).includes(cid));
+        let isDefeated = cleared.includes(cid) || (saved && Array.isArray(saved.clearedGX) && saved.clearedGX.map(x => String(x).toLowerCase()).includes(cid)) || (saved && Array.isArray(saved.cleared5D) && saved.cleared5D.map(x => String(x).toLowerCase()).includes(cid));
         if (isDefeated) {
             let p = portraitMap[n.char];
             let w = wins[cid] || 0;
@@ -4719,16 +4722,39 @@ window.customShowShop = function() {
     let sStr = origGet('FMR_SAVE_' + window.activeAccount);
     let s = sStr ? JSON.parse(sStr) : (window.nativeAPI && window.nativeAPI.loadGame ? window.nativeAPI.loadGame() : null);
     if (!s) return;
-    s.collection = s.collection || {};
-    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
-    s.deck = s.deck || [];
-    s.decks = s.decks || {};
-    if (Object.keys(s.decks).length === 0) {
-        s.decks['Deck 1'] = [...s.deck];
-    }
-    s.activeDeck = s.activeDeck || Object.keys(s.decks)[0] || 'Deck 1';
-    if (s.decks[s.activeDeck]) {
-        s.deck = [...s.decks[s.activeDeck]];
+
+    let is5D = ((s.world || 1) === 3);
+    if (is5D) {
+        s.decksMundo3 = s.decksMundo3 || {};
+        s.collectionMundo3 = s.collectionMundo3 || {};
+        if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40) {
+            s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
+            s.decksMundo3['Extra'] = window.generate5DExtraDeck ? window.generate5DExtraDeck() : [];
+            s.activeDeckMundo3 = 'Principal';
+            s.decksMundo3['Principal'].forEach(n => {
+                s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Principal'].filter(x => x === n).length);
+            });
+            s.decksMundo3['Extra'].forEach(n => {
+                s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Extra'].filter(x => x === n).length);
+            });
+        }
+        s.decks = s.decksMundo3;
+        s.collection = s.collectionMundo3;
+        s.activeDeck = s.activeDeckMundo3 || 'Principal';
+        s.extra = s.decksMundo3['Extra'] || [];
+        s.deck = s.decks[s.activeDeck] || [];
+    } else {
+        s.collection = s.collection || {};
+        if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
+        s.deck = s.deck || [];
+        s.decks = s.decks || {};
+        if (Object.keys(s.decks).length === 0) {
+            s.decks['Deck 1'] = [...s.deck];
+        }
+        s.activeDeck = s.activeDeck || Object.keys(s.decks)[0] || 'Deck 1';
+        if (s.decks[s.activeDeck]) {
+            s.deck = [...s.decks[s.activeDeck]];
+        }
     }
     
     let existingOverlay = document.getElementById('custom-shop-dashboard');
@@ -4765,18 +4791,23 @@ window.customShowShop = function() {
     let rightSide = document.createElement('div');
     rightSide.style.cssText = 'flex: 1; display:flex; flex-direction:column; overflow:hidden;';
     
+    let shopHeaderTheme = is5D ? '#00e5ff' : '#ffd700';
     let header = document.createElement('div');
-    header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #ffd700; padding-bottom: 12px; margin-bottom: 12px; flex-wrap:wrap; gap:10px;';
+    header.style.cssText = `display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid ${shopHeaderTheme}; padding-bottom: 12px; margin-bottom: 12px; flex-wrap:wrap; gap:10px;`;
     header.innerHTML = `
         <div>
-            <div style="font-family:VT323, monospace; color:#ffcc00; font-size: 26px; text-shadow: 2px 2px 0 #000; letter-spacing:1px;">TIENDA DE MEMORIAS · CARTAS PODEROSAS</div>
-            <div style="color:#aaa; font-size:12px;">Cartas de élite para ayudarte a vencer a los rivales más desafiantes</div>
+            <div style="font-family:VT323, monospace; color:${shopHeaderTheme}; font-size: 26px; text-shadow: 2px 2px 0 #000; letter-spacing:1px;">
+                ${is5D ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY (5D\'S)' : 'TIENDA DE MEMORIAS · CARTAS PODEROSAS'}
+            </div>
+            <div style="color:${is5D ? '#80deea' : '#aaa'}; font-size:12px;">
+                ${is5D ? 'Cartas, piezas y Monstruos de Sincronía recolectados en Satélite' : 'Cartas de élite para ayudarte a vencer a los rivales más desafiantes'}
+            </div>
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
             <button id="btn-shop-subscription" style="background:linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; border:2px solid #fff; padding:7px 16px; border-radius:6px; cursor:pointer; font-weight:900; font-family:VT323, monospace; font-size:16px; box-shadow:0 0 10px rgba(255,215,0,0.4); display:flex; align-items:center; gap:6px;">
                 <span>⭐</span><span>SUSCRIPCIÓN (6 MESES) · $10</span>
             </button>
-            <div id="shop-pm-balance" style="background:#2b2200; border:2px solid #ffd700; color:#ffd700; padding:8px 16px; border-radius:6px; font-weight:bold; font-size:16px; text-shadow:1px 1px 0 #000;">
+            <div id="shop-pm-balance" style="background:#2b2200; border:2px solid ${shopHeaderTheme}; color:${shopHeaderTheme}; padding:8px 16px; border-radius:6px; font-weight:bold; font-size:16px; text-shadow:1px 1px 0 #000;">
                 💰 ${s.pm || 0} PM
             </div>
             <div id="shop-deck-count" style="background:#222; border:1px solid #555; padding:8px 16px; border-radius:6px; font-weight:bold; font-size:14px;">
@@ -4841,6 +4872,23 @@ window.customShowShop = function() {
     let searchInput = document.getElementById('shop-search');
     let typeSelect = document.getElementById('shop-filter-type');
     
+    function persistShopSave() {
+        if (is5D) {
+            s.decksMundo3 = s.decks || s.decksMundo3 || {};
+            s.decksMundo3[s.activeDeck || 'Principal'] = [...s.deck];
+            s.decksMundo3['Extra'] = [...(s.extra || [])];
+            s.activeDeckMundo3 = s.activeDeck || 'Principal';
+            s.collectionMundo3 = s.collection;
+        } else {
+            if (s.decks && s.activeDeck) s.decks[s.activeDeck] = [...s.deck];
+        }
+        if (window.persistUserSave) window.persistUserSave(s);
+        else {
+            origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
+        }
+    }
+
     function renderShopRows() {
         let counts = {};
         s.deck.forEach(n => counts[n] = (counts[n]||0) + 1);
@@ -4848,7 +4896,7 @@ window.customShowShop = function() {
         let pmEl = document.getElementById('shop-pm-balance');
         if (pmEl) pmEl.innerHTML = `💰 ${s.pm || 0} PM`;
         let deckEl = document.getElementById('shop-deck-count');
-        if (deckEl) deckEl.innerHTML = `DECK: <span style="color:${s.deck.length === 40 ? '#4caf50' : '#f44336'}">${s.deck.length}</span>/40`;
+        if (deckEl) deckEl.innerHTML = `DECK: <span style="color:${s.deck.length === 40 ? '#4caf50' : '#f44336'}">${s.deck.length}</span>/40${is5D ? ` <span style="color:#00e5ff; margin-left:6px;">EXTRA: ${(s.extra || []).length}/15</span>` : ''}`;
         
         tbody.innerHTML = '';
         let query = (searchInput.value || '').toLowerCase();
@@ -4887,77 +4935,134 @@ window.customShowShop = function() {
             return false;
         }
 
-        let activeShopCards = [...POWERFUL_SHOP_CARDS].filter(item => !isFusionOrExtra(item));
-        // Enforce equip pricing in POWERFUL_SHOP_CARDS
-        activeShopCards.forEach(item => {
-            let n = item.name.toLowerCase().trim();
-            if (GENERAL_EQUIPS.has(n)) {
-                item.price = 20000;
-                item.tier = 'EQUIPO GENERAL (20k)';
-            } else if (SPECIFIC_EQUIPS.has(n)) {
-                item.price = 10000;
-                item.tier = 'EQUIPO ESPECÍFICO (10k)';
-            }
-        });
-
-        // Garantizar Mystical Space Typhoon y Dust Tornado a 4000 DP
-        const REQUIRED_SHOP_ST = [
-            { name: 'Mystical Space Typhoon', price: 4000, tier: 'MAGIA RÁPIDA', desc: 'Destruye 1 carta Mágica o Trampa en el campo.' },
-            { name: 'Dust Tornado', price: 4000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye 1 carta Mágica, Trampa o Equipo del rival.' }
-        ];
-        REQUIRED_SHOP_ST.forEach(req => {
-            let norm = req.name.toLowerCase().trim();
-            let found = activeShopCards.find(x => x.name.toLowerCase().trim() === norm);
-            if (found) {
-                found.price = req.price;
-                found.tier = req.tier;
-                found.desc = req.desc;
-            } else {
-                activeShopCards.push(req);
-            }
-        });
-
-        let existingNames = new Set(activeShopCards.map(c => c.name.toLowerCase().trim()));
-
-        // Ensure ALL Equip cards exist in the shop
-        if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
-            window.CARDS_DATA.forEach(c => {
-                if (!c || !c.name) return;
-                let norm = c.name.toLowerCase().trim();
-                let isGen = GENERAL_EQUIPS.has(norm);
-                let isSpec = SPECIFIC_EQUIPS.has(norm);
-                let isEq = isGen || isSpec || (typeof window.isEquipSpell === 'function' && window.isEquipSpell(c));
-
-                if (isEq) {
-                    let eqPrice = isGen ? 20000 : 10000;
-                    let eqTier = isGen ? 'EQUIPO GENERAL (20k)' : 'EQUIPO ESPECÍFICO (10k)';
-                    if (!existingNames.has(norm)) {
-                        activeShopCards.push({
-                            name: c.name,
-                            price: eqPrice,
-                            tier: eqTier,
-                            desc: c.text || c.desc || 'Carta Mágica de Equipo'
-                        });
-                        existingNames.add(norm);
+        let activeShopCards = [];
+        if (is5D) {
+            // Mundo 3: Catálogo exclusivo de 5D's y Monstruos de Sincronía
+            if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+                window.CARDS_DATA.filter(c => c && c.world === 3).forEach(c => {
+                    let isSynchro = (c.kind === 'SYNCHRO');
+                    let isTuner = typeof window.isTunerMonster === 'function' ? window.isTunerMonster(c) : false;
+                    let isSpellTrap = (c.kind === 'SPELL' || c.kind === 'TRAP');
+                    let price = 4000;
+                    let tier = 'MONSTRUO 5D\'S';
+                    if (isSynchro) {
+                        let lv = Number(c.level || 0);
+                        price = lv >= 8 ? 45000 : (lv >= 7 ? 30000 : 20000);
+                        tier = 'SINCRONÍA (EXTRA DECK)';
+                    } else if (isTuner) {
+                        price = 6000;
+                        tier = 'CANTANTE (TUNER)';
+                    } else if (isSpellTrap) {
+                        price = 4000;
+                        tier = 'MAGIA/TRAMPA 5D\'S';
                     } else {
-                        let existing = activeShopCards.find(x => x.name.toLowerCase().trim() === norm);
-                        if (existing) {
-                            existing.price = eqPrice;
-                            existing.tier = eqTier;
-                        }
+                        let atk = Number(c.atk || 0);
+                        price = atk >= 2000 ? 6000 : 3500;
                     }
-                } else if (c.price && c.price > 0 && !existingNames.has(norm)) {
-                    if (isFusionOrExtra(c)) return; // REGLA: No poner monstruos fusión en la tienda
-                    if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(c)) return;
                     activeShopCards.push({
                         name: c.name,
-                        price: parseInt(c.price),
-                        tier: c.tier || (c.kind === 'MONSTER' ? (c.atk >= 2500 ? 'ÉLITE ADMIN' : 'TIENDA') : 'MAGIA/TRAMPA'),
-                        desc: c.text || c.desc || (c.kind === 'MONSTER' ? `Monstruo ${c.type || ''} (ATK ${c.atk || 0} / DEF ${c.def || 0})` : 'Efecto especial')
+                        price: price,
+                        tier: tier,
+                        kind: c.kind,
+                        desc: c.text || c.desc || ''
                     });
-                    existingNames.add(norm);
+                });
+            }
+            // Magias y Trampas clásicas permitidas en Mundo 3
+            const M3_STAPLES = [
+                { name: 'Mystical Space Typhoon', price: 4000, tier: 'MAGIA RÁPIDA', desc: 'Destruye 1 carta Mágica o Trampa en el campo.' },
+                { name: 'Dust Tornado', price: 4000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye 1 carta Mágica, Trampa o Equipo del rival.' },
+                { name: 'Swords of Revealing Light', price: 6000, tier: 'MAGIA NORMAL', desc: 'Los monstruos del adversario no pueden declarar ataques por 3 turnos.' },
+                { name: 'Dark Hole', price: 8000, tier: 'MAGIA NORMAL', desc: 'Destruye todos los monstruos en el campo.' },
+                { name: 'Fissure', price: 3000, tier: 'MAGIA NORMAL', desc: 'Destruye 1 monstruo boca arriba del adversario con el menor ATK.' },
+                { name: 'Trap Hole', price: 3000, tier: 'TRAMPA NORMAL', desc: 'Cuando el adversario invoca un monstruo con 1000+ ATK, destrúyelo.' },
+                { name: 'Waboku', price: 3000, tier: 'TRAMPA NORMAL', desc: 'No recibes daño de batalla y tus monstruos no pueden ser destruidos en batalla este turno.' },
+                { name: 'Sakuretsu Armor', price: 5000, tier: 'TRAMPA NORMAL', desc: 'Cuando un monstruo adversario declara un ataque, destruye ese monstruo.' },
+                { name: 'United We Stand', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Gana 800 ATK/DEF por cada monstruo boca arriba que controles.' },
+                { name: 'Axe of Despair', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Equipa solo a un monstruo. Gana 1000 ATK.' },
+                { name: 'Mage Power', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Gana 500 ATK/DEF por cada carta Mágica/Trampa que controles.' },
+                { name: 'Red Medicine', price: 1500, tier: 'MAGIA NORMAL', desc: 'Aumenta tus Life Points en 500.' },
+                { name: 'Dian Keto the Cure Master', price: 2500, tier: 'MAGIA NORMAL', desc: 'Aumenta tus Life Points en 1000.' }
+            ];
+            let curNames = new Set(activeShopCards.map(c => c.name.toLowerCase().trim()));
+            M3_STAPLES.forEach(st => {
+                if (!curNames.has(st.name.toLowerCase().trim())) {
+                    activeShopCards.push(st);
+                    curNames.add(st.name.toLowerCase().trim());
                 }
             });
+        } else {
+            activeShopCards = [...POWERFUL_SHOP_CARDS].filter(item => !isFusionOrExtra(item));
+            activeShopCards.forEach(item => {
+                let n = item.name.toLowerCase().trim();
+                if (GENERAL_EQUIPS.has(n)) {
+                    item.price = 20000;
+                    item.tier = 'EQUIPO GENERAL (20k)';
+                } else if (SPECIFIC_EQUIPS.has(n)) {
+                    item.price = 10000;
+                    item.tier = 'EQUIPO ESPECÍFICO (10k)';
+                }
+            });
+
+            // Garantizar Mystical Space Typhoon y Dust Tornado a 4000 DP
+            const REQUIRED_SHOP_ST = [
+                { name: 'Mystical Space Typhoon', price: 4000, tier: 'MAGIA RÁPIDA', desc: 'Destruye 1 carta Mágica o Trampa en el campo.' },
+                { name: 'Dust Tornado', price: 4000, tier: 'TRAMPA CLÁSICA', desc: 'Destruye 1 carta Mágica, Trampa o Equipo del rival.' }
+            ];
+            REQUIRED_SHOP_ST.forEach(req => {
+                let norm = req.name.toLowerCase().trim();
+                let found = activeShopCards.find(x => x.name.toLowerCase().trim() === norm);
+                if (found) {
+                    found.price = req.price;
+                    found.tier = req.tier;
+                    found.desc = req.desc;
+                } else {
+                    activeShopCards.push(req);
+                }
+            });
+
+            let existingNames = new Set(activeShopCards.map(c => c.name.toLowerCase().trim()));
+
+            // Ensure ALL Equip cards exist in the shop
+            if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+                window.CARDS_DATA.forEach(c => {
+                    if (!c || !c.name) return;
+                    let norm = c.name.toLowerCase().trim();
+                    let isGen = GENERAL_EQUIPS.has(norm);
+                    let isSpec = SPECIFIC_EQUIPS.has(norm);
+                    let isEq = isGen || isSpec || (typeof window.isEquipSpell === 'function' && window.isEquipSpell(c));
+
+                    if (isEq) {
+                        let eqPrice = isGen ? 20000 : 10000;
+                        let eqTier = isGen ? 'EQUIPO GENERAL (20k)' : 'EQUIPO ESPECÍFICO (10k)';
+                        if (!existingNames.has(norm)) {
+                            activeShopCards.push({
+                                name: c.name,
+                                price: eqPrice,
+                                tier: eqTier,
+                                desc: c.text || c.desc || 'Carta Mágica de Equipo'
+                            });
+                            existingNames.add(norm);
+                        } else {
+                            let existing = activeShopCards.find(x => x.name.toLowerCase().trim() === norm);
+                            if (existing) {
+                                existing.price = eqPrice;
+                                existing.tier = eqTier;
+                            }
+                        }
+                    } else if (c.price && c.price > 0 && !existingNames.has(norm)) {
+                        if (isFusionOrExtra(c)) return;
+                        if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(c)) return;
+                        activeShopCards.push({
+                            name: c.name,
+                            price: parseInt(c.price),
+                            tier: c.tier || (c.kind === 'MONSTER' ? (c.atk >= 2500 ? 'ÉLITE ADMIN' : 'TIENDA') : 'MAGIA/TRAMPA'),
+                            desc: c.text || c.desc || (c.kind === 'MONSTER' ? `Monstruo ${c.type || ''} (ATK ${c.atk || 0} / DEF ${c.def || 0})` : 'Efecto especial')
+                        });
+                        existingNames.add(norm);
+                    }
+                });
+            }
         }
         
         let filterTotal = document.getElementById('shop-filter-type');
@@ -4979,38 +5084,39 @@ window.customShowShop = function() {
             if (fType === 'SPELL_EQUIP' && (!isSpell || !isEquip)) return;
             if (fType === 'TRAP' && !info.isTrap) return;
             
+            let isSynchroItem = is5D && (item.kind === 'SYNCHRO' || (item.tier && item.tier.includes('SINCRON')));
             let ownCount = s.collection[item.name] || 0;
-            let inDeck = counts[item.name] || 0;
-            let canBuy = (s.pm >= item.price);
-            let canAddToDeck = (ownCount > inDeck) && (inDeck < 3);
+            let inDeck = isSynchroItem ? ((s.extra || []).filter(x => x === item.name).length) : (counts[item.name] || 0);
+            let canBuy = (s.pm >= item.price) && (ownCount < 3 || isSynchroItem);
+            let canAddToDeck = (ownCount > inDeck) && (isSynchroItem ? ((s.extra || []).length < 15) : (s.deck.length <= 40));
             let canRemoveFromDeck = inDeck > 0;
             
-            let cardColor = info.isMonster ? '#d4af37' : (info.isTrap ? '#ff80ab' : '#4caf50');
+            let cardColor = isSynchroItem ? '#e0e0e0' : (info.isMonster ? '#d4af37' : (info.isTrap ? '#ff80ab' : '#4caf50'));
             
             let tr = document.createElement('tr');
             tr.style.cssText = 'border-bottom: 1px solid #333; transition: background 0.15s; cursor: pointer;';
             tr.onmouseover = () => {
                 tr.style.background = '#282834';
                 previewImg.src = info.imgUrl;
-                let atkDef = info.isMonster ? `<br><br><span style="color:#ff5252; font-weight:bold;">⚔ ATK ${info.atk}</span> / <span style="color:#2196f3; font-weight:bold;">🛡 DEF ${info.def}</span>` : '';
+                let atkDef = (info.isMonster || isSynchroItem) ? `<br><br><span style="color:#ff5252; font-weight:bold;">⚔ ATK ${info.atk}</span> / <span style="color:#2196f3; font-weight:bold;">🛡 DEF ${info.def}</span>` : '';
                 previewText.innerHTML = `
                     <div style="font-weight:bold; font-size:18px; color:${cardColor}; margin-bottom: 5px;">${info.name}</div>
                     <div style="font-size:13px; color:#aaa;">[${info.type}] ${info.attr !== '-' ? ' · ' + info.attr : ''} · <span style="color:#ffd700;">${item.tier}</span></div>
                     ${atkDef}
                     <div style="margin-top:10px; color:#ffe082; font-size:13px; line-height:1.4;">${item.desc || info.desc}</div>
                     <div style="margin-top:12px; padding-top:8px; border-top:1px solid #444; font-size:12px; color:#ccc;">
-                        En Colección: <b style="color:#fff;">${ownCount}</b> · En tu Deck: <b style="color:#81c784;">${inDeck}</b>/3
+                        En Colección: <b style="color:#fff;">${ownCount}</b> · ${isSynchroItem ? 'En Extra Deck' : 'En tu Deck'}: <b style="color:#81c784;">${inDeck}</b>/3
                     </div>
                 `;
             };
             tr.onmouseout = () => tr.style.background = 'transparent';
             
-            let statDisplay = info.isMonster ? `<span style="color:#ff5252; font-weight:bold;">${info.atk}</span> / <span style="color:#2196f3; font-weight:bold;">${info.def}</span>` : `<span style="color:#aaa; font-size:12px;">${item.tier}</span>`;
+            let statDisplay = (info.isMonster || isSynchroItem) ? `<span style="color:#ff5252; font-weight:bold;">${info.atk}</span> / <span style="color:#2196f3; font-weight:bold;">${info.def}</span>${isSynchroItem ? ` <span style="color:#00e5ff; font-size:11px;">(★${info.level || item.level || 0})</span>` : ''}` : `<span style="color:#aaa; font-size:12px;">${item.tier}</span>`;
             
             tr.innerHTML = `
                 <td style="padding: 10px 12px; color: #888;">#${String(info.num).replace(/[^\d]/g, '').padStart(3, '0')}</td>
                 <td style="padding: 10px 12px; font-weight: bold; color: ${cardColor};">${info.name}</td>
-                <td style="padding: 10px 12px; font-size:13px;">${info.isMonster ? info.type : (info.isTrap ? 'Trampa' : (isField ? 'Magia (Campo)' : (isEquip ? 'Magia (Equipo)' : 'Magia (Normal)')))}</td>
+                <td style="padding: 10px 12px; font-size:13px;">${isSynchroItem ? 'Sincronía (Extra)' : (info.isMonster ? info.type : (info.isTrap ? 'Trampa' : (isField ? 'Magia (Campo)' : (isEquip ? 'Magia (Equipo)' : 'Magia (Normal)'))))}</td>
                 <td style="padding: 10px 12px;">${statDisplay}</td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold; color:#ffd700;">${item.price} PM</td>
                 <td style="padding: 10px 12px; text-align:center; font-weight:bold;">
@@ -5024,7 +5130,7 @@ window.customShowShop = function() {
                         ${s.pm < item.price ? 'SIN PM' : '🛒 COMPRAR'}
                     </button>
                     <button class="shop-add-btn" style="background:#2e7d32; color:#fff; border:none; padding:7px 10px; border-radius:4px; font-weight:bold; font-size:12px; cursor:${canAddToDeck ? 'pointer' : 'not-allowed'}; opacity:${canAddToDeck ? '1' : '0.4'}; margin-right:4px;" title="Equipar al Deck">
-                        ➕ AL DECK
+                        ➕ ${isSynchroItem ? 'AL EXTRA' : 'AL DECK'}
                     </button>
                     <button class="shop-rem-btn" style="background:#c62828; color:#fff; border:none; padding:7px 10px; border-radius:4px; font-weight:bold; font-size:12px; cursor:${canRemoveFromDeck ? 'pointer' : 'not-allowed'}; opacity:${canRemoveFromDeck ? '1' : '0.4'};" title="Quitar del Deck">
                         ➖ QUITAR
@@ -5041,12 +5147,7 @@ window.customShowShop = function() {
                 s.pm -= item.price;
                 s.collection = s.collection || {};
                 s.collection[item.name] = (s.collection[item.name] || 0) + 1;
-                
-                if (window.persistUserSave) window.persistUserSave(s);
-                else {
-                    origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
-                    if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
-                }
+                persistShopSave();
                 
                 alert(`¡Has comprado "${item.name}" por ${item.price} PM!\n\n📦 La carta ha sido enviada directamente a tu BANCA / BAÚL DE RESERVA.\nPuedes armar y equipar tus decks en el Dashboard del Deck.`);
                 renderShopRows();
@@ -5058,24 +5159,30 @@ window.customShowShop = function() {
                 e.stopPropagation();
                 if (!canAddToDeck) return;
                 window.playHoverSound && window.playHoverSound();
-                if (s.deck.length < 40) {
-                    s.deck.push(item.name);
-                    if (s.decks && s.activeDeck) s.decks[s.activeDeck] = [...s.deck];
-                    alert(`¡${item.name} añadida a tu Deck activo ("${s.activeDeck || 'Principal'}")! (Total: ${s.deck.length}/40)`);
-                } else {
-                    let lowest = findLowestMonsterInDeck(s.deck);
-                    if (confirm(`Tu Deck activo ("${s.activeDeck || 'Principal'}") ya tiene 40 cartas.\n¿Deseas equipar ${item.name} reemplazando a ${lowest.name} (ATK ${lowest.atk})?`)) {
-                        s.deck.splice(lowest.index, 1, item.name);
-                        if (s.decks && s.activeDeck) s.decks[s.activeDeck] = [...s.deck];
-                        alert(`¡${item.name} equipada en tu Deck activo!\n(Reemplazó a ${lowest.name} de ATK ${lowest.atk})`);
+                if (isSynchroItem) {
+                    s.extra = s.extra || [];
+                    if (s.extra.length < 15) {
+                        s.extra.push(item.name);
+                        persistShopSave();
+                        alert(`¡${item.name} añadida a tu Extra Deck de Sincronía! (Total: ${s.extra.length}/15)`);
                     } else {
-                        return;
+                        alert('Tu Extra Deck ya tiene el límite de 15 monstruos de Sincronía.');
                     }
-                }
-                if (window.persistUserSave) window.persistUserSave(s);
-                else {
-                    origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
-                    if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
+                } else {
+                    if (s.deck.length < 40) {
+                        s.deck.push(item.name);
+                        persistShopSave();
+                        alert(`¡${item.name} añadida a tu Deck activo ("${s.activeDeck || 'Principal'}")! (Total: ${s.deck.length}/40)`);
+                    } else {
+                        let lowest = findLowestMonsterInDeck(s.deck);
+                        if (confirm(`Tu Deck activo ("${s.activeDeck || 'Principal'}") ya tiene 40 cartas.\n¿Deseas equipar ${item.name} reemplazando a ${lowest.name} (ATK ${lowest.atk})?`)) {
+                            s.deck.splice(lowest.index, 1, item.name);
+                            persistShopSave();
+                            alert(`¡${item.name} equipada en tu Deck activo!\n(Reemplazó a ${lowest.name} de ATK ${lowest.atk})`);
+                        } else {
+                            return;
+                        }
+                    }
                 }
                 renderShopRows();
             };
@@ -5086,16 +5193,20 @@ window.customShowShop = function() {
                 e.stopPropagation();
                 if (!canRemoveFromDeck) return;
                 window.playHoverSound && window.playHoverSound();
-                let idx = s.deck.lastIndexOf(item.name);
-                if (idx >= 0) {
-                    s.deck.splice(idx, 1);
-                    if (s.decks && s.activeDeck) s.decks[s.activeDeck] = [...s.deck];
-                    if (window.persistUserSave) window.persistUserSave(s);
-                    else {
-                        origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
-                        if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
+                if (isSynchroItem) {
+                    let idx = (s.extra || []).lastIndexOf(item.name);
+                    if (idx >= 0) {
+                        s.extra.splice(idx, 1);
+                        persistShopSave();
+                        renderShopRows();
                     }
-                    renderShopRows();
+                } else {
+                    let idx = s.deck.lastIndexOf(item.name);
+                    if (idx >= 0) {
+                        s.deck.splice(idx, 1);
+                        persistShopSave();
+                        renderShopRows();
+                    }
                 }
             };
             
@@ -5142,7 +5253,14 @@ window.openCustomShopMenu = function() {
     s.deck = s.deck || [];
     s.cleared = s.cleared || [];
     s.activeDeck = s.activeDeck || Object.keys(s.decks)[0] || 'Deck 1';
+    let is5DShop = ((s.world || 1) === 3);
     let curActiveDeck = s.decks[s.activeDeck] || s.deck;
+    if (is5DShop) {
+        s.decksMundo3 = s.decksMundo3 || {};
+        s.collectionMundo3 = s.collectionMundo3 || {};
+        s.activeDeckMundo3 = s.activeDeckMundo3 || 'Principal';
+        curActiveDeck = s.decksMundo3[s.activeDeckMundo3] || [];
+    }
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
 
     // 7 Artículos del Milenio Data & Unlocking Logic
@@ -5578,90 +5696,109 @@ window.openCustomShopMenu = function() {
     overlay.appendChild(bgParticles);
 
     // 1. TOP HEADER STATUS BAR
+    let shopThemeColor = is5DShop ? '#00e5ff' : '#ffd700';
+    let shopBorderColor = is5DShop ? '#00838f' : '#b8860b';
+    let shopBgHeader = is5DShop ? 'linear-gradient(180deg, rgba(8,20,30,0.95) 0%, rgba(4,10,18,0.7) 100%)' : 'linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%)';
+    let thirdStatHtml = is5DShop ? `
+        <div class="shop-stat-badge" style="background:#07212b; border:1px solid #00e5ff; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Monstruos Sincronía en tu Extra Deck">
+            <span style="font-size:15px;">⭐</span>
+            <span style="color:#00e5ff; font-size:11px; font-weight:bold;">EXTRA DECK:</span>
+            <span style="color:#fff; font-weight:bold; font-size:12px;">${(s.decksMundo3 && s.decksMundo3['Extra'] ? s.decksMundo3['Extra'].length : 0)} / 15</span>
+        </div>
+    ` : `
+        <div class="shop-stat-badge" style="background:#281c00; border:1px solid #b8860b; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Artículos del Milenio en tu poder">
+            <span style="font-size:15px;">✨</span>
+            <span style="color:#ffd700; font-size:11px; font-weight:bold;">MILENIO:</span>
+            <span style="color:#fff; font-weight:bold; font-size:12px;">${unlockedCount} / 7</span>
+        </div>
+    `;
+
     let topBar = document.createElement('div');
     topBar.id = 'shop-top-bar';
-    topBar.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:12px 28px; background:linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%); border-bottom:2px solid #b8860b; box-shadow:0 4px 15px rgba(0,0,0,0.6); z-index:10;';
+    topBar.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:12px 28px; background:${shopBgHeader}; border-bottom:2px solid ${shopBorderColor}; box-shadow:0 4px 15px rgba(0,0,0,0.6); z-index:10;`;
     topBar.innerHTML = `
         <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-            <span style="font-size:24px; filter:drop-shadow(0 0 6px #ffd700); flex-shrink:0;">🏺</span>
+            <span style="font-size:24px; filter:drop-shadow(0 0 6px ${shopThemeColor}); flex-shrink:0;">${is5DShop ? '⚙️' : '🏺'}</span>
             <div style="min-width:0;">
-                <div class="shop-header-title" style="font-family:VT323, monospace; color:#ffd700; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    KAME GAME · TIENDA DEL ABUELO MOTO
+                <div class="shop-header-title" style="font-family:VT323, monospace; color:${shopThemeColor}; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px ${is5DShop ? 'rgba(0,229,255,0.5)' : 'rgba(255,215,0,0.5)'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    ${is5DShop ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY' : 'KAME GAME · TIENDA DEL ABUELO MOTO'}
                 </div>
-                <div class="shop-header-subtitle" style="font-size:12px; color:#c7a76d; letter-spacing:0.5px;">Bazar Ancestral de Cartas y Reliquias Milenarias</div>
+                <div class="shop-header-subtitle" style="font-size:12px; color:${is5DShop ? '#80deea' : '#c7a76d'}; letter-spacing:0.5px;">${is5DShop ? 'Chatarrería de Piezas, Cartas y Monstruos de Sincronía' : 'Bazar Ancestral de Cartas y Reliquias Milenarias'}</div>
             </div>
         </div>
         <div class="shop-top-stats" style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-            <div class="shop-stat-badge" style="background:#201608; border:1px solid #ffd700; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
+            <div class="shop-stat-badge" style="background:${is5DShop ? '#081c24' : '#201608'}; border:1px solid ${shopThemeColor}; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
                 <span style="font-size:15px;">💰</span>
                 <span style="color:#aaa; font-size:11px; font-weight:bold;">PM:</span>
-                <span style="color:#ffd700; font-weight:bold; font-size:15px; font-family:VT323, monospace;" id="shop-menu-pm">${s.pm || 0}</span>
+                <span style="color:${shopThemeColor}; font-weight:bold; font-size:15px; font-family:VT323, monospace;" id="shop-menu-pm">${s.pm || 0}</span>
             </div>
             <div class="shop-stat-badge" style="background:#16202d; border:1px solid #4a90e2; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
                 <span style="font-size:15px;">🎴</span>
                 <span style="color:#aaa; font-size:11px; font-weight:bold;">DECK:</span>
-                <span style="color:#66c0f4; font-weight:bold; font-size:12px;">${(s.activeDeck || 'Deck 1').toUpperCase()}</span>
+                <span style="color:#66c0f4; font-weight:bold; font-size:12px;">${(is5DShop ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1')).toUpperCase()}</span>
                 <span style="background:#0d47a1; color:#fff; font-size:10px; padding:1px 5px; border-radius:3px;">${activeDeckCount}/40</span>
             </div>
-            <div class="shop-stat-badge" style="background:#281c00; border:1px solid #b8860b; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Artículos del Milenio en tu poder">
-                <span style="font-size:15px;">✨</span>
-                <span style="color:#ffd700; font-size:11px; font-weight:bold;">MILENIO:</span>
-                <span style="color:#fff; font-weight:bold; font-size:12px;">${unlockedCount} / 7</span>
-            </div>
+            ${thirdStatHtml}
         </div>
     `;
     overlay.appendChild(topBar);
 
-    // 2. MIDDLE WORKSPACE (Left: Grandpa Moto with Speech Bubble, Right: Action Menu)
+    // 2. MIDDLE WORKSPACE (Left: Grandpa Moto / Rally with Speech Bubble, Right: Action Menu)
     let workspace = document.createElement('div');
     workspace.id = 'shop-workspace';
     workspace.style.cssText = 'flex: 1; display:flex; flex-direction:row; padding:10px 30px 4px 30px; box-sizing:border-box; overflow:hidden; position:relative; align-items:center; justify-content:space-between; gap:20px;';
 
-    // LEFT: GRANDPA MOTO + SPEECH BUBBLE
+    // LEFT: GRANDPA MOTO / RALLY + SPEECH BUBBLE
     let grandpaWrap = document.createElement('div');
     grandpaWrap.id = 'shop-grandpa-wrap';
     grandpaWrap.style.cssText = 'flex: 1; height: 100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; max-width: 480px; box-sizing:border-box;';
 
+    let defaultGreeting = is5DShop 
+        ? '¡Hola, compañero! Encontré unas cartas geniales y repuestos en Satélite. ¿En qué puedo ayudarte hoy?'
+        : '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?';
+
     // Speech bubble
     let bubble = document.createElement('div');
     bubble.id = 'grandpa-speech-bubble';
-    bubble.style.cssText = 'position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, #2b2010 0%, #181208 100%); border: 2px solid #ffd700; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px rgba(255,215,0,0.25); z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;';
+    bubble.style.cssText = `position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, ${is5DShop ? '#081a24' : '#2b2010'} 0%, ${is5DShop ? '#040d14' : '#181208'} 100%); border: 2px solid ${shopThemeColor}; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px ${is5DShop ? 'rgba(0,229,255,0.3)' : 'rgba(255,215,0,0.25)'}; z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;`;
     
     // Bubble pointer tail
     let bubbleTail = document.createElement('div');
     bubbleTail.id = 'bubble-pointer-tail';
-    bubbleTail.style.cssText = 'position:absolute; bottom:-10px; left:50%; margin-left:-8px; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid #ffd700;';
+    bubbleTail.style.cssText = `position:absolute; bottom:-10px; left:50%; margin-left:-8px; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid ${shopThemeColor};`;
     bubble.appendChild(bubbleTail);
 
     let bubbleTitle = document.createElement('div');
     bubbleTitle.id = 'grandpa-speech-title';
-    bubbleTitle.style.cssText = 'font-weight:bold; font-size:11px; color:#ffd700; font-family:VT323, monospace; letter-spacing:1px; margin-bottom:3px; display:flex; align-items:center; gap:5px;';
-    bubbleTitle.innerHTML = '<span>👴 ABUELO MOTO DICE:</span>';
+    bubbleTitle.style.cssText = `font-weight:bold; font-size:11px; color:${shopThemeColor}; font-family:VT323, monospace; letter-spacing:1px; margin-bottom:3px; display:flex; align-items:center; gap:5px;`;
+    bubbleTitle.innerHTML = is5DShop ? '<span>⚙️ RALLY DAWSON DICE:</span>' : '<span>👴 ABUELO MOTO DICE:</span>';
     bubble.appendChild(bubbleTitle);
 
     let bubbleText = document.createElement('div');
     bubbleText.id = 'grandpa-speech-text';
     bubbleText.style.cssText = 'font-size:13px; color:#fff; line-height:1.35; transition: opacity 0.15s ease; font-style:italic;';
-    bubbleText.textContent = '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?';
+    bubbleText.textContent = defaultGreeting;
     bubble.appendChild(bubbleText);
 
     grandpaWrap.appendChild(bubble);
 
-    // Warm radial aura behind Grandpa Moto
+    // Radial aura behind character
     let auraGlow = document.createElement('div');
     auraGlow.id = 'shop-aura-glow';
-    auraGlow.style.cssText = 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;';
+    auraGlow.style.cssText = is5DShop 
+        ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(0, 229, 255, 0.25) 0%, rgba(0, 150, 255, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
+        : 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;';
     grandpaWrap.appendChild(auraGlow);
 
-    // Grandpa Moto Image (Interactive + Breathing animation)
+    // Character Image (Interactive + Breathing animation)
     let grandpaImg = document.createElement('img');
     grandpaImg.id = 'shop-grandpa-img';
-    grandpaImg.src = 'ImagenesPersonajes/abueloYugi.jpg';
-    grandpaImg.alt = 'Abuelo Moto';
-    grandpaImg.style.cssText = 'height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px rgba(255, 180, 0, 0.45)); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;';
-    grandpaImg.title = '¡Haz clic para hablar con el Abuelo Moto!';
+    grandpaImg.src = is5DShop ? 'ImagenesPersonajes/Rally.png' : 'ImagenesPersonajes/abueloYugi.jpg';
+    grandpaImg.alt = is5DShop ? 'Rally Dawson' : 'Abuelo Moto';
+    grandpaImg.style.cssText = `height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px ${is5DShop ? 'rgba(0, 229, 255, 0.45)' : 'rgba(255, 180, 0, 0.45)'}); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;`;
+    grandpaImg.title = is5DShop ? '¡Haz clic para hablar con Rally Dawson!' : '¡Haz clic para hablar con el Abuelo Moto!';
 
-    // Random wisdom quotes for clicking Grandpa
+    // Random wisdom quotes for clicking Grandpa / Rally
     const GRANDPA_RANDOM_QUOTES = [
       '¡Cree siempre en el Corazón de las Cartas, muchacho! Ellas responderán a tu espíritu.',
       '¡Esa baraja tuya tiene un vínculo sagrado contigo! Cuida a cada uno de tus monstruos.',
@@ -5670,6 +5807,15 @@ window.openCustomShopMenu = function() {
       '¡Un verdadero duelista jamás se rinde, ni siquiera cuando sólo le quedan 100 LP!',
       '¡Me alegra mucho verte por aquí! Tómate tu tiempo para revisar tus cartas y preparar tu estrategia.',
       'Si combinas cartas afines en el tablero, ¡puedes desatar fusiones sorprendentes!'
+    ];
+
+    const RALLY_RANDOM_QUOTES = [
+      '¡Yusei me enseñó que cada carta, por pequeña que sea, tiene un propósito en el Duelo!',
+      '¡Si juntas un Monstruo Cantante con otros monstruos, puedes invocar monstruos Sincronía increíbles!',
+      '¡Mira esta pieza que encontré! Podría servir para mejorar un D-Wheel o reforzar tu baraja.',
+      'En Satélite no tenemos mucho, ¡pero nuestros lazos y cartas son más fuertes que los de la Ciudad!',
+      '¡Ten cuidado con Seguridad y Trudge! Siempre están vigilando a los duelistas de Satélite.',
+      '¡Sigue mejorando tu Deck! ¡Algún día todos los duelistas de Satélite cruzaremos el puente hacia la Ciudad!'
     ];
 
     function setGrandpaSpeech(text, isTemporary) {
@@ -5686,17 +5832,18 @@ window.openCustomShopMenu = function() {
         void grandpaImg.offsetWidth;
         grandpaImg.style.animation = 'grandpaBounce 0.55s ease, grandpaFloat 3.8s ease-in-out 0.55s infinite';
         
-        let randomQuote = GRANDPA_RANDOM_QUOTES[Math.floor(Math.random() * GRANDPA_RANDOM_QUOTES.length)];
+        let pool = is5DShop ? RALLY_RANDOM_QUOTES : GRANDPA_RANDOM_QUOTES;
+        let randomQuote = pool[Math.floor(Math.random() * pool.length)];
         setGrandpaSpeech(randomQuote);
     };
 
     grandpaWrap.appendChild(grandpaImg);
 
-    // Floating hint badge below Grandpa
+    // Floating hint badge below character
     let clickHint = document.createElement('div');
     clickHint.id = 'shop-grandpa-hint';
-    clickHint.style.cssText = 'font-size:11px; color:#ffd700; background:rgba(0,0,0,0.7); border:1px solid #b8860b; border-radius:12px; padding:2px 10px; margin-bottom:6px; z-index:3; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px #000;';
-    clickHint.textContent = '💬 ¡Haz clic en el Abuelo!';
+    clickHint.style.cssText = `font-size:11px; color:${shopThemeColor}; background:rgba(0,0,0,0.7); border:1px solid ${shopBorderColor}; border-radius:12px; padding:2px 10px; margin-bottom:6px; z-index:3; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px #000;`;
+    clickHint.textContent = is5DShop ? '💬 ¡Haz clic en Rally!' : '💬 ¡Haz clic en el Abuelo!';
     clickHint.onclick = grandpaImg.onclick;
     grandpaWrap.appendChild(clickHint);
 
@@ -5753,14 +5900,14 @@ window.openCustomShopMenu = function() {
             icon: '📜', 
             label: 'COLECCIÓN DE CARTAS', 
             desc: 'Visualiza todas las cartas que posees en tu archivo.',
-            speech: '¡Aquí puedes revisar tu colección completa de cartas! ¿Qué tesoros has encontrado en tus viajes?',
+            speech: is5DShop ? '¡Aquí puedes revisar tu colección completa de cartas y repuestos de Satélite!' : '¡Aquí puedes revisar tu colección completa de cartas! ¿Qué tesoros has encontrado en tus viajes?',
             action: () => runNativeView('showCollection') 
         },
         { 
             icon: '⚔️', 
             label: 'EDITAR DECK (DASHBOARD)', 
             desc: 'Organiza tus decks y configura tu Deck Activo.',
-            speech: '¡El corazón del duelista! Ahora puedes crear varios decks y decidir cuál será tu Deck Activo para los combates.',
+            speech: is5DShop ? '¡Configura tu baraja principal y tu Extra Deck para tus invocaciones por Sincronía!' : '¡El corazón del duelista! Ahora puedes crear varios decks y decidir cuál será tu Deck Activo para los combates.',
             action: () => {
                 window.playViolinClick();
                 overlay.remove();
@@ -5777,7 +5924,7 @@ window.openCustomShopMenu = function() {
             icon: '⚡', 
             label: 'DUELO LIBRE', 
             desc: 'Reta a duelistas superados para conseguir más cartas.',
-            speech: '¿Buscas entrenar y ganar nuevas cartas? ¡Reta a cualquier rival que hayas derrotado en la cúpula de duelos!',
+            speech: is5DShop ? '¿Quieres practicar tus combos de Sincronía? ¡Reta a los duelistas que ya has derrotado!' : '¿Buscas entrenar y ganar nuevas cartas? ¡Reta a cualquier rival que hayas derrotado en la cúpula de duelos!',
             action: () => { 
                 window.playViolinClick();
                 overlay.remove();
@@ -5788,7 +5935,7 @@ window.openCustomShopMenu = function() {
             icon: '💎', 
             label: 'TIENDA DE MEMORIAS (CARTAS)', 
             desc: 'Adquiere cartas mágicas, trampas y monstruos con PM.',
-            speech: '¡He traído cartas legendarias de todas partes del mundo! Puedes comprarlas usando los PM ganados en tus duelos.',
+            speech: is5DShop ? '¡Tengo cartas y repuestos de Satélite listos para intercambiar por tus PM!' : '¡He traído cartas legendarias de todas partes del mundo! Puedes comprarlas usando los PM ganados en tus duelos.',
             action: () => {
                 overlay.remove();
                 window.customShowShop();
@@ -5814,7 +5961,7 @@ window.openCustomShopMenu = function() {
             icon: '💾', 
             label: 'GUARDAR PARTIDA', 
             desc: 'Respalda tus progresos y decks en el navegador y servidor.',
-            speech: '¡Una sabia decisión! Un duelista precavido siempre asegura sus cartas y progresos.',
+            speech: is5DShop ? '¡Aseguremos tus cartas y tus mejoras para que no se pierdan!' : '¡Una sabia decisión! Un duelista precavido siempre asegura sus cartas y progresos.',
             action: () => { 
                 if (window.persistUserSave) window.persistUserSave(s);
                 else {
@@ -5822,7 +5969,7 @@ window.openCustomShopMenu = function() {
                     origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
                     if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
                 }
-                setGrandpaSpeech('¡Partida guardada exitosamente! Tus progresos, cartas y barajas están respaldados con total seguridad.');
+                setGrandpaSpeech(is5DShop ? '¡Partida guardada con éxito! Tus cartas de Sincronía y progresos están a salvo.' : '¡Partida guardada exitosamente! Tus progresos, cartas y barajas están respaldados con total seguridad.');
                 alert('¡Partida y barajas guardadas exitosamente en el navegador y en el servidor!'); 
             } 
         },
@@ -5830,7 +5977,7 @@ window.openCustomShopMenu = function() {
             icon: '🗺️', 
             label: 'VOLVER AL MAPA', 
             desc: 'Regresa a la exploración de la campaña principal.',
-            speech: '¡Que la fortuna y el Corazón de las Cartas te acompañen en tu próxima batalla!',
+            speech: is5DShop ? '¡Ten cuidado ahí afuera en las calles de Satélite y Neo Domino!' : '¡Que la fortuna y el Corazón de las Cartas te acompañen en tu próxima batalla!',
             action: () => {
                 if(window.hideDuelBoard) window.hideDuelBoard();
                 window.playViolinClick(); 
@@ -5848,9 +5995,9 @@ window.openCustomShopMenu = function() {
         let btn = document.createElement('button');
         btn.className = 'shop-interactive-btn';
         btn.innerHTML = `
-            <span class="btn-icon" style="font-size:20px; filter:drop-shadow(0 0 4px #ffd700); flex-shrink:0;">${opt.icon}</span>
+            <span class="btn-icon" style="font-size:20px; filter:drop-shadow(0 0 4px ${shopThemeColor}); flex-shrink:0;">${opt.icon}</span>
             <div style="flex:1; min-width:0; overflow:hidden;">
-                <div class="btn-label" style="font-weight:bold; font-size:14px; color:#ffd700; font-family:VT323, monospace; letter-spacing:1px; text-shadow:1px 1px 0 #000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${opt.label}</div>
+                <div class="btn-label" style="font-weight:bold; font-size:14px; color:${shopThemeColor}; font-family:VT323, monospace; letter-spacing:1px; text-shadow:1px 1px 0 #000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${opt.label}</div>
                 <div class="btn-desc" style="font-size:11px; color:#aaa; font-weight:normal; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${opt.desc}</div>
             </div>
             <span class="btn-arrow" style="font-size:12px; color:#888; flex-shrink:0;">▶</span>
@@ -5860,7 +6007,7 @@ window.openCustomShopMenu = function() {
             setGrandpaSpeech(opt.speech);
         };
         btn.onmouseleave = () => {
-            setGrandpaSpeech('¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?');
+            setGrandpaSpeech(defaultGreeting);
         };
         btn.onclick = () => {
             window.playViolinClick && window.playViolinClick();
@@ -5953,7 +6100,9 @@ window.openCustomShopMenu = function() {
     });
 
     showcaseBar.appendChild(itemsGrid);
-    overlay.appendChild(showcaseBar);
+    if (!is5DShop) {
+        overlay.appendChild(showcaseBar);
+    }
 
     // MODAL DIALOG FOR DETAILED ITEM LORE
     function showMillenniumItemModal(it) {
