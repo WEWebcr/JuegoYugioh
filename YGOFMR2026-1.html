@@ -87,9 +87,10 @@
 #campaign3000.hidden { display: none !important; }
 </style>
 </head>
-<body><div class="wrap">
-<!-- CAMPAIGN OVERLAY - always exists, shown by showShell() -->
-<div id="campaign3000" class="hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;display:none;"></div>
+<body>
+<!-- CAMPAIGN OVERLAY - direct body child for clean full-screen -->
+<div id="campaign3000" class="hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999999;display:none;"></div>
+<div class="wrap">
 <div id="campaignDuelHud3000" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99998;background:#0a0806;padding:4px 10px;font-size:12px;color:#eee;"></div>
 <div id="duelTopHeader" class="top" style="display:none;"><div><b>Forbidden Memories Reborn</b><div class="mode">Web Playtest V2.9.26 · Fichas de campo reconstruidas</div></div><div class="lp">Tú: <span id="plp">8000</span> LP · Rival: <span id="elp">8000</span> LP</div></div>
 <div id="duelBoardWrapper" style="display:none;">
@@ -9389,8 +9390,9 @@ duelScaleStyle.textContent = `
             font-size: 16px !important;
         }
 
-        /* TABLERO DE DUELO EN MÓVIL (Ajuste óptimo de escala y altura) */
-        .wrap {
+        /* TABLERO DE DUELO EN MÓVIL (Ajuste óptimo de escala y altura en duelo) */
+        body.view-field .wrap,
+        body.in-duel .wrap {
             zoom: 0.76 !important;
             max-width: 100vw !important;
             margin: 0 auto !important;
@@ -9721,14 +9723,18 @@ duelScaleStyle.textContent = `
        5. TELÉFONOS EN MODO PANORÁMICO / LANDSCAPE (HORIZONTAL)
        ════════════════════════════════════════════════════════════════ */
     @media (max-height: 560px) and (orientation: landscape) {
-        .wrap {
+        body.view-field .wrap,
+        body.in-duel .wrap {
             zoom: 0.74 !important;
             max-width: 100vw !important;
             margin: 0 auto !important;
             padding: 0 4px !important;
         }
-        /* Barra de Vida Superior (LP) Fija / Sticky para evitar que quede cortada */
-        #duelTopHeader, .top {
+        /* Barra de Vida Superior (LP) Fija / Sticky para evitar que quede cortada en duelo */
+        body.view-field #duelTopHeader,
+        body.in-duel #duelTopHeader,
+        body.view-field .top,
+        body.in-duel .top {
             position: sticky !important;
             top: 0 !important;
             z-index: 1000 !important;
@@ -10968,18 +10974,77 @@ window.applyMainWallpaper = function(rawUrl, updatedAt) {
         document.head.appendChild(styleTag);
     }
     styleTag.textContent = 
-        '#campaign3000, #campaign3000:has(.campHero3000), body:has(#campaign3000:not(.hidden)) {\n' +
-        '    background: url("' + urlWithBust + '") center / cover no-repeat, #070503 !important;\n' +
+        '/* Menú principal: pantalla completa exacta, sin zoom heredado ni desfase */\n' +
+        '#campaign3000, #campaign3000:has(.campHero3000) {\n' +
+        '    position: fixed !important;\n' +
+        '    top: 0 !important;\n' +
+        '    left: 0 !important;\n' +
+        '    right: 0 !important;\n' +
+        '    bottom: 0 !important;\n' +
+        '    width: 100vw !important;\n' +
+        '    height: 100vh !important;\n' +
+        '    height: 100dvh !important;\n' +
+        '    max-width: 100vw !important;\n' +
+        '    max-height: 100vh !important;\n' +
+        '    margin: 0 !important;\n' +
+        '    padding: 0 !important;\n' +
+        '    zoom: 1 !important;\n' +
+        '    transform: none !important;\n' +
+        '    box-sizing: border-box !important;\n' +
+        '    z-index: 999999 !important;\n' +
+        '    overflow: hidden !important;\n' +
+        '    display: flex !important;\n' +
+        '    flex-direction: column !important;\n' +
+        '    align-items: center !important;\n' +
+        '    justify-content: center !important;\n' +
+        '    background: url("' + urlWithBust + '") center center / cover no-repeat, #070503 !important;\n' +
         '    background-image: url("' + urlWithBust + '") !important;\n' +
+        '    background-size: cover !important;\n' +
+        '    background-position: center center !important;\n' +
+        '    background-repeat: no-repeat !important;\n' +
         '}\n' +
-        'body:has(#campaign3000.hidden) {\n' +
+        '#campaign3000.hidden {\n' +
+        '    display: none !important;\n' +
+        '}\n' +
+        '/* El body no debe tener imagen duplicada de fondo para evitar que se asome otra por detrás */\n' +
+        'body {\n' +
+        '    background: #050403 !important;\n' +
         '    background-image: none !important;\n' +
+        '}\n' +
+        'body:has(#campaign3000:not(.hidden)) {\n' +
+        '    background: #050403 !important;\n' +
+        '    background-image: none !important;\n' +
+        '    overflow: hidden !important;\n' +
+        '}\n' +
+        '/* Ocultar elementos de duelo cuando el menú de campaña esté activo */\n' +
+        'body:has(#campaign3000:not(.hidden)) #duelTopHeader,\n' +
+        'body:has(#campaign3000:not(.hidden)) #duelBoardWrapper,\n' +
+        'body:has(#campaign3000:not(.hidden)) .top,\n' +
+        '#campaign3000:not(.hidden) ~ #duelTopHeader,\n' +
+        '#campaign3000:not(.hidden) ~ .wrap #duelTopHeader {\n' +
+        '    display: none !important;\n' +
+        '    visibility: hidden !important;\n' +
+        '    opacity: 0 !important;\n' +
+        '    pointer-events: none !important;\n' +
         '}\n';
 
     var camp = document.getElementById('campaign3000');
     if (camp) {
-        camp.style.setProperty('background', 'url("' + urlWithBust + '") center / cover no-repeat, #070503', 'important');
+        if (camp.parentElement && camp.parentElement !== document.body) {
+            document.body.appendChild(camp);
+        }
+        camp.style.setProperty('position', 'fixed', 'important');
+        camp.style.setProperty('top', '0', 'important');
+        camp.style.setProperty('left', '0', 'important');
+        camp.style.setProperty('width', '100vw', 'important');
+        camp.style.setProperty('height', '100vh', 'important');
+        camp.style.setProperty('zoom', '1', 'important');
+        camp.style.setProperty('transform', 'none', 'important');
+        camp.style.setProperty('z-index', '999999', 'important');
+        camp.style.setProperty('background', 'url("' + urlWithBust + '") center center / cover no-repeat, #070503', 'important');
         camp.style.setProperty('background-image', 'url("' + urlWithBust + '")', 'important');
+        camp.style.setProperty('background-size', 'cover', 'important');
+        camp.style.setProperty('background-position', 'center center', 'important');
     }
     return urlWithBust;
 };
@@ -11020,17 +11085,29 @@ window.customShowMain = function() {
         camp.id = 'campaign3000';
         document.body.appendChild(camp);
     }
+    if (camp.parentElement !== document.body) {
+        document.body.appendChild(camp);
+    }
+
+    // Ocultar cabeceras de duelo para evitar que se asomen en el menú
+    var topH = document.getElementById('duelTopHeader');
+    if (topH) topH.style.setProperty('display', 'none', 'important');
+    var bWrapper = document.getElementById('duelBoardWrapper');
+    if (bWrapper) bWrapper.style.setProperty('display', 'none', 'important');
+
     camp.classList.remove('hidden');
-    camp.style.display = '';
+    camp.style.display = 'flex';
     camp.innerHTML = '';
 
     var activeUrl = window.getMainWallpaper();
     var rawWall = window._customMainWallpaper || localStorage.getItem('FMR_MAIN_WALLPAPER') || 'ImagenesPersonajes/PortadaPrincipal.jpeg';
     window.applyMainWallpaper(rawWall, window._customMainWallpaperStamp);
 
-    camp.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999;';
-    camp.style.setProperty('background', 'url("' + activeUrl + '") center / cover no-repeat, #070503', 'important');
+    camp.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; height:100dvh; max-width:100vw; max-height:100vh; margin:0; padding:0; zoom:1; transform:none; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999999; box-sizing:border-box; overflow:hidden;';
+    camp.style.setProperty('background', 'url("' + activeUrl + '") center center / cover no-repeat, #070503', 'important');
     camp.style.setProperty('background-image', 'url("' + activeUrl + '")', 'important');
+    camp.style.setProperty('background-size', 'cover', 'important');
+    camp.style.setProperty('background-position', 'center center', 'important');
     
     let clickOverlay = document.createElement('div');
     clickOverlay.style.cssText = 'position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; justify-content:center; align-items:center; color:#ffcc00; font-family:VT323, monospace; font-size:24px; cursor:pointer;';
@@ -11044,7 +11121,7 @@ window.customShowMain = function() {
     
     let btnContainer = document.createElement('div');
     btnContainer.className = 'campBtns3000';
-    btnContainer.style.marginTop = '15vh';
+    btnContainer.style.cssText = 'display:flex; flex-direction:column; gap:10px; width:min(84vw, 320px); margin-top:16vh; z-index:10;';
     
     let btnNew = document.createElement('button');
     btnNew.className = 'campBtn3000 ps1-btn ps1-btn-green'; btnNew.textContent = 'NEW GAME';
@@ -25565,9 +25642,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         zoom: 0.74 !important;
       }
       body.view-field #duelTopHeader,
-      body.mobile-landscape #duelTopHeader,
-      #duelTopHeader,
-      .top {
+      body.in-duel #duelTopHeader,
+      body.mobile-landscape.view-field #duelTopHeader,
+      body.view-field .top,
+      body.in-duel .top {
         position: sticky !important;
         top: 0 !important;
         left: 0 !important;
@@ -27020,9 +27098,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     @media (orientation: landscape) {
       #campaignDuelHud3000 { display: none !important; }
       body.view-field { display: block !important; min-height: unset !important; padding: 0 !important; }
-      .wrap,
       body.view-field .wrap,
-      body.mobile-landscape .wrap {
+      body.in-duel .wrap,
+      body.mobile-landscape.view-field .wrap {
         padding: 0 4px !important;
         max-width: 100vw !important;
         margin: 0 auto !important;
@@ -27030,9 +27108,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       /* Barra de LP Sticky y destacada que nunca se corta ni desaparece */
       body.view-field #duelTopHeader,
-      body.mobile-landscape #duelTopHeader,
-      #duelTopHeader,
-      .top {
+      body.in-duel #duelTopHeader,
+      body.mobile-landscape.view-field #duelTopHeader,
+      body.view-field .top,
+      body.in-duel .top {
         position: sticky !important;
         top: 0 !important;
         left: 0 !important;

@@ -17,6 +17,12 @@ html = html.replace(/stopMusic\(\);/g, "void 0;");
 // 1.6 Neutralize hardcoded base64 world1 background to allow dynamic admin wallpaper
 html = html.replace(/<style id="fmr-v303-world1-visual">[\s\S]*?<\/style>/i, '<style id="fmr-v303-world1-visual">/* base64 background neutralized for dynamic admin wallpaper */</style>');
 
+// 1.7 Move campaign3000 outside .wrap so it is a direct child of <body> (avoids .wrap zoom & clipping)
+html = html.replace(
+  /<body>\s*<div class="wrap">\s*<!-- CAMPAIGN OVERLAY - always exists, shown by showShell\(\) -->\s*<div id="campaign3000" class="hidden"[^>]*><\/div>/i,
+  '<body>\n<!-- CAMPAIGN OVERLAY - direct body child for clean full-screen -->\n<div id="campaign3000" class="hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:999999;display:none;"></div>\n<div class="wrap">'
+);
+
 // 2. Inject nativeAPI
 let target = '[80,400,1200,3000,6000,10000,15000,22000].forEach(t=>setTimeout(stamp,t));';
 let injection = target + `

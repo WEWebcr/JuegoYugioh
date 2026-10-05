@@ -332,9 +332,9 @@
     @media (orientation: landscape) {
       #campaignDuelHud3000 { display: none !important; }
       body.view-field { display: block !important; min-height: unset !important; padding: 0 !important; }
-      .wrap,
       body.view-field .wrap,
-      body.mobile-landscape .wrap {
+      body.in-duel .wrap,
+      body.mobile-landscape.view-field .wrap {
         padding: 0 4px !important;
         max-width: 100vw !important;
         margin: 0 auto !important;
@@ -342,9 +342,10 @@
       }
       /* Barra de LP Sticky y destacada que nunca se corta ni desaparece */
       body.view-field #duelTopHeader,
-      body.mobile-landscape #duelTopHeader,
-      #duelTopHeader,
-      .top {
+      body.in-duel #duelTopHeader,
+      body.mobile-landscape.view-field #duelTopHeader,
+      body.view-field .top,
+      body.in-duel .top {
         position: sticky !important;
         top: 0 !important;
         left: 0 !important;
