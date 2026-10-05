@@ -18324,7 +18324,21 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       var oppDeckObj = (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]));
       if (oppDeckObj && Array.isArray(oppDeckObj.extraDeck)) {
-        enemyExtraNames = oppDeckObj.extraDeck;
+        enemyExtraNames = oppDeckObj.extraDeck.slice();
+      }
+      if (!enemyExtraNames || enemyExtraNames.length === 0) {
+        var FIVE_D_ACE_MAP = {
+          trudge: ['Goyo Guardian'],
+          leo: ['Power Tool Dragon'],
+          akiza: ['Black Rose Dragon'],
+          crow: ['Blackwing - Armor Master', 'Blackwing Armed Wing'],
+          jack: ['Red Dragon Archfiend'],
+          yusei: ['Stardust Dragon', 'Junk Warrior']
+        };
+        var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (FIVE_D_ACE_MAP[normOppKey]) {
+          enemyExtraNames = FIVE_D_ACE_MAP[normOppKey].slice();
+        }
       }
     } else {
       if (sSave) {
@@ -18458,37 +18472,55 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (g.enemyDeck.length > 0) g.enemyHand.push(g.enemyDeck.pop());
     }
 
-    // En Mundo 3 (5D's), el oponente comienza con su Carta Maestra de Sincronía en el campo
-    if (is5DDuel) {
-      var FIVE_D_ACE_MAP = {
-        trudge: 'Goyo Guardian',
-        leo: 'Power Tool Dragon',
-        akiza: 'Black Rose Dragon',
-        crow: 'Blackwing - Armor Master',
-        jack: 'Red Dragon Archfiend',
-        yusei: 'Stardust Dragon'
-      };
+    // En duelos con Sincronía (Mundo 3 / 5D's o si hay Extra Deck), garantizar que
+    // tanto el jugador como el oponente comiencen con al menos 1 Monstruo Cantante (Tuner) en su mano inicial de 5 cartas.
+    // El rival NO empieza con su Sincro directamente en el campo; ambos compiten en igualdad para invocarlo.
+    var hasSynchroDuel = is5DDuel || (Array.isArray(g.extra) && g.extra.length > 0) || (Array.isArray(g.enemyExtra) && g.enemyExtra.length > 0);
+    if (hasSynchroDuel) {
       var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-      var aceName = FIVE_D_ACE_MAP[normOppKey];
-      if (aceName) {
-        var aceCard = cardResolver(aceName);
-        if (aceCard) {
-          aceCard.pos = 'ATK';
-          aceCard.faceUp = true;
-          aceCard.summonedTurn = 1;
-          g.enemy[2] = aceCard; // Posición central
-          // Remover una copia de su Extra Deck si estaba allí
-          if (Array.isArray(g.enemyExtra)) {
-            var exIdx = g.enemyExtra.findIndex(function(c) { return (c.name || c[0]) === aceName; });
-            if (exIdx >= 0) g.enemyExtra.splice(exIdx, 1);
-          }
-          if (typeof log === 'function') {
-            log('⚔️ [MUNDO 3 - 5D\'S] ¡' + (oppDisplayName || normOppKey.toUpperCase()) + ' entra al duelo con su Monstruo Insignia de Sincronía en el campo: ' + aceName + '!');
-          }
-          if (typeof duelToast === 'function') {
-            duelToast('👑 ¡' + (oppDisplayName || normOppKey.toUpperCase()) + ' comienza con ' + aceName + '!');
+      var OPP_TUNER_MAP = {
+        trudge: 'Jutte Fighter',
+        leo: 'Formula Synchron',
+        akiza: 'Twilight Rose Knight',
+        crow: 'Blackwing - Gale the Whirlwind',
+        jack: 'Dark Resonator',
+        yusei: 'Junk Synchron'
+      };
+
+      function ensureTunerInHand(handArr, deckArr, defaultTunerName) {
+        if (!Array.isArray(handArr) || handArr.length === 0) return;
+        var hasTuner = handArr.some(function(c) { return window.isTunerMonster(c); });
+        if (hasTuner) return;
+
+        // 1. Buscar un Cantante en el deck restante
+        var dIdx = (deckArr || []).findIndex(function(c) { return window.isTunerMonster(c); });
+        if (dIdx >= 0) {
+          var tunerCard = deckArr.splice(dIdx, 1)[0];
+          var returned = handArr.pop();
+          if (returned) deckArr.push(returned);
+          handArr.unshift(tunerCard);
+        } else if (defaultTunerName) {
+          // 2. Si el mazo no incluía Cantante, resolver el Cantante insignia
+          var newTuner = cardResolver(defaultTunerName);
+          if (newTuner) {
+            handArr.pop();
+            handArr.unshift(newTuner);
           }
         }
+      }
+
+      // Garantizar Tuner en la mano inicial del jugador
+      ensureTunerInHand(g.hand, g.deck, 'Junk Synchron');
+
+      // Garantizar Tuner en la mano inicial del rival
+      var enemyTunerDefault = OPP_TUNER_MAP[normOppKey] || 'Junk Synchron';
+      ensureTunerInHand(g.enemyHand, g.enemyDeck, enemyTunerDefault);
+
+      if (typeof log === 'function') {
+        log('🎵 [SINCRONÍA] ¡Ambos duelistas tienen garantizado al menos 1 Monstruo Cantante (Tuner) en su mano inicial!');
+      }
+      if (typeof duelToast === 'function') {
+        duelToast('🎵 ¡Monstruo Cantante garantizado en mano!');
       }
     }
 
