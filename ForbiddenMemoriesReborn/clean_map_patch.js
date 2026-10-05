@@ -856,6 +856,28 @@ window.getShopBgm = function(world) {
 
 window.getDuelMusic = function(charId) {
     charId = (charId || '').toLowerCase().trim();
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    var curWorld = (g && g._currentWorld) || (window.currentWorld) || 1;
+
+    // ── MUNDO 3: NEO DOMINO CITY (5D's) ──
+    var is5DChar = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'rally'].includes(charId);
+    if (curWorld === 3 || is5DChar) {
+        if (charId === 'jack' || charId === 'yusei') {
+            return 'duelo_5d_boss.mp3';
+        }
+        return 'duelo_5d.mp3';
+    }
+
+    // ── MUNDO 2: ACADEMIA DE DUELOS (GX) ──
+    var isGXChar = ['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster', 'dorothy'].includes(charId);
+    if (curWorld === 2 || isGXChar) {
+        if (charId === 'jaden' || charId === 'chazz' || charId === 'zane' || charId === 'aster' || charId === 'crowler') {
+            return 'duelo_gx_boss.mp3';
+        }
+        return 'duelo_gx.mp3';
+    }
+
+    // ── MUNDO 1: CIUDAD DOMINO / EGIPTO (DUEL MONSTERS) ──
     if (charId === 'tristan') return 'DueloTristan.mp3';
     if (charId === 'weevil' || charId === 'wivil') return 'DueloWivil.mp3';
     if (charId === 'mai') return 'DueloMai.mp3';
@@ -865,10 +887,6 @@ window.getDuelMusic = function(charId) {
     if (charId === 'noah' || charId === 'kosaburo' || charId === 'gozaburo') return 'duelosjefes.mp3';
     if (charId === 'ishizu') return 'dueloIshizu.mp3';
     if (charId === 'odion') return 'dueloOdion.mp3';
-    if (charId === 'chumley' || charId === 'syrus') return 'duelo1.mp3';
-    if (charId === 'jaden' || charId === 'bastion' || charId === 'alexis') return 'duelo2.mp3';
-    if (charId === 'chazz' || charId === 'crowler') return 'MusicaJefes.mp3';
-    if (charId === 'zane' || charId === 'aster') return 'dueloJefeFinal.mp3';
     if (charId === 'seto' || charId === 'kaiba' || charId === 'marik' || charId === 'yugi' || charId === 'atem') {
         return 'dueloJefeFinal.mp3';
     }
