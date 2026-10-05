@@ -16852,11 +16852,20 @@ setTimeout(() => {
     window.customShowMain();
 }, 300);
 
-// XYZ, Weevil & Mai Fusion Override
-setTimeout(() => {
-    if (typeof window.fusionResult === 'function') {
+// XYZ, Weevil & Mai Fusion Override and Mundo 3 Fusion Blocker
+function applyFusionOverride() {
+    if (typeof window.fusionResult === 'function' && !window._fusionHooked5D) {
+        window._fusionHooked5D = true;
         const origFusionResult = window.fusionResult;
         window.fusionResult = function(names) {
+            // En Mundo 3 (5D's), las fusiones retro están totalmente deshabilitadas
+            var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+            var oppStr = (typeof opp !== 'undefined' ? opp : (typeof window.storyOpponent !== 'undefined' ? window.storyOpponent : ''));
+            var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
+                       (window.currentWorld === 3) ||
+                       fiveDDuelists.includes(String(oppStr || '').toLowerCase());
+            if (is5D) return null;
+
             names = (names || []).filter(Boolean);
             if (names.length === 3 && names.includes('X-Head Cannon') && names.includes('Y-Dragon Head') && names.includes('Z-Metal Tank')) {
                 return 'XYZ-Dragon Cannon';
@@ -17331,7 +17340,9 @@ setTimeout(() => {
             { exact: ["Destiny HERO - Dogma", "Evil HERO Malicious Edge"], result: "Evil HERO Malicious Fiend" }
         );
     }
-}, 500);
+}
+applyFusionOverride();
+setTimeout(applyFusionOverride, 500);
 
 console.log('=== V5 CLEAN MASTER PATCH INJECTED ===');
 
@@ -22993,11 +23004,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+    var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
+               (window.currentWorld === 3) ||
+               fiveDDuelists.includes(String(opp || '').toLowerCase());
     var freeMonsterSlot = (game.enemy || []).findIndex(function(x) { return !x; });
-    var fnFusion = typeof window.fusionResult === 'function' ? window.fusionResult : (typeof fusionResult === 'function' ? fusionResult : null);
+    var fnFusion = !is5D && (typeof window.fusionResult === 'function' ? window.fusionResult : (typeof fusionResult === 'function' ? fusionResult : null));
 
-    // B. FUSIONES DESDE LA MANO (IA FMR Forbidden Memories)
-    if (freeMonsterSlot >= 0 && fnFusion && game.enemyHand.length >= 2) {
+    // B. FUSIONES DESDE LA MANO (IA FMR Forbidden Memories) - Deshabilitado en Mundo 3 (5D's)
+    if (!is5D && freeMonsterSlot >= 0 && fnFusion && game.enemyHand.length >= 2) {
       var bestFusion = null;
       var bestAtk = -1;
       var matIdxA = -1, matIdxB = -1;
@@ -23047,8 +23062,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // C. FUSIÓN CAMPO + MANO RIVAL
-    if (fnFusion && game.enemyHand.length >= 1) {
+    // C. FUSIÓN CAMPO + MANO RIVAL - Deshabilitado en Mundo 3 (5D's)
+    if (!is5D && fnFusion && game.enemyHand.length >= 1) {
       for (var f = 0; f < (game.enemy || []).length; f++) {
         var fMon = game.enemy[f];
         if (!fMon) continue;
@@ -23125,9 +23140,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    // D2. FUSIÓN INTELIGENTE DESDE LA MANO PARA LA IA (Ej: Black Luster Soldier + Blue-Eyes Ultimate Dragon)
+    // D2. FUSIÓN INTELIGENTE DESDE LA MANO PARA LA IA (Ej: Black Luster Soldier + Blue-Eyes Ultimate Dragon) - Deshabilitado en Mundo 3 (5D's)
     var openSlot = (game.enemy || []).findIndex(function(x) { return !x; });
-    if (openSlot >= 0 && game.enemyHand.length >= 2) {
+    if (!is5D && openSlot >= 0 && game.enemyHand.length >= 2) {
       var bestFusion = null;
       var fIdx1 = -1, fIdx2 = -1;
       for (var fi = 0; fi < game.enemyHand.length; fi++) {
