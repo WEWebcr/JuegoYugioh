@@ -19508,8 +19508,79 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { fuse = window.fuse; } catch(_) {}
 
-  // 4. Renace al Monstruo Modal Resolver
+  // 4. Renace al Monstruo Modal Resolver & Graveyard Stat Sanitizer
+  function resetMonsterOriginalStats(c) {
+    if (!c) return c;
+    var name = c.name || (Array.isArray(c) ? c[0] : null);
+    if (!name) return c;
+    var base = null;
+    if (typeof window.resolveGameCard === 'function') {
+      base = window.resolveGameCard(name);
+    }
+    if (!base && typeof mk === 'function') {
+      base = mk(name);
+    }
+    if (!base && typeof DB !== 'undefined' && Array.isArray(DB)) {
+      var row = DB.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
+      if (row) base = { atk: row[4], def: row[5] };
+    }
+    if (!base && window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+      var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase() === name.toLowerCase())); });
+      if (cd && cd.atk !== undefined) base = { atk: cd.atk, def: cd.def };
+    }
+
+    if (base && (base.atk !== undefined || base.def !== undefined)) {
+      if (base.atk !== undefined) c.atk = Number(base.atk);
+      if (base.def !== undefined) c.def = Number(base.def);
+      if (Array.isArray(c)) {
+        if (base.atk !== undefined) c[4] = Number(base.atk);
+        if (base.def !== undefined) c[5] = Number(base.def);
+      }
+    }
+    c.equip = 0;
+    c.tempBoost = 0;
+    c.tempDefense = 0;
+    c.tempBoostDef = 0;
+    c._handEquipAtk = 0;
+    c._handEquipDef = 0;
+    c._appliedAtk109 = 0;
+    c._appliedDef109 = 0;
+    c._equipAtk111 = 0;
+    c._equipDef111 = 0;
+    c._equipToken109 = null;
+    c._targetMonster = null;
+    c.equippedCards = [];
+    return c;
+  }
+  window.resetMonsterOriginalStats = resetMonsterOriginalStats;
+
+  function hookGraveArray(arr) {
+    if (!arr || arr._hookedStatsReset) return arr;
+    var origPush = arr.push;
+    arr.push = function() {
+      for (var i = 0; i < arguments.length; i++) {
+        var card = arguments[i];
+        if (card && typeof card === 'object') {
+          resetMonsterOriginalStats(card);
+        }
+      }
+      return origPush.apply(this, arguments);
+    };
+    arr._hookedStatsReset = true;
+    return arr;
+  }
+  window.hookGraveArray = hookGraveArray;
+
+  function ensureGravesHooked() {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return;
+    if (Array.isArray(g.grave)) hookGraveArray(g.grave);
+    if (Array.isArray(g.enemyGrave)) hookGraveArray(g.enemyGrave);
+  }
+  window.ensureGravesHooked = ensureGravesHooked;
+
   function resolveMonsterReborn(fromBackIndex, fromHandIndex) {
+    ensureGravesHooked();
     var pGrave = (game.grave || []).map(function(c, idx) { return { card: c, pile: 'grave', idx: idx }; });
     var eGrave = (game.enemyGrave || []).map(function(c, idx) { return { card: c, pile: 'enemyGrave', idx: idx }; });
     var allGrave = pGrave.concat(eGrave).filter(function(x) {
@@ -19518,7 +19589,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     });
 
     if (!allGrave.length) {
-      duelToast('Renace al Monstruo: No hay monstruos en ning\u00fan Cementerio.');
+      duelToast('Renace al Monstruo: No hay monstruos en ningún Cementerio.');
       return;
     }
 
@@ -19533,7 +19604,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:999999;display:flex;justify-content:center;align-items:center;font-family:VT323, monospace;";
     var box = document.createElement('div');
     box.style.cssText = "width:460px;max-height:85vh;overflow-y:auto;padding:25px;background:rgba(20,10,0,0.96);border:3px solid #ffd700;border-radius:8px;text-align:center;box-shadow:0 0 35px #000;";
-    box.innerHTML = '<h3 style="color:#ffd700;font-size:24px;margin:0 0 10px;">RENACE AL MONSTRUO</h3><p style="color:#fff;font-size:16px;margin:0 0 15px;">Selecciona el monstruo que deseas revivir:</p><div id="rebornTargets" style="display:flex;flex-direction:column;gap:10px;"></div><button id="rebornCancel" style="margin-top:15px;padding:8px 24px;background:#660000;color:#fff;border:2px solid #ff0000;font-family:inherit;font-size:16px;cursor:pointer;">CANCELAR</button>';
+    box.innerHTML = '<h3 style="color:#ffd700;font-size:24px;margin:0 0 10px;">RENACE AL MONSTRUO</h3><p style="color:#fff;font-size:16px;margin:0 0 15px;">Selecciona el monstruo que deseas revivir (con su ATK/DEF original):</p><div id="rebornTargets" style="display:flex;flex-direction:column;gap:10px;"></div><button id="rebornCancel" style="margin-top:15px;padding:8px 24px;background:#660000;color:#fff;border:2px solid #ff0000;font-family:inherit;font-size:16px;cursor:pointer;">CANCELAR</button>';
     overlay.appendChild(box);
     document.body.appendChild(overlay);
 
@@ -19542,9 +19613,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var container = document.getElementById('rebornTargets');
     allGrave.forEach(function(item) {
       var c = item.card;
+      resetMonsterOriginalStats(c);
       var cName = c.name || c[0] || 'Monstruo';
-      var atk = c.atk !== undefined ? c.atk : (c[4] || 0);
-      var def = c.def !== undefined ? c.def : (c[5] || 0);
+      var base = (cName && typeof window.resolveGameCard === 'function') ? window.resolveGameCard(cName) : null;
+      if (!base && cName && typeof mk === 'function') base = mk(cName);
+      var atk = (base && base.atk !== undefined) ? base.atk : (c.atk !== undefined ? c.atk : (c[4] || 0));
+      var def = (base && base.def !== undefined) ? base.def : (c.def !== undefined ? c.def : (c[5] || 0));
 
       var row = document.createElement('div');
       row.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#181818;border:2px solid #555;border-radius:5px;";
@@ -19580,9 +19654,19 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var revivedCard = actualIdx >= 0 ? sourcePile.splice(actualIdx, 1)[0] : item.card;
       if (!revivedCard) return;
 
-      var finalCard = window.mk(revivedCard) || Object.assign({}, revivedCard);
+      var cName = revivedCard.name || (Array.isArray(revivedCard) ? revivedCard[0] : null);
+      var baseCard = null;
+      if (cName && typeof window.resolveGameCard === 'function') {
+        baseCard = window.resolveGameCard(cName);
+      }
+      if (!baseCard && cName && typeof mk === 'function') {
+        baseCard = mk(cName);
+      }
+      var finalCard = baseCard ? Object.assign({}, baseCard) : Object.assign({}, revivedCard);
+      resetMonsterOriginalStats(finalCard);
       finalCard.pos = pos;
       finalCard.faceUp = true;
+      finalCard.materials = [];
       game.field[slot] = finalCard;
 
       // Consumir Renace al Monstruo
@@ -19598,10 +19682,32 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       game.selected = [];
       if (window.playSummonSound) window.playSummonSound();
       if (typeof render === 'function') render();
-      duelToast('\u00a1Renace al Monstruo invoc\u00f3 a ' + (finalCard.name || 'monstruo') + ' en ' + pos + '!');
-      if (typeof log === 'function') log('Renace al Monstruo invoco ' + (finalCard.name || 'monstruo') + ' en ' + pos + '.');
+      duelToast('¡Renace al Monstruo invocó a ' + (finalCard.name || 'monstruo') + ' en ' + pos + ' con ATK original!');
+      if (typeof log === 'function') log('Renace al Monstruo invoco ' + (finalCard.name || 'monstruo') + ' en ' + pos + ' con ATK original (' + finalCard.atk + ').');
     }
   }
+
+  var prevChooseRebornGlobal = window.chooseRebornPosition;
+  window.chooseRebornPosition = function(pos) {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    if (g && ['REBORN', 'GRAVE_CALL'].includes(g.pendingAction) && g.pendingTarget != null) {
+      var pile = g.pendingAction === 'REBORN' ? g.grave : g.enemyGrave;
+      var target = pile ? pile[g.pendingTarget] : null;
+      if (target) {
+        resetMonsterOriginalStats(target);
+      }
+    }
+    var res = prevChooseRebornGlobal ? prevChooseRebornGlobal.apply(this, arguments) : undefined;
+    if (g && Array.isArray(g.field)) {
+      g.field.forEach(function(m) {
+        if (m && m._revivedBy === 'REBORN') {
+          resetMonsterOriginalStats(m);
+        }
+      });
+    }
+    return res;
+  };
+  try { chooseRebornPosition = window.chooseRebornPosition; } catch(_) {}
 
   // 4b. EQUIP SYSTEM: Direct Prompt Modal (Campo y Mano)
   function isEquipSpell(c) {
@@ -19771,6 +19877,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!g || g.turn !== 'player') return;
     if (!eqCard) return;
 
+    // Regla oficial: Activar una carta de equipo desde la mano requiere un espacio libre en la zona de Magia/Trampa
+    if (source && source.type === 'hand') {
+      var freeBackIdx = (g.playerBack || []).findIndex(function(x) { return !x; });
+      if (freeBackIdx < 0) {
+        duelToast('Tu zona de Magia y Trampa está llena. No puedes equipar desde la mano.');
+        if (typeof log === 'function') log('No puedes activar ' + (eqCard.name || 'este equipo') + ': la zona de Magia y Trampa está llena.');
+        return;
+      }
+    }
+
     var fieldTargets = [];
     (g.field || []).forEach(function(c, idx) {
       if (c && !c.faceDown && !c.faceDownSet103 && canEquip(eqCard, c)) {
@@ -19783,28 +19899,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     });
 
-    var handTargets = [];
-    (g.hand || []).forEach(function(c, idx) {
-      if (!c) return;
-      if (source && source.type === 'hand' && source.index === idx) return;
-      if (typeof isST === 'function' && isST(c)) return;
-      if (c.kind === 'SPELL' || c.kind === 'TRAP' || c.kind === 'EQUIP') return;
-      if (canEquip(eqCard, c)) {
-        handTargets.push({ card: c, zone: 'h', index: idx, locLabel: 'EN TU MANO (Carta ' + (idx + 1) + ')' });
-      }
-    });
-
-    var allTargets = fieldTargets.concat(handTargets);
+    var allTargets = fieldTargets;
     var eqName = eqCard.name || eqCard[0] || 'Este Equipo';
     var eqVal = eqCard.value || '';
 
     if (!allTargets.length) {
       if (eqVal === 'DRAGON_TREASURE' || eqName === 'Dragon Treasure' || eqVal === 'EQUIP_DRAGON' || eqName === 'Garra del Dragón') {
-        duelToast('Dragon Treasure requiere al menos un monstruo Tipo Dragón (en campo o en mano).');
+        duelToast('Dragon Treasure requiere al menos un monstruo Tipo Dragón boca arriba en el campo.');
       } else if (eqVal === 'FUSION_WEAPON' || eqName === 'Fusion Weapon') {
-        duelToast('Fusion Weapon requiere un monstruo de Fusión Nivel 6 o menor (en campo o en mano).');
+        duelToast('Fusion Weapon requiere un monstruo de Fusión Nivel 6 o menor boca arriba en el campo.');
       } else {
-        duelToast('No tienes ningún monstruo disponible en el campo ni en tu mano para equipar.');
+        duelToast('Debes tener al menos un monstruo boca arriba en el campo que cumpla los requisitos para equipar.');
       }
       return;
     }
@@ -19829,7 +19934,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var headerHTML = '<h3 style="color:#ffd700;font-size:24px;margin:0 0 6px;text-align:center;letter-spacing:1px;text-shadow:0 0 8px #ffb300;">' +
       'EQUIPAR: ' + eqName + '</h3>' +
       '<p style="color:#fff;font-size:16px;margin:0 0 15px;text-align:center;line-height:1.3;">' +
-      'Otorga <b style="color:#00ff88;">' + boostStr + '</b>. Elige el monstruo objetivo:</p>';
+      'Otorga <b style="color:#00ff88;">' + boostStr + '</b>. Elige el monstruo en el campo:</p>';
 
     var scrollList = document.createElement('div');
     scrollList.style.cssText = "display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-right:6px;max-height:50vh;";
@@ -19838,7 +19943,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var c = t.card;
       var name = c.name || c[0] || 'Monstruo';
       var tStats = getEquipStats(eqCard, c);
-      var curAtk = (t.zone === 'h') ? (Number(c.atk ?? c[4] ?? 0) + Number(c.tempBoost || 0) + Number(c.equip || 0)) : (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(c) : c.atk);
+      var curAtk = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(c) : c.atk);
       var curDef = (c.kind === 'LINK') ? 'LINK' : (Number(c.def ?? c[5] ?? 0) + Number(c.tempDefense || 0) + Number(c.tempBoostDef || 0));
       var newAtk = curAtk + tStats.atk;
       var newDef = (c.kind === 'LINK') ? 'LINK' : (curDef + tStats.def);
@@ -19853,8 +19958,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var imgTag = imgSrc ? '<img src="' + imgSrc + '" style="width:42px;height:52px;object-fit:cover;border-radius:4px;border:1px solid #ffd700;" />' :
         '<div style="width:42px;height:52px;background:#333;border-radius:4px;border:1px solid #666;display:flex;align-items:center;justify-content:center;font-size:11px;color:#aaa;">?</div>';
 
-      var locBadgeColor = (t.zone === 'h') ? '#4fc3f7' : '#81c784';
-      var locBadgeText = (t.zone === 'h') ? '✋ ' + t.locLabel : '⚔️ ' + t.locLabel;
+      var locBadgeColor = '#81c784';
+      var locBadgeText = '⚔️ ' + t.locLabel;
 
       var row = document.createElement('div');
       row.style.cssText = "display:flex;align-items:center;gap:12px;padding:10px;background:#18130d;border:2px solid #5d4624;border-radius:6px;transition:0.15s;cursor:pointer;";
@@ -19909,63 +20014,45 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!tCard.equippedCards) tCard.equippedCards = [];
     tCard.equippedCards.push(eqCard.name);
 
-    if (target.zone === 'h') {
-      tCard._handEquipAtk = (tCard._handEquipAtk || 0) + atk;
-      tCard._handEquipDef = (tCard._handEquipDef || 0) + def;
-      // Equipping monster in Hand
-      if (source && source.type === 'hand') {
-        var spliced = g.hand.splice(source.index, 1)[0] || eqCard;
-        g.grave.push(Object.assign({}, spliced, { set: false, faceUp: true }));
-      } else if (source && source.type === 'back') {
-        var backCard = g.playerBack[source.index] || eqCard;
-        g.playerBack[source.index] = null;
-        g.grave.push(Object.assign({}, backCard, { set: false, faceUp: true }));
-      }
-    } else {
-      // Equipping monster on Field
-      var token = tCard._equipToken109 || ('EQM109-' + Date.now() + '-' + Math.random());
-      tCard._equipToken109 = token;
+    // Equipping monster on Field
+    var token = tCard._equipToken109 || ('EQM109-' + Date.now() + '-' + Math.random());
+    tCard._equipToken109 = token;
 
-      if (source && source.type === 'hand') {
-        var splicedCard = g.hand.splice(source.index, 1)[0] || eqCard;
-        var freeBackIdx = (g.playerBack || []).findIndex(function(x) { return !x; });
-        if (freeBackIdx >= 0) {
-          g.playerBack[freeBackIdx] = Object.assign({}, splicedCard, {
-            kind: 'EQUIP',
-            type: 'EQUIP',
-            set: false,
-            faceUp: true,
-            equipToken109: token,
-            _targetMonster: tCard,
-            _appliedAtk109: atk,
-            _appliedDef109: def
-          });
-        } else {
-          tCard._handEquipAtk = (tCard._handEquipAtk || 0) + atk;
-          tCard._handEquipDef = (tCard._handEquipDef || 0) + def;
-          g.grave.push(Object.assign({}, splicedCard, { set: false, faceUp: true }));
-        }
-      } else if (source && source.type === 'back') {
-        if (g.playerBack[source.index]) {
-          g.playerBack[source.index].kind = 'EQUIP';
-          g.playerBack[source.index].type = 'EQUIP';
-          g.playerBack[source.index].set = false;
-          g.playerBack[source.index].faceUp = true;
-          g.playerBack[source.index].equipToken109 = token;
-          g.playerBack[source.index]._targetMonster = tCard;
-          g.playerBack[source.index]._appliedAtk109 = atk;
-          g.playerBack[source.index]._appliedDef109 = def;
-        }
+    if (source && source.type === 'hand') {
+      var splicedCard = g.hand.splice(source.index, 1)[0] || eqCard;
+      var freeBackIdx = (g.playerBack || []).findIndex(function(x) { return !x; });
+      if (freeBackIdx >= 0) {
+        g.playerBack[freeBackIdx] = Object.assign({}, splicedCard, {
+          kind: 'EQUIP',
+          type: 'EQUIP',
+          set: false,
+          faceUp: true,
+          equipToken109: token,
+          _targetMonster: tCard,
+          _appliedAtk109: atk,
+          _appliedDef109: def
+        });
+      } else {
+        g.grave.push(Object.assign({}, splicedCard, { set: false, faceUp: true }));
+      }
+    } else if (source && source.type === 'back') {
+      if (g.playerBack[source.index]) {
+        g.playerBack[source.index].kind = 'EQUIP';
+        g.playerBack[source.index].type = 'EQUIP';
+        g.playerBack[source.index].set = false;
+        g.playerBack[source.index].faceUp = true;
+        g.playerBack[source.index].equipToken109 = token;
+        g.playerBack[source.index]._targetMonster = tCard;
+        g.playerBack[source.index]._appliedAtk109 = atk;
+        g.playerBack[source.index]._appliedDef109 = def;
       }
     }
 
     g.selected = [];
     if (typeof render === 'function') render();
-    if (typeof restoreHandEquips === 'function') restoreHandEquips();
     var tName = tCard.name || tCard[0] || 'monstruo';
-    var locText = target.zone === 'h' ? 'en tu mano' : 'en el campo';
-    duelToast('¡' + (eqCard.name) + ' equipado a ' + tName + ' (' + locText + ')!');
-    if (typeof log === 'function') log('Equipaste ' + eqCard.name + ' a ' + tName + ' (' + locText + '). +' + atk + ' ATK' + (def ? ' / +' + def + ' DEF' : '') + '.');
+    duelToast('¡' + (eqCard.name) + ' equipado a ' + tName + ' en el campo!');
+    if (typeof log === 'function') log('Equipaste ' + eqCard.name + ' a ' + tName + ' en el campo. +' + atk + ' ATK' + (def ? ' / +' + def + ' DEF' : '') + '.');
   }
 
   // Override equipSpell and activateEquipPlayer109
@@ -20403,37 +20490,38 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   // Identification helpers
   function isHeavyStorm(c) {
     if (!c) return false;
-    var v = String(c.value || '').toUpperCase();
-    var n = String(c.name || '').trim().toLowerCase();
+    var v = String(c.value || c[2] || '').toUpperCase();
+    var n = String(c.name || c[0] || '').trim().toLowerCase();
     return v === 'HEAVY_STORM' || v === 'HEAVY_STORM_EN' || n === 'heavy storm' || n === 'tormenta pesada' || n.includes('heavy storm') || n.includes('tormenta pesada');
   }
   window.isHeavyStorm = isHeavyStorm;
 
   function isFeatherDuster(c) {
     if (!c) return false;
-    var v = String(c.value || '').toUpperCase();
-    var n = String(c.name || '').trim().toLowerCase();
+    var v = String(c.value || c[2] || '').toUpperCase();
+    var n = String(c.name || c[0] || '').trim().toLowerCase();
     return v === 'FEATHER_DUSTER' || n === "harpie's feather duster" || n === 'plumero de arpia' || n === 'plumero de la arpia' || n.includes('feather duster') || n.includes('plumero');
   }
   window.isFeatherDuster = isFeatherDuster;
 
   function isRaigeki(c) {
     if (!c) return false;
-    var v = String(c.value || '').toUpperCase();
-    var n = String(c.name || '').trim().toLowerCase();
-    return v === 'RAIGEKI' || n === 'raigeki';
+    var v = String(c.value || c[2] || '').toUpperCase();
+    var n = String(c.name || c[0] || '').trim().toLowerCase();
+    if (v === 'RAIGEKI_BREAK' || n.includes('break')) return false;
+    return v === 'RAIGEKI' || n === 'raigeki' || n.includes('raigeki');
   }
   window.isRaigeki = isRaigeki;
 
   function isDarkHole(c) {
     if (!c) return false;
-    var v = String(c.value || '').toUpperCase();
-    var n = String(c.name || '').trim().toLowerCase();
+    var v = String(c.value || c[2] || '').toUpperCase();
+    var n = String(c.name || c[0] || '').trim().toLowerCase();
     return v === 'DARK_HOLE' || n === 'dark hole' || n === 'agujero oscuro';
   }
   window.isDarkHole = isDarkHole;
 
-  // Bulletproof Backrow destruction
+  // Bulletproof Backrow destruction (Tormenta Pesada / Plumero / MST)
   function destroyBackrowSide(side) {
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
     if (!g) return 0;
@@ -20451,23 +20539,27 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (!c) continue;
       back[i] = null;
 
-      // Handle equip card stat detachment
-      if (c.kind === 'EQUIP' || c.type === 'EQUIP' || c.equipToken109 || c._targetMonster || c._appliedAtk109) {
+      // Desvincular y descontar estadísticas del monstruo equipado
+      if (c.kind === 'EQUIP' || c.type === 'EQUIP' || c.equipToken109 || c._targetMonster || c._appliedAtk109 || (typeof isEquipSpell === 'function' && isEquipSpell(c))) {
         if (c._targetMonster) {
-          if (c._appliedAtk109) c._targetMonster.equip = Math.max(0, (c._targetMonster.equip || 0) - c._appliedAtk109);
-          if (c._appliedDef109) c._targetMonster.tempBoostDef = Math.max(0, (c._targetMonster.tempBoostDef || 0) - c._appliedDef109);
+          var eqA = c._appliedAtk109 || (typeof getEquipStats === 'function' ? getEquipStats(c, c._targetMonster).atk : 0);
+          var eqD = c._appliedDef109 || (typeof getEquipStats === 'function' ? getEquipStats(c, c._targetMonster).def : 0);
+          if (eqA) c._targetMonster.equip = Math.max(0, (c._targetMonster.equip || 0) - eqA);
+          if (eqD) c._targetMonster.tempBoostDef = Math.max(0, (c._targetMonster.tempBoostDef || 0) - eqD);
           if (Array.isArray(c._targetMonster.equippedCards)) {
-            var eqIdx = c._targetMonster.equippedCards.indexOf(c.name);
+            var eqIdx = c._targetMonster.equippedCards.indexOf(c.name || c[0]);
             if (eqIdx >= 0) c._targetMonster.equippedCards.splice(eqIdx, 1);
           }
         }
         var fieldMons = (side === 'player') ? (g.field || []).concat(g.linkZones || []) : (g.enemy || []).concat(g.enemyLinkZones || []);
         fieldMons.forEach(function(m) {
           if (m && c.equipToken109 && m._equipToken109 === c.equipToken109) {
-            if (c._appliedAtk109) m.equip = Math.max(0, (m.equip || 0) - c._appliedAtk109);
-            if (c._appliedDef109) m.tempBoostDef = Math.max(0, (m.tempBoostDef || 0) - c._appliedDef109);
+            var eqA2 = c._appliedAtk109 || (typeof getEquipStats === 'function' ? getEquipStats(c, m).atk : 0);
+            var eqD2 = c._appliedDef109 || (typeof getEquipStats === 'function' ? getEquipStats(c, m).def : 0);
+            if (eqA2) m.equip = Math.max(0, (m.equip || 0) - eqA2);
+            if (eqD2) m.tempBoostDef = Math.max(0, (m.tempBoostDef || 0) - eqD2);
             if (Array.isArray(m.equippedCards)) {
-              var mIdx = m.equippedCards.indexOf(c.name);
+              var mIdx = m.equippedCards.indexOf(c.name || c[0]);
               if (mIdx >= 0) m.equippedCards.splice(mIdx, 1);
             }
           }
@@ -20508,7 +20600,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   window.destroyBackrowSide = destroyBackrowSide;
   window.destroyBackrow109 = destroyBackrowSide;
 
-  // Bulletproof Monsters destruction
+  // Bulletproof Monsters destruction (Raigeki / Dark Hole)
   function destroyMonstersSide(side) {
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
     if (!g) return 0;
@@ -20529,6 +20621,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       m.faceDown = false;
       m.faceDownSet103 = false;
       m.faceUp = true;
+      if (typeof window.resetMonsterOriginalStats === 'function') {
+        window.resetMonsterOriginalStats(m);
+      }
       grave.push(m);
       count++;
     }
@@ -20540,6 +20635,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         links[li] = null;
         lm.faceDown = false;
         lm.faceUp = true;
+        if (typeof window.resetMonsterOriginalStats === 'function') {
+          window.resetMonsterOriginalStats(lm);
+        }
         grave.push(lm);
         count++;
       }
@@ -21838,38 +21936,28 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
 
     // Raigeki (aniquilar monstruos del jugador si tiene presencia en campo)
-    var raigekiIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Raigeki' || (c.value && c.value === 'RAIGEKI')); });
-    if (raigekiIdx >= 0 && (game.field || []).some(Boolean)) {
+    var raigekiIdx = game.enemyHand.findIndex(function(c) { return isRaigeki(c); });
+    if (raigekiIdx >= 0 && ((game.field || []).some(Boolean) || (game.linkZones || []).some(Boolean))) {
       var rCard = game.enemyHand.splice(raigekiIdx, 1)[0];
       game.enemyGrave.push(Object.assign({}, rCard, { faceUp: true, set: false }));
-      var killedP = 0;
-      for (var pi = 0; pi < (game.field || []).length; pi++) {
-        if (game.field[pi]) {
-          game.grave.push(game.field[pi]);
-          game.field[pi] = null;
-          killedP++;
-        }
-      }
+      var killedP = destroyMonstersSide('player');
       if (window.playDestroySound) window.playDestroySound();
       duelToast('⚡ ¡' + opp.toUpperCase() + ' activa RAIGEKI y destruye tus monstruos!');
       if (typeof log === 'function') log('¡' + opp.toUpperCase() + ' activa Raigeki y destruye ' + killedP + ' monstruos del jugador!');
       if (typeof render === 'function') render();
     }
 
-    // Heavy Storm (barrer cartas mágicas y trampas del jugador si tiene)
-    var hsIdx = game.enemyHand.findIndex(function(c) { return c && (c.name === 'Heavy Storm' || (c.value && c.value === 'HEAVY_STORM')); });
-    if (hsIdx >= 0 && (game.playerBack || []).some(Boolean)) {
+    // Heavy Storm (barrer cartas mágicas y trampas si hay en el campo)
+    var hsIdx = game.enemyHand.findIndex(function(c) { return isHeavyStorm(c); });
+    if (hsIdx >= 0 && ((game.playerBack || []).some(Boolean) || (game.enemyBack || []).some(Boolean))) {
       var hsCard = game.enemyHand.splice(hsIdx, 1)[0];
       game.enemyGrave.push(Object.assign({}, hsCard, { faceUp: true, set: false }));
-      for (var pb = 0; pb < (game.playerBack || []).length; pb++) {
-        if (game.playerBack[pb]) { game.grave.push(game.playerBack[pb]); game.playerBack[pb] = null; }
-      }
-      for (var eb = 0; eb < (game.enemyBack || []).length; eb++) {
-        if (game.enemyBack[eb]) { game.enemyGrave.push(game.enemyBack[eb]); game.enemyBack[eb] = null; }
-      }
+      var nPlayerHS = destroyBackrowSide('player');
+      var nEnemyHS = destroyBackrowSide('enemy');
+      var totalHS = nPlayerHS + nEnemyHS;
       if (window.playDestroySound) window.playDestroySound();
-      duelToast('🌪️ ¡' + opp.toUpperCase() + ' activa HEAVY STORM y barre las Magias y Trampas!');
-      if (typeof log === 'function') log('¡' + opp.toUpperCase() + ' activa Heavy Storm y destruye todas las Magias y Trampas!');
+      duelToast('🌪️ ¡' + opp.toUpperCase() + ' activa HEAVY STORM y barre ' + totalHS + ' Magias y Trampas!');
+      if (typeof log === 'function') log('¡' + opp.toUpperCase() + ' activa Heavy Storm y destruye ' + totalHS + ' Magias/Trampas en todo el Campo!');
       if (typeof render === 'function') render();
     }
 
@@ -23815,6 +23903,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   window.render = function() {
     if (typeof cleanupOrphanedEquips === 'function') {
       try { cleanupOrphanedEquips(); } catch(_) {}
+    }
+    if (typeof ensureGravesHooked === 'function') {
+      try { ensureGravesHooked(); } catch(_) {}
     }
     if (typeof game !== 'undefined' && game) {
       if (game.turn === 'player' || (game._wabokuActiveTurn && game.turnNo !== game._wabokuActiveTurn)) {
