@@ -866,7 +866,7 @@
 
     const btnSpecial = document.getElementById('m-btn-summon-special');
     if (btnSpecial) btnSpecial.onclick = () => {
-      if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand();
+      if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand(idx);
       closeActionBar();
     };
 

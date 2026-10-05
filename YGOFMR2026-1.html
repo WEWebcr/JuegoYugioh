@@ -19653,7 +19653,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   }
 
   function getAvailableFusionOptions() {
-    if (!game || !game.hand || game.turn !== 'player' || game.handSummoned) return [];
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    if (is5D) return [];
+    if (!g || !g.hand || g.turn !== 'player' || g.handSummoned) return [];
     var out = [];
     var seen = {};
 
@@ -19843,8 +19846,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   window.updateFusionAssist = function() {
     var btn = document.getElementById('fusionBtn');
     if (!btn) return;
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    if (is5D) {
+      btn.disabled = true;
+      btn.classList.add('disabled');
+      btn.classList.remove('fusionReady');
+      btn.style.display = 'none';
+      return;
+    }
     var opts = getAvailableFusionOptions();
-    var ready = game && game.turn === 'player' && !game.handSummoned && opts.length > 0;
+    var ready = g && g.turn === 'player' && !g.handSummoned && opts.length > 0;
     btn.disabled = !ready;
     btn.classList.toggle('disabled', !ready);
     btn.classList.toggle('fusionReady', ready);
@@ -19853,7 +19865,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       btn.title = opts.length + ' Fusión' + (opts.length === 1 ? '' : 'es') + ' disponible' + (opts.length === 1 ? '' : 's') + '. Pulsa para ver la lista y fusionar automáticamente.';
     } else {
       btn.innerHTML = 'Fusión';
-      btn.title = (game && game.handSummoned) ? 'Ya realizaste tu invocación/fusión de este turno.' : 'No hay una Fusión disponible';
+      btn.title = (g && g.handSummoned) ? 'Ya realizaste tu invocación/fusión de este turno.' : 'No hay una Fusión disponible';
     }
   };
   try { updateFusionAssist = window.updateFusionAssist; } catch(_) {}
@@ -24359,54 +24371,89 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!is5D) return false;
     if (g.turn !== 'player') return false;
 
+    // Regla: Solo 1 Invocación Especial por turno
+    if (g._specialSummonedTurn === g.turnNo) return false;
+
     var name = (c.name || c[0] || '').trim();
     var freeSlot = (g.field || []).findIndex(function(x) { return !x; });
     if (freeSlot < 0) return false;
 
     // a) Vice Dragon: si el rival controla al menos un monstruo y el jugador no controla ninguno
-    if (name === 'Vice Dragon' || name === 'Dragón del Vicio') {
+    if (name === 'Vice Dragon' || name === 'Dragón del Vicio' || name.includes('Vice Dragon') || name.includes('Dragón del Vicio')) {
       var enemyHasMon = (g.enemy || []).some(Boolean);
       var playerHasMon = (g.field || []).some(Boolean);
       return enemyHasMon && !playerHasMon;
     }
 
     // b) Blackwing - Gale the Whirlwind: si el jugador controla otro Blackwing en campo
-    if (name.includes('Gale the Whirlwind') || name.includes('Gale el Remolino')) {
+    if (name.includes('Gale the Whirlwind') || name.includes('Gale el Remolino') || name.includes('Gale')) {
       return (g.field || []).some(function(m) {
         return m && ((m.name || m[0] || '').includes('Blackwing') || (m.name || m[0] || '').includes('Ala Negra'));
       });
     }
 
     // c) Blackwing - Bora the Spear: si el jugador controla otro Blackwing en campo
-    if (name.includes('Bora the Spear') || name.includes('Bora la Lanza')) {
+    if (name.includes('Bora the Spear') || name.includes('Bora la Lanza') || name.includes('Bora')) {
       return (g.field || []).some(function(m) {
         return m && ((m.name || m[0] || '').includes('Blackwing') || (m.name || m[0] || '').includes('Ala Negra'));
+      });
+    }
+
+    // d) Quillbolt Hedgehog: si el jugador controla un Monstruo Cantante (Tuner) en el campo
+    if (name.includes('Quillbolt Hedgehog') || name.includes('Erizo Portapúas') || name.includes('Quillbolt')) {
+      return (g.field || []).some(function(m) {
+        return m && !m.faceDown && !m.faceDownSet103 && window.isTunerMonster && window.isTunerMonster(m);
       });
     }
 
     return false;
   };
 
-  window.specialSummonFromHand = function() {
+  window.getSpecialSummonOptionsFromHand = function() {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g || g.turn !== 'player') return [];
+    var is5D = (g._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) return [];
+    if (g._specialSummonedTurn === g.turnNo) return [];
+    var freeSlot = (g.field || []).findIndex(function(x) { return !x; });
+    if (freeSlot < 0) return [];
+    if (!Array.isArray(g.hand)) return [];
+
+    var opts = [];
+    for (var i = 0; i < g.hand.length; i++) {
+      var c = g.hand[i];
+      if (c && window.canSpecialSummonFromHand(c)) {
+        opts.push({ card: c, handIndex: i });
+      }
+    }
+    return opts;
+  };
+
+  window.closeSpecialSummonModal = function() {
+    var m = document.getElementById('specialSummonModal');
+    if (m) m.remove();
+  };
+
+  window.executeSpecialSummon = function(idx) {
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
     if (!g || g.turn !== 'player') return;
-    var sel = (g.selected || []).find(function(x) { return x && x[0] === 'h'; });
-    var idx = sel ? sel[1] : null;
-    if (idx == null || !g.hand || !g.hand[idx]) {
-      if (typeof duelToast === 'function') duelToast('Selecciona un monstruo de tu mano.');
+    if (g._specialSummonedTurn === g.turnNo) {
+      if (typeof duelToast === 'function') duelToast('Solo se permite 1 Invocación Especial por turno.');
       return;
     }
+    var slot = (g.field || []).findIndex(function(x) { return !x; });
+    if (slot < 0) {
+      if (typeof duelToast === 'function') duelToast('No hay espacio libre en tu campo.');
+      return;
+    }
+    if (!g.hand || !g.hand[idx]) return;
     var c = g.hand[idx];
     if (!window.canSpecialSummonFromHand(c)) {
       if (typeof duelToast === 'function') duelToast('No se cumplen los requisitos de Invocación Especial.');
       return;
     }
 
-    var slot = (g.field || []).findIndex(function(x) { return !x; });
-    if (slot < 0) {
-      if (typeof duelToast === 'function') duelToast('No hay espacio libre en tu campo.');
-      return;
-    }
+    window.closeSpecialSummonModal();
 
     var name = (c.name || c[0] || '').trim();
     var monster = window.mk ? (window.mk(c) || window.mk(name)) : Object.assign({}, c);
@@ -24417,7 +24464,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     monster.summonedTurn = g.turnNo;
 
     // Vice Dragon reduce su ATK y DEF originales a la mitad
-    if (name === 'Vice Dragon' || name === 'Dragón del Vicio') {
+    if (name === 'Vice Dragon' || name === 'Dragón del Vicio' || name.includes('Vice Dragon') || name.includes('Dragón del Vicio')) {
       var origAtk = Number(c.atk !== undefined ? c.atk : (c[4] !== undefined ? c[4] : 2000));
       var origDef = Number(c.def !== undefined ? c.def : (c[5] !== undefined ? c[5] : 2400));
       monster.atk = Math.floor(origAtk / 2);
@@ -24428,11 +24475,180 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     g.hand.splice(idx, 1);
     g.selected = [];
 
-    // NOTA: g.handSummoned NO se activa, preservando la invocación normal del turno.
+    // Marcar uso de la invocación especial de este turno
+    g._specialSummonedTurn = g.turnNo;
+    // NOTA: g.handSummoned NO se modifica, por lo que el jugador AÚN PUEDE hacer su invocación normal o set!
+
     if (window.playSummonSound) window.playSummonSound();
     if (typeof render === 'function') render();
     if (typeof setDuelView === 'function') setDuelView('field');
-    if (typeof duelToast === 'function') duelToast('¡Invocación Especial! ' + monster.name);
+    if (typeof duelToast === 'function') duelToast('¡Invocación Especial! ' + (monster.name || name));
+    if (typeof log === 'function') log('INVOCACIÓN ESPECIAL → ' + (monster.name || name) + ' en casilla ' + (slot + 1) + '.');
+  };
+
+  window.openSpecialSummonModal = function(options) {
+    window.closeSpecialSummonModal();
+    if (!options || !options.length) {
+      if (typeof duelToast === 'function') duelToast('No hay ninguna Invocación Especial disponible.');
+      return;
+    }
+
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    var selH = (g && g.selected || []).find(function(x) { return x && x[0] === 'h'; });
+    var selIdx = selH ? selH[1] : null;
+
+    var overlay = document.createElement('div');
+    overlay.id = 'specialSummonModal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;background:rgba(2,10,20,0.88);backdrop-filter:blur(4px);display:flex;justify-content:center;align-items:center;padding:16px;font-family:VT323, monospace;box-sizing:border-box;';
+
+    var win = document.createElement('div');
+    win.className = 'specialSummonWin';
+    win.style.cssText = 'width:min(680px,96vw);max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#0a192f 0%,#050c18 100%);border:2.5px solid #00e5ff;border-radius:16px;padding:20px;color:#fff;box-shadow:0 0 35px rgba(0,229,255,0.4),0 15px 45px rgba(0,0,0,0.95);display:flex;flex-direction:column;';
+
+    var head = document.createElement('div');
+    head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #00507a;padding-bottom:12px;margin-bottom:12px;';
+    head.innerHTML = '<div style="font-size:24px;font-weight:900;color:#00e5ff;display:flex;align-items:center;gap:10px;text-shadow:0 0 8px rgba(0,229,255,0.6);">⚡ INVOCACIÓN ESPECIAL <span style="background:#00507a;border:1px solid #00e5ff;border-radius:12px;padding:2px 10px;font-size:15px;color:#fff;">' + options.length + ' disponible' + (options.length === 1 ? '' : 's') + '</span></div><button type="button" id="specialSummonCloseBtn" style="background:#0b253a;border:2px solid #00e5ff;color:#00e5ff;font-size:20px;width:38px;height:38px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold;">✕</button>';
+    win.appendChild(head);
+
+    var help = document.createElement('div');
+    help.style.cssText = 'font-size:16px;color:#a8d8ea;margin-bottom:14px;line-height:1.3;';
+    help.innerHTML = 'Elige el monstruo de tu mano que deseas <b>Invocar de Modo Especial</b>. <span style="color:#ffd700;">(Límite: 1 Invocación Especial por turno; aún podrás Invocar de Modo Normal o Colocar SET)</span>.';
+    win.appendChild(help);
+
+    var list = document.createElement('div');
+    list.style.cssText = 'display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:60vh;padding-right:6px;';
+
+    options.forEach(function(opt) {
+      var c = opt.card;
+      var name = (c.name || c[0] || '').trim();
+      var cObj = (window.mk ? window.mk(c) : null) || c;
+      var atk = cObj.atk != null ? cObj.atk : (c[4] != null ? c[4] : '?');
+      var def = cObj.def != null ? cObj.def : (c[5] != null ? c[5] : '?');
+      var lvl = cObj.level != null ? cObj.level : (c[1] != null ? c[1] : 4);
+      var thumb = (typeof getFusionCardThumb === 'function') ? getFusionCardThumb(name) : 'https://i.imgur.com/vHqR8Kq.png';
+
+      // Nota del efecto
+      var effectNote = '';
+      if (name.includes('Vice Dragon') || name.includes('Dragón del Vicio')) {
+        effectNote = '⚔ ATK y DEF a la mitad (' + Math.floor(atk / 2) + '/' + Math.floor(def / 2) + ') por invocarse cuando el rival controla monstruos y tu campo está vacío.';
+      } else if (name.includes('Quillbolt') || name.includes('Erizo Portapúas')) {
+        effectNote = '⚡ Invocación por la presencia de un Monstruo Cantante (Tuner) en tu campo.';
+      } else if (name.includes('Gale') || name.includes('Bora')) {
+        effectNote = '🦅 Invocación por controlar otro monstruo Alanegra (Blackwing) en tu campo.';
+      } else {
+        effectNote = '⚡ Invocación Especial desde la mano.';
+      }
+
+      var isPreselected = (opt.handIndex === selIdx);
+      var item = document.createElement('div');
+      item.style.cssText = 'background:linear-gradient(135deg,#0c2338 0%,#071421 100%);border:' + (isPreselected ? '2.5px solid #ffd700' : '2px solid #0096c7') + ';border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 4px 12px rgba(0,0,0,0.6);cursor:pointer;transition:all 0.2s;';
+
+      item.innerHTML = '<div style="display:flex;align-items:center;gap:14px;flex:1;">' +
+        '<img src="' + thumb + '" alt="' + name + '" style="width:50px;height:72px;object-fit:cover;border-radius:5px;border:1.5px solid #00e5ff;box-shadow:0 2px 8px #000;background:#000;flex-shrink:0;">' +
+        '<div style="display:flex;flex-direction:column;gap:3px;flex:1;">' +
+          '<div style="font-size:20px;font-weight:900;color:#00e5ff;line-height:1.2;display:flex;align-items:center;gap:8px;">' +
+            name +
+            (isPreselected ? '<span style="background:#ffd700;color:#000;border-radius:4px;padding:1px 6px;font-size:11px;font-weight:bold;">SELECCIONADO</span>' : '') +
+          '</div>' +
+          '<div style="font-size:15px;color:#fff;">★ Nivel ' + lvl + ' &nbsp;|&nbsp; <span style="color:#55dfff;">ATK ' + atk + ' / DEF ' + def + '</span></div>' +
+          '<div style="font-size:13px;color:#a8d8ea;line-height:1.2;">' + effectNote + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<button type="button" class="spSummonPickBtn" style="background:linear-gradient(180deg,#00b4d8 0%,#0077b6 100%);border:2px solid #00e5ff;color:#fff;font-family:inherit;font-size:16px;font-weight:900;padding:10px 18px;border-radius:10px;cursor:pointer;letter-spacing:1px;box-shadow:0 0 12px rgba(0,229,255,0.5);flex-shrink:0;">⚡ INVOCAR</button>';
+
+      var pickBtn = item.querySelector('.spSummonPickBtn');
+      pickBtn.onclick = function(e) {
+        e.stopPropagation();
+        window.executeSpecialSummon(opt.handIndex);
+      };
+      item.onclick = function() {
+        window.executeSpecialSummon(opt.handIndex);
+      };
+
+      list.appendChild(item);
+    });
+
+    win.appendChild(list);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+
+    document.getElementById('specialSummonCloseBtn').onclick = window.closeSpecialSummonModal;
+    overlay.onclick = function(e) {
+      if (e.target === overlay) window.closeSpecialSummonModal();
+    };
+  };
+
+  window.specialSummonFromHand = function(targetHandIndex) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g || g.turn !== 'player') return;
+    var is5D = (g._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) return;
+
+    if (g._specialSummonedTurn === g.turnNo) {
+      if (typeof duelToast === 'function') duelToast('Solo se permite 1 Invocación Especial por turno.');
+      return;
+    }
+
+    var freeSlot = (g.field || []).findIndex(function(x) { return !x; });
+    if (freeSlot < 0) {
+      if (typeof duelToast === 'function') duelToast('No hay espacio libre en tu campo.');
+      return;
+    }
+
+    var opts = window.getSpecialSummonOptionsFromHand();
+    if (!opts || opts.length === 0) {
+      if (typeof duelToast === 'function') duelToast('No hay monstruos en tu mano para Invocación Especial.');
+      return;
+    }
+
+    // 1. Si se invoca con un índice específico (e.g. barra móvil o script):
+    if (typeof targetHandIndex === 'number') {
+      var found = opts.find(function(o) { return o.handIndex === targetHandIndex; });
+      if (found) {
+        window.executeSpecialSummon(found.handIndex);
+        return;
+      }
+    }
+
+    // 2. Si el jugador ya tenía seleccionada una carta en mano y es válida:
+    var selH = (g.selected || []).find(function(x) { return x && x[0] === 'h'; });
+    if (selH && typeof selH[1] === 'number') {
+      var match = opts.find(function(o) { return o.handIndex === selH[1]; });
+      if (match) {
+        window.executeSpecialSummon(match.handIndex);
+        return;
+      }
+    }
+
+    // 3. Si no hay carta seleccionada, abrir modal para que el jugador escoja libremente:
+    window.openSpecialSummonModal(opts);
+  };
+
+  window.updateSpecialSummonAssist = function() {
+    var spBtn = document.getElementById('specialSummonBtn');
+    if (!spBtn) return;
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) {
+      spBtn.style.display = 'none';
+      spBtn.disabled = true;
+      spBtn.classList.add('disabled');
+      spBtn.classList.remove('specialSummonReady');
+      return;
+    }
+    spBtn.style.display = 'inline-flex';
+    var opts = window.getSpecialSummonOptionsFromHand();
+    var ready = opts.length > 0;
+    spBtn.disabled = !ready;
+    spBtn.classList.toggle('disabled', !ready);
+    spBtn.classList.toggle('specialSummonReady', ready);
+    if (ready) {
+      spBtn.innerHTML = '⚡ Inv. Especial <span class="spSummonCount104">' + opts.length + '</span>';
+      spBtn.title = opts.length + ' Invocación Especial disponible. Pulsa para elegir e invocar.';
+    } else {
+      spBtn.innerHTML = '⚡ Inv. Especial';
+      spBtn.title = (g && g._specialSummonedTurn === g.turnNo) ? 'Ya realizaste tu Invocación Especial de este turno.' : 'No hay Invocación Especial disponible';
+    }
   };
 
   window.isTunerMonster = function(c) {
@@ -24921,7 +25137,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var fb = document.getElementById('fusionBtn');
 
     if (is5D) {
-      if (fb) fb.style.display = 'none';
+      if (fb) {
+        fb.style.display = 'none';
+        fb.disabled = true;
+        fb.classList.remove('fusionReady');
+        fb.classList.add('disabled');
+      }
       if (exp) {
         exp.style.display = 'flex';
         var ec = document.getElementById('extraCount');
@@ -24955,24 +25176,18 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         spBtn.id = 'specialSummonBtn';
         spBtn.className = 'btn';
         spBtn.textContent = '⚡ Inv. Especial';
-        spBtn.style.cssText = 'background: linear-gradient(135deg, #00b4d8, #0077b6); border: 2px solid #00e5ff; color: white; font-weight: bold; box-shadow: 0 0 10px rgba(0,229,255,0.6); display: none;';
         spBtn.onclick = function() {
           if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand();
         };
         actionBtns.insertBefore(spBtn, actionBtns.children[1] || null);
       }
     }
-    if (spBtn) {
-      var selH = (g && g.selected || []).find(function(x) { return x && x[0] === 'h'; });
-      var selCard = (selH && g && g.hand) ? g.hand[selH[1]] : null;
-      if (is5D && g && g.turn === 'player' && selCard && typeof window.canSpecialSummonFromHand === 'function' && window.canSpecialSummonFromHand(selCard)) {
-        spBtn.style.display = 'inline-flex';
-      } else {
-        spBtn.style.display = 'none';
-      }
+    if (typeof updateSpecialSummonAssist === 'function') {
+      try { updateSpecialSummonAssist(); } catch(_) {}
     }
 
     if (typeof updateFusionAssist === 'function') try { updateFusionAssist(); } catch(_) {}
+    if (typeof updateSpecialSummonAssist === 'function') try { updateSpecialSummonAssist(); } catch(_) {}
     if (typeof updateSetButton103 === 'function') try { updateSetButton103(); } catch(_) {}
     if (typeof fixBadChars === 'function') try { fixBadChars(); } catch(_) {}
     if (typeof updateGuardianBattleHints === 'function') try { updateGuardianBattleHints(); } catch(_) {}
@@ -25102,7 +25317,88 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     #sharedLink,
     .linkZone { display: none !important; }
 
-    body.world-3 #fusionBtn { display: none !important; }
+    body.world-3 #fusionBtn,
+    body.world-3 .btn.fusionReady#fusionBtn,
+    body.world-3 #fusionBtn.fusionReady,
+    body.world-3.view-hand #fusionBtn,
+    body.world-3.view-field #fusionBtn {
+      display: none !important;
+      opacity: 0 !important;
+      animation: none !important;
+      pointer-events: none !important;
+    }
+
+    body.world-3 #specialSummonBtn,
+    body.world-3.view-hand #specialSummonBtn,
+    body.world-3.view-field #specialSummonBtn {
+      display: inline-flex !important;
+    }
+
+    body:not(.world-3) #specialSummonBtn {
+      display: none !important;
+    }
+
+    #specialSummonBtn {
+      background: linear-gradient(135deg, #0077b6, #0096c7) !important;
+      border: 1.5px solid #00b4d8 !important;
+      color: #fff !important;
+      font-weight: bold !important;
+      border-radius: 6px !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      transition: all 0.2s ease !important;
+    }
+
+    #specialSummonBtn .spSummonCount104 {
+      display: inline-flex;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      margin-left: 5px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: #00364d;
+      border: 1px solid #00e5ff;
+      color: #fff;
+      font-size: 10px;
+      vertical-align: middle;
+    }
+
+    #specialSummonBtn.disabled,
+    #specialSummonBtn:disabled {
+      opacity: 0.35 !important;
+      filter: grayscale(0.8) !important;
+      pointer-events: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      border-color: #555 !important;
+      cursor: default !important;
+    }
+
+    #specialSummonBtn.specialSummonReady {
+      opacity: 1 !important;
+      filter: none !important;
+      pointer-events: auto !important;
+      border: 2px solid #00e5ff !important;
+      box-shadow: 0 0 14px rgba(0, 229, 255, 0.8) !important;
+      animation: specialSummonPulse 1.4s ease-in-out infinite !important;
+      cursor: pointer !important;
+    }
+
+    @keyframes specialSummonPulse {
+      0% {
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+      }
+      50% {
+        box-shadow: 0 0 22px rgba(0, 229, 255, 1);
+      }
+      100% {
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+      }
+    }
+
     body.world-3 #extraPile {
       display: flex !important;
       cursor: pointer !important;
@@ -26938,7 +27234,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     const btnSpecial = document.getElementById('m-btn-summon-special');
     if (btnSpecial) btnSpecial.onclick = () => {
-      if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand();
+      if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand(idx);
       closeActionBar();
     };
 
