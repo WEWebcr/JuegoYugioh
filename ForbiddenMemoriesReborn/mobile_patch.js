@@ -810,7 +810,11 @@
       if (cKind === 'MONSTER') {
         buttonsHtml += '<button class="m-act-btn m-act-atk" id="m-btn-summon-atk">⚔ INVOCAR</button>';
         buttonsHtml += '<button class="m-act-btn m-act-set" id="m-btn-summon-set">🛡 SET</button>';
-        if (typeof window.fuse === 'function') {
+        const is5DWorld = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
+        if (is5DWorld && typeof window.canSpecialSummonFromHand === 'function' && window.canSpecialSummonFromHand(card)) {
+          buttonsHtml += '<button class="m-act-btn m-act-special" id="m-btn-summon-special" style="background:linear-gradient(135deg,#00b4d8,#0077b6);border:1px solid #00e5ff;color:#fff;font-weight:bold;box-shadow:0 0 8px #00e5ff;">⚡ INV. ESPECIAL</button>';
+        }
+        if (!is5DWorld && typeof window.fuse === 'function') {
           buttonsHtml += '<button class="m-act-btn m-act-fuse" id="m-btn-fuse">🔄 FUSIÓN</button>';
         }
       } else if (cKind === 'SPELL' || cKind === 'MAGIC') {
@@ -857,6 +861,12 @@
     if (btnSet) btnSet.onclick = () => {
       if (typeof window.setCard === 'function') window.setCard();
       else if (typeof window.normalSummon === 'function') window.normalSummon();
+      closeActionBar();
+    };
+
+    const btnSpecial = document.getElementById('m-btn-summon-special');
+    if (btnSpecial) btnSpecial.onclick = () => {
+      if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand();
       closeActionBar();
     };
 

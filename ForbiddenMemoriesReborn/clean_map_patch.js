@@ -8148,6 +8148,12 @@ window.onBeforeFuse = function(maybeResult) {
 // Interceptor global para llamada a fuse() manual
 const origGlobalFuse = window.fuse;
 window.fuse = function() {
+    var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
+    if (is5D) {
+        var toast = (typeof window !== 'undefined' && window.duelToast) ? window.duelToast : (typeof duelToast === 'function' ? duelToast : null);
+        if (toast) toast('En este mundo no se permiten fusiones; se rige por Sincronía.');
+        return;
+    }
     try {
         if (typeof window.onBeforeFuse === 'function') window.onBeforeFuse();
     } catch(_) {}
@@ -9948,6 +9954,60 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     game.hand.splice(idx, 1);
     game.handSummoned = true;
     game.selected = [];
+
+    // Efectos al ser Invocado de Modo Normal en Mundo 3 (5D's)
+    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
+    if (is5D && monster) {
+      var mName = (monster.name || '').trim();
+      // Junk Synchron: Revive monstruo Nivel <= 2 del Cementerio en Posición de Defensa
+      if (mName === 'Junk Synchron' || mName.includes('Junk Synchron')) {
+        var freeSlot = (game.field || []).findIndex(function(x) { return !x; });
+        if (freeSlot >= 0 && Array.isArray(game.grave) && game.grave.length > 0) {
+          var targetGraveIdx = -1;
+          for (var gi = game.grave.length - 1; gi >= 0; gi--) {
+            var gc = game.grave[gi];
+            var lvl = Number(gc.level || gc[1] || 0);
+            if (lvl > 0 && lvl <= 2 && (gc.atk !== undefined || gc.def !== undefined || gc.kind === 'MONSTER' || gc[4] !== undefined)) {
+              targetGraveIdx = gi;
+              break;
+            }
+          }
+          if (targetGraveIdx >= 0) {
+            var revived = game.grave.splice(targetGraveIdx, 1)[0];
+            var rm = window.mk ? (window.mk(revived) || window.mk(revived.name || revived[0])) : Object.assign({}, revived);
+            if (!rm) rm = Object.assign({}, revived);
+            rm.pos = 'DEF';
+            rm.faceUp = true;
+            rm.summonedTurn = game.turnNo;
+            game.field[freeSlot] = rm;
+            if (typeof log === 'function') log('⚙️ [Efecto de Junk Synchron] ¡Revivió a ' + (rm.name || rm[0]) + ' (Nv ' + (rm.level || 2) + ') del Cementerio en Posición de Defensa!');
+            if (typeof duelToast === 'function') duelToast('¡Junk Synchron revivió a ' + (rm.name || rm[0]) + '!');
+          }
+        }
+      }
+
+      // Twilight Rose Knight: Invoca Especialmente de la mano 1 monstruo Planta de Nivel <= 4
+      if (mName === 'Twilight Rose Knight' || mName.includes('Twilight Rose')) {
+        var freeSlot = (game.field || []).findIndex(function(x) { return !x; });
+        if (freeSlot >= 0 && Array.isArray(game.hand) && game.hand.length > 0) {
+          var plantIdx = (game.hand || []).findIndex(function(c) {
+            return c && ((c.type || c[2] || '').toLowerCase().includes('plant') || (c.type || c[2] || '').toLowerCase().includes('planta')) && Number(c.level || c[1] || 0) <= 4;
+          });
+          if (plantIdx >= 0) {
+            var plantCard = game.hand.splice(plantIdx, 1)[0];
+            var pm = window.mk ? (window.mk(plantCard) || window.mk(plantCard.name || plantCard[0])) : Object.assign({}, plantCard);
+            if (!pm) pm = Object.assign({}, plantCard);
+            pm.pos = 'ATK';
+            pm.faceUp = true;
+            pm.summonedTurn = game.turnNo;
+            game.field[freeSlot] = pm;
+            if (typeof log === 'function') log('🌹 [Efecto de Twilight Rose Knight] ¡Invocó de Modo Especial a ' + (pm.name || pm[0]) + ' desde la mano!');
+            if (typeof duelToast === 'function') duelToast('¡Twilight Rose Knight invocó a ' + (pm.name || pm[0]) + '!');
+          }
+        }
+      }
+    }
+
     if (typeof render === 'function') render();
     if (typeof setDuelView === 'function') setDuelView('field');
     if (isEgyptianGod(monster.name)) {
@@ -10820,8 +10880,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   window.openFusionModal = openFusionModal;
 
   window.fuse = function() {
-    if (!game || game.turn !== 'player') return;
-    if (game.handSummoned) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g || g.turn !== 'player') return;
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    if (is5D) {
+      var toast = (typeof window !== 'undefined' && window.duelToast) ? window.duelToast : (typeof duelToast === 'function' ? duelToast : null);
+      if (toast) toast('En este mundo no se permiten fusiones; se rige por Sincronía.');
+      return;
+    }
+    if (g.handSummoned) {
       duelToast('Solo se permite 1 invocación o colocación por turno.');
       return;
     }
@@ -15104,7 +15171,91 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { activateSetCard = window.activateSetCard; } catch(_) {}
 
-  // 7. Extra Deck & Sincronía en Mundo 3 (5D's) / Bloqueado en Mundo 1 y Mundo 2 (Solo fusiones al estilo FMR)
+  // 7. Extra Deck, Invocaciones Especiales & Sincronía en Mundo 3 (5D's)
+  window.canSpecialSummonFromHand = function(c) {
+    if (!c) return false;
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g) return false;
+    var is5D = (g._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) return false;
+    if (g.turn !== 'player') return false;
+
+    var name = (c.name || c[0] || '').trim();
+    var freeSlot = (g.field || []).findIndex(function(x) { return !x; });
+    if (freeSlot < 0) return false;
+
+    // a) Vice Dragon: si el rival controla al menos un monstruo y el jugador no controla ninguno
+    if (name === 'Vice Dragon' || name === 'Dragón del Vicio') {
+      var enemyHasMon = (g.enemy || []).some(Boolean);
+      var playerHasMon = (g.field || []).some(Boolean);
+      return enemyHasMon && !playerHasMon;
+    }
+
+    // b) Blackwing - Gale the Whirlwind: si el jugador controla otro Blackwing en campo
+    if (name.includes('Gale the Whirlwind') || name.includes('Gale el Remolino')) {
+      return (g.field || []).some(function(m) {
+        return m && ((m.name || m[0] || '').includes('Blackwing') || (m.name || m[0] || '').includes('Ala Negra'));
+      });
+    }
+
+    // c) Blackwing - Bora the Spear: si el jugador controla otro Blackwing en campo
+    if (name.includes('Bora the Spear') || name.includes('Bora la Lanza')) {
+      return (g.field || []).some(function(m) {
+        return m && ((m.name || m[0] || '').includes('Blackwing') || (m.name || m[0] || '').includes('Ala Negra'));
+      });
+    }
+
+    return false;
+  };
+
+  window.specialSummonFromHand = function() {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (!g || g.turn !== 'player') return;
+    var sel = (g.selected || []).find(function(x) { return x && x[0] === 'h'; });
+    var idx = sel ? sel[1] : null;
+    if (idx == null || !g.hand || !g.hand[idx]) {
+      if (typeof duelToast === 'function') duelToast('Selecciona un monstruo de tu mano.');
+      return;
+    }
+    var c = g.hand[idx];
+    if (!window.canSpecialSummonFromHand(c)) {
+      if (typeof duelToast === 'function') duelToast('No se cumplen los requisitos de Invocación Especial.');
+      return;
+    }
+
+    var slot = (g.field || []).findIndex(function(x) { return !x; });
+    if (slot < 0) {
+      if (typeof duelToast === 'function') duelToast('No hay espacio libre en tu campo.');
+      return;
+    }
+
+    var name = (c.name || c[0] || '').trim();
+    var monster = window.mk ? (window.mk(c) || window.mk(name)) : Object.assign({}, c);
+    if (!monster) monster = Object.assign({}, c);
+
+    monster.pos = 'ATK';
+    monster.faceUp = true;
+    monster.summonedTurn = g.turnNo;
+
+    // Vice Dragon reduce su ATK y DEF originales a la mitad
+    if (name === 'Vice Dragon' || name === 'Dragón del Vicio') {
+      var origAtk = Number(c.atk !== undefined ? c.atk : (c[4] !== undefined ? c[4] : 2000));
+      var origDef = Number(c.def !== undefined ? c.def : (c[5] !== undefined ? c[5] : 2400));
+      monster.atk = Math.floor(origAtk / 2);
+      monster.def = Math.floor(origDef / 2);
+    }
+
+    g.field[slot] = monster;
+    g.hand.splice(idx, 1);
+    g.selected = [];
+
+    // NOTA: g.handSummoned NO se activa, preservando la invocación normal del turno.
+    if (window.playSummonSound) window.playSummonSound();
+    if (typeof render === 'function') render();
+    if (typeof setDuelView === 'function') setDuelView('field');
+    if (typeof duelToast === 'function') duelToast('¡Invocación Especial! ' + monster.name);
+  };
+
   window.isTunerMonster = function(c) {
     if (!c) return false;
     if (c.isTuner === true) return true;
@@ -15202,12 +15353,88 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (window.playViolinClick) window.playViolinClick();
   };
 
-  // Invocación por Sincronía de la IA rival en Mundo 3
+  // Invocación por Sincronía y Jugadas Especiales de la IA rival en Mundo 3
   window.aiExtraSummon = function() {
     if (typeof game === 'undefined' || !game) return;
     var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
     if (!is5D) return;
 
+    // 1. Invocaciones Especiales de la IA desde la Mano en Mundo 3
+    if (Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
+      // a) Vice Dragon: si la IA no tiene monstruos y el jugador sí tiene al menos 1
+      var vdIdx = game.enemyHand.findIndex(function(c) {
+        return c && ((c.name || c[0] || '').trim() === 'Vice Dragon' || (c.name || c[0] || '').trim() === 'Dragón del Vicio');
+      });
+      if (vdIdx >= 0) {
+        var eHasMon = (game.enemy || []).some(Boolean);
+        var pHasMon = (game.field || []).some(Boolean);
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (!eHasMon && pHasMon && fSlot >= 0) {
+          var vc = game.enemyHand.splice(vdIdx, 1)[0];
+          var vm = window.mk ? (window.mk(vc) || window.mk(vc.name || vc[0])) : Object.assign({}, vc);
+          if (!vm) vm = Object.assign({}, vc);
+          vm.pos = 'ATK';
+          vm.faceUp = true;
+          vm.atk = Math.floor(Number(vc.atk !== undefined ? vc.atk : (vc[4] || 2000)) / 2);
+          vm.def = Math.floor(Number(vc.def !== undefined ? vc.def : (vc[5] || 2400)) / 2);
+          vm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = vm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ El rival invoca a Vice Dragon (1000 ATK / 1200 DEF).');
+        }
+      }
+
+      // b) Blackwing - Gale the Whirlwind o Bora the Spear: si la IA ya controla otro Blackwing
+      var bwIdx = game.enemyHand.findIndex(function(c) {
+        var n = (c && (c.name || c[0] || '')) || '';
+        return n.includes('Gale the Whirlwind') || n.includes('Bora the Spear');
+      });
+      if (bwIdx >= 0) {
+        var eHasOtherBw = (game.enemy || []).some(function(m) {
+          return m && ((m.name || m[0] || '').includes('Blackwing') || (m.name || m[0] || '').includes('Ala Negra'));
+        });
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (eHasOtherBw && fSlot >= 0) {
+          var bwc = game.enemyHand.splice(bwIdx, 1)[0];
+          var bwm = window.mk ? (window.mk(bwc) || window.mk(bwc.name || bwc[0])) : Object.assign({}, bwc);
+          if (!bwm) bwm = Object.assign({}, bwc);
+          bwm.pos = 'ATK';
+          bwm.faceUp = true;
+          bwm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = bwm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ El rival invoca a ' + (bwm.name || bwm[0]) + ' desde su mano.');
+        }
+      }
+    }
+
+    // 2. Efecto de Junk Synchron de la IA si está en campo y el cementerio enemigo tiene Nivel <= 2
+    var jsIdx = (game.enemy || []).findIndex(function(m) {
+      return m && ((m.name || m[0] || '').includes('Junk Synchron'));
+    });
+    if (jsIdx >= 0 && Array.isArray(game.enemyGrave) && game.enemyGrave.length > 0) {
+      var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+      if (fSlot >= 0) {
+        var gLv2 = -1;
+        for (var gi = game.enemyGrave.length - 1; gi >= 0; gi--) {
+          var gc = game.enemyGrave[gi];
+          var lvl = Number(gc.level || gc[1] || 0);
+          if (lvl > 0 && lvl <= 2 && (gc.atk !== undefined || gc[4] !== undefined)) {
+            gLv2 = gi; break;
+          }
+        }
+        if (gLv2 >= 0) {
+          var rev = game.enemyGrave.splice(gLv2, 1)[0];
+          var rm = window.mk ? (window.mk(rev) || window.mk(rev.name || rev[0])) : Object.assign({}, rev);
+          if (!rm) rm = Object.assign({}, rev);
+          rm.pos = 'DEF';
+          rm.faceUp = true;
+          rm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = rm;
+          if (typeof log === 'function') log('⚙️ [Efecto Rival] ¡Junk Synchron revive a ' + (rm.name || rm[0]) + ' del Cementerio enemigo!');
+        }
+      }
+    }
+
+    // 3. Invocación por Sincronía desde el Extra Deck
     if (!Array.isArray(game.enemyExtra) || game.enemyExtra.length === 0) return;
 
     // Buscar monstruos boca arriba en el campo enemigo
@@ -15489,24 +15716,82 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         game._threateningRoarActive = false;
       }
     }
-    if (typeof game !== 'undefined' && game) {
-      game.extra = [];
-      game.extraUsed = [];
-      game.linkZones = [null, null];
-      game.enemyLinkZones = [null, null];
-      game.linkField = null;
-      game.enemyLinkField = null;
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    if (document.body) {
+      document.body.classList.toggle('world-3', !!is5D);
+    }
+    if (g) {
+      if (!is5D) {
+        g.extra = [];
+        g.extraUsed = [];
+      }
+      g.linkZones = [null, null];
+      g.enemyLinkZones = [null, null];
+      g.linkField = null;
+      g.enemyLinkField = null;
     }
     if (prevRenderMaster) prevRenderMaster.apply(this, arguments);
 
     var ep = document.getElementById('enemyExtraPile');
-    if (ep) ep.style.display = 'none';
     var pp = document.querySelector('.playerPileGroup .extraPile');
-    if (pp) pp.style.display = 'none';
     var exp = document.getElementById('extraPile');
-    if (exp) exp.style.display = 'none';
     var sl = document.getElementById('sharedLink');
     if (sl) sl.style.display = 'none';
+
+    var fb = document.getElementById('fusionBtn');
+
+    if (is5D) {
+      if (fb) fb.style.display = 'none';
+      if (exp) {
+        exp.style.display = 'flex';
+        var ec = document.getElementById('extraCount');
+        if (ec && g && g.extra) ec.textContent = String(g.extra.length);
+      }
+      if (ep) {
+        if (g && g.enemyExtra && g.enemyExtra.length > 0) {
+          ep.style.display = 'flex';
+          var eec = document.getElementById('enemyExtraCount');
+          if (eec) eec.textContent = String(g.enemyExtra.length);
+        } else {
+          ep.style.display = 'none';
+        }
+      }
+      if (typeof updateExtraReady === 'function') {
+        try { updateExtraReady(); } catch(_) {}
+      }
+    } else {
+      if (fb) fb.style.display = '';
+      if (ep) ep.style.display = 'none';
+      if (pp) pp.style.display = 'none';
+      if (exp) exp.style.display = 'none';
+    }
+
+    // Botón de Invocación Especial en la barra de acciones
+    var spBtn = document.getElementById('specialSummonBtn');
+    if (!spBtn) {
+      var actionBtns = document.querySelector('.btns.actionBtns');
+      if (actionBtns) {
+        spBtn = document.createElement('button');
+        spBtn.id = 'specialSummonBtn';
+        spBtn.className = 'btn';
+        spBtn.textContent = '⚡ Inv. Especial';
+        spBtn.style.cssText = 'background: linear-gradient(135deg, #00b4d8, #0077b6); border: 2px solid #00e5ff; color: white; font-weight: bold; box-shadow: 0 0 10px rgba(0,229,255,0.6); display: none;';
+        spBtn.onclick = function() {
+          if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand();
+        };
+        actionBtns.insertBefore(spBtn, actionBtns.children[1] || null);
+      }
+    }
+    if (spBtn) {
+      var selH = (g && g.selected || []).find(function(x) { return x && x[0] === 'h'; });
+      var selCard = (selH && g && g.hand) ? g.hand[selH[1]] : null;
+      if (is5D && g && g.turn === 'player' && selCard && typeof window.canSpecialSummonFromHand === 'function' && window.canSpecialSummonFromHand(selCard)) {
+        spBtn.style.display = 'inline-flex';
+      } else {
+        spBtn.style.display = 'none';
+      }
+    }
 
     if (typeof updateFusionAssist === 'function') try { updateFusionAssist(); } catch(_) {}
     if (typeof updateSetButton103 === 'function') try { updateSetButton103(); } catch(_) {}
@@ -15632,12 +15917,30 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
-    #enemyExtraPile,
-    .extraPile,
-    #extraPile,
+    body:not(.world-3) #enemyExtraPile,
+    body:not(.world-3) .extraPile,
+    body:not(.world-3) #extraPile,
     #sharedLink,
     .linkZone { display: none !important; }
-    body.view-field #fusionBtn { display: inline-flex !important; }
+
+    body.world-3 #fusionBtn { display: none !important; }
+    body.world-3 #extraPile {
+      display: flex !important;
+      cursor: pointer !important;
+      border: 2px solid #00e5ff !important;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.5) !important;
+      background: linear-gradient(145deg, #0b1a24, #030a0f) !important;
+    }
+    body.world-3 #extraPile.extraReady {
+      border: 2px solid #00ff88 !important;
+      box-shadow: 0 0 16px rgba(0, 255, 136, 0.9) !important;
+      animation: synchroPulse 1.2s infinite alternate !important;
+    }
+    @keyframes synchroPulse {
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
+      100% { transform: scale(1.06); box-shadow: 0 0 20px rgba(0, 255, 136, 1); }
+    }
+    body:not(.world-3).view-field #fusionBtn { display: inline-flex !important; }
 
     /* GUARDIAN SIGNS BATTLE INDICATORS */
     .guardianSignBattleBadge {
