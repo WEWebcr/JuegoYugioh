@@ -12403,6 +12403,62 @@ const MAP_EDGES_5D = [
     ['5d_1', '5d_shop']
 ];
 
+window.FIVE_D_CARD_NAMES = new Set([
+  'Junk Warrior', 'Goyo Guardian', 'Blackwing Armed Wing', 'Black Rose Dragon',
+  'Power Tool Dragon', 'Blackwing - Armor Master', 'Stardust Dragon', 'Red Dragon Archfiend',
+  'Junk Synchron', 'Nitro Synchron', 'Dark Resonator', 'Flare Resonator',
+  'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North',
+  'Twilight Rose Knight', 'Jutte Fighter',
+  'Speed Warrior', 'Quillbolt Hedgehog', 'Sonic Chick', 'Vice Dragon',
+  'Mad Archfiend', 'Twin-Shield Defender', 'Blackwing - Bora the Spear',
+  'Blackwing - Shura the Blue Flame', 'Botanical Lion', 'Lord Poison',
+  'Morphtronic Radion', 'Assault Dog',
+  'Synchro Blast Wave', 'Urgent Tuning'
+]);
+
+window.MUNDO3_ALLOWED_STAPLES = new Set([
+  'Mystical Space Typhoon', 'Dust Tornado', 'Swords of Revealing Light',
+  'Dark Hole', 'Fissure', 'Trap Hole', 'Waboku', 'Sakuretsu Armor',
+  'United We Stand', 'Axe of Despair', 'Mage Power',
+  'Red Medicine', 'Dian Keto the Cure Master'
+]);
+
+window.is5DCard = function(cardOrName) {
+  if (!cardOrName) return false;
+  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || '')).trim();
+  if (window.FIVE_D_CARD_NAMES && window.FIVE_D_CARD_NAMES.has(name)) return true;
+  var meta = (typeof cardOrName === 'object' && cardOrName.kind) ? cardOrName : (window.getCardMetadata ? window.getCardMetadata(name) : null);
+  if (meta) {
+    if (meta.world === 3 || meta.kind === 'SYNCHRO' || meta.isTuner === true) return true;
+    var num = Number(meta.num || meta.id || 0);
+    if (num >= 950 && num <= 979) return true;
+  }
+  if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+    var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
+    if (cd) {
+      if (cd.world === 3 || cd.kind === 'SYNCHRO' || cd.isTuner === true) return true;
+      var id = Number(cd.id || 0);
+      if (id >= 950 && id <= 979) return true;
+    }
+  }
+  return false;
+};
+
+window.isCardAllowedInWorld = function(cardOrName, targetWorld) {
+  var is5DWorld = (Number(targetWorld) === 3);
+  var is5DC = window.is5DCard(cardOrName);
+  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || '')).trim();
+
+  if (is5DWorld) {
+    if (is5DC) return true;
+    if (window.MUNDO3_ALLOWED_STAPLES && window.MUNDO3_ALLOWED_STAPLES.has(name)) return true;
+    return false;
+  } else {
+    if (is5DC) return false;
+    return true;
+  }
+};
+
 window.generate5DStarterDeck = function() {
     return [
       "Junk Synchron", "Junk Synchron", "Junk Synchron",
@@ -12911,6 +12967,13 @@ window.customShowMap = function() {
                                     if (window.customShowDeckEditor) window.customShowDeckEditor();
                                     return;
                                 }
+                                let targetW = is5DCheck ? 3 : 1;
+                                let invalidCards = (curCheckDeck || []).filter(c => !window.isCardAllowedInWorld(c, targetW));
+                                if (invalidCards.length > 0) {
+                                    alert(`⚠️ DECK ACTIVO NO VÁLIDO ⚠️\n\nTu Deck Activo ("${curDeckName}") contiene cartas no compatibles con este mundo (${invalidCards.slice(0, 3).join(', ')}).\nPor favor ve al Dashboard del Deck para ajustarlo.`);
+                                    if (window.customShowDeckEditor) window.customShowDeckEditor();
+                                    return;
+                                }
                             }
                         } catch(e) {}
                     }
@@ -12952,6 +13015,13 @@ window.customShowMap = function() {
                         let curDeckName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
                         if (curCheckDeck && curCheckDeck.length !== 40) {
                             alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
+                            if (window.customShowDeckEditor) window.customShowDeckEditor();
+                            return;
+                        }
+                        let targetW2 = is5DCheck ? 3 : 1;
+                        let invalidCards2 = (curCheckDeck || []).filter(c => !window.isCardAllowedInWorld(c, targetW2));
+                        if (invalidCards2.length > 0) {
+                            alert(`⚠️ DECK ACTIVO NO VÁLIDO ⚠️\n\nTu Deck Activo ("${curDeckName}") contiene cartas no compatibles con este mundo (${invalidCards2.slice(0, 3).join(', ')}).\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                             if (window.customShowDeckEditor) window.customShowDeckEditor();
                             return;
                         }
@@ -13606,20 +13676,7 @@ window.cleanSaveCollection = function(s) {
   if (!s) return s;
   var modified = false;
 
-  // Si está en Mundo 3, protegemos estrictamente las cartas y extra deck de 5D's
-  if (s.world === 3) {
-    if (s.decksMundo3 && s.decksMundo3['Principal'] && window.isTaintedTristanDeck(s.decksMundo3['Principal'])) {
-      s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
-      s.decksMundo3['Extra'] = window.generate5DExtraDeck ? window.generate5DExtraDeck() : [];
-      s.collectionMundo3 = s.collectionMundo3 || {};
-      s.decksMundo3['Principal'].forEach(function(n) { s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, 1); });
-      s.decksMundo3['Extra'].forEach(function(n) { s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, 1); });
-      modified = true;
-    }
-    return s;
-  }
-
-  // Auto-reparar baraja si fue contaminada por el bug del deck de Tristan
+  // Auto-reparar baraja clásica si fue contaminada por el bug del deck de Tristan
   if (window.isTaintedTristanDeck(s.deck)) {
     var cleanStarter = (typeof window.generateForbiddenMemoriesStarterDeck === 'function' && window.generateForbiddenMemoriesStarterDeck()) || window.FMR_CANONICAL_STARTER_DECK;
     if (cleanStarter && cleanStarter.length === 40) {
@@ -13632,74 +13689,144 @@ window.cleanSaveCollection = function(s) {
     }
   }
 
-  if (s.collection && typeof s.collection === 'object') {
-    var keys = Object.keys(s.collection);
-    for (var i = 0; i < keys.length; i++) {
-      var k = keys[i];
-      if (!window.isCardProgrammed(k)) {
-        delete s.collection[k];
-        modified = true;
-      }
+  // 1. Limpieza y aislamiento estricto de colecciones
+  s.collection = s.collection || {};
+  s.collectionMundo3 = s.collectionMundo3 || {};
+
+  // Mover cartas 5D's que hayan caído en s.collection hacia s.collectionMundo3
+  Object.keys(s.collection).forEach(function(k) {
+    if (typeof window.is5DCard === 'function' && window.is5DCard(k)) {
+      s.collectionMundo3[k] = Math.max(s.collectionMundo3[k] || 0, s.collection[k]);
+      delete s.collection[k];
+      modified = true;
+    } else if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(k)) {
+      delete s.collection[k];
+      modified = true;
     }
-  }
-  // Migrar cualquier carta que haya quedado en Extra Deck a la coleccion / banca principal
+  });
+
+  // Mover cartas clásicas que hayan caído en s.collectionMundo3 hacia s.collection
+  Object.keys(s.collectionMundo3).forEach(function(k) {
+    if (typeof window.isCardAllowedInWorld === 'function' && !window.isCardAllowedInWorld(k, 3)) {
+      s.collection[k] = Math.max(s.collection[k] || 0, s.collectionMundo3[k]);
+      delete s.collectionMundo3[k];
+      modified = true;
+    }
+  });
+
+  // 2. Extra Deck en Mundo 1/2 no existe: migrar cartas al destino correcto
   if (s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
-    s.collection = s.collection || {};
     s.extra.forEach(function(cardName) {
       if (cardName) {
-        s.collection[cardName] = (s.collection[cardName] || 0) + 1;
+        if (typeof window.is5DCard === 'function' && window.is5DCard(cardName)) {
+          s.collectionMundo3[cardName] = (s.collectionMundo3[cardName] || 0) + 1;
+        } else {
+          s.collection[cardName] = (s.collection[cardName] || 0) + 1;
+        }
         modified = true;
       }
     });
     s.extra = [];
     modified = true;
   }
-  if (s.decks && typeof s.decks === 'object') {
-    Object.keys(s.decks).forEach(function(dk) {
-      if (dk.endsWith('_extra')) {
-        var exList = s.decks[dk];
-        if (Array.isArray(exList)) {
-          exList.forEach(function(cName) {
-            if (cName) {
-              s.collection[cName] = (s.collection[cName] || 0) + 1;
-              modified = true;
-            }
-          });
-        }
-        delete s.decks[dk];
-        modified = true;
-      }
-    });
-  }
 
+  // 3. Limpiar decks clásicos (s.decks y s.deck) de cualquier carta 5D's
   var defaultFillers = ['Celtic Guardian', 'Silver Fang', 'Mammoth Graveyard', 'Feral Imp', 'Winged Dragon, Guardian of the Fortress #1'];
-  function sanitizeDeck(deckArr) {
+  function sanitizeClassicDeck(deckArr) {
     if (!Array.isArray(deckArr)) return deckArr;
     var filtered = deckArr.filter(function(cardName) {
       if (!window.isCardProgrammed(cardName)) {
         modified = true;
         return false;
       }
+      if (typeof window.is5DCard === 'function' && window.is5DCard(cardName)) {
+        modified = true;
+        return false;
+      }
       return true;
     });
     var fIdx = 0;
-    while (filtered.length < 40) {
+    while (filtered.length < 40 && filtered.length > 0) {
       filtered.push(defaultFillers[fIdx % defaultFillers.length]);
       fIdx++;
       modified = true;
     }
     return filtered;
   }
+
   if (Array.isArray(s.deck)) {
-    s.deck = sanitizeDeck(s.deck);
+    s.deck = sanitizeClassicDeck(s.deck);
   }
   if (s.decks && typeof s.decks === 'object') {
     for (var dName in s.decks) {
-      if (Array.isArray(s.decks[dName])) {
-        s.decks[dName] = sanitizeDeck(s.decks[dName]);
+      if (dName.endsWith('_extra')) {
+        var exList = s.decks[dName];
+        if (Array.isArray(exList)) {
+          exList.forEach(function(cName) {
+            if (cName) {
+              if (typeof window.is5DCard === 'function' && window.is5DCard(cName)) {
+                s.collectionMundo3[cName] = (s.collectionMundo3[cName] || 0) + 1;
+              } else {
+                s.collection[cName] = (s.collection[cName] || 0) + 1;
+              }
+              modified = true;
+            }
+          });
+        }
+        delete s.decks[dName];
+        modified = true;
+      } else if (Array.isArray(s.decks[dName])) {
+        s.decks[dName] = sanitizeClassicDeck(s.decks[dName]);
       }
     }
   }
+
+  // 4. Limpiar decks de Mundo 3 (s.decksMundo3)
+  if (s.decksMundo3 && typeof s.decksMundo3 === 'object') {
+    if (s.decksMundo3['Principal'] && (s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal']))) {
+      s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
+      s.decksMundo3['Extra'] = window.generate5DExtraDeck ? window.generate5DExtraDeck() : [];
+      s.decksMundo3['Principal'].forEach(function(n) { s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, 1); });
+      s.decksMundo3['Extra'].forEach(function(n) { s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, 1); });
+      modified = true;
+    }
+
+    var defaultM3Fillers = ['Speed Warrior', 'Sonic Chick', 'Junk Synchron', 'Quillbolt Hedgehog', 'Assault Dog'];
+    function sanitizeMundo3Deck(deckArr) {
+      if (!Array.isArray(deckArr)) return deckArr;
+      var filtered = deckArr.filter(function(cardName) {
+        if (!window.isCardProgrammed(cardName)) {
+          modified = true;
+          return false;
+        }
+        if (typeof window.isCardAllowedInWorld === 'function' && !window.isCardAllowedInWorld(cardName, 3)) {
+          modified = true;
+          return false;
+        }
+        return true;
+      });
+      var fIdx = 0;
+      while (filtered.length < 40 && filtered.length > 0) {
+        filtered.push(defaultM3Fillers[fIdx % defaultM3Fillers.length]);
+        fIdx++;
+        modified = true;
+      }
+      return filtered;
+    }
+
+    for (var m3Key in s.decksMundo3) {
+      if (m3Key === 'Extra') {
+        if (Array.isArray(s.decksMundo3['Extra'])) {
+          s.decksMundo3['Extra'] = s.decksMundo3['Extra'].filter(function(c) {
+            return typeof window.is5DCard === 'function' && window.is5DCard(c);
+          });
+        }
+      } else if (Array.isArray(s.decksMundo3[m3Key])) {
+        s.decksMundo3[m3Key] = sanitizeMundo3Deck(s.decksMundo3[m3Key]);
+      }
+    }
+  }
+
   if (modified) {
     if (typeof window.persistUserSave === 'function') {
       window.persistUserSave(s);
@@ -14190,6 +14317,8 @@ window.customShowShop = function() {
     let m1ActiveDeckBackup = s.activeDeck;
     let m1DeckBackup = s.deck;
 
+    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
+
     if (is5D) {
         s.decksMundo3 = s.decksMundo3 || {};
         s.collectionMundo3 = s.collectionMundo3 || {};
@@ -14211,7 +14340,6 @@ window.customShowShop = function() {
         s.deck = s.decks[s.activeDeck] || [];
     } else {
         s.collection = s.collection || {};
-        if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
         s.deck = s.deck || [];
         s.decks = s.decks || {};
         if (Object.keys(s.decks).length === 0) {
@@ -14356,6 +14484,13 @@ window.customShowShop = function() {
         else {
             origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
+        }
+        if (is5D) {
+            s.decks = s.decksMundo3;
+            s.collection = s.collectionMundo3;
+            s.activeDeck = s.activeDeckMundo3;
+            s.extra = s.decksMundo3['Extra'] || [];
+            s.deck = s.decks[s.activeDeck] || [];
         }
     }
 
@@ -16024,7 +16159,10 @@ window.customShowDeckEditor = function() {
     if (!sStr) return;
     let s = JSON.parse(sStr);
     
+    if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
+
     let is5D = ((s.world || 1) === 3);
+    let targetWorld = is5D ? 3 : 1;
     let m1DecksBackup = s.decks;
     let m1CollectionBackup = s.collection;
     let m1ActiveDeckBackup = s.activeDeck;
@@ -16056,7 +16194,6 @@ window.customShowDeckEditor = function() {
     } else {
         s.collection = s.collection || {};
         s.decks = s.decks || {};
-        if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
         if (!s.deck || s.deck.length === 0 || window.isTaintedTristanDeck(s.deck)) {
             s.deck = [...DEF];
             DEF.forEach(n => s.collection[n] = Math.max(s.collection[n] || 0, DEF.filter(x => x === n).length));
@@ -16096,6 +16233,13 @@ window.customShowDeckEditor = function() {
             origSet(curSaveKey, JSON.stringify(s));
             origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
             if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(s);
+        }
+        if (is5D) {
+            s.decks = s.decksMundo3;
+            s.collection = s.collectionMundo3;
+            s.activeDeck = s.activeDeckMundo3;
+            s.extra = s.decksMundo3['Extra'] || [];
+            s.deck = s.decks[s.activeDeck] || [];
         }
     }
     
@@ -16272,17 +16416,36 @@ window.customShowDeckEditor = function() {
 
     // Ensure all cards in any deck or extra are in collection count
     Object.values(s.decks).forEach(dArr => {
-        if (Array.isArray(dArr)) dArr.forEach(n => { if ((s.collection[n] || 0) < 1) s.collection[n] = 1; });
+        if (Array.isArray(dArr)) dArr.forEach(n => {
+            if (window.isCardAllowedInWorld(n, targetWorld)) {
+                if ((s.collection[n] || 0) < 1) s.collection[n] = 1;
+            }
+        });
     });
-    s.extra.forEach(n => { if ((s.collection[n] || 0) < 1) s.collection[n] = 1; });
+    if (is5D && Array.isArray(s.extra)) {
+        s.extra.forEach(n => {
+            if (window.isCardAllowedInWorld(n, 3)) {
+                if ((s.collection[n] || 0) < 1) s.collection[n] = 1;
+            }
+        });
+    }
 
-    let ownedSet = new Set(Object.keys(s.collection).filter(n => s.collection[n] > 0));
+    let ownedSet = new Set(Object.keys(s.collection).filter(n => (s.collection[n] > 0) && window.isCardAllowedInWorld(n, targetWorld)));
     Object.values(s.decks).forEach(dArr => {
-        if (Array.isArray(dArr)) dArr.forEach(n => ownedSet.add(n));
+        if (Array.isArray(dArr)) dArr.forEach(n => {
+            if (window.isCardAllowedInWorld(n, targetWorld)) ownedSet.add(n);
+        });
     });
-    s.extra.forEach(n => ownedSet.add(n));
+    if (is5D && Array.isArray(s.extra)) {
+        s.extra.forEach(n => {
+            if (window.isCardAllowedInWorld(n, 3)) ownedSet.add(n);
+        });
+    }
     ownedSet.forEach(name => {
         if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(name)) {
+            ownedSet.delete(name);
+        }
+        if (!window.isCardAllowedInWorld(name, targetWorld)) {
             ownedSet.delete(name);
         }
     });
@@ -16422,6 +16585,7 @@ window.customShowDeckEditor = function() {
     }
 
     function matchesFilter(name, info) {
+        if (!window.isCardAllowedInWorld(name, targetWorld)) return false;
         if (currentFilter.text && !name.toLowerCase().includes(currentFilter.text)) return false;
         if (currentFilter.cardType) {
             var isSpell = (info.type === 'SPELL' || info.type === 'EQUIP' || info.kind === 'SPELL' || info.kind === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(info)) || (!info.isMonster && info.type !== 'TRAP'));
@@ -16528,6 +16692,11 @@ window.customShowDeckEditor = function() {
                     alert(`⚠️ Para activar este deck para los duelos debe tener EXACTAMENTE 40 cartas.\n(Actualmente tiene ${curArr.length}/40 cartas).`);
                     return;
                 }
+                let invalidInDeck = curArr.filter(c => !window.isCardAllowedInWorld(c, targetWorld));
+                if (invalidInDeck.length > 0) {
+                    alert(`⚠️ Este deck contiene cartas no compatibles con este mundo (${invalidInDeck.slice(0, 3).join(', ')}).\nPor favor cámbialas antes de activarlo.`);
+                    return;
+                }
                 s.activeDeck = currentDeckKey;
                 s.deck = [...curArr];
                 persistSave();
@@ -16550,7 +16719,8 @@ window.customShowDeckEditor = function() {
                 return;
             }
             let copyCurrent = confirm(`¿Deseas duplicar las cartas del deck actual ("${currentDeckKey}") en el nuevo deck?\n\n(Aceptar = Duplicar actual / Cancelar = Iniciar deck vacío)`);
-            s.decks[name] = copyCurrent ? [...(s.decks[currentDeckKey] || [])] : [];
+            let sourceArr = s.decks[currentDeckKey] || [];
+            s.decks[name] = copyCurrent ? sourceArr.filter(c => window.isCardAllowedInWorld(c, targetWorld)) : [];
             currentDeckKey = name;
             persistSave();
             window.playViolinClick && window.playViolinClick();
@@ -16604,6 +16774,19 @@ window.customShowDeckEditor = function() {
 
     function renderRows() {
         let currentDeck = s.decks[currentDeckKey] = s.decks[currentDeckKey] || [];
+        let illegalCards = currentDeck.filter(c => !window.isCardAllowedInWorld(c, targetWorld));
+        if (illegalCards.length > 0) {
+            currentDeck = s.decks[currentDeckKey] = currentDeck.filter(c => window.isCardAllowedInWorld(c, targetWorld));
+            if (currentDeckKey === s.activeDeck) s.deck = [...currentDeck];
+            persistSave();
+        }
+        if (is5D && Array.isArray(s.extra)) {
+            let illegalExtra = s.extra.filter(c => !window.is5DCard(c));
+            if (illegalExtra.length > 0) {
+                s.extra = s.extra.filter(c => window.is5DCard(c));
+                persistSave();
+            }
+        }
         let deckCounts = {};
         currentDeck.forEach(n => deckCounts[n] = (deckCounts[n] || 0) + 1);
         let exCounts = {};
@@ -16772,6 +16955,12 @@ window.customShowDeckEditor = function() {
             let deckBtn = tr.querySelector('.deck-btn');
             deckBtn.onclick = (e) => {
                 e.stopPropagation();
+                if (!window.isCardAllowedInWorld(name, targetWorld)) {
+                    alert(is5D 
+                        ? `⚠️ "${name}" no pertenece al Mundo de 5D's. Las cartas de otros mundos no se pueden añadir a este deck.`
+                        : `⚠️ "${name}" pertenece al Mundo de 5D's. No es compatible con este mundo y no se puede añadir.`);
+                    return;
+                }
                 if (!canAddMore) {
                     alert('Ya tienes el límite máximo permitido (' + maxC + ') de ' + name + ' en este Deck.');
                     return;
@@ -18318,13 +18507,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (is5DDuel) {
       if (sSave && sSave.decksMundo3) {
         var aKey = sSave.activeDeckMundo3 || 'Principal';
-        if (Array.isArray(sSave.decksMundo3[aKey]) && sSave.decksMundo3[aKey].length === 40 && !window.isTaintedTristanDeck(sSave.decksMundo3[aKey])) {
-          playerCardNames = sSave.decksMundo3[aKey];
-        } else if (Array.isArray(sSave.decksMundo3['Principal']) && sSave.decksMundo3['Principal'].length === 40 && !window.isTaintedTristanDeck(sSave.decksMundo3['Principal'])) {
-          playerCardNames = sSave.decksMundo3['Principal'];
+        var candDeck = Array.isArray(sSave.decksMundo3[aKey]) ? sSave.decksMundo3[aKey] : sSave.decksMundo3['Principal'];
+        if (Array.isArray(candDeck) && candDeck.length === 40 && !window.isTaintedTristanDeck(candDeck)) {
+          var hasInvalid5D = candDeck.some(function(c) { return !window.isCardAllowedInWorld(c, 3); });
+          if (!hasInvalid5D) {
+            playerCardNames = candDeck;
+          }
         }
         if (Array.isArray(sSave.decksMundo3['Extra'])) {
-          playerExtraNames = sSave.decksMundo3['Extra'];
+          playerExtraNames = sSave.decksMundo3['Extra'].filter(function(c) { return window.is5DCard(c); });
         }
       }
       if (!playerCardNames || playerCardNames.length !== 40) {
@@ -18353,10 +18544,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     } else {
       if (sSave) {
-        if (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40 && !window.isTaintedTristanDeck(sSave.decks[sSave.activeDeck])) {
-          playerCardNames = sSave.decks[sSave.activeDeck];
-        } else if (Array.isArray(sSave.deck) && sSave.deck.length === 40 && !window.isTaintedTristanDeck(sSave.deck)) {
-          playerCardNames = sSave.deck;
+        var candClassic = (sSave.decks && sSave.activeDeck && Array.isArray(sSave.decks[sSave.activeDeck]) && sSave.decks[sSave.activeDeck].length === 40)
+          ? sSave.decks[sSave.activeDeck]
+          : ((Array.isArray(sSave.deck) && sSave.deck.length === 40) ? sSave.deck : null);
+        if (candClassic && !window.isTaintedTristanDeck(candClassic)) {
+          var has5DInClassic = candClassic.some(function(c) { return window.is5DCard(c); });
+          if (!has5DInClassic) {
+            playerCardNames = candClassic;
+          }
         }
       }
       if (!playerCardNames || playerCardNames.length !== 40) {
