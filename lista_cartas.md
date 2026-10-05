@@ -11,7 +11,7 @@
 | #010 | **Harpie Lady** | Monstruo (Winged Beast) | 1300 / 1400 | imagenescartas/Mundo1/010.jpeg |
 | #013 | **Summoned Skull** | Monstruo (Fiend) | 2500 / 1200 | imagenescartas/Mundo1/013.jpg |
 | #015 | **Winged Dragon, Guardian of the Fortress #1** | Monstruo (Dragon) | 1400 / 1200 | imagenescartas/Mundo1/015.jpg |
-| #017 | **Cyber Commander** | Monstruo (Machine) | 750 / 700 | imagenescartas/Mundo1/114.jpg |
+| #017 | **Cyber Commander** | Monstruo (Machine) | 750 / 700 | imagenescartas/Mundo1/017.jpg |
 | #019 | **Celtic Guardian** | Monstruo (Warrior) | 1400 / 1200 | imagenescartas/Mundo1/019.jpeg |
 | #020 | **Baby Dragon** | Monstruo (Dragon) | 700 / 700 | imagenescartas/Mundo1/020.jpeg |
 | #021 | **Silver Fang** | Monstruo (Beast) | 1200 / 800 | imagenescartas/Mundo1/021.jpg |
