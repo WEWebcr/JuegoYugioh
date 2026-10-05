@@ -661,6 +661,7 @@ const portraitMap = {
     'CHUMLEY': 'Chumley.jpg', 'SYRUS': 'Syrus.png', 'JADEN': 'Jaden.png',
     'BASTION': 'Bastion.png', 'ALEXIS': 'Alexis.png', 'CHAZZ': 'Chazz.png',
     'ZANE': 'Zane.png', 'CROWLER': 'Crowler.png', 'ASTER': 'Aster.png',
+    'DOROTHY': 'Dorothy.png',
     // 5D's characters (Mundo 3)
     'TRUDGE': 'Trudge.png', 'LEO': 'Leo.png', 'AKIZA': 'Akiza.png',
     'CROW': 'Crow.png', 'JACK': 'Jack.png', 'YUSEI': 'Yusei.png',
@@ -697,6 +698,7 @@ const dialogPortraitMap = {
     'ZANE': 'Zane.png',
     'CROWLER': 'Crowler.png',
     'ASTER': 'Aster.png',
+    'DOROTHY': 'Dorothy.png',
     // 5D's characters (Mundo 3)
     'TRUDGE': 'Trudge.png',
     'LEO': 'Leo.png',
@@ -734,6 +736,7 @@ window.DUELISTS_NAMES = {
     'zane': 'Zane Truesdale',
     'crowler': 'Dr. Vellian Crowler',
     'aster': 'Aster Phoenix',
+    'dorothy': 'Señora Dorothy',
     // 5D's characters (Mundo 3)
     'trudge': 'Tetsu Trudge',
     'leo': 'Leo (Rua)',
@@ -837,6 +840,18 @@ window.playCustomMusic = function(fileName) {
             p.catch(e => console.log('BGM play deferred until interaction:', e));
         }
     }
+};
+
+window.getMapBgm = function(world) {
+    if (world === 3) return 'mapa_5d.mp3';
+    if (world === 2) return 'mapa_gx.mp3';
+    return 'mapa.mp3';
+};
+
+window.getShopBgm = function(world) {
+    if (world === 3) return 'tienda_5d.mp3';
+    if (world === 2) return 'tienda_gx.mp3';
+    return 'tienda.mp3';
 };
 
 window.getDuelMusic = function(charId) {
@@ -3032,7 +3047,7 @@ window.CUSTOM_NODES_GX = [
     { id: 'gx7', left: '65%', top: '30%', label: 'ZANE', char: 'ZANE', req: ['chazz'] },
     { id: 'gx8', left: '50%', top: '21%', label: 'CROWLER', char: 'CROWLER', req: ['zane'] },
     { id: 'gx9', left: '50%', top: '11%', label: 'ASTER', char: 'ASTER', req: ['crowler'] },
-    { id: 'gx_shop', left: '88%', top: '84%', label: 'TIENDA GX', char: 'ABUELO', req: [] }
+    { id: 'gx_shop', left: '88%', top: '84%', label: 'TIENDA GX', char: 'DOROTHY', req: [] }
 ];
 
 const MAP_EDGES_GX = [
@@ -3103,7 +3118,6 @@ window.customShowMap = function() {
     if (window.cleanAllOverlays) window.cleanAllOverlays();
     if (window.hideDuelBoard) window.hideDuelBoard();
     if (window.nativeAPI && window.nativeAPI.showShell) window.nativeAPI.showShell();
-    window.playCustomMusic('mapa.mp3');
     
     let camp = document.getElementById('campaign3000');
     if (camp) { camp.innerHTML = ''; camp.classList.add('hidden'); }
@@ -3119,6 +3133,8 @@ window.customShowMap = function() {
     
     let is5D = ((s.world || 1) === 3);
     let isGX = ((s.world || 1) === 2);
+    let curWorld = is5D ? 3 : (isGX ? 2 : 1);
+    window.playCustomMusic(window.getMapBgm(curWorld));
 
     // Inicializar Starter Deck y Colección para Mundo 3 si entra por primera vez
     if (is5D) {
@@ -3158,10 +3174,10 @@ window.customShowMap = function() {
     let map = document.createElement('div');
     map.id = 'map-container-overlay';
     let mapBg = is5D
-        ? 'linear-gradient(180deg, rgba(3,10,22,0.88) 0%, rgba(5,18,36,0.94) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #020814;'
+        ? 'linear-gradient(180deg, rgba(3,10,22,0.60) 0%, rgba(5,18,36,0.78) 100%), url("ImagenesPersonajes/map_bg_5d.jpg") center center / cover no-repeat, #020814;'
         : (isGX 
-            ? 'linear-gradient(180deg, rgba(4,14,32,0.85) 0%, rgba(8,24,56,0.92) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #030a18;'
-            : 'linear-gradient(180deg, rgba(8,5,2,0.72) 0%, rgba(18,12,5,0.84) 100%), url("ImagenesPersonajes/PortadaPrincipal.jpeg") center center / cover no-repeat, #0a0600;');
+            ? 'linear-gradient(180deg, rgba(4,14,32,0.55) 0%, rgba(8,24,56,0.72) 100%), url("ImagenesPersonajes/map_bg_gx.jpg") center center / cover no-repeat, #030a18;'
+            : 'linear-gradient(180deg, rgba(8,5,2,0.55) 0%, rgba(18,12,5,0.72) 100%), url("ImagenesPersonajes/map_bg_m1.jpg") center center / cover no-repeat, #0a0600;');
     map.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: ' + mapBg + ' overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; font-family:"Segoe UI", sans-serif;';
     
     let mapStage = document.createElement('div');
@@ -5305,8 +5321,6 @@ if (window.nativeAPI) window.nativeAPI.showShop = window.customShowShop;
 window.showShop = window.customShowShop;
 
 window.openCustomShopMenu = function() {
-    window.playCustomMusic('tienda.mp3');
-    
     let existing = document.getElementById('custom-shop-menu');
     if (existing) existing.remove();
 
@@ -5319,6 +5333,8 @@ window.openCustomShopMenu = function() {
     s.cleared = s.cleared || [];
     s.activeDeck = s.activeDeck || Object.keys(s.decks)[0] || 'Deck 1';
     let is5DShop = ((s.world || 1) === 3);
+    let isGXShop = ((s.world || 1) === 2);
+    window.playCustomMusic(window.getShopBgm(s ? s.world : 1));
     let curActiveDeck = s.decks[s.activeDeck] || s.deck;
     if (is5DShop) {
         s.decksMundo3 = s.decksMundo3 || {};
@@ -5761,14 +5777,20 @@ window.openCustomShopMenu = function() {
     overlay.appendChild(bgParticles);
 
     // 1. TOP HEADER STATUS BAR
-    let shopThemeColor = is5DShop ? '#00e5ff' : '#ffd700';
-    let shopBorderColor = is5DShop ? '#00838f' : '#b8860b';
-    let shopBgHeader = is5DShop ? 'linear-gradient(180deg, rgba(8,20,30,0.95) 0%, rgba(4,10,18,0.7) 100%)' : 'linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%)';
+    let shopThemeColor = is5DShop ? '#00e5ff' : (isGXShop ? '#ffca28' : '#ffd700');
+    let shopBorderColor = is5DShop ? '#00838f' : (isGXShop ? '#d32f2f' : '#b8860b');
+    let shopBgHeader = is5DShop ? 'linear-gradient(180deg, rgba(8,20,30,0.95) 0%, rgba(4,10,18,0.7) 100%)' : (isGXShop ? 'linear-gradient(180deg, rgba(32,10,18,0.95) 0%, rgba(16,5,9,0.7) 100%)' : 'linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%)');
     let thirdStatHtml = is5DShop ? `
         <div class="shop-stat-badge" style="background:#07212b; border:1px solid #00e5ff; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Monstruos Sincronía en tu Extra Deck">
             <span style="font-size:15px;">⭐</span>
             <span style="color:#00e5ff; font-size:11px; font-weight:bold;">EXTRA DECK:</span>
             <span style="color:#fff; font-weight:bold; font-size:12px;">${(s.decksMundo3 && s.decksMundo3['Extra'] ? s.decksMundo3['Extra'].length : 0)} / 15</span>
+        </div>
+    ` : (isGXShop ? `
+        <div class="shop-stat-badge" style="background:#200a12; border:1px solid #ff3366; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Dormitorios de la Academia de Duelos">
+            <span style="font-size:15px;">🎓</span>
+            <span style="color:#ff6688; font-size:11px; font-weight:bold;">ACADEMIA:</span>
+            <span style="color:#fff; font-weight:bold; font-size:12px;">GX</span>
         </div>
     ` : `
         <div class="shop-stat-badge" style="background:#281c00; border:1px solid #b8860b; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Artículos del Milenio en tu poder">
@@ -5776,23 +5798,23 @@ window.openCustomShopMenu = function() {
             <span style="color:#ffd700; font-size:11px; font-weight:bold;">MILENIO:</span>
             <span style="color:#fff; font-weight:bold; font-size:12px;">${unlockedCount} / 7</span>
         </div>
-    `;
+    `);
 
     let topBar = document.createElement('div');
     topBar.id = 'shop-top-bar';
     topBar.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:12px 28px; background:${shopBgHeader}; border-bottom:2px solid ${shopBorderColor}; box-shadow:0 4px 15px rgba(0,0,0,0.6); z-index:10;`;
     topBar.innerHTML = `
         <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-            <span style="font-size:24px; filter:drop-shadow(0 0 6px ${shopThemeColor}); flex-shrink:0;">${is5DShop ? '⚙️' : '🏺'}</span>
+            <span style="font-size:24px; filter:drop-shadow(0 0 6px ${shopThemeColor}); flex-shrink:0;">${is5DShop ? '⚙️' : (isGXShop ? '🥪' : '🏺')}</span>
             <div style="min-width:0;">
-                <div class="shop-header-title" style="font-family:VT323, monospace; color:${shopThemeColor}; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px ${is5DShop ? 'rgba(0,229,255,0.5)' : 'rgba(255,215,0,0.5)'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    ${is5DShop ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY' : 'KAME GAME · TIENDA DEL ABUELO MOTO'}
+                <div class="shop-header-title" style="font-family:VT323, monospace; color:${shopThemeColor}; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px ${is5DShop ? 'rgba(0,229,255,0.5)' : (isGXShop ? 'rgba(255,202,40,0.5)' : 'rgba(255,215,0,0.5)')}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    ${is5DShop ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY' : (isGXShop ? 'ACADEMIA DE DUELOS · TIENDA DE DOROTHY' : 'KAME GAME · TIENDA DEL ABUELO MOTO')}
                 </div>
-                <div class="shop-header-subtitle" style="font-size:12px; color:${is5DShop ? '#80deea' : '#c7a76d'}; letter-spacing:0.5px;">${is5DShop ? 'Chatarrería de Piezas, Cartas y Monstruos de Sincronía' : 'Bazar Ancestral de Cartas y Reliquias Milenarias'}</div>
+                <div class="shop-header-subtitle" style="font-size:12px; color:${is5DShop ? '#80deea' : (isGXShop ? '#ffb74d' : '#c7a76d')}; letter-spacing:0.5px;">${is5DShop ? 'Chatarrería de Piezas, Cartas y Monstruos de Sincronía' : (isGXShop ? 'Boutique Escolar · Cartas Oficiales, Sándwiches y Sobres GX' : 'Bazar Ancestral de Cartas y Reliquias Milenarias')}</div>
             </div>
         </div>
         <div class="shop-top-stats" style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-            <div class="shop-stat-badge" style="background:${is5DShop ? '#081c24' : '#201608'}; border:1px solid ${shopThemeColor}; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
+            <div class="shop-stat-badge" style="background:${is5DShop ? '#081c24' : (isGXShop ? '#200a12' : '#201608')}; border:1px solid ${shopThemeColor}; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
                 <span style="font-size:15px;">💰</span>
                 <span style="color:#aaa; font-size:11px; font-weight:bold;">PM:</span>
                 <span style="color:${shopThemeColor}; font-weight:bold; font-size:15px; font-family:VT323, monospace;" id="shop-menu-pm">${s.pm || 0}</span>
@@ -5808,24 +5830,26 @@ window.openCustomShopMenu = function() {
     `;
     overlay.appendChild(topBar);
 
-    // 2. MIDDLE WORKSPACE (Left: Grandpa Moto / Rally with Speech Bubble, Right: Action Menu)
+    // 2. MIDDLE WORKSPACE (Left: Grandpa Moto / Dorothy / Rally with Speech Bubble, Right: Action Menu)
     let workspace = document.createElement('div');
     workspace.id = 'shop-workspace';
     workspace.style.cssText = 'flex: 1; display:flex; flex-direction:row; padding:10px 30px 4px 30px; box-sizing:border-box; overflow:hidden; position:relative; align-items:center; justify-content:space-between; gap:20px;';
 
-    // LEFT: GRANDPA MOTO / RALLY + SPEECH BUBBLE
+    // LEFT: GRANDPA MOTO / DOROTHY / RALLY + SPEECH BUBBLE
     let grandpaWrap = document.createElement('div');
     grandpaWrap.id = 'shop-grandpa-wrap';
     grandpaWrap.style.cssText = 'flex: 1; height: 100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; max-width: 480px; box-sizing:border-box;';
 
     let defaultGreeting = is5DShop 
         ? '¡Hola, compañero! Encontré unas cartas geniales y repuestos en Satélite. ¿En qué puedo ayudarte hoy?'
-        : '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?';
+        : (isGXShop 
+            ? '¡Hola, querido duelista! Acaban de llegar nuevos sobres y los deliciosos sándwiches de la Academia. ¿En qué puedo ayudarte hoy?'
+            : '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?');
 
     // Speech bubble
     let bubble = document.createElement('div');
     bubble.id = 'grandpa-speech-bubble';
-    bubble.style.cssText = `position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, ${is5DShop ? '#081a24' : '#2b2010'} 0%, ${is5DShop ? '#040d14' : '#181208'} 100%); border: 2px solid ${shopThemeColor}; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px ${is5DShop ? 'rgba(0,229,255,0.3)' : 'rgba(255,215,0,0.25)'}; z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;`;
+    bubble.style.cssText = `position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, ${is5DShop ? '#081a24' : (isGXShop ? '#240810' : '#2b2010')} 0%, ${is5DShop ? '#040d14' : (isGXShop ? '#120408' : '#181208')} 100%); border: 2px solid ${shopThemeColor}; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px ${is5DShop ? 'rgba(0,229,255,0.3)' : (isGXShop ? 'rgba(255,202,40,0.3)' : 'rgba(255,215,0,0.25)')}; z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;`;
     
     // Bubble pointer tail
     let bubbleTail = document.createElement('div');
@@ -5836,7 +5860,7 @@ window.openCustomShopMenu = function() {
     let bubbleTitle = document.createElement('div');
     bubbleTitle.id = 'grandpa-speech-title';
     bubbleTitle.style.cssText = `font-weight:bold; font-size:11px; color:${shopThemeColor}; font-family:VT323, monospace; letter-spacing:1px; margin-bottom:3px; display:flex; align-items:center; gap:5px;`;
-    bubbleTitle.innerHTML = is5DShop ? '<span>⚙️ RALLY DAWSON DICE:</span>' : '<span>👴 ABUELO MOTO DICE:</span>';
+    bubbleTitle.innerHTML = is5DShop ? '<span>⚙️ RALLY DAWSON DICE:</span>' : (isGXShop ? '<span>🥪 SEÑORA DOROTHY DICE:</span>' : '<span>👴 ABUELO MOTO DICE:</span>');
     bubble.appendChild(bubbleTitle);
 
     let bubbleText = document.createElement('div');
@@ -5852,18 +5876,20 @@ window.openCustomShopMenu = function() {
     auraGlow.id = 'shop-aura-glow';
     auraGlow.style.cssText = is5DShop 
         ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(0, 229, 255, 0.25) 0%, rgba(0, 150, 255, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
-        : 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;';
+        : (isGXShop 
+            ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 64, 129, 0.25) 0%, rgba(255, 193, 7, 0.12) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
+            : 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;');
     grandpaWrap.appendChild(auraGlow);
 
     // Character Image (Interactive + Breathing animation)
     let grandpaImg = document.createElement('img');
     grandpaImg.id = 'shop-grandpa-img';
-    grandpaImg.src = is5DShop ? 'ImagenesPersonajes/Rally.png' : 'ImagenesPersonajes/abueloYugi.jpg';
-    grandpaImg.alt = is5DShop ? 'Rally Dawson' : 'Abuelo Moto';
-    grandpaImg.style.cssText = `height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px ${is5DShop ? 'rgba(0, 229, 255, 0.45)' : 'rgba(255, 180, 0, 0.45)'}); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;`;
-    grandpaImg.title = is5DShop ? '¡Haz clic para hablar con Rally Dawson!' : '¡Haz clic para hablar con el Abuelo Moto!';
+    grandpaImg.src = is5DShop ? 'ImagenesPersonajes/Rally.png' : (isGXShop ? 'ImagenesPersonajes/Dorothy.png' : 'ImagenesPersonajes/abueloYugi.jpg');
+    grandpaImg.alt = is5DShop ? 'Rally Dawson' : (isGXShop ? 'Señora Dorothy' : 'Abuelo Moto');
+    grandpaImg.style.cssText = `height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px ${is5DShop ? 'rgba(0, 229, 255, 0.45)' : (isGXShop ? 'rgba(255, 202, 40, 0.45)' : 'rgba(255, 180, 0, 0.45)')}); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;`;
+    grandpaImg.title = is5DShop ? '¡Haz clic para hablar con Rally Dawson!' : (isGXShop ? '¡Haz clic para hablar con la Señora Dorothy!' : '¡Haz clic para hablar con el Abuelo Moto!');
 
-    // Random wisdom quotes for clicking Grandpa / Rally
+    // Random wisdom quotes for clicking Grandpa / Dorothy / Rally
     const GRANDPA_RANDOM_QUOTES = [
       '¡Cree siempre en el Corazón de las Cartas, muchacho! Ellas responderán a tu espíritu.',
       '¡Esa baraja tuya tiene un vínculo sagrado contigo! Cuida a cada uno de tus monstruos.',
@@ -5872,6 +5898,15 @@ window.openCustomShopMenu = function() {
       '¡Un verdadero duelista jamás se rinde, ni siquiera cuando sólo le quedan 100 LP!',
       '¡Me alegra mucho verte por aquí! Tómate tu tiempo para revisar tus cartas y preparar tu estrategia.',
       'Si combinas cartas afines en el tablero, ¡puedes desatar fusiones sorprendentes!'
+    ];
+
+    const DOROTHY_RANDOM_QUOTES = [
+      '¡Los sándwiches de huevo dorado traen cartas rarísimas adentro! ¡Jaden siempre corre para conseguir uno!',
+      '¡Bienvenido a la Tienda de la Academia! Aquí los duelistas de Slifer, Ra y Obelisk son bienvenidos por igual.',
+      'Chumley siempre me pide sándwiches de queso a la parrilla... ¡es su comida favorita antes de un duelo!',
+      'El Dr. Crowler a veces viene buscando cartas raras para sus clases prácticas, ¡ju ju!',
+      '¡Revisa bien tus cartas de Fusión! En esta Academia, sincronizar tu espíritu con tus cartas es el camino a la cima.',
+      '¡Si te esfuerzas en cada duelo, algún día podrás graduarte como un auténtico Rey de los Juegos!'
     ];
 
     const RALLY_RANDOM_QUOTES = [
@@ -5897,7 +5932,7 @@ window.openCustomShopMenu = function() {
         void grandpaImg.offsetWidth;
         grandpaImg.style.animation = 'grandpaBounce 0.55s ease, grandpaFloat 3.8s ease-in-out 0.55s infinite';
         
-        let pool = is5DShop ? RALLY_RANDOM_QUOTES : GRANDPA_RANDOM_QUOTES;
+        let pool = is5DShop ? RALLY_RANDOM_QUOTES : (isGXShop ? DOROTHY_RANDOM_QUOTES : GRANDPA_RANDOM_QUOTES);
         let randomQuote = pool[Math.floor(Math.random() * pool.length)];
         setGrandpaSpeech(randomQuote);
     };
@@ -5908,7 +5943,7 @@ window.openCustomShopMenu = function() {
     let clickHint = document.createElement('div');
     clickHint.id = 'shop-grandpa-hint';
     clickHint.style.cssText = `font-size:11px; color:${shopThemeColor}; background:rgba(0,0,0,0.7); border:1px solid ${shopBorderColor}; border-radius:12px; padding:2px 10px; margin-bottom:6px; z-index:3; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px #000;`;
-    clickHint.textContent = is5DShop ? '💬 ¡Haz clic en Rally!' : '💬 ¡Haz clic en el Abuelo!';
+    clickHint.textContent = is5DShop ? '💬 ¡Haz clic en Rally!' : (isGXShop ? '💬 ¡Haz clic en Dorothy!' : '💬 ¡Haz clic en el Abuelo!');
     clickHint.onclick = grandpaImg.onclick;
     grandpaWrap.appendChild(clickHint);
 
@@ -5951,7 +5986,7 @@ window.openCustomShopMenu = function() {
                         window.playViolinClick();
                         if (camp) camp.innerHTML = '';
                         if (mapOverlay) mapOverlay.style.display = ''; 
-                        window.playCustomMusic('mapa.mp3');
+                        window.playCustomMusic(window.getMapBgm(s ? s.world : 1));
                     };
                 }
             }, 100);
@@ -5965,14 +6000,14 @@ window.openCustomShopMenu = function() {
             icon: '📜', 
             label: 'COLECCIÓN DE CARTAS', 
             desc: 'Visualiza todas las cartas que posees en tu archivo.',
-            speech: is5DShop ? '¡Aquí puedes revisar tu colección completa de cartas y repuestos de Satélite!' : '¡Aquí puedes revisar tu colección completa de cartas! ¿Qué tesoros has encontrado en tus viajes?',
+            speech: is5DShop ? '¡Aquí puedes revisar tu colección completa de cartas y repuestos de Satélite!' : (isGXShop ? '¡Aquí tienes todo el registro de cartas que has desbloqueado en la Academia!' : '¡Aquí puedes revisar tu colección completa de cartas! ¿Qué tesoros has encontrado en tus viajes?'),
             action: () => runNativeView('showCollection') 
         },
         { 
             icon: '⚔️', 
             label: 'EDITAR DECK (DASHBOARD)', 
             desc: 'Organiza tus decks y configura tu Deck Activo.',
-            speech: is5DShop ? '¡Configura tu baraja principal y tu Extra Deck para tus invocaciones por Sincronía!' : '¡El corazón del duelista! Ahora puedes crear varios decks y decidir cuál será tu Deck Activo para los combates.',
+            speech: is5DShop ? '¡Configura tu baraja principal y tu Extra Deck para tus invocaciones por Sincronía!' : (isGXShop ? '¡Prepara tu mazo para los duelos de la Academia! Combina tus cartas y perfecciona tu estrategia.' : '¡El corazón del duelista! Ahora puedes crear varios decks y decidir cuál será tu Deck Activo para los combates.'),
             action: () => {
                 window.playViolinClick();
                 overlay.remove();
@@ -5989,7 +6024,7 @@ window.openCustomShopMenu = function() {
             icon: '⚡', 
             label: 'DUELO LIBRE', 
             desc: 'Reta a duelistas superados para conseguir más cartas.',
-            speech: is5DShop ? '¿Quieres practicar tus combos de Sincronía? ¡Reta a los duelistas que ya has derrotado!' : '¿Buscas entrenar y ganar nuevas cartas? ¡Reta a cualquier rival que hayas derrotado en la cúpula de duelos!',
+            speech: is5DShop ? '¿Quieres practicar tus combos de Sincronía? ¡Reta a los duelistas que ya has derrotado!' : (isGXShop ? '¿Listo para un duelo amistoso de práctica? ¡Reta a los mejores estudiantes de la Academia!' : '¿Buscas entrenar y ganar nuevas cartas? ¡Reta a cualquier rival que hayas derrotado en la cúpula de duelos!'),
             action: () => { 
                 window.playViolinClick();
                 overlay.remove();
@@ -6000,7 +6035,7 @@ window.openCustomShopMenu = function() {
             icon: '💎', 
             label: 'TIENDA DE MEMORIAS (CARTAS)', 
             desc: 'Adquiere cartas mágicas, trampas y monstruos con PM.',
-            speech: is5DShop ? '¡Tengo cartas y repuestos de Satélite listos para intercambiar por tus PM!' : '¡He traído cartas legendarias de todas partes del mundo! Puedes comprarlas usando los PM ganados en tus duelos.',
+            speech: is5DShop ? '¡Tengo cartas y repuestos de Satélite listos para intercambiar por tus PM!' : (isGXShop ? '¡Tengo sobres oficiales y cartas especiales recién llegadas para tus PM!' : '¡He traído cartas legendarias de todas partes del mundo! Puedes comprarlas usando los PM ganados en tus duelos.'),
             action: () => {
                 overlay.remove();
                 window.customShowShop();
@@ -6026,7 +6061,7 @@ window.openCustomShopMenu = function() {
             icon: '💾', 
             label: 'GUARDAR PARTIDA', 
             desc: 'Respalda tus progresos y decks en el navegador y servidor.',
-            speech: is5DShop ? '¡Aseguremos tus cartas y tus mejoras para que no se pierdan!' : '¡Una sabia decisión! Un duelista precavido siempre asegura sus cartas y progresos.',
+            speech: is5DShop ? '¡Aseguremos tus cartas y tus mejoras para que no se pierdan!' : (isGXShop ? '¡Aseguremos tu mazo y progresos académicos para tu próximo examen de duelo!' : '¡Una sabia decisión! Un duelista precavido siempre asegura sus cartas y progresos.'),
             action: () => { 
                 if (window.persistUserSave) window.persistUserSave(s);
                 else {
@@ -6034,7 +6069,7 @@ window.openCustomShopMenu = function() {
                     origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
                     if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
                 }
-                setGrandpaSpeech(is5DShop ? '¡Partida guardada con éxito! Tus cartas de Sincronía y progresos están a salvo.' : '¡Partida guardada exitosamente! Tus progresos, cartas y barajas están respaldados con total seguridad.');
+                setGrandpaSpeech(is5DShop ? '¡Partida guardada con éxito! Tus cartas de Sincronía y progresos están a salvo.' : (isGXShop ? '¡Partida guardada con éxito! Tus progresos en la Academia están a salvo.' : '¡Partida guardada exitosamente! Tus progresos, cartas y barajas están respaldados con total seguridad.'));
                 alert('¡Partida y barajas guardadas exitosamente en el navegador y en el servidor!'); 
             } 
         },
@@ -6042,7 +6077,7 @@ window.openCustomShopMenu = function() {
             icon: '🗺️', 
             label: 'VOLVER AL MAPA', 
             desc: 'Regresa a la exploración de la campaña principal.',
-            speech: is5DShop ? '¡Ten cuidado ahí afuera en las calles de Satélite y Neo Domino!' : '¡Que la fortuna y el Corazón de las Cartas te acompañen en tu próxima batalla!',
+            speech: is5DShop ? '¡Ten cuidado ahí afuera en las calles de Satélite y Neo Domino!' : (isGXShop ? '¡Mucho éxito en tus clases y duelos en el campus de la Academia!' : '¡Que la fortuna y el Corazón de las Cartas te acompañen en tu próxima batalla!'),
             action: () => {
                 if(window.hideDuelBoard) window.hideDuelBoard();
                 window.playViolinClick(); 
@@ -6051,7 +6086,7 @@ window.openCustomShopMenu = function() {
                 if (mapOverlay) mapOverlay.style.display = '';
                 let camp = document.getElementById('campaign3000');
                 if (camp) camp.className = 'campContainer3000 hidden';
-                window.playCustomMusic('mapa.mp3'); 
+                window.playCustomMusic(window.getMapBgm(s ? s.world : 1)); 
             } 
         }
     ];
