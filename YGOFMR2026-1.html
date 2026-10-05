@@ -9184,13 +9184,6 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
     var pool = window.FMR_ST_POOL_V1 || [];
     var st = pool.find(function(c) { return c && (c.name === name || (c.name && c.name.toLowerCase() === name.toLowerCase())); });
     if (st) return Object.assign({}, st, { faceUp: true });
-    if (typeof DB !== 'undefined' && Array.isArray(DB)) {
-      var d = DB.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
-      if (d) {
-        var isTunerDb = typeof window.isTunerMonster === 'function' ? window.isTunerMonster({ name: d[0], type: d[2] }) : false;
-        return { name: d[0], level: d[1], type: d[2], attr: d[3], atk: d[4], def: d[5], kind: 'MONSTER', isTuner: isTunerDb, pos: 'ATK', materials: [], faceUp: true };
-      }
-    }
     if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
       var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase() === name.toLowerCase())); });
       if (cd) {
@@ -9216,6 +9209,13 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
             faceUp: true
           };
         }
+      }
+    }
+    if (typeof DB !== 'undefined' && Array.isArray(DB)) {
+      var d = DB.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
+      if (d) {
+        var isTunerDb = typeof window.isTunerMonster === 'function' ? window.isTunerMonster({ name: d[0], type: d[2] }) : false;
+        return { name: d[0], level: d[1], type: d[2], attr: d[3], atk: d[4], def: d[5], kind: 'MONSTER', isTuner: isTunerDb, pos: 'ATK', materials: [], faceUp: true };
       }
     }
     if (typeof mkST === 'function') {
@@ -24987,7 +24987,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (!targetLevel) return null;
 
     var reqText = (sc.text || sc.desc || '').toLowerCase();
-    var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"');
+    if (!reqText) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
+      if (foundCd && (foundCd.text || foundCd.desc)) reqText = (foundCd.text || foundCd.desc).toLowerCase();
+    }
+    var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"') || sc.name === 'Junk Warrior';
 
     // 1. Si el jugador ya seleccionó monstruos en el campo:
     var selField = (game.selected || [])
@@ -25075,16 +25079,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
   // Validación de invocación por Sincronía
   window.extraEligible = function(c) {
-    if (typeof game === 'undefined' || !game || game.turn !== 'player' || game.duelOver) return false;
-    if (game.extraUsed && game.extraUsed.includes(c.name)) return false;
+    if (typeof game === 'undefined' || !game || !c || game.turn !== 'player' || game.duelOver) return false;
 
     // Reconocer si la carta es de tipo SYNCHRO
     var kind = (c.kind || '').toUpperCase();
-    if (!kind) {
+    if (!kind || kind === 'MONSTER') {
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
       if (foundCd && foundCd.kind) {
         kind = foundCd.kind.toUpperCase();
         c.kind = kind;
+        if (!c.level && foundCd.level) c.level = foundCd.level;
+        if (!c.text && (foundCd.text || foundCd.desc)) c.text = foundCd.text || foundCd.desc;
       } else {
         kind = 'SYNCHRO';
         c.kind = 'SYNCHRO';
@@ -25099,15 +25104,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   // Representación HTML de carta en el Extra Deck con estado iluminado ⭐ INVOCABLE
   window.extraCardHTML = function(c, i) {
     if (!c) return '';
-    if (!c.kind) {
-      var found = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
-      c.kind = (found && found.kind) ? found.kind : 'SYNCHRO';
-      if (found && !c.level && found.level) c.level = found.level;
-      if (found && !c.type && found.type) c.type = found.type;
-      if (found && !c.attr && found.attr) c.attr = found.attr;
-      if (found && !c.atk && found.atk) c.atk = found.atk;
-      if (found && !c.def && found.def) c.def = found.def;
+    var found = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+    if (found) {
+      if (found.kind && (!c.kind || c.kind === 'MONSTER')) c.kind = found.kind;
+      if (!c.level && found.level) c.level = found.level;
+      if (!c.type && found.type) c.type = found.type;
+      if (!c.attr && found.attr) c.attr = found.attr;
+      if (!c.atk && found.atk) c.atk = found.atk;
+      if (!c.def && found.def) c.def = found.def;
+      if (!c.text && (found.text || found.desc)) c.text = found.text || found.desc;
     }
+    if (!c.kind || c.kind === 'MONSTER') c.kind = 'SYNCHRO';
     var sel = (game.selected || []).some(function(x) { return x && x[0] === 'x' && x[1] === i; });
     var eligible = window.extraEligible ? window.extraEligible(c) : false;
     var cls = 'card monster ' + (sel ? 'selected ' : '') + (eligible ? 'eligible' : 'disabled');
@@ -25546,15 +25553,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
-    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    var hasExtra = (g && Array.isArray(g.extra) && g.extra.length > 0);
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3) || hasExtra;
     if (document.body) {
       document.body.classList.toggle('world-3', !!is5D);
     }
     if (g) {
-      if (!is5D) {
-        g.extra = [];
-        g.extraUsed = [];
-      }
       g.linkZones = [null, null];
       g.enemyLinkZones = [null, null];
       g.linkField = null;
@@ -25570,8 +25574,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     var fb = document.getElementById('fusionBtn');
 
-    if (is5D) {
-      if (fb) {
+    if (is5D || hasExtra) {
+      if (fb && is5D) {
         fb.style.display = 'none';
         fb.disabled = true;
         fb.classList.remove('fusionReady');
@@ -26597,7 +26601,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (typeof storyDuelActive !== 'undefined' && storyDuelActive && typeof storyOpponent !== 'undefined' && storyOpponent) {
           var dObj = (typeof DUELISTS !== 'undefined' && DUELISTS.find(function(x) { return x.id === storyOpponent; }));
           var dName = dObj ? dObj.name : String(storyOpponent).toUpperCase();
-          b.textContent = 'MUNDO 1 · ' + dName;
+          var fiveDD = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+          var oppIdLower = String(storyOpponent || '').toLowerCase();
+          var wNum = 1;
+          if (typeof game !== 'undefined' && game && game._currentWorld) {
+            wNum = game._currentWorld;
+          } else if (window.currentWorld) {
+            wNum = window.currentWorld;
+          } else if (fiveDD.includes(oppIdLower)) {
+            wNum = 3;
+          }
+          b.textContent = 'MUNDO ' + wNum + ' · ' + dName;
         } else {
           b.textContent = 'Forbidden Memories Reborn';
         }
