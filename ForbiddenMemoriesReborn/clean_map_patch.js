@@ -4519,9 +4519,31 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     let is5DOpponent = FIVE_D_OPPONENTS_SET.has(normalizedOpp) || (s && s.world === 3);
     let isGXOpponent = !is5DOpponent && GX_OPPONENTS_SET.has(normalizedOpp);
 
-    // En Mundo 3 (5D's), recompensas provienen de la baraja principal y del Extra Deck del rival
+    // En Mundo 3 (5D's), recompensas provienen 100% de cartas temáticas de 5D's, Cantantes, Sincronías y soporte sin relleno de DM
     if (is5DOpponent) {
-        cardPool = [...new Set([...(oppDeck && oppDeck.cards ? oppDeck.cards : []), ...(oppDeck && oppDeck.extraDeck ? oppDeck.extraDeck : [])])];
+        const DM_FILLER_FILTER = new Set([
+            'Red Medicine', 'Dian Keto the Cure Master', 'Fissure', 'Trap Hole', 'Waboku',
+            'Dark Hole', 'Swords of Revealing Light', 'Eatgaboon', 'Bear Trap', 'Acid Trap Hole',
+            'Invisible Wire', 'Goblin Fan', 'Bad Reaction to Simochi', 'Reverse Trap', 'Fake Trap'
+        ]);
+        const FIVE_D_ALL_CARDS = [
+            'Junk Warrior', 'Goyo Guardian', 'Blackwing Armed Wing', 'Black Rose Dragon',
+            'Power Tool Dragon', 'Blackwing - Armor Master', 'Stardust Dragon', 'Red Dragon Archfiend',
+            'Junk Synchron', 'Nitro Synchron', 'Dark Resonator', 'Flare Resonator',
+            'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North',
+            'Twilight Rose Knight', 'Jutte Fighter',
+            'Speed Warrior', 'Quillbolt Hedgehog', 'Sonic Chick', 'Vice Dragon',
+            'Mad Archfiend', 'Twin-Shield Defender', 'Blackwing - Bora the Spear',
+            'Blackwing - Shura the Blue Flame', 'Botanical Lion', 'Lord Poison',
+            'Morphtronic Radion', 'Assault Dog',
+            'Synchro Blast Wave', 'Urgent Tuning'
+        ];
+        let rawDeckPool = [...new Set([...(oppDeck && oppDeck.cards ? oppDeck.cards : []), ...(oppDeck && oppDeck.extraDeck ? oppDeck.extraDeck : [])])];
+        cardPool = rawDeckPool.filter(c => !DM_FILLER_FILTER.has(c));
+        // Enriquecer con el catálogo 5D's completo
+        FIVE_D_ALL_CARDS.forEach(c => {
+            if (!cardPool.includes(c)) cardPool.push(c);
+        });
     } else if (isGXOpponent) {
         // cardPool ya contiene oppDeck.cards (su baraja principal para reforzar decks)
     } else {
@@ -4596,25 +4618,73 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     s.wins = s.wins || {};
     let oppWins = (s.wins[normalizedOpp] || 0);
 
-    // RECOMPENSAS 5D'S EXCLUSIVAS (CARTAS INSIGNIA Y SYNCHROS SUPREMOS):
+    // RECOMPENSAS 5D'S EXCLUSIVAS (CARTAS INSIGNIA, CANTANTES Y SYNCHROS SUPREMOS):
     if (is5DOpponent) {
-        if (isHighRank && selected3.length > 0) {
-            let boss5DMap = {
-                trudge: ['Goyo Guardian', 'Stygian Security'],
-                leo: ['Power Tool Dragon', 'Morphtronic Celfon'],
-                akiza: ['Black Rose Dragon', 'Twilight Rose Knight'],
-                crow: ['Black-Winged Dragon', 'Blackwing - Armor Master', 'Blackwing - Gale the Whirlwind'],
-                jack: ['Red Dragon Archfiend', 'Dark Resonator'],
-                yusei: ['Stardust Dragon', 'Junk Berserker', 'Nitro Warrior', 'Shooting Star Dragon', 'Formula Synchron']
-            };
-            let possibleBosses = boss5DMap[normalizedOpp] || [];
-            let unowned5DBoss = possibleBosses.filter(c => (curCollection[c] || 0) < 3);
-            let chosen5DBoss = unowned5DBoss.length > 0 
-                ? unowned5DBoss[Math.floor(Math.random() * unowned5DBoss.length)]
-                : (possibleBosses.length > 0 ? possibleBosses[Math.floor(Math.random() * possibleBosses.length)] : null);
-            let boss5DChance = oppWins <= 1 ? (rankStr.includes('S') ? 0.35 : 0.15) : (rankStr.includes('S') ? 0.65 : 0.35);
-            if (Math.random() < boss5DChance && chosen5DBoss && !selected3.includes(chosen5DBoss)) {
-                selected3[0] = chosen5DBoss;
+        let boss5DMap = {
+            trudge: ['Goyo Guardian', 'Junk Warrior'],
+            leo: ['Power Tool Dragon', 'Junk Warrior'],
+            akiza: ['Black Rose Dragon', 'Goyo Guardian'],
+            crow: ['Blackwing - Armor Master', 'Blackwing Armed Wing'],
+            jack: ['Red Dragon Archfiend', 'Goyo Guardian'],
+            yusei: ['Stardust Dragon', 'Junk Warrior']
+        };
+        let rivalTunersMap = {
+            trudge: ['Jutte Fighter', 'Junk Synchron'],
+            leo: ['Junk Synchron', 'Nitro Synchron'],
+            akiza: ['Twilight Rose Knight', 'Flare Resonator'],
+            crow: ['Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North'],
+            jack: ['Dark Resonator', 'Flare Resonator'],
+            yusei: ['Junk Synchron', 'Nitro Synchron']
+        };
+        let rivalSupportMap = {
+            trudge: ['Assault Dog', 'Twin-Shield Defender', 'Urgent Tuning', 'Sakuretsu Armor'],
+            leo: ['Morphtronic Radion', 'Sonic Chick', 'Synchro Blast Wave', 'United We Stand'],
+            akiza: ['Botanical Lion', 'Lord Poison', 'Urgent Tuning', 'Sakuretsu Armor'],
+            crow: ['Blackwing - Bora the Spear', 'Blackwing - Shura the Blue Flame', 'Urgent Tuning'],
+            jack: ['Mad Archfiend', 'Vice Dragon', 'Synchro Blast Wave', 'Urgent Tuning'],
+            yusei: ['Speed Warrior', 'Quillbolt Hedgehog', 'Synchro Blast Wave', 'Urgent Tuning']
+        };
+
+        let possibleBosses = boss5DMap[normalizedOpp] || ['Stardust Dragon', 'Junk Warrior'];
+        let possibleTuners = rivalTunersMap[normalizedOpp] || ['Junk Synchron', 'Dark Resonator'];
+        let possibleSupport = rivalSupportMap[normalizedOpp] || ['Synchro Blast Wave', 'Urgent Tuning'];
+
+        // Carta 1: Monstruo Sincro Jefe con alta probabilidad (S/A rango o victorias previas)
+        let unowned5DBoss = possibleBosses.filter(c => (curCollection[c] || 0) < 3);
+        let chosen5DBoss = unowned5DBoss.length > 0 
+            ? unowned5DBoss[Math.floor(Math.random() * unowned5DBoss.length)]
+            : (possibleBosses.length > 0 ? possibleBosses[Math.floor(Math.random() * possibleBosses.length)] : null);
+        let boss5DChance = isHighRank ? (oppWins <= 1 ? 0.50 : 0.75) : 0.30;
+        if (Math.random() < boss5DChance && chosen5DBoss) {
+            selected3[0] = chosen5DBoss;
+        } else {
+            selected3[0] = possibleTuners[Math.floor(Math.random() * possibleTuners.length)] || possibleBosses[0];
+        }
+
+        // Carta 2: Monstruo Cantante (Tuner) garantizado
+        let unownedTuners = possibleTuners.filter(c => (curCollection[c] || 0) < 3);
+        let chosenTuner = unownedTuners.length > 0
+            ? unownedTuners[Math.floor(Math.random() * unownedTuners.length)]
+            : possibleTuners[Math.floor(Math.random() * possibleTuners.length)];
+        if (chosenTuner) {
+            selected3[1] = chosenTuner;
+        }
+
+        // Carta 3: Carta de Soporte Sincronía o Arquetipo 5D's garantizado
+        let unownedSupport = possibleSupport.filter(c => (curCollection[c] || 0) < 3);
+        let chosenSupport = unownedSupport.length > 0
+            ? unownedSupport[Math.floor(Math.random() * unownedSupport.length)]
+            : possibleSupport[Math.floor(Math.random() * possibleSupport.length)];
+        if (chosenSupport && !selected3.includes(chosenSupport)) {
+            selected3[2] = chosenSupport;
+        }
+
+        // Garantizar que ninguna carta en selected3 sea un relleno de Mundo 1
+        const DM_FILLER_SET = new Set(['Red Medicine', 'Dian Keto the Cure Master', 'Fissure', 'Trap Hole', 'Waboku', 'Dark Hole', 'Swords of Revealing Light', 'Acid Trap Hole', 'Bear Trap', 'Eatgaboon', 'Invisible Wire']);
+        for (let i = 0; i < selected3.length; i++) {
+            if (DM_FILLER_SET.has(selected3[i])) {
+                let fallbackPool = ['Speed Warrior', 'Quillbolt Hedgehog', 'Sonic Chick', 'Junk Synchron', 'Urgent Tuning', 'Synchro Blast Wave'];
+                selected3[i] = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
             }
         }
     } else if (isGXOpponent) {
@@ -9105,6 +9175,40 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     for (var h = 0; h < 5; h++) {
       if (g.deck.length > 0) g.hand.push(g.deck.pop());
       if (g.enemyDeck.length > 0) g.enemyHand.push(g.enemyDeck.pop());
+    }
+
+    // En Mundo 3 (5D's), el oponente comienza con su Carta Maestra de Sincronía en el campo
+    if (is5DDuel) {
+      var FIVE_D_ACE_MAP = {
+        trudge: 'Goyo Guardian',
+        leo: 'Power Tool Dragon',
+        akiza: 'Black Rose Dragon',
+        crow: 'Blackwing - Armor Master',
+        jack: 'Red Dragon Archfiend',
+        yusei: 'Stardust Dragon'
+      };
+      var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      var aceName = FIVE_D_ACE_MAP[normOppKey];
+      if (aceName) {
+        var aceCard = cardResolver(aceName);
+        if (aceCard) {
+          aceCard.pos = 'ATK';
+          aceCard.faceUp = true;
+          aceCard.summonedTurn = 1;
+          g.enemy[2] = aceCard; // Posición central
+          // Remover una copia de su Extra Deck si estaba allí
+          if (Array.isArray(g.enemyExtra)) {
+            var exIdx = g.enemyExtra.findIndex(function(c) { return (c.name || c[0]) === aceName; });
+            if (exIdx >= 0) g.enemyExtra.splice(exIdx, 1);
+          }
+          if (typeof log === 'function') {
+            log('⚔️ [MUNDO 3 - 5D\'S] ¡' + (oppDisplayName || normOppKey.toUpperCase()) + ' entra al duelo con su Monstruo Insignia de Sincronía en el campo: ' + aceName + '!');
+          }
+          if (typeof duelToast === 'function') {
+            duelToast('👑 ¡' + (oppDisplayName || normOppKey.toUpperCase()) + ' comienza con ' + aceName + '!');
+          }
+        }
+      }
     }
 
     window.storyDeckReady = true;
@@ -15121,7 +15225,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     try { startRival58 = window.startRival58; } catch(_) {}
   }
 
-  // Hook window.cardHTML: render face-down defense cards correctly on field
+  // Hook window.cardHTML: render face-down defense cards correctly on field & Tuner badges
   var prevCardHTMLConceal = window.cardHTML;
   if (typeof prevCardHTMLConceal === 'function') {
     window.cardHTML = function(c, zone, i) {
@@ -15130,31 +15234,61 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         var label = c._concealed ? 'OCULTO' : 'SET';
         return '<div data-zone="' + zone + '" data-index="' + i + '" class="fieldMonster defense faceDownSet103 ' + (sel ? 'selected' : '') + '" onclick="select(\'' + zone + '\',' + i + ')"><div class="setMonsterBack103"><span>' + label + '</span></div><div class="setMonsterDef103">🛡 DEF</div></div>';
       }
-      return prevCardHTMLConceal.apply(this, arguments);
+      var res = prevCardHTMLConceal.apply(this, arguments);
+      if (c && typeof window.isTunerMonster === 'function' && window.isTunerMonster(c)) {
+        if (zone === 'h' && typeof res === 'string' && !res.includes('tunerBadge104')) {
+          res = res.replace('<div class="cardTop">', '<div class="cardTop"><span class="tunerBadge104">★ CANTANTE</span>');
+          res = res.replace(/<div class="cardMeta">([^<]+)<\/div>/, function(m, inner) {
+            return '<div class="cardMeta">' + inner.replace('·', '· [CANTANTE] ·') + '</div>';
+          });
+        } else if ((zone === 'f' || zone === 'e') && !c.faceDown && !c.faceDownSet103 && typeof res === 'string' && !res.includes('fieldTunerBadge104')) {
+          res = res.replace('<div class="fieldArt"', '<div class="fieldTunerBadge104">★ TUNER</div><div class="fieldArt"');
+        }
+      }
+      return res;
     };
     try { cardHTML = window.cardHTML; } catch(_) {}
   }
 
-  // Hook window.updateCardInfo: show detailed info for concealed cards
+  // Hook window.updateCardInfo: show detailed info for concealed cards, Tuners, and Synchros
   var prevUpdateCardInfoConceal = window.updateCardInfo;
   if (typeof prevUpdateCardInfoConceal === 'function') {
     window.updateCardInfo = function() {
       var r = prevUpdateCardInfoConceal.apply(this, arguments);
       try {
         if (typeof game === 'undefined' || !game) return r;
-        var pick = [...(game.selected || [])].reverse().find(function(x) { return x && ['f', 'e', 'l', 'el'].includes(x[0]); });
+        var pick = [...(game.selected || [])].reverse().find(function(x) { return x && ['f', 'e', 'l', 'el', 'h'].includes(x[0]); });
         if (!pick) return r;
         var zone = pick[0], idx = Number(pick[1]);
-        var targetList = (zone === 'f') ? game.field : (zone === 'e' ? game.enemy : null);
+        var targetList = (zone === 'f') ? game.field : (zone === 'e' ? game.enemy : (zone === 'h' ? game.hand : null));
         var c = targetList ? targetList[idx] : null;
-        if (c && (c.faceDown || c.faceDownSet103)) {
+        if (c) {
           var body = document.getElementById('cardInfoBody');
           var grid = body && body.querySelector('.infoGrid');
           if (grid) {
-            var s = document.createElement('span'); s.textContent = 'Posición';
-            var b = document.createElement('b'); b.className = 'infoSet103';
-            b.textContent = c._concealed ? 'DEFENSA BOCA ABAJO (Espadas de Luz Ocultadora)' : 'SET · DEFENSA BOCA ABAJO';
-            grid.append(s, b);
+            if (c.faceDown || c.faceDownSet103) {
+              var s = document.createElement('span'); s.textContent = 'Posición';
+              var b = document.createElement('b'); b.className = 'infoSet103';
+              b.textContent = c._concealed ? 'DEFENSA BOCA ABAJO (Espadas de Luz Ocultadora)' : 'SET · DEFENSA BOCA ABAJO';
+              grid.append(s, b);
+            }
+            if (typeof window.isTunerMonster === 'function' && window.isTunerMonster(c)) {
+              var st = document.createElement('span'); st.textContent = 'Subtipo';
+              var bt = document.createElement('b'); bt.style.cssText = 'color:#00ff88; text-shadow:0 0 6px rgba(0,255,136,0.8); font-weight:bold;';
+              bt.textContent = '★ CANTANTE (TUNER)';
+              var sm = document.createElement('span'); sm.textContent = 'Sincronía';
+              var bm = document.createElement('b'); bm.style.cssText = 'color:#a3ffc7; font-size:11px;';
+              bm.textContent = 'Material Tuner para Extra Deck';
+              grid.append(st, bt, sm, bm);
+            } else if ((c.kind || '').toUpperCase() === 'SYNCHRO') {
+              var ss = document.createElement('span'); ss.textContent = 'Subtipo';
+              var bs = document.createElement('b'); bs.style.cssText = 'color:#ffffff; text-shadow:0 0 6px #fff; font-weight:bold;';
+              bs.textContent = '★ MONSTRUO SINCRONÍA';
+              var sr = document.createElement('span'); sr.textContent = 'Invocación';
+              var br = document.createElement('b'); br.style.cssText = 'color:#e0e0e0; font-size:11px;';
+              br.textContent = '1 Cantante + 1+ no-Cantantes';
+              grid.append(ss, bs, sr, br);
+            }
           }
         }
       } catch(_) {}
@@ -15551,14 +15685,83 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var name = (c.name || c[0] || '').trim();
     var type = (c.type || c[2] || '').toLowerCase();
     var frame = (c.frameType || '').toLowerCase();
-    if (type.includes('tuner') || frame.includes('tuner')) return true;
+    var race = (c.race || '').toLowerCase();
+    if (type.includes('tuner') || frame.includes('tuner') || race.includes('tuner') || type.includes('cantante') || race.includes('cantante')) return true;
     var TUNER_NAMES = [
       'Junk Synchron', 'Nitro Synchron', 'Dark Resonator', 'Flare Resonator',
       'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North',
       'Twilight Rose Knight', 'Jutte Fighter', 'Debris Dragon', 'Formula Synchron'
     ];
-    return TUNER_NAMES.includes(name);
+    return TUNER_NAMES.some(function(tn) { return tn.toLowerCase() === name.toLowerCase(); });
   };
+
+  // Comprueba si el jugador puede realizar alguna invocación por Sincronía en este momento
+  window.canPlayerSynchroSummonAny = function() {
+    if (typeof game === 'undefined' || !game) return false;
+    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D || game.turn !== 'player') return false;
+    if (!Array.isArray(game.extra) || game.extra.length === 0) return false;
+
+    // 1. Si el jugador tiene monstruos seleccionados en el campo:
+    var selField = (game.selected || []).filter(function(x) { return x && x[0] === 'f'; });
+    if (selField.length > 0) {
+      return game.extra.some(function(c) {
+        return (c.kind === 'SYNCHRO') && window.extraEligible(c);
+      });
+    }
+
+    // 2. Si NO tiene selección en campo: verificar si sus monstruos boca arriba pueden formar alguna Sincronía
+    var faceUpMonsters = (game.field || [])
+      .filter(function(c) { return c && !c.faceDown && !c.faceDownSet103; });
+
+    if (faceUpMonsters.length < 2) return false;
+
+    var tuners = faceUpMonsters.filter(function(c) { return window.isTunerMonster(c); });
+    var nonTuners = faceUpMonsters.filter(function(c) { return !window.isTunerMonster(c); });
+    if (tuners.length === 0 || nonTuners.length === 0) return false;
+
+    var availableSynchros = game.extra.filter(function(c) {
+      return c && (c.kind === 'SYNCHRO') && !(game.extraUsed && game.extraUsed.includes(c.name));
+    });
+    if (availableSynchros.length === 0) return false;
+
+    // Probar 1 Tuner + 1 no-Tuner
+    for (var t = 0; t < tuners.length; t++) {
+      var tLvl = Number(tuners[t].level || tuners[t][1] || 0);
+      for (var nt = 0; nt < nonTuners.length; nt++) {
+        var ntLvl = Number(nonTuners[nt].level || nonTuners[nt][1] || 0);
+        if (availableSynchros.some(function(sc) { return Number(sc.level || sc[1] || 0) === (tLvl + ntLvl); })) return true;
+      }
+      // Probar 1 Tuner + 2 no-Tuners
+      if (nonTuners.length >= 2) {
+        for (var i = 0; i < nonTuners.length; i++) {
+          for (var j = i + 1; j < nonTuners.length; j++) {
+            var sum3 = tLvl + Number(nonTuners[i].level || nonTuners[i][1] || 0) + Number(nonTuners[j].level || nonTuners[j][1] || 0);
+            if (availableSynchros.some(function(sc) { return Number(sc.level || sc[1] || 0) === sum3; })) return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  // El botón Extra Deck SOLO se enciende cuando existe una Sincronía válida disponible
+  window.updateExtraReady = function() {
+    var p = document.getElementById('extraPile');
+    var e = document.getElementById('enemyExtraPile');
+    if (e) e.classList.remove('extraReady');
+    if (!p) return;
+
+    var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
+    if (!is5D) {
+      p.classList.remove('extraReady');
+      return;
+    }
+
+    var ready = window.canPlayerSynchroSummonAny();
+    p.classList.toggle('extraReady', !!ready);
+  };
+  try { updateExtraReady = window.updateExtraReady; } catch(_) {}
 
   // Validación de invocación por Sincronía
   window.extraEligible = function(c) {
@@ -15593,6 +15796,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     return sumLevels === Number(c.level || c[1] || 0);
   };
+  try { extraEligible = window.extraEligible; } catch(_) {}
 
   // Invocación por Sincronía del Jugador
   window.extraClick = function(i) {
@@ -15602,7 +15806,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     if (!window.extraEligible(c)) {
       if (typeof log === 'function') log('Esa carta no puede sincronizarse con los materiales seleccionados.');
-      if (typeof duelToast === 'function') duelToast('Selecciona 1 Tuner + 1 o más no-Tuners cuyo nivel sume ' + (c.level || 0));
+      if (typeof duelToast === 'function') duelToast('Selecciona 1 Cantante (Tuner) + 1 o más no-Cantantes cuyo nivel sume ' + (c.level || 0));
       return;
     }
 
@@ -15641,6 +15845,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (typeof duelToast === 'function') duelToast('¡Sincronización! ' + sc.name);
     if (window.playViolinClick) window.playViolinClick();
   };
+  try { extraClick = window.extraClick; } catch(_) {}
 
   // Invocación por Sincronía y Jugadas Especiales de la IA rival en Mundo 3
   window.aiExtraSummon = function() {
@@ -16296,18 +16501,55 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     body.world-3 #extraPile {
       display: flex !important;
       cursor: pointer !important;
-      border: 2px solid #00e5ff !important;
-      box-shadow: 0 0 12px rgba(0, 229, 255, 0.5) !important;
-      background: linear-gradient(145deg, #0b1a24, #030a0f) !important;
+      border: 1px solid #2a3a4a !important;
+      box-shadow: none !important;
+      background: linear-gradient(145deg, #0b141b, #04080b) !important;
+      opacity: 0.82;
+      transition: all 0.25s ease;
+    }
+    body.world-3 #extraPile:hover {
+      opacity: 1;
+      border-color: #4a627a !important;
     }
     body.world-3 #extraPile.extraReady {
+      opacity: 1 !important;
       border: 2px solid #00ff88 !important;
-      box-shadow: 0 0 16px rgba(0, 255, 136, 0.9) !important;
+      box-shadow: 0 0 16px rgba(0, 255, 136, 0.95) !important;
       animation: synchroPulse 1.2s infinite alternate !important;
     }
     @keyframes synchroPulse {
       0% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
       100% { transform: scale(1.06); box-shadow: 0 0 20px rgba(0, 255, 136, 1); }
+    }
+    .tunerBadge104 {
+      background: linear-gradient(135deg, #005a2b, #008f43);
+      border: 1px solid #00ff88;
+      color: #eafff2;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 4px;
+      box-shadow: 0 0 6px rgba(0, 255, 136, 0.7);
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .fieldTunerBadge104 {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      z-index: 6;
+      background: rgba(0, 60, 30, 0.92);
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 1px 4px;
+      border-radius: 3px;
+      box-shadow: 0 0 6px rgba(0, 255, 136, 0.8);
+      pointer-events: none;
+      letter-spacing: 0.5px;
     }
     body:not(.world-3).view-field #fusionBtn { display: inline-flex !important; }
 
