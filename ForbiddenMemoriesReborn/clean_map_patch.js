@@ -53,7 +53,10 @@
     if (st) return Object.assign({}, st, { faceUp: true });
     if (typeof DB !== 'undefined' && Array.isArray(DB)) {
       var d = DB.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
-      if (d) return { name: d[0], level: d[1], type: d[2], attr: d[3], atk: d[4], def: d[5], pos: 'ATK', materials: [], faceUp: true };
+      if (d) {
+        var isTunerDb = typeof window.isTunerMonster === 'function' ? window.isTunerMonster({ name: d[0], type: d[2] }) : false;
+        return { name: d[0], level: d[1], type: d[2], attr: d[3], atk: d[4], def: d[5], kind: 'MONSTER', isTuner: isTunerDb, pos: 'ATK', materials: [], faceUp: true };
+      }
     }
     if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
       var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase() === name.toLowerCase())); });
@@ -61,7 +64,24 @@
         if (cd.kind === 'SPELL' || cd.kind === 'TRAP' || cd.kind === 'EQUIP') {
           return { name: cd.name, kind: cd.kind, value: cd.value || cd.name.toUpperCase().replace(/\s+/g, '_'), text: cd.text || cd.desc || '', faceUp: true };
         } else {
-          return { name: cd.name, level: cd.level || 4, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, pos: 'ATK', materials: [], faceUp: true };
+          var cardKind = cd.kind || (cd.frameType === 'synchro' || (cd.type && cd.type.includes('Synchro')) ? 'SYNCHRO' : 'MONSTER');
+          var isTunerCd = cd.isTuner === true || (typeof window.isTunerMonster === 'function' ? window.isTunerMonster(cd) : false);
+          return {
+            id: cd.id,
+            name: cd.name,
+            level: cd.level || 4,
+            type: cd.type || 'Warrior',
+            attr: cd.attr || 'EARTH',
+            atk: cd.atk || 0,
+            def: cd.def || 0,
+            kind: cardKind,
+            isTuner: isTunerCd,
+            text: cd.text || cd.desc || '',
+            image: cd.image || '',
+            pos: 'ATK',
+            materials: [],
+            faceUp: true
+          };
         }
       }
     }
@@ -15823,54 +15843,89 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     return TUNER_NAMES.some(function(tn) { return tn.toLowerCase() === name.toLowerCase(); });
   };
 
-  // Comprueba si el jugador puede realizar alguna invocación por Sincronía en este momento
-  window.canPlayerSynchroSummonAny = function() {
-    if (typeof game === 'undefined' || !game) return false;
-    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
-    if (!is5D || game.turn !== 'player') return false;
-    if (!Array.isArray(game.extra) || game.extra.length === 0) return false;
-
-    // 1. Si el jugador tiene monstruos seleccionados en el campo:
-    var selField = (game.selected || []).filter(function(x) { return x && x[0] === 'f'; });
-    if (selField.length > 0) {
-      return game.extra.some(function(c) {
-        return (c.kind === 'SYNCHRO') && window.extraEligible(c);
-      });
+  // Buscar materiales válidos en el campo del jugador para un monstruo Sincro
+  window.findSynchroMaterialsFor = function(sc) {
+    if (typeof game === 'undefined' || !game || !sc) return null;
+    var targetLevel = Number(sc.level || sc[1] || 0);
+    if (!targetLevel) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
+      if (foundCd && foundCd.level) targetLevel = Number(foundCd.level);
     }
+    if (!targetLevel) return null;
 
-    // 2. Si NO tiene selección en campo: verificar si sus monstruos boca arriba pueden formar alguna Sincronía
-    var faceUpMonsters = (game.field || [])
-      .filter(function(c) { return c && !c.faceDown && !c.faceDownSet103; });
+    var reqText = (sc.text || sc.desc || '').toLowerCase();
+    var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"');
 
-    if (faceUpMonsters.length < 2) return false;
+    // 1. Si el jugador ya seleccionó monstruos en el campo:
+    var selField = (game.selected || [])
+      .filter(function(x) { return x && x[0] === 'f'; })
+      .map(function(x) { return { idx: x[1], card: game.field[x[1]] }; })
+      .filter(function(x) { return x.card && !x.card.faceDown && !x.card.faceDownSet103; });
 
-    var tuners = faceUpMonsters.filter(function(c) { return window.isTunerMonster(c); });
-    var nonTuners = faceUpMonsters.filter(function(c) { return !window.isTunerMonster(c); });
-    if (tuners.length === 0 || nonTuners.length === 0) return false;
-
-    var availableSynchros = game.extra.filter(function(c) {
-      return c && (c.kind === 'SYNCHRO') && !(game.extraUsed && game.extraUsed.includes(c.name));
-    });
-    if (availableSynchros.length === 0) return false;
-
-    // Probar 1 Tuner + 1 no-Tuner
-    for (var t = 0; t < tuners.length; t++) {
-      var tLvl = Number(tuners[t].level || tuners[t][1] || 0);
-      for (var nt = 0; nt < nonTuners.length; nt++) {
-        var ntLvl = Number(nonTuners[nt].level || nonTuners[nt][1] || 0);
-        if (availableSynchros.some(function(sc) { return Number(sc.level || sc[1] || 0) === (tLvl + ntLvl); })) return true;
-      }
-      // Probar 1 Tuner + 2 no-Tuners
-      if (nonTuners.length >= 2) {
-        for (var i = 0; i < nonTuners.length; i++) {
-          for (var j = i + 1; j < nonTuners.length; j++) {
-            var sum3 = tLvl + Number(nonTuners[i].level || nonTuners[i][1] || 0) + Number(nonTuners[j].level || nonTuners[j][1] || 0);
-            if (availableSynchros.some(function(sc) { return Number(sc.level || sc[1] || 0) === sum3; })) return true;
+    if (selField.length >= 2) {
+      var sTuners = selField.filter(function(x) { return window.isTunerMonster(x.card); });
+      var sNonTuners = selField.filter(function(x) { return !window.isTunerMonster(x.card); });
+      if (sTuners.length === 1 && sNonTuners.length >= 1) {
+        var tName = (sTuners[0].card.name || '').toLowerCase();
+        if (!reqJunk || tName.includes('junk')) {
+          var sumSel = selField.reduce(function(s, x) {
+            return s + (Number(x.card.level) || Number(x.card[1]) || 0);
+          }, 0);
+          if (sumSel === targetLevel) {
+            return selField.map(function(x) { return x.idx; });
           }
         }
       }
     }
-    return false;
+
+    // 2. Si NO hay selección previa (o no coincide): buscar automáticamente entre los monstruos boca arriba
+    var faceUp = (game.field || [])
+      .map(function(c, idx) { return { idx: idx, card: c }; })
+      .filter(function(x) { return x.card && !x.card.faceDown && !x.card.faceDownSet103; });
+
+    var fTuners = faceUp.filter(function(x) { return window.isTunerMonster(x.card); });
+    var fNonTuners = faceUp.filter(function(x) { return !window.isTunerMonster(x.card); });
+    if (fTuners.length === 0 || fNonTuners.length === 0) return null;
+
+    // Probar 1 Tuner + 1 no-Tuner
+    for (var t = 0; t < fTuners.length; t++) {
+      var tCard = fTuners[t].card;
+      var tNameLower = (tCard.name || '').toLowerCase();
+      if (reqJunk && !tNameLower.includes('junk')) continue;
+      var tLvl = Number(tCard.level || tCard[1] || 0);
+
+      for (var nt = 0; nt < fNonTuners.length; nt++) {
+        var ntCard = fNonTuners[nt].card;
+        var ntLvl = Number(ntCard.level || ntCard[1] || 0);
+        if ((tLvl + ntLvl) === targetLevel) {
+          return [fTuners[t].idx, fNonTuners[nt].idx];
+        }
+      }
+
+      // Probar 1 Tuner + 2 no-Tuners
+      if (fNonTuners.length >= 2) {
+        for (var i = 0; i < fNonTuners.length; i++) {
+          var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
+          for (var j = i + 1; j < fNonTuners.length; j++) {
+            var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
+            if ((tLvl + nt1Lvl + nt2Lvl) === targetLevel) {
+              return [fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx];
+            }
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  // Comprueba si el jugador puede realizar alguna invocación por Sincronía en este momento
+  window.canPlayerSynchroSummonAny = function() {
+    if (typeof game === 'undefined' || !game || game.turn !== 'player' || game.duelOver) return false;
+    if (!Array.isArray(game.extra) || game.extra.length === 0) return false;
+
+    return game.extra.some(function(c) {
+      return window.extraEligible(c);
+    });
   };
 
   // El botón Extra Deck SOLO se enciende cuando existe una Sincronía válida disponible
@@ -15880,12 +15935,6 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (e) e.classList.remove('extraReady');
     if (!p) return;
 
-    var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
-    if (!is5D) {
-      p.classList.remove('extraReady');
-      return;
-    }
-
     var ready = window.canPlayerSynchroSummonAny();
     p.classList.toggle('extraReady', !!ready);
   };
@@ -15893,38 +15942,56 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
   // Validación de invocación por Sincronía
   window.extraEligible = function(c) {
-    if (typeof game === 'undefined' || !game) return false;
-    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
-    if (!is5D) return false;
-    if (game.turn !== 'player' || (game.extraUsed && game.extraUsed.includes(c.name))) return false;
-    
-    // Solo Synchro monsters en Mundo 3
+    if (typeof game === 'undefined' || !game || game.turn !== 'player' || game.duelOver) return false;
+    if (game.extraUsed && game.extraUsed.includes(c.name)) return false;
+
+    // Reconocer si la carta es de tipo SYNCHRO
     var kind = (c.kind || '').toUpperCase();
+    if (!kind) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+      if (foundCd && foundCd.kind) {
+        kind = foundCd.kind.toUpperCase();
+        c.kind = kind;
+      } else {
+        kind = 'SYNCHRO';
+        c.kind = 'SYNCHRO';
+      }
+    }
     if (kind !== 'SYNCHRO') return false;
 
-    // Obtener monstruos seleccionados del campo del jugador
-    var selField = (game.selected || [])
-      .filter(x => x && x[0] === 'f')
-      .map(x => ({ idx: x[1], card: game.field[x[1]] }))
-      .filter(x => x.card && !x.card.faceDown && !x.card.faceDownSet103);
-
-    // Regla de Sincronía: al menos 2 monstruos (1 Tuner + 1 o más no-Tuners)
-    if (selField.length < 2) return false;
-
-    var tuners = selField.filter(x => window.isTunerMonster(x.card));
-    var nonTuners = selField.filter(x => !window.isTunerMonster(x.card));
-
-    // Exactamente 1 Tuner y al menos 1 no-Tuner
-    if (tuners.length !== 1 || nonTuners.length < 1) return false;
-
-    // La suma de niveles debe coincidir exactamente con el nivel del monstruo Sincro
-    var sumLevels = selField.reduce(function(sum, x) {
-      return sum + (Number(x.card.level) || Number(x.card[1]) || 0);
-    }, 0);
-
-    return sumLevels === Number(c.level || c[1] || 0);
+    return !!window.findSynchroMaterialsFor(c);
   };
   try { extraEligible = window.extraEligible; } catch(_) {}
+
+  // Representación HTML de carta en el Extra Deck con estado iluminado ⭐ INVOCABLE
+  window.extraCardHTML = function(c, i) {
+    if (!c) return '';
+    if (!c.kind) {
+      var found = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+      c.kind = (found && found.kind) ? found.kind : 'SYNCHRO';
+      if (found && !c.level && found.level) c.level = found.level;
+      if (found && !c.type && found.type) c.type = found.type;
+      if (found && !c.attr && found.attr) c.attr = found.attr;
+      if (found && !c.atk && found.atk) c.atk = found.atk;
+      if (found && !c.def && found.def) c.def = found.def;
+    }
+    var sel = (game.selected || []).some(function(x) { return x && x[0] === 'x' && x[1] === i; });
+    var eligible = window.extraEligible ? window.extraEligible(c) : false;
+    var cls = 'card monster ' + (sel ? 'selected ' : '') + (eligible ? 'eligible' : 'disabled');
+    var kindText = c.kind === 'LINK' ? 'LINK' : (c.kind + ' · Nv/Rank ' + (c.level || 0));
+    var ratingText = c.kind === 'LINK' ? (' · Rating ' + (c.level || 0)) : '';
+    var defText = c.kind === 'LINK' ? ' · SIN DEF' : (' / DEF ' + (c.def || 0));
+    var badge = eligible ? '<div style="font-size:10px; margin-top:5px; color:#7cff7c; font-weight:bold; letter-spacing:0.5px;">⭐ INVOCABLE</div>' : '';
+
+    return '<div class="' + cls + '" onclick="extraClick(' + i + ')" style="' + (eligible ? 'box-shadow: 0 0 14px #7cff7c, inset 0 0 8px rgba(124,255,124,0.4); border-color: #7cff7c !important; cursor: pointer;' : '') + '">' +
+      '<div class="name" style="font-weight:bold; color:' + (eligible ? '#ffd700' : '#ddd') + ';">' + (c.name || 'Desconocido') + '</div>' +
+      '<div style="font-size:10px; opacity:0.85;">' + kindText + ratingText + '</div>' +
+      '<div style="font-size:10px; opacity:0.75;">' + (c.type || 'Monster') + ' · ' + (c.attr || 'DARK') + '</div>' +
+      '<div class="stats">ATK ' + (c.atk || 0) + defText + '</div>' +
+      badge +
+    '</div>';
+  };
+  try { extraCardHTML = window.extraCardHTML; } catch(_) {}
 
   // Invocación por Sincronía del Jugador
   window.extraClick = function(i) {
@@ -15932,31 +15999,38 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var c = game.extra && game.extra[i];
     if (!c) return;
 
-    if (!window.extraEligible(c)) {
-      if (typeof log === 'function') log('Esa carta no puede sincronizarse con los materiales seleccionados.');
-      if (typeof duelToast === 'function') duelToast('Selecciona 1 Cantante (Tuner) + 1 o más no-Cantantes cuyo nivel sume ' + (c.level || 0));
+    if (!c.kind) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+      c.kind = (foundCd && foundCd.kind) ? foundCd.kind : 'SYNCHRO';
+    }
+
+    var mats = window.findSynchroMaterialsFor(c);
+    if (!mats || mats.length < 2) {
+      if (typeof log === 'function') log('Esa carta no puede sincronizarse con los materiales disponibles en el campo.');
+      if (typeof duelToast === 'function') duelToast('Necesitas 1 Cantante (Tuner) + 1 o más no-Cantantes cuyo nivel sume ' + (c.level || 0));
       return;
     }
 
-    var selIndices = (game.selected || []).filter(x => x && x[0] === 'f').map(x => x[1]);
-    selIndices.sort((a, b) => b - a);
-
     // Enviar materiales al cementerio
-    selIndices.forEach(idx => {
+    mats.sort(function(a, b) { return b - a; });
+    var matNames = [];
+    mats.forEach(function(idx) {
       var mat = game.field[idx];
       if (mat) {
+        matNames.push(mat.name || 'Monstruo');
         game.grave.push(mat);
         game.field[idx] = null;
       }
     });
 
     // Encontrar slot libre en el campo
-    var slot = game.field.findIndex(x => !x);
-    if (slot < 0) slot = selIndices[0];
+    var slot = game.field.findIndex(function(x) { return !x; });
+    if (slot < 0) slot = mats[0];
 
     var sc = JSON.parse(JSON.stringify(c));
     sc.pos = 'ATK';
     sc.faceUp = true;
+    sc.kind = 'SYNCHRO';
     sc.summonedTurn = game.turnNo;
     game.field[slot] = sc;
 
@@ -15969,7 +16043,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     if (typeof closePile === 'function') closePile();
     if (typeof render === 'function') render();
-    if (typeof log === 'function') log('¡SINCRONIZACIÓN! ⚡ ' + sc.name + ' (Nv ' + sc.level + ') invocada al campo. ¡Materiales al Cementerio!');
+    if (typeof log === 'function') log('¡INVOCACIÓN POR SINCRONÍA! ⭐ ' + sc.name + ' (Nv ' + sc.level + ') invocada al campo enviando ' + matNames.join(' + ') + ' al Cementerio.');
     if (typeof duelToast === 'function') duelToast('¡Sincronización! ' + sc.name);
     if (window.playViolinClick) window.playViolinClick();
   };
