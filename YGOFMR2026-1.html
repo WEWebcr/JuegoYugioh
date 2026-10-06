@@ -23235,6 +23235,104 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
   runSearchStep();
 };
 
+window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCancel) {
+  var existing = document.getElementById('sbw-target-modal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'sbw-target-modal';
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999999; display:flex; justify-content:center; align-items:center; padding:15px; font-family:"Segoe UI", Arial, sans-serif; backdrop-filter:blur(3px);';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'width:min(740px, 95vw); max-height:85vh; background:linear-gradient(180deg, #1f0808 0%, #0d0303 100%); border:2.5px solid #ff3d00; border-radius:12px; box-shadow:0 0 35px rgba(255, 61, 0, 0.5), 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+  var header = document.createElement('div');
+  header.style.cssText = 'background:rgba(40, 10, 10, 0.95); padding:14px 20px; border-bottom:2px solid #ff3d00; text-align:center; position:relative;';
+  header.innerHTML = `
+    <div style="font-family:VT323, monospace; font-size:26px; color:#ffccbc; text-shadow:0 0 12px #ff3d00; letter-spacing:1px;">
+      💥 SYNCHRO BLAST WAVE · DESTRUIR MONSTRUO RIVAL
+    </div>
+    <div style="color:#ffab91; font-size:13px; margin-top:5px;">
+      Controlas un Monstruo de Sincronía. <b>Elige 1 monstruo del oponente</b> para destruirlo:
+    </div>
+  `;
+  box.appendChild(header);
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; padding:20px; overflow-y:auto; max-height:55vh; justify-items:center;';
+
+  oppTargets.forEach(function(item) {
+    var m = item.card;
+    var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(m.name || m[0]) : null;
+    var name = m.faceDown ? 'Monstruo Boca Abajo' : ((meta && meta.name) || m.name || m[0] || 'Monstruo');
+    var atk = m.faceDown ? '?' : (m.atk !== undefined ? m.atk : (m[4] !== undefined ? m[4] : '-'));
+    var def = m.faceDown ? '?' : (m.def !== undefined ? m.def : (m[5] !== undefined ? m[5] : '-'));
+    var level = m.faceDown ? '?' : ((meta && meta.level) || m.level || m[1] || 4);
+    var imgUrl = m.faceDown ? 'https://i.imgur.com/vHqR8Kq.png' : ((meta && meta.imgUrl) || m.imgUrl || (m.id ? 'imagenescartas/Mundo3/' + m.id + '.jpg' : 'https://i.imgur.com/vHqR8Kq.png'));
+    var posBadge = m.pos === 'DEF' ? '🛡 DEFENSA' : '⚔ ATAQUE';
+
+    var cardItem = document.createElement('div');
+    cardItem.style.cssText = 'width:130px; background:#1c0808; border:2px solid #b71c1c; border-radius:8px; padding:8px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:all 0.18s ease; box-shadow:0 4px 10px rgba(0,0,0,0.6); position:relative;';
+
+    cardItem.innerHTML = `
+      <div style="font-size:9.5px; font-weight:bold; color:#ff8a80; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; margin-bottom:4px;">
+        Zona ${item.index + 1} · ${posBadge}
+      </div>
+      <div style="width:100%; height:120px; background:#000; border-radius:4px; overflow:hidden; margin-bottom:6px; display:flex; align-items:center; justify-content:center;">
+        <img src="${imgUrl}" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png';">
+      </div>
+      <div style="font-weight:bold; font-size:11px; color:#ffccbc; text-align:center; height:28px; overflow:hidden; line-height:1.2; margin-bottom:4px;">
+        ${name}
+      </div>
+      <div style="font-size:10px; color:#ffd700; margin-bottom:4px;">
+        ${m.faceDown ? '★ ?' : '★' + level}
+      </div>
+      <div style="font-size:10px; color:#ff8a80; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; width:100%; text-align:center;">
+        ⚔ ${atk} / 🛡 ${def}
+      </div>
+      <button style="margin-top:8px; width:100%; padding:6px 0; background:linear-gradient(180deg, #d32f2f, #b71c1c); border:1px solid #ff5252; color:#fff; border-radius:4px; font-weight:bold; font-size:10.5px; cursor:pointer;">
+        💥 DESTRUIR
+      </button>
+    `;
+
+    cardItem.onmouseover = function() {
+      cardItem.style.transform = 'translateY(-4px) scale(1.03)';
+      cardItem.style.borderColor = '#ff5252';
+      cardItem.style.boxShadow = '0 0 18px rgba(255, 82, 82, 0.7)';
+    };
+    cardItem.onmouseout = function() {
+      cardItem.style.transform = 'none';
+      cardItem.style.borderColor = '#b71c1c';
+      cardItem.style.boxShadow = '0 4px 10px rgba(0,0,0,0.6)';
+    };
+
+    cardItem.onclick = function() {
+      if (window.playViolinClick) window.playViolinClick();
+      overlay.remove();
+      if (typeof onSelected === 'function') onSelected(item);
+    };
+
+    grid.appendChild(cardItem);
+  });
+
+  box.appendChild(grid);
+
+  var footer = document.createElement('div');
+  footer.style.cssText = 'background:rgba(30, 8, 8, 0.95); padding:10px 20px; border-top:1px solid #b71c1c; display:flex; justify-content:flex-end; align-items:center;';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.textContent = '❌ Cancelar';
+  cancelBtn.style.cssText = 'background:#263238; border:1px solid #455a64; color:#cfd8dc; padding:6px 16px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;';
+  cancelBtn.onclick = function() {
+    overlay.remove();
+    if (typeof onCancel === 'function') onCancel();
+  };
+  footer.appendChild(cancelBtn);
+  box.appendChild(footer);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+};
+
     // ALLURE OF DARKNESS
     if (val === 'ALLURE_OF_DARKNESS' || cName === 'Allure of Darkness' || nUpperHand === 'ALLURE OF DARKNESS') {
       g.hand.splice(i, 1);
@@ -23370,6 +23468,47 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
       if (typeof log === 'function') log('¡De-Synchro! ' + (synTarget.name || 'Sincro') + ' regresa al Extra Deck' + (deRevived.length ? ' e invoca sus materiales: ' + deRevived.join(', ') : '') + '.');
       duelToast('¡De-Synchro! ' + (synTarget.name || 'Sincro') + ' regresa al Extra Deck.');
       if (typeof render === 'function') render();
+      return;
+    }
+
+    // SYNCHRO BLAST WAVE
+    if (val === 'SYNCHRO_BLAST_WAVE' || cName === 'Synchro Blast Wave' || nUpperHand === 'SYNCHRO BLAST WAVE' || nUpperHand.includes('SYNCHRO BLAST') || nUpperHand.includes('ONDA DE CHOQUE SINCRO')) {
+      var hasSynchro = (g.field || []).some(function(m) {
+        return m && !m.faceDown && (m.kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(m)));
+      });
+      if (!hasSynchro) {
+        duelToast('Debes controlar al menos 1 Monstruo de Sincronía para activar Synchro Blast Wave.');
+        if (typeof log === 'function') log('Synchro Blast Wave: No puedes activarla porque no controlas ningún Monstruo de Sincronía en el campo.');
+        return;
+      }
+      var oppTargets = (g.enemy || []).map(function(m, idx) {
+        return m ? { card: m, index: idx } : null;
+      }).filter(Boolean);
+      if (!oppTargets.length) {
+        duelToast('Tu oponente no controla ningún monstruo para destruir.');
+        if (typeof log === 'function') log('Synchro Blast Wave: El rival no tiene monstruos en el campo.');
+        return;
+      }
+      window.showSynchroBlastWaveTargetModal(oppTargets, function(chosen) {
+        var curHandIdx = g.hand.indexOf(c);
+        if (curHandIdx >= 0) g.hand.splice(curHandIdx, 1);
+        else if (i >= 0 && i < g.hand.length) g.hand.splice(i, 1);
+        g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+        var targetMon = g.enemy[chosen.index];
+        if (targetMon) {
+          var tName = targetMon.faceDown ? 'Monstruo boca abajo' : (targetMon.name || targetMon[0] || 'Monstruo');
+          g.enemy[chosen.index] = null;
+          g.enemyGrave = g.enemyGrave || [];
+          g.enemyGrave.push(Object.assign({}, targetMon, { faceUp: true }));
+          if (window.playDestroySound) window.playDestroySound();
+          else if (window.playFusionSound) window.playFusionSound();
+          duelToast('💥 ¡Synchro Blast Wave destruyó a ' + tName + '!');
+          if (typeof log === 'function') log('💥 ¡Synchro Blast Wave! Activada controlando un Monstruo Sincro: destruye a ' + tName + ' del rival.');
+        }
+        if (typeof render === 'function') render();
+      }, function() {
+        duelToast('Synchro Blast Wave: Activación cancelada.');
+      });
       return;
     }
 
@@ -23605,6 +23744,45 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
       duelToast('🌪️ ¡Magia Continua Black Whirlwind activada boca arriba!');
       if (typeof log === 'function') log('🌪️ ¡Magia Continua Black Whirlwind activada boca arriba en el campo! Cada vez que invoques de Modo Normal un Alanegra, buscarás otro en el Deck con menor ATK.');
       if (typeof render === 'function') render();
+      return;
+    }
+
+    // Activación de Magia Synchro Blast Wave desde SET
+    if (cName === 'Synchro Blast Wave' || val === 'SYNCHRO_BLAST_WAVE' || (cName && cName.toUpperCase().includes('SYNCHRO BLAST'))) {
+      var hasSynchro = (g.field || []).some(function(m) {
+        return m && !m.faceDown && (m.kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(m)));
+      });
+      if (!hasSynchro) {
+        duelToast('Debes controlar al menos 1 Monstruo de Sincronía para activar Synchro Blast Wave.');
+        if (typeof log === 'function') log('Synchro Blast Wave: No puedes activarla porque no controlas ningún Monstruo de Sincronía en el campo.');
+        return;
+      }
+      var oppTargets = (g.enemy || []).map(function(m, idx) {
+        return m ? { card: m, index: idx } : null;
+      }).filter(Boolean);
+      if (!oppTargets.length) {
+        duelToast('Tu oponente no controla ningún monstruo para destruir.');
+        if (typeof log === 'function') log('Synchro Blast Wave: El rival no tiene monstruos en el campo.');
+        return;
+      }
+      window.showSynchroBlastWaveTargetModal(oppTargets, function(chosen) {
+        g.playerBack[i] = null;
+        g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+        var targetMon = g.enemy[chosen.index];
+        if (targetMon) {
+          var tName = targetMon.faceDown ? 'Monstruo boca abajo' : (targetMon.name || targetMon[0] || 'Monstruo');
+          g.enemy[chosen.index] = null;
+          g.enemyGrave = g.enemyGrave || [];
+          g.enemyGrave.push(Object.assign({}, targetMon, { faceUp: true }));
+          if (window.playDestroySound) window.playDestroySound();
+          else if (window.playFusionSound) window.playFusionSound();
+          duelToast('💥 ¡Synchro Blast Wave destruyó a ' + tName + '!');
+          if (typeof log === 'function') log('💥 ¡Synchro Blast Wave! Activada desde SET controlando un Monstruo Sincro: destruye a ' + tName + ' del rival.');
+        }
+        if (typeof render === 'function') render();
+      }, function() {
+        duelToast('Synchro Blast Wave: Activación cancelada.');
+      });
       return;
     }
 
@@ -24475,6 +24653,42 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
         duelToast('🌙 ¡' + opp.toUpperCase() + ' activa Book of Moon y voltea a ' + (strongPlayerMon.name || 'tu monstruo') + ' boca abajo en Defensa!');
         if (typeof log === 'function') log('¡Book of Moon! ' + (strongPlayerMon.name || 'El monstruo') + ' es volteado boca abajo en Posición de Defensa.');
         if (typeof render === 'function') render();
+      }
+    }
+
+    // Synchro Blast Wave (IA)
+    var sbwIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Synchro Blast Wave' || (c.value && c.value === 'SYNCHRO_BLAST_WAVE'));
+    });
+    if (sbwIdx >= 0) {
+      var aiHasSynchro = (game.enemy || []).some(function(m) {
+        return m && !m.faceDown && (m.kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(m)));
+      });
+      if (aiHasSynchro && Array.isArray(game.field)) {
+        var strongestPlayerIdx = -1;
+        var highestAtk = -1;
+        for (var pi = 0; pi < game.field.length; pi++) {
+          var pm = game.field[pi];
+          if (pm) {
+            var patk = Number(pm.atk !== undefined ? pm.atk : (pm[4] || 0));
+            if (patk > highestAtk) {
+              highestAtk = patk;
+              strongestPlayerIdx = pi;
+            }
+          }
+        }
+        if (strongestPlayerIdx >= 0) {
+          var sbwCard = game.enemyHand.splice(sbwIdx, 1)[0];
+          game.enemyGrave.push(Object.assign({}, sbwCard, { faceUp: true, set: false }));
+          var destroyedPlayerMon = game.field[strongestPlayerIdx];
+          game.field[strongestPlayerIdx] = null;
+          game.grave = game.grave || [];
+          game.grave.push(Object.assign({}, destroyedPlayerMon, { faceUp: true }));
+          if (window.playDestroySound) window.playDestroySound();
+          duelToast('💥 ¡' + opp.toUpperCase() + ' activa Synchro Blast Wave y destruye a ' + (destroyedPlayerMon.name || destroyedPlayerMon[0]) + '!');
+          if (typeof log === 'function') log('¡' + opp.toUpperCase() + ' activa Synchro Blast Wave y destruye a ' + (destroyedPlayerMon.name || destroyedPlayerMon[0]) + '!');
+          if (typeof render === 'function') render();
+        }
       }
     }
 
