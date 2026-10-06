@@ -304,7 +304,7 @@ function equipSpell(i){
 }
 function enforceHandLimit(side){let hand=side==='enemy'?game.enemyHand:game.hand;let grave=side==='enemy'?game.enemyGrave:game.grave;while(hand.length>6){let c=hand.pop();grave.push(isST(c)?{...c,faceUp:true}:mk(c[0]));log((side==='enemy'?'Rival':'Tú')+' descarta '+(c.name||c[0])+' al Cementerio por superar 6 cartas.')}}
 function draw(){if(game.turn!=='player')return;if(window.playDrawSound) window.playDrawSound();if(game.deck.length){game.hand.push(game.deck.pop());enforceHandLimit('player');render();log('Robaste una carta.')}}
-function normalSummon(){if(game.turn!=='player')return;if(game.handSummoned)return log('Ya hiciste tu invocación desde la mano este turno.'); if(window.playSummonSound) window.playSummonSound();let i=game.selected.find(x=>x[0]==='h')?.[1];if(i==null)return log('Selecciona una carta de la mano.');let c=game.hand[i];let slot=game.field.findIndex(x=>!x);if(slot<0)return log('No hay espacio en el campo.');let placed=mk(c[0]);placed.summonedTurn=game.turnNo;game.field[slot]=placed;game.hand.splice(i,1);game.handSummoned=true;game.selected=[];render();setDuelView('field');log('Invocaste '+c[0]+'.')}
+function normalSummon(){if(game.turn!=='player')return;if(game.handSummoned)return log('Ya hiciste tu invocación desde la mano este turno.'); if(window.playSummonSound) window.playSummonSound();let i=game.selected.find(x=>x[0]==='h')?.[1];if(i==null)return log('Selecciona una carta de la mano.');let c=game.hand[i];let slot=game.field.findIndex(x=>!x);if(slot<0)return log('No hay espacio en el campo.');let placed=mk(c[0]);placed.summonedTurn=game.turnNo;game.field[slot]=placed;game.hand.splice(i,1);game.handSummoned=true;game.selected=[];render();setDuelView('field');log('Invocaste '+c[0]+'.');if(typeof window.triggerBlackWhirlwindIfAny==='function')try{window.triggerBlackWhirlwindIfAny(placed);}catch(_){}}
 function fuse(){if(game.turn!=='player')return;let ids=game.selected.filter(x=>x[0]==='h').map(x=>x[1]).sort((a,b)=>b-a);if(ids.length<2)return log('Selecciona 2 o más cartas de la mano.');let names=ids.map(i=>game.hand[i]?.[0]);let result=fusionResult(names);if(!result)return log('No existe una Fusión para esos materiales.');let slot=game.field.findIndex(x=>!x);if(slot<0)return log('No hay espacio para el resultado.');ids.forEach(i=>game.grave.push(mk(game.hand[i][0])));ids.forEach(i=>game.hand.splice(i,1));let fused=mk(result);fused.summonedTurn=game.turnNo;game.field[slot]=fused;if(typeof window.recordDiscoveredFusion==='function')try{window.recordDiscoveredFusion(result);}catch(_){}if(window.playFusionSound)window.playFusionSound();game.handSummoned=true;game.selected=[];render();log('FUSIÓN ? '+result+'.')}
 function fusionResult(names){
   if(names.includes('Baby Dragon')&&names.includes('Thunder Dragon'))return 'Twin-Headed Thunder Dragon';
@@ -20355,6 +20355,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    // Disparo de Black Whirlwind para el jugador al invocar monstruo Alanegra
+    if (typeof window.triggerBlackWhirlwindIfAny === 'function') {
+      try {
+        window.triggerBlackWhirlwindIfAny(monster);
+      } catch (errBW) {
+        console.error('Error triggering Black Whirlwind:', errBW);
+      }
+    }
+
     if (typeof render === 'function') render();
     if (typeof setDuelView === 'function') setDuelView('field');
     if (isEgyptianGod(monster.name)) {
@@ -23044,6 +23053,188 @@ window.showAllureDarkChoiceModal = function(darkList, onChosen) {
   document.body.appendChild(overlay);
 };
 
+window.showBlackWhirlwindSearchModal = function(candidates, summonedMonster, summonedAtk, titleSuffix, onChosen, onCancel) {
+  var existing = document.getElementById('bw-search-modal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'bw-search-modal';
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999999; display:flex; justify-content:center; align-items:center; padding:15px; font-family:"Segoe UI", Arial, sans-serif;';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'width:min(720px, 95vw); max-height:85vh; background:linear-gradient(180deg, #102019 0%, #08120e 100%); border:2.5px solid #00e676; border-radius:12px; box-shadow:0 0 35px rgba(0, 230, 118, 0.4), 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+  var sName = summonedMonster.name || summonedMonster[0] || 'Alanegra';
+
+  var header = document.createElement('div');
+  header.style.cssText = 'background:rgba(10, 35, 25, 0.95); padding:14px 20px; border-bottom:2px solid #00e676; text-align:center; position:relative;';
+  header.innerHTML = `
+    <div style="font-family:VT323, monospace; font-size:26px; color:#b9f6ca; text-shadow:0 0 12px #00e676; letter-spacing:1px;">
+      🌪️ TORBELLINO NEGRO · EFECTO BLACK WHIRLWIND ${titleSuffix || ''}
+    </div>
+    <div style="color:#e0f2f1; font-size:13px; margin-top:5px;">
+      Invocaste a <b>${sName}</b> (<b>${summonedAtk} ATK</b>). Elige <b>1 monstruo Alanegra</b> de tu Deck con <b>menor ATK</b>:
+    </div>
+  `;
+  box.appendChild(header);
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; padding:20px; overflow-y:auto; max-height:55vh; justify-items:center;';
+
+  candidates.forEach(function(item) {
+    var c = item.card;
+    var meta = item.meta || (typeof window.getCardMetadata === 'function' ? window.getCardMetadata(c.name || c[0]) : null);
+    var name = (meta && meta.name) || c.name || c[0] || 'Monstruo';
+    var atk = item.atk;
+    var def = (meta && meta.def != null) ? meta.def : (c.def != null ? c.def : (c[5] != null ? c[5] : '-'));
+    var level = (meta && meta.level) || c.level || c[1] || 4;
+    var imgUrl = (meta && meta.imgUrl) || c.imgUrl || (c.id ? 'imagenescartas/Mundo3/' + c.id + '.jpg' : 'https://i.imgur.com/vHqR8Kq.png');
+
+    var cardItem = document.createElement('div');
+    cardItem.style.cssText = 'width:130px; background:#0e1d17; border:2px solid #00897b; border-radius:8px; padding:8px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:all 0.18s ease; box-shadow:0 4px 10px rgba(0,0,0,0.6); position:relative;';
+
+    cardItem.innerHTML = `
+      <div style="width:100%; height:130px; background:#000; border-radius:4px; overflow:hidden; margin-bottom:6px; display:flex; align-items:center; justify-content:center;">
+        <img src="${imgUrl}" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png';">
+      </div>
+      <div style="font-weight:bold; font-size:11px; color:#e0f2f1; text-align:center; height:28px; overflow:hidden; line-height:1.2; margin-bottom:4px;">
+        ${name}
+      </div>
+      <div style="font-size:10px; color:#ffd700; margin-bottom:4px;">
+        ★${level} · OSCURIDAD
+      </div>
+      <div style="font-size:10px; color:#00e676; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; width:100%; text-align:center; font-weight:bold;">
+        ⚔ ${atk} < ${summonedAtk} ATK
+      </div>
+      <button style="margin-top:8px; width:100%; padding:6px 0; background:linear-gradient(180deg, #00c853, #1b5e20); border:1px solid #69f0ae; color:#fff; border-radius:4px; font-weight:bold; font-size:11px; cursor:pointer;">
+        ⚡ AÑADIR A LA MANO
+      </button>
+    `;
+
+    cardItem.onmouseover = function() {
+      cardItem.style.transform = 'translateY(-4px) scale(1.03)';
+      cardItem.style.borderColor = '#69f0ae';
+      cardItem.style.boxShadow = '0 0 18px rgba(105, 240, 174, 0.7)';
+    };
+    cardItem.onmouseout = function() {
+      cardItem.style.transform = 'none';
+      cardItem.style.borderColor = '#00897b';
+      cardItem.style.boxShadow = '0 4px 10px rgba(0,0,0,0.6)';
+    };
+
+    cardItem.onclick = function() {
+      if (window.playViolinClick) window.playViolinClick();
+      overlay.remove();
+      if (typeof onChosen === 'function') onChosen(item);
+    };
+
+    grid.appendChild(cardItem);
+  });
+
+  box.appendChild(grid);
+
+  var footer = document.createElement('div');
+  footer.style.cssText = 'background:rgba(10, 35, 25, 0.9); padding:10px 20px; border-top:1px solid #1b5e20; display:flex; justify-content:flex-end; align-items:center;';
+  var cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Omitir Búsqueda';
+  cancelBtn.style.cssText = 'background:#263238; border:1px solid #455a64; color:#cfd8dc; padding:6px 16px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:bold;';
+  cancelBtn.onclick = function() {
+    overlay.remove();
+    if (typeof onCancel === 'function') onCancel();
+  };
+  footer.appendChild(cancelBtn);
+  box.appendChild(footer);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+};
+
+window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
+  var g = (typeof game !== 'undefined' && game) ? game : window.game;
+  if (!g || !summonedMonster) return;
+
+  var mName = (summonedMonster.name || summonedMonster[0] || '').toLowerCase();
+  var isBw = (mName.includes('blackwing') || mName.includes('alanegra') || mName.includes('ala negra'));
+  if (!isBw) return;
+
+  // Encontrar todas las Black Whirlwind activas boca arriba en la zona mágica del jugador
+  var activeWhirlwinds = (g.playerBack || []).filter(function(b) {
+    if (!b || b.set) return false;
+    var bn = (b.name || '').toLowerCase();
+    var bv = (b.value || '').toUpperCase();
+    return bn.includes('black whirlwind') || bn.includes('torbellino negro') || bv === 'BLACK_WHIRLWIND';
+  });
+
+  if (!activeWhirlwinds.length) return;
+
+  var sAtk = (typeof window.effectiveAtk === 'function') ? window.effectiveAtk(summonedMonster) : Number(summonedMonster.atk !== undefined ? summonedMonster.atk : (summonedMonster[4] || 0));
+
+  function getCandidates() {
+    var cands = [];
+    if (!Array.isArray(g.deck)) return cands;
+    g.deck.forEach(function(c, dIdx) {
+      if (!c) return;
+      if (typeof isST === 'function' && isST(c)) return;
+      if (c.kind === 'SPELL' || c.kind === 'TRAP' || c.kind === 'EQUIP') return;
+      if (c.kind === 'SYNCHRO' || c.kind === 'FUSION' || c.kind === 'LINK' || c.kind === 'XYZ') return;
+      var cn = (c.name || c[0] || '').toLowerCase();
+      if (!cn.includes('blackwing') && !cn.includes('alanegra') && !cn.includes('ala negra')) return;
+      var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(c.name || c[0]) : null;
+      var cAtk = (meta && meta.atk != null && !isNaN(Number(meta.atk))) ? Number(meta.atk) : Number(c.atk !== undefined ? c.atk : (c[4] !== undefined ? c[4] : 0));
+      if (cAtk < sAtk) {
+        cands.push({ card: c, deckIndex: dIdx, atk: cAtk, meta: meta, name: (c.name || c[0] || 'Alanegra') });
+      }
+    });
+    return cands;
+  }
+
+  var candidates = getCandidates();
+  if (candidates.length === 0) {
+    var smName = summonedMonster.name || summonedMonster[0] || 'Alanegra';
+    duelToast('🌪️ [Black Whirlwind] No tienes monstruos Alanegra en tu Deck con menor ATK que ' + smName + ' (' + sAtk + ' ATK).');
+    if (typeof log === 'function') log('🌪️ [Black Whirlwind] No hay monstruos Alanegra en tu Deck con menor ATK que ' + smName + ' (' + sAtk + ' ATK).');
+    return;
+  }
+
+  var whirlwindsTotal = activeWhirlwinds.length;
+  var currentWIndex = 0;
+
+  function runSearchStep() {
+    if (currentWIndex >= whirlwindsTotal) return;
+    var curCands = getCandidates();
+    if (!curCands.length) {
+      duelToast('🌪️ [Black Whirlwind] Ya no quedan más monstruos Alanegra con menor ATK en el Deck.');
+      return;
+    }
+    currentWIndex++;
+    var titleSuffix = whirlwindsTotal > 1 ? ' (' + currentWIndex + '/' + whirlwindsTotal + ')' : '';
+    window.showBlackWhirlwindSearchModal(curCands, summonedMonster, sAtk, titleSuffix, function(chosenItem) {
+      var actualIdx = g.deck.indexOf(chosenItem.card);
+      if (actualIdx < 0) actualIdx = chosenItem.deckIndex;
+      if (actualIdx >= 0 && actualIdx < g.deck.length) {
+        var added = g.deck.splice(actualIdx, 1)[0];
+        g.hand.push(added);
+        if (typeof enforceHandLimit === 'function') enforceHandLimit('player');
+        if (window.playDrawSound) window.playDrawSound();
+        var aName = added.name || added[0] || 'Alanegra';
+        duelToast('🌪️ ¡Black Whirlwind! Añadiste a ' + aName + ' (' + chosenItem.atk + ' ATK) a tu mano.');
+        if (typeof log === 'function') log('🌪️ [Black Whirlwind] Añadiste a ' + aName + ' (' + chosenItem.atk + ' ATK) del Deck a la mano.');
+        if (typeof render === 'function') render();
+      }
+      if (currentWIndex < whirlwindsTotal) {
+        setTimeout(runSearchStep, 350);
+      }
+    }, function() {
+      duelToast('🌪️ Omitiste la búsqueda de Black Whirlwind.');
+      if (currentWIndex < whirlwindsTotal) {
+        setTimeout(runSearchStep, 350);
+      }
+    });
+  }
+
+  runSearchStep();
+};
+
     // ALLURE OF DARKNESS
     if (val === 'ALLURE_OF_DARKNESS' || cName === 'Allure of Darkness' || nUpperHand === 'ALLURE OF DARKNESS') {
       g.hand.splice(i, 1);
@@ -23182,25 +23373,18 @@ window.showAllureDarkChoiceModal = function(darkList, onChosen) {
       return;
     }
 
-    // BLACK WHIRLWIND
+    // BLACK WHIRLWIND (Magia Continua)
     if (val === 'BLACK_WHIRLWIND' || cName === 'Black Whirlwind' || nUpperHand === 'BLACK WHIRLWIND' || nUpperHand.includes('TORBELLINO NEGRO')) {
-      g.hand.splice(i, 1);
       var placedSlot = (g.playerBack || []).findIndex(function(x) { return !x; });
-      if (placedSlot >= 0) {
-        g.playerBack[placedSlot] = Object.assign({}, c, { set: false, faceUp: true });
-      } else {
-        g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      if (placedSlot < 0) {
+        duelToast('No hay espacio en tu Zona de Magia/Trampa para activar Black Whirlwind.');
+        return;
       }
-      var bwIdx = (g.deck || []).findIndex(function(x) { return x && ((x.name || '').includes('Blackwing') || (x.name || '').includes('Ala Negra')); });
-      if (bwIdx >= 0) {
-        var bwCard = g.deck.splice(bwIdx, 1)[0];
-        g.hand.push(bwCard);
-        if (typeof log === 'function') log('¡Black Whirlwind! Añades ' + (bwCard.name || 'Alanegra') + ' del Deck a tu mano.');
-        duelToast('¡Black Whirlwind! Añades ' + (bwCard.name || 'Alanegra') + ' a la mano.');
-      } else {
-        if (typeof log === 'function') log('Black Whirlwind activado en el campo.');
-        duelToast('¡Black Whirlwind activado!');
-      }
+      g.hand.splice(i, 1);
+      g.playerBack[placedSlot] = Object.assign({}, c, { set: false, faceUp: true, kind: 'SPELL' });
+      if (window.playSpellSound) window.playSpellSound();
+      if (typeof log === 'function') log('🌪️ ¡Magia Continua Black Whirlwind activada en el campo! Cada vez que invoques de Modo Normal un Alanegra, buscarás otro en el Deck con menor ATK.');
+      duelToast('🌪️ ¡Magia Continua Black Whirlwind activada en el campo!');
       if (typeof render === 'function') render();
       return;
     }
@@ -23410,6 +23594,17 @@ window.showAllureDarkChoiceModal = function(darkList, onChosen) {
     }
     if (isFissure(c)) {
       window.resolveFissure(i, null);
+      return;
+    }
+
+    // Activación de Magia Continua Black Whirlwind desde SET
+    if (cName === 'Black Whirlwind' || val === 'BLACK_WHIRLWIND' || (cName && cName.toUpperCase().includes('BLACK WHIRLWIND'))) {
+      g.playerBack[i].set = false;
+      g.playerBack[i].faceUp = true;
+      if (window.playSpellSound) window.playSpellSound();
+      duelToast('🌪️ ¡Magia Continua Black Whirlwind activada boca arriba!');
+      if (typeof log === 'function') log('🌪️ ¡Magia Continua Black Whirlwind activada boca arriba en el campo! Cada vez que invoques de Modo Normal un Alanegra, buscarás otro en el Deck con menor ATK.');
+      if (typeof render === 'function') render();
       return;
     }
 
@@ -24619,23 +24814,27 @@ window.showAllureDarkChoiceModal = function(darkList, onChosen) {
         // Disparo de Black Whirlwind para la IA
         var sName = summoned.name || summoned[0] || '';
         if (sName.includes('Blackwing') || sName.includes('Alanegra')) {
-          var hasWhirlwind = (game.enemyBack || []).some(function(b) {
+          var aiWhirlwindCount = (game.enemyBack || []).filter(function(b) {
             return b && !b.set && (b.name === 'Black Whirlwind' || (b.value && b.value === 'BLACK_WHIRLWIND'));
-          });
-          if (hasWhirlwind && Array.isArray(game.enemyDeck)) {
-            var searchBwIdx = game.enemyDeck.findIndex(function(c) {
-              if (!c || isST(c)) return false;
-              var cn = c.name || c[0] || '';
-              if (!cn.includes('Blackwing') && !cn.includes('Alanegra')) return false;
-              var cAtk = Number(c.atk !== undefined ? c.atk : (c[4] || 0));
-              return cAtk <= sAtk;
-            });
-            if (searchBwIdx >= 0) {
-              var searchedBw = game.enemyDeck.splice(searchBwIdx, 1)[0];
-              game.enemyHand.push(searchedBw);
-              duelToast('🌪️ [Efecto Black Whirlwind] ' + opp.toUpperCase() + ' busca y añade a ' + (searchedBw.name || searchedBw[0]) + ' a su mano.');
-              if (typeof log === 'function') log('¡Black Whirlwind añade a ' + (searchedBw.name || searchedBw[0]) + ' a la mano del rival!');
-              if (typeof render === 'function') render();
+          }).length;
+          if (aiWhirlwindCount > 0 && Array.isArray(game.enemyDeck)) {
+            for (var aiW = 0; aiW < aiWhirlwindCount; aiW++) {
+              var searchBwIdx = game.enemyDeck.findIndex(function(c) {
+                if (!c || isST(c)) return false;
+                var cn = c.name || c[0] || '';
+                if (!cn.includes('Blackwing') && !cn.includes('Alanegra')) return false;
+                var cAtk = Number(c.atk !== undefined ? c.atk : (c[4] || 0));
+                return cAtk < sAtk;
+              });
+              if (searchBwIdx >= 0) {
+                var searchedBw = game.enemyDeck.splice(searchBwIdx, 1)[0];
+                game.enemyHand.push(searchedBw);
+                duelToast('🌪️ [Efecto Black Whirlwind] ' + opp.toUpperCase() + ' busca y añade a ' + (searchedBw.name || searchedBw[0]) + ' a su mano.');
+                if (typeof log === 'function') log('¡Black Whirlwind añade a ' + (searchedBw.name || searchedBw[0]) + ' a la mano del rival!');
+                if (typeof render === 'function') render();
+              } else {
+                break;
+              }
             }
           }
         }
