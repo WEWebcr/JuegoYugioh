@@ -13698,7 +13698,12 @@ window.PROGRAMMED_ST_NAMES = new Set([
   'threatening roar', 'crush card virus', 'eatgaboon', 'bear trap', 'invisible wire',
   'goblin fan', 'bad reaction to simochi', 'reverse trap', 'fake trap', 'javalina',
   'llamado de la tumba', 'toon defense', 'curse of anubis', 'statue of the wicked',
-  'ring of defense', 'soul rope', 'obliterate!!!', 'destiny board', 'sentence of doom', 'muko'
+  'ring of defense', 'soul rope', 'obliterate!!!', 'destiny board', 'sentence of doom', 'muko',
+
+  // Soporte 5D's / Neo Domino (Mundo 3)
+  'soul charge', 'black whirlwind', 'allure of darkness', 'de-synchro',
+  'trap stun', 'book of moon', 'crimson gaia', 'resonator call',
+  'synchro blast wave', 'urgent tuning'
 ]);
 
 window.isCardProgrammed = function(cardOrName) {
@@ -13719,6 +13724,8 @@ window.isCardProgrammed = function(cardOrName) {
     c = cardOrName;
     name = (c.name || c[0] || '').trim().toLowerCase();
   }
+  // Cartas de 5D's oficiales están siempre programadas
+  if (typeof window.is5DCard === 'function' && window.is5DCard(c || name)) return true;
   if (!c) {
     return window.PROGRAMMED_ST_NAMES.has(name);
   }
@@ -13787,6 +13794,15 @@ window.cleanSaveCollection = function(s) {
       cleanStarter.forEach(function(n) { s.collection[n] = Math.max(s.collection[n] || 0, 1); });
       modified = true;
     }
+  }
+
+  // Auto-otorgar DP de prueba y cartas solicitadas para el usuario Josue
+  if (s && ((s.name && String(s.name).toLowerCase() === 'josue') || (window.activeAccount && String(window.activeAccount).toLowerCase() === 'josue')) && !s._grant_josue_300k) {
+    s.pm = Math.max(Number(s.pm || 0), 300000);
+    s.collectionMundo3 = s.collectionMundo3 || {};
+    s.collectionMundo3['Black Whirlwind'] = Math.max(Number(s.collectionMundo3['Black Whirlwind'] || 0), 3);
+    s._grant_josue_300k = true;
+    modified = true;
   }
 
   // 1. Limpieza y aislamiento estricto de colecciones

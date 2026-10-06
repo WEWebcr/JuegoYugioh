@@ -671,6 +671,14 @@ app.post('/api/save', async (req, res) => {
     }
   }
 
+  // 1b. Fusión inteligente de colección Mundo 3 (5D's)
+  const mergedCollectionM3 = Object.assign({}, existing.collectionMundo3 || {});
+  if (data.collectionMundo3 && typeof data.collectionMundo3 === 'object') {
+    for (const [card, count] of Object.entries(data.collectionMundo3)) {
+      mergedCollectionM3[card] = Math.max(mergedCollectionM3[card] || 0, parseInt(count) || 0);
+    }
+  }
+
   // 2. Fusión de historial de recompensas
   const mergedRewards = Array.isArray(existing.rewardsHistory) ? [...existing.rewardsHistory] : [];
   if (Array.isArray(data.rewardsHistory)) {
@@ -700,6 +708,7 @@ app.post('/api/save', async (req, res) => {
     name: existing.name || name,
     passwordHash: existing.passwordHash,
     collection: mergedCollection,
+    collectionMundo3: mergedCollectionM3,
     rewardsHistory: mergedRewards,
     cleared: mergedCleared,
     unlocked: mergedUnlocked,
@@ -714,6 +723,7 @@ app.post('/api/save', async (req, res) => {
       ok: true,
       subscription: subStatus,
       collection: mergedCollection,
+      collectionMundo3: mergedCollectionM3,
       cleared: mergedCleared,
       unlocked: mergedUnlocked,
       wins: mergedWins,

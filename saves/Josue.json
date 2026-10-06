@@ -4,7 +4,7 @@
   "passwordHash": "69a6b100074bc1e3c319a6c533277fdb873c9a44d896accc5c42230b4ce3b3ce",
   "schema": 1,
   "world": 1,
-  "pm": 3825,
+  "pm": 300000,
   "unlocked": [
     "tristan",
     "weevil",
@@ -51,7 +51,8 @@
     "Flying Kamakiri #1": 1,
     "Birdface": 1,
     "Swords of Concealing Light": 1,
-    "Cyber-Tech Alligator": 1
+    "Cyber-Tech Alligator": 1,
+    "Black Whirlwind": 3
   },
   "deck": [
     "Celtic Guardian",
@@ -135,6 +136,20 @@
       "count": 2,
       "reason": "Regalo especial",
       "date": 1790900390098
+    },
+    {
+      "type": "DP",
+      "amount": 300000,
+      "mode": "set",
+      "reason": "Regalía de DP solicitada por Josue para pruebas",
+      "date": 1791259268733
+    },
+    {
+      "type": "CARD",
+      "card": "Black Whirlwind",
+      "count": 3,
+      "reason": "Restauración de carta comprada en tienda 5D's",
+      "date": 1791259268733
     }
   ],
   "decks": {
@@ -207,5 +222,8 @@
     "remainingMs": 15515086714,
     "remainingDays": 180,
     "plan": "vip_6m"
+  },
+  "collectionMundo3": {
+    "Black Whirlwind": 3
   }
 }
