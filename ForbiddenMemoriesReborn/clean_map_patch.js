@@ -13818,26 +13818,132 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       return;
     }
 
+window.showAllureDarkChoiceModal = function(darkList, onChosen) {
+  var existing = document.getElementById('allure-choice-modal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'allure-choice-modal';
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999999; display:flex; justify-content:center; align-items:center; padding:15px; font-family:"Segoe UI", Arial, sans-serif;';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'width:min(680px, 95vw); max-height:85vh; background:linear-gradient(180deg, #1f142b 0%, #11091a 100%); border:2.5px solid #ba68c8; border-radius:12px; box-shadow:0 0 35px rgba(186, 104, 200, 0.6), 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+  var header = document.createElement('div');
+  header.style.cssText = 'background:rgba(40, 15, 60, 0.9); padding:14px 20px; border-bottom:2px solid #ab47bc; text-align:center;';
+  header.innerHTML = `
+    <div style="font-family:VT323, monospace; font-size:26px; color:#f3e5f5; text-shadow:0 0 10px #ab47bc; letter-spacing:1px;">
+      🌑 ALLURE OF DARKNESS · REMOVER MONSTRUO OSCURIDAD
+    </div>
+    <div style="color:#ce93d8; font-size:13px; margin-top:4px;">
+      Has robado 2 cartas. Elige <b>1 monstruo de OSCURIDAD</b> de tu mano para enviarlo a la <b>Zona de Removidos</b>:
+    </div>
+  `;
+  box.appendChild(header);
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; padding:20px; overflow-y:auto; max-height:55vh; justify-items:center;';
+
+  darkList.forEach(function(item) {
+    var c = item.card;
+    var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(c.name || c[0]) : null;
+    var name = (meta && meta.name) || c.name || c[0] || 'Monstruo';
+    var atk = (meta && meta.atk != null) ? meta.atk : (c.atk != null ? c.atk : (c[4] != null ? c[4] : '-'));
+    var def = (meta && meta.def != null) ? meta.def : (c.def != null ? c.def : (c[5] != null ? c[5] : '-'));
+    var level = (meta && meta.level) || c.level || c[1] || 4;
+    var imgUrl = (meta && meta.imgUrl) || c.imgUrl || (c.id ? 'imagenescartas/Mundo3/' + c.id + '.jpg' : 'https://i.imgur.com/vHqR8Kq.png');
+
+    var cardItem = document.createElement('div');
+    cardItem.style.cssText = 'width:130px; background:#180b24; border:2px solid #7b1fa2; border-radius:8px; padding:8px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:all 0.18s ease; box-shadow:0 4px 10px rgba(0,0,0,0.6); position:relative;';
+
+    cardItem.innerHTML = `
+      <div style="width:100%; height:130px; background:#000; border-radius:4px; overflow:hidden; margin-bottom:6px; display:flex; align-items:center; justify-content:center;">
+        <img src="${imgUrl}" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png';">
+      </div>
+      <div style="font-weight:bold; font-size:11px; color:#f3e5f5; text-align:center; height:28px; overflow:hidden; line-height:1.2; margin-bottom:4px;">
+        ${name}
+      </div>
+      <div style="font-size:10px; color:#ffd700; margin-bottom:4px;">
+        ★${level} · OSCURIDAD
+      </div>
+      <div style="font-size:10px; color:#bbb; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; width:100%; text-align:center;">
+        ⚔ ${atk} / 🛡 ${def}
+      </div>
+      <button style="margin-top:8px; width:100%; padding:6px 0; background:linear-gradient(180deg, #9c27b0, #6a1b9a); border:1px solid #ba68c8; color:#fff; border-radius:4px; font-weight:bold; font-size:11px; cursor:pointer;">
+        ⚡ REMOVER CARTA
+      </button>
+    `;
+
+    cardItem.onmouseover = function() {
+      cardItem.style.transform = 'translateY(-4px) scale(1.03)';
+      cardItem.style.borderColor = '#e1bee7';
+      cardItem.style.boxShadow = '0 0 18px rgba(225, 190, 231, 0.7)';
+    };
+    cardItem.onmouseout = function() {
+      cardItem.style.transform = 'none';
+      cardItem.style.borderColor = '#7b1fa2';
+      cardItem.style.boxShadow = '0 4px 10px rgba(0,0,0,0.6)';
+    };
+
+    cardItem.onclick = function() {
+      if (window.playViolinClick) window.playViolinClick();
+      overlay.remove();
+      if (typeof onChosen === 'function') onChosen(item.card);
+    };
+
+    grid.appendChild(cardItem);
+  });
+
+  box.appendChild(grid);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+};
+
     // ALLURE OF DARKNESS
     if (val === 'ALLURE_OF_DARKNESS' || cName === 'Allure of Darkness' || nUpperHand === 'ALLURE OF DARKNESS') {
       g.hand.splice(i, 1);
       g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
       for (var d = 0; d < 2; d++) { if (g.deck.length) g.hand.push(g.deck.pop()); }
-      var darkIdx = g.hand.findIndex(function(m) {
-        return m && (m.isMonster || (m.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(m.type).toUpperCase()))) && (m.attr === 'DARK' || (m[3] && String(m[3]).toUpperCase() === 'DARK'));
-      });
-      if (darkIdx >= 0) {
-        var banished = g.hand.splice(darkIdx, 1)[0];
-        g.banished = g.banished || [];
-        g.banished.push(banished);
-        if (typeof log === 'function') log('Allure of Darkness: robas 2 cartas y destierras ' + (banished.name || 'un monstruo de OSCURIDAD') + '.');
-        duelToast('¡Allure of Darkness! Robas 2 y destierras ' + (banished.name || '1 OSCURIDAD') + '.');
-      } else {
+      if (window.playDrawSound) window.playDrawSound();
+      if (typeof render === 'function') render();
+
+      // Buscar todos los monstruos de OSCURIDAD en mano
+      var darkList = [];
+      for (var h = 0; h < g.hand.length; h++) {
+        var monCandidate = g.hand[h];
+        if (!monCandidate) continue;
+        var isMon = monCandidate.isMonster || (monCandidate.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(monCandidate.type).toUpperCase()));
+        if (!isMon) continue;
+        var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(monCandidate.name || monCandidate[0]) : null;
+        var attr = String((meta && (meta.attr || meta.attribute)) || monCandidate.attr || monCandidate[3] || '').toUpperCase();
+        var nLow = String(monCandidate.name || monCandidate[0] || '').toLowerCase();
+        var isDark = (attr === 'DARK' || attr === 'OSCURIDAD' || nLow.includes('resonator') || nLow.includes('blackwing') || nLow.includes('archfiend'));
+        if (isDark) {
+          darkList.push({ card: monCandidate, index: h });
+        }
+      }
+
+      if (darkList.length === 0) {
         while (g.hand.length > 0) { g.grave.push(g.hand.pop()); }
         if (typeof log === 'function') log('Allure of Darkness: no tenías monstruos de OSCURIDAD en la mano; toda tu mano fue enviada al Cementerio.');
-        duelToast('¡Allure of Darkness! Sin OSCURIDAD: mano al Cementerio.');
+        duelToast('¡Allure of Darkness! Sin monstruos de OSCURIDAD: toda la mano al Cementerio.');
+        if (typeof render === 'function') render();
+        return;
       }
-      if (typeof render === 'function') render();
+
+      // Si hay monstruos de OSCURIDAD, abrir modal de selección
+      window.showAllureDarkChoiceModal(darkList, function(chosenCard) {
+        var cardIdx = g.hand.indexOf(chosenCard);
+        if (cardIdx >= 0) {
+          var banished = g.hand.splice(cardIdx, 1)[0];
+          g.banished = g.banished || [];
+          g.banished.push(banished);
+          var bName = banished.name || banished[0] || 'monstruo de OSCURIDAD';
+          if (typeof log === 'function') log('Allure of Darkness: robaste 2 cartas y removiste del juego a ' + bName + '.');
+          duelToast('🌑 ¡Allure of Darkness! Removiste a ' + bName + ' a la Zona de Removidos.');
+          if (typeof render === 'function') render();
+        }
+      });
       return;
     }
 
@@ -14885,8 +14991,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       });
       if (darkIdx >= 0) {
         var banished = game.enemyHand.splice(darkIdx, 1)[0];
-        if (!game.enemyBanish) game.enemyBanish = [];
-        game.enemyBanish.push(banished);
+        if (!game.enemyBanished) game.enemyBanished = [];
+        game.enemyBanished.push(banished);
+        game.enemyBanish = game.enemyBanished;
         duelToast('🌑 ¡' + opp.toUpperCase() + ' activa Allure of Darkness! Roba 2 cartas y destierra a ' + (banished.name || banished[0]) + '.');
       } else {
         while (game.enemyHand.length > 0) {
