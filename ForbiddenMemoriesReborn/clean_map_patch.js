@@ -4924,7 +4924,20 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             'Mad Archfiend', 'Twin-Shield Defender', 'Blackwing - Bora the Spear',
             'Blackwing - Shura the Blue Flame', 'Botanical Lion', 'Lord Poison',
             'Morphtronic Radion', 'Assault Dog',
-            'Synchro Blast Wave', 'Urgent Tuning'
+            'Synchro Blast Wave', 'Urgent Tuning',
+            // NUEVAS CARTAS 5D'S:
+            'Shooting Quasar Dragon', 'Shooting Star Dragon', 'Accel Synchro Stardust Dragon',
+            'Junk Speeder', 'Formula Synchron', 'Road Warrior', 'Ancient Fairy Dragon',
+            'Baronne de Fleur', 'Adamancipator Risen - Dragite', 'Crystal Wing Synchro Dragon',
+            'Clear Wing Synchro Dragon', 'Blackwing Full Armor Master', 'Blackwing - Silverwind the Ascendant',
+            'Assault Blackwing - Raikiri the Rain Shower', 'Red Nova Dragon - Burning Soul',
+            'Hot Red Dragon Archfiend Abyss', 'Scarred Dragon Archfiend', 'Black-Winged Assault Dragon',
+            'Hot Red Dragon Archfiend', 'Hot Red Dragon Archfiend Bane', 'Chaos Angel',
+            'Quickdraw Synchron', 'Stardust Synchron', 'Revolution Synchron', 'Stardust Trail',
+            'Blackwing - Auster the South Wind', 'Soul Resonator', 'Crimson Resonator',
+            'Vision Resonator', 'Bone Archfiend', 'Synkron Resonator', 'Darkness Resonator',
+            'Soul Charge', 'Black Whirlwind', 'Allure of Darkness', 'De-Synchro', 'Trap Stun',
+            'Book of Moon', 'Crimson Gaia', 'Resonator Call'
         ];
         let rawDeckPool = [...new Set([...(oppDeck && oppDeck.cards ? oppDeck.cards : []), ...(oppDeck && oppDeck.extraDeck ? oppDeck.extraDeck : [])])];
         cardPool = rawDeckPool.filter(c => !DM_FILLER_FILTER.has(c));
@@ -5010,27 +5023,99 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     if (is5DOpponent) {
         let boss5DMap = {
             trudge: ['Goyo Guardian', 'Junk Warrior'],
-            leo: ['Power Tool Dragon', 'Junk Warrior'],
-            akiza: ['Black Rose Dragon', 'Goyo Guardian'],
-            crow: ['Blackwing - Armor Master', 'Blackwing Armed Wing'],
-            jack: ['Red Dragon Archfiend', 'Goyo Guardian'],
-            yusei: ['Stardust Dragon', 'Junk Warrior']
+            leo: ['Power Tool Dragon', 'Junk Warrior', 'Formula Synchron'],
+            akiza: ['Black Rose Dragon', 'Ancient Fairy Dragon', 'Goyo Guardian'],
+            crow: [
+                'Blackwing Full Armor Master',
+                'Blackwing - Silverwind the Ascendant',
+                'Assault Blackwing - Raikiri the Rain Shower',
+                'Black-Winged Assault Dragon',
+                'Blackwing - Armor Master',
+                'Blackwing Armed Wing'
+            ],
+            jack: [
+                'Red Nova Dragon - Burning Soul',
+                'Hot Red Dragon Archfiend Abyss',
+                'Scarred Dragon Archfiend',
+                'Hot Red Dragon Archfiend',
+                'Hot Red Dragon Archfiend Bane',
+                'Red Dragon Archfiend',
+                'Chaos Angel'
+            ],
+            yusei: [
+                'Shooting Quasar Dragon',
+                'Shooting Star Dragon',
+                'Accel Synchro Stardust Dragon',
+                'Junk Speeder',
+                'Formula Synchron',
+                'Baronne de Fleur',
+                'Crystal Wing Synchro Dragon',
+                'Clear Wing Synchro Dragon',
+                'Adamancipator Risen - Dragite',
+                'Road Warrior',
+                'Stardust Dragon',
+                'Junk Warrior'
+            ]
         };
         let rivalTunersMap = {
             trudge: ['Jutte Fighter', 'Junk Synchron'],
-            leo: ['Junk Synchron', 'Nitro Synchron'],
+            leo: ['Junk Synchron', 'Nitro Synchron', 'Formula Synchron'],
             akiza: ['Twilight Rose Knight', 'Flare Resonator'],
-            crow: ['Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North'],
-            jack: ['Dark Resonator', 'Flare Resonator'],
-            yusei: ['Junk Synchron', 'Nitro Synchron']
+            crow: [
+                'Blackwing - Auster the South Wind',
+                'Blackwing - Gale the Whirlwind',
+                'Blackwing - Blizzard the Far North'
+            ],
+            jack: [
+                'Soul Resonator',
+                'Crimson Resonator',
+                'Vision Resonator',
+                'Synkron Resonator',
+                'Darkness Resonator',
+                'Dark Resonator',
+                'Flare Resonator'
+            ],
+            yusei: [
+                'Quickdraw Synchron',
+                'Stardust Synchron',
+                'Revolution Synchron',
+                'Formula Synchron',
+                'Junk Synchron',
+                'Nitro Synchron'
+            ]
         };
         let rivalSupportMap = {
             trudge: ['Assault Dog', 'Twin-Shield Defender', 'Urgent Tuning', 'Sakuretsu Armor'],
             leo: ['Morphtronic Radion', 'Sonic Chick', 'Synchro Blast Wave', 'United We Stand'],
             akiza: ['Botanical Lion', 'Lord Poison', 'Urgent Tuning', 'Sakuretsu Armor'],
-            crow: ['Blackwing - Bora the Spear', 'Blackwing - Shura the Blue Flame', 'Urgent Tuning'],
-            jack: ['Mad Archfiend', 'Vice Dragon', 'Synchro Blast Wave', 'Urgent Tuning'],
-            yusei: ['Speed Warrior', 'Quillbolt Hedgehog', 'Synchro Blast Wave', 'Urgent Tuning']
+            crow: [
+                'Black Whirlwind',
+                'Allure of Darkness',
+                'Trap Stun',
+                'Blackwing - Bora the Spear',
+                'Blackwing - Shura the Blue Flame',
+                'Urgent Tuning'
+            ],
+            jack: [
+                'Bone Archfiend',
+                'Crimson Gaia',
+                'Resonator Call',
+                'Vice Dragon',
+                'Mad Archfiend',
+                'Synchro Blast Wave',
+                'Urgent Tuning'
+            ],
+            yusei: [
+                'Stardust Trail',
+                'Soul Charge',
+                'De-Synchro',
+                'Book of Moon',
+                'Speed Warrior',
+                'Quillbolt Hedgehog',
+                'Sonic Chick',
+                'Synchro Blast Wave',
+                'Urgent Tuning'
+            ]
         };
 
         let possibleBosses = boss5DMap[normalizedOpp] || ['Stardust Dragon', 'Junk Warrior'];
@@ -5042,15 +5127,17 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         let chosen5DBoss = unowned5DBoss.length > 0 
             ? unowned5DBoss[Math.floor(Math.random() * unowned5DBoss.length)]
             : (possibleBosses.length > 0 ? possibleBosses[Math.floor(Math.random() * possibleBosses.length)] : null);
-        let boss5DChance = isHighRank ? (oppWins <= 1 ? 0.50 : 0.75) : 0.30;
+        let boss5DChance = isHighRank ? (oppWins <= 1 ? 0.70 : 0.85) : 0.50;
         if (Math.random() < boss5DChance && chosen5DBoss) {
             selected3[0] = chosen5DBoss;
         } else {
-            selected3[0] = possibleTuners[Math.floor(Math.random() * possibleTuners.length)] || possibleBosses[0];
+            let altBoss = possibleBosses[Math.floor(Math.random() * possibleBosses.length)] || possibleBosses[0];
+            selected3[0] = altBoss;
         }
 
-        // Carta 2: Monstruo Cantante (Tuner) garantizado
-        let unownedTuners = possibleTuners.filter(c => (curCollection[c] || 0) < 3);
+        // Carta 2: Monstruo Cantante (Tuner) garantizado (priorizando los que aún no tiene x3 y sin duplicados en selected3)
+        let unownedTuners = possibleTuners.filter(c => (curCollection[c] || 0) < 3 && !selected3.includes(c));
+        if (unownedTuners.length === 0) unownedTuners = possibleTuners.filter(c => !selected3.includes(c));
         let chosenTuner = unownedTuners.length > 0
             ? unownedTuners[Math.floor(Math.random() * unownedTuners.length)]
             : possibleTuners[Math.floor(Math.random() * possibleTuners.length)];
@@ -5058,12 +5145,13 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             selected3[1] = chosenTuner;
         }
 
-        // Carta 3: Carta de Soporte Sincronía o Arquetipo 5D's garantizado
-        let unownedSupport = possibleSupport.filter(c => (curCollection[c] || 0) < 3);
+        // Carta 3: Carta de Soporte Sincronía o Arquetipo 5D's garantizado (sin repetir en selected3)
+        let unownedSupport = possibleSupport.filter(c => (curCollection[c] || 0) < 3 && !selected3.includes(c));
+        if (unownedSupport.length === 0) unownedSupport = possibleSupport.filter(c => !selected3.includes(c));
         let chosenSupport = unownedSupport.length > 0
             ? unownedSupport[Math.floor(Math.random() * unownedSupport.length)]
             : possibleSupport[Math.floor(Math.random() * possibleSupport.length)];
-        if (chosenSupport && !selected3.includes(chosenSupport)) {
+        if (chosenSupport) {
             selected3[2] = chosenSupport;
         }
 
@@ -9597,12 +9685,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       if (!enemyExtraNames || enemyExtraNames.length === 0) {
         var FIVE_D_ACE_MAP = {
-          trudge: ['Goyo Guardian'],
-          leo: ['Power Tool Dragon'],
-          akiza: ['Black Rose Dragon'],
-          crow: ['Blackwing - Armor Master', 'Blackwing Armed Wing'],
-          jack: ['Red Dragon Archfiend'],
-          yusei: ['Stardust Dragon', 'Junk Warrior']
+          trudge: ['Goyo Guardian', 'Junk Warrior'],
+          leo: ['Power Tool Dragon', 'Formula Synchron'],
+          akiza: ['Black Rose Dragon', 'Ancient Fairy Dragon'],
+          crow: ['Blackwing - Armor Master', 'Blackwing Armed Wing', 'Blackwing Full Armor Master', 'Blackwing - Silverwind the Ascendant', 'Assault Blackwing - Raikiri the Rain Shower', 'Black-Winged Assault Dragon'],
+          jack: ['Red Dragon Archfiend', 'Red Nova Dragon - Burning Soul', 'Hot Red Dragon Archfiend Abyss', 'Scarred Dragon Archfiend', 'Hot Red Dragon Archfiend', 'Hot Red Dragon Archfiend Bane', 'Chaos Angel'],
+          yusei: ['Stardust Dragon', 'Junk Warrior', 'Junk Speeder', 'Formula Synchron', 'Shooting Star Dragon', 'Shooting Quasar Dragon', 'Accel Synchro Stardust Dragon', 'Baronne de Fleur', 'Crystal Wing Synchro Dragon']
         };
         var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         if (FIVE_D_ACE_MAP[normOppKey]) {
