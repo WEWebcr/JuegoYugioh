@@ -3453,7 +3453,7 @@ window.customShowMap = function() {
             ? (Array.isArray(s.clearedGX) ? s.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []))
             : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : []));
     let curActiveDeck = is5D
-        ? ((s.decksMundo3 && s.activeDeckMundo3 && s.decksMundo3[s.activeDeckMundo3]) || (s.decksMundo3 && s.decksMundo3['Principal']) || [])
+        ? ((s.decksMundo3 && s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra' && s.decksMundo3[s.activeDeckMundo3]) || (s.decksMundo3 && s.decksMundo3['Principal']) || [])
         : ((s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || []);
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
     
@@ -3874,9 +3874,9 @@ window.customShowMap = function() {
                             if (sCheck) {
                                 let is5DCheck = (sCheck.world === 3);
                                 let curCheckDeck = is5DCheck 
-                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
                                     : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                                let curDeckName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
+                                let curDeckName = is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal');
                                 if (curCheckDeck && curCheckDeck.length !== 40) {
                                     alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                                     if (window.customShowDeckEditor) window.customShowDeckEditor();
@@ -3925,9 +3925,9 @@ window.customShowMap = function() {
                     if (sCheck) {
                         let is5DCheck = (sCheck.world === 3);
                         let curCheckDeck = is5DCheck 
-                            ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                            ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
                             : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                        let curDeckName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
+                        let curDeckName = is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal');
                         if (curCheckDeck && curCheckDeck.length !== 40) {
                             alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                             if (window.customShowDeckEditor) window.customShowDeckEditor();
@@ -4201,9 +4201,9 @@ window.openFreeDuelMenu = function() {
                             if (sCheck) {
                                 let is5DCheck = (sCheck.world === 3);
                                 let curDeck = is5DCheck 
-                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
                                     : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                                let curName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
+                                let curName = is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal');
                                 if (!is5DCheck && sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
                                     sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
                                     if (window.persistUserSave) window.persistUserSave(sCheck);
@@ -4750,6 +4750,14 @@ window.cleanSaveCollection = function(s) {
 
   // 4. Limpiar decks de Mundo 3 (s.decksMundo3)
   if (s.decksMundo3 && typeof s.decksMundo3 === 'object') {
+    if (s.activeDeckMundo3 === 'Extra') {
+      s.activeDeckMundo3 = 'Principal';
+      modified = true;
+    }
+    if (s.activeDeck === 'Extra') {
+      s.activeDeck = 'Principal';
+      modified = true;
+    }
     if (s.decksMundo3['Principal'] && (s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal']))) {
       s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
       if (!Array.isArray(s.decksMundo3['Extra'])) {
@@ -4780,11 +4788,9 @@ window.cleanSaveCollection = function(s) {
         }
         return true;
       });
-      if (synchros.length > 0 && Array.isArray(s.decksMundo3['Extra'])) {
+      if (synchros.length > 0) {
         synchros.forEach(function(sc) {
-          if (s.decksMundo3['Extra'].length < 15 && s.decksMundo3['Extra'].filter(function(x) { return x === sc; }).length < 3) {
-            s.decksMundo3['Extra'].push(sc);
-          }
+          s.collectionMundo3[sc] = Math.max(s.collectionMundo3[sc] || 0, 1);
         });
       }
       var fIdx = 0;
@@ -5407,9 +5413,10 @@ window.customShowShop = function() {
         }
         s.decks = s.decksMundo3;
         s.collection = s.collectionMundo3;
-        s.activeDeck = s.activeDeckMundo3 || 'Principal';
-        s.extra = s.decksMundo3['Extra'] || [];
-        s.deck = s.decks[s.activeDeck] || [];
+        s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
+        s.activeDeckMundo3 = s.activeDeck;
+        s.extra = Array.isArray(s.decksMundo3['Extra']) ? s.decksMundo3['Extra'] : [];
+        s.deck = s.decks[s.activeDeck] || s.decks['Principal'] || [];
     } else {
         s.collection = s.collection || {};
         s.deck = s.deck || [];
@@ -5541,6 +5548,7 @@ window.customShowShop = function() {
     function persistShopSave() {
         if (is5D) {
             s.decksMundo3 = s.decks || s.decksMundo3 || {};
+            if (s.activeDeck === 'Extra') s.activeDeck = 'Principal';
             s.decksMundo3[s.activeDeck || 'Principal'] = [...s.deck];
             s.decksMundo3['Extra'] = [...(s.extra || [])];
             s.activeDeckMundo3 = s.activeDeck || 'Principal';
@@ -5560,7 +5568,8 @@ window.customShowShop = function() {
         if (is5D) {
             s.decks = s.decksMundo3;
             s.collection = s.collectionMundo3;
-            s.activeDeck = s.activeDeckMundo3;
+            s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
+            s.activeDeckMundo3 = s.activeDeck;
             s.extra = s.decksMundo3['Extra'] || [];
             s.deck = s.decks[s.activeDeck] || [];
         }
@@ -5968,7 +5977,7 @@ window.openCustomShopMenu = function() {
     if (is5DShop) {
         s.decksMundo3 = s.decksMundo3 || {};
         s.collectionMundo3 = s.collectionMundo3 || {};
-        s.activeDeckMundo3 = s.activeDeckMundo3 || 'Principal';
+        if (s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) s.activeDeckMundo3 = 'Principal';
         curActiveDeck = s.decksMundo3[s.activeDeckMundo3] || [];
     }
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
@@ -7286,6 +7295,9 @@ window.customShowDeckEditor = function() {
     if (is5D) {
         s.decksMundo3 = s.decksMundo3 || {};
         s.collectionMundo3 = s.collectionMundo3 || {};
+        if (s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) {
+            s.activeDeckMundo3 = 'Principal';
+        }
         if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal'])) {
             s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
             if (!Array.isArray(s.decksMundo3['Extra'])) {
@@ -7301,8 +7313,10 @@ window.customShowDeckEditor = function() {
         }
         s.decks = s.decksMundo3;
         s.collection = s.collectionMundo3;
-        s.activeDeck = s.activeDeckMundo3 || 'Principal';
-        s.extra = s.decksMundo3['Extra'] || [];
+        s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
+        s.activeDeckMundo3 = s.activeDeck;
+        s.extra = Array.isArray(s.decksMundo3['Extra']) ? s.decksMundo3['Extra'] : [];
+        s.deck = s.decks[s.activeDeck] || s.decks['Principal'] || [];
     } else {
         s.collection = s.collection || {};
         s.decks = s.decks || {};
@@ -7313,18 +7327,20 @@ window.customShowDeckEditor = function() {
         if (Object.keys(s.decks).length === 0) {
             s.decks['Deck 1'] = [...s.deck];
         }
-        if (!s.activeDeck || !s.decks[s.activeDeck]) {
-            s.activeDeck = Object.keys(s.decks)[0] || 'Deck 1';
+        if (!s.activeDeck || !s.decks[s.activeDeck] || s.activeDeck === 'Extra') {
+            let kList = Object.keys(s.decks).filter(k => k !== 'Extra');
+            s.activeDeck = kList[0] || 'Deck 1';
         }
         if (s.decks[s.activeDeck]) {
             s.deck = [...s.decks[s.activeDeck]];
         }
     }
     
-    let currentDeckKey = s.activeDeck;
+    let currentDeckKey = (s.activeDeck === 'Extra') ? (is5D ? 'Principal' : 'Deck 1') : (s.activeDeck || (is5D ? 'Principal' : 'Deck 1'));
 
     function persistSave() {
         if (is5D) {
+            if (s.activeDeck === 'Extra') s.activeDeck = 'Principal';
             s.decksMundo3 = s.decks;
             s.activeDeckMundo3 = s.activeDeck;
             s.collectionMundo3 = s.collection;
@@ -7349,7 +7365,8 @@ window.customShowDeckEditor = function() {
         if (is5D) {
             s.decks = s.decksMundo3;
             s.collection = s.collectionMundo3;
-            s.activeDeck = s.activeDeckMundo3;
+            s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
+            s.activeDeckMundo3 = s.activeDeck;
             s.extra = s.decksMundo3['Extra'] || [];
             s.deck = s.decks[s.activeDeck] || [];
         }
@@ -7965,13 +7982,14 @@ window.customShowDeckEditor = function() {
     }
 
     function renderDeckBar() {
-        let deckKeys = Object.keys(s.decks);
+        let deckKeys = Object.keys(s.decks).filter(k => k !== 'Extra');
         if (deckKeys.length === 0) {
-            s.decks['Deck 1'] = [...s.deck];
-            deckKeys = ['Deck 1'];
+            let defKey = is5D ? 'Principal' : 'Deck 1';
+            s.decks[defKey] = [...(s.deck || [])];
+            deckKeys = [defKey];
         }
-        if (!s.decks[currentDeckKey]) currentDeckKey = deckKeys[0];
-        if (!s.activeDeck || !s.decks[s.activeDeck]) s.activeDeck = deckKeys[0];
+        if (!deckKeys.includes(currentDeckKey)) currentDeckKey = deckKeys[0];
+        if (!deckKeys.includes(s.activeDeck)) s.activeDeck = deckKeys[0];
 
         let isActive = (currentDeckKey === s.activeDeck);
         let curCount = (s.decks[currentDeckKey] || []).length;
@@ -8055,11 +8073,15 @@ window.customShowDeckEditor = function() {
 
         let newBtn = deckBar.querySelector('#btn-new-deck');
         newBtn.onclick = () => {
-            let nextNum = Object.keys(s.decks).length + 1;
+            let nextNum = Object.keys(s.decks).filter(k => k !== 'Extra').length + 1;
             let name = prompt('Nombre para el nuevo Deck:', 'Deck ' + nextNum);
             if (!name) return;
             name = name.trim();
             if (!name) return;
+            if (name.toLowerCase() === 'extra') {
+                alert('El nombre "Extra" está reservado para el Extra Deck. Por favor elige otro nombre.');
+                return;
+            }
             if (s.decks[name]) {
                 alert('Ya existe un deck llamado "' + name + '". Por favor elige otro nombre.');
                 return;
@@ -8080,6 +8102,10 @@ window.customShowDeckEditor = function() {
             if (!newName) return;
             newName = newName.trim();
             if (!newName || newName === currentDeckKey) return;
+            if (newName.toLowerCase() === 'extra') {
+                alert('El nombre "Extra" está reservado para el Extra Deck. Por favor elige otro nombre.');
+                return;
+            }
             if (s.decks[newName]) {
                 alert('Ya existe un deck llamado "' + newName + '".');
                 return;
@@ -8098,16 +8124,17 @@ window.customShowDeckEditor = function() {
 
         let delBtn = deckBar.querySelector('#btn-delete-deck');
         delBtn.onclick = () => {
-            let keys = Object.keys(s.decks);
+            let keys = Object.keys(s.decks).filter(k => k !== 'Extra');
             if (keys.length <= 1) {
                 alert('No puedes eliminar el único deck disponible.');
                 return;
             }
             if (!confirm(`¿Seguro que deseas eliminar el deck "${currentDeckKey}"?\nEsta acción no se puede deshacer.`)) return;
             delete s.decks[currentDeckKey];
+            let remainingKeys = Object.keys(s.decks).filter(k => k !== 'Extra');
             if (s.activeDeck === currentDeckKey) {
-                s.activeDeck = Object.keys(s.decks)[0];
-                s.deck = [...s.decks[s.activeDeck]];
+                s.activeDeck = remainingKeys[0] || (is5D ? 'Principal' : 'Deck 1');
+                s.deck = [...(s.decks[s.activeDeck] || [])];
                 alert(`⚠️ Se ha asignado "${s.activeDeck}" como tu nuevo Deck Activo.`);
             }
             currentDeckKey = s.activeDeck;
@@ -8119,6 +8146,7 @@ window.customShowDeckEditor = function() {
     }
 
     function renderRows() {
+        if (currentDeckKey === 'Extra') currentDeckKey = is5D ? 'Principal' : 'Deck 1';
         let currentDeck = s.decks[currentDeckKey] = s.decks[currentDeckKey] || [];
         let illegalCards = currentDeck.filter(c => !window.isCardAllowedInWorld(c, targetWorld));
         if (illegalCards.length > 0) {
@@ -8130,11 +8158,9 @@ window.customShowDeckEditor = function() {
         if (synchrosInDeck.length > 0) {
             currentDeck = s.decks[currentDeckKey] = currentDeck.filter(c => !(window.isSynchroCard && window.isSynchroCard(c)));
             if (is5D) {
-                s.extra = s.extra || [];
                 synchrosInDeck.forEach(c => {
-                    if (s.extra.length < 15 && s.extra.filter(x => x === c).length < 3) {
-                        s.extra.push(c);
-                    }
+                    s.collection[c] = Math.max(s.collection[c] || 0, 1);
+                    if (s.collectionMundo3) s.collectionMundo3[c] = Math.max(s.collectionMundo3[c] || 0, 1);
                 });
             }
             if (currentDeckKey === s.activeDeck) s.deck = [...currentDeck];
@@ -8249,6 +8275,14 @@ window.customShowDeckEditor = function() {
                     let idx = arr.indexOf(name);
                     if (idx >= 0) {
                         arr.splice(idx, 1);
+                        s.decksMundo3 = s.decksMundo3 || {};
+                        s.decksMundo3['Extra'] = s.extra;
+                        s.collection[name] = Math.max(s.collection[name] || 0, 1);
+                        if (s.collectionMundo3) s.collectionMundo3[name] = Math.max(s.collectionMundo3[name] || 0, 1);
+                        if (!ownedSet.has(name)) {
+                            ownedSet.add(name);
+                            owned.push(name);
+                        }
                         persistSave();
                         window.playHoverSound && window.playHoverSound();
                         renderDeckBar();
@@ -8297,7 +8331,7 @@ window.customShowDeckEditor = function() {
             benchRowsRendered++;
             let maxC = 3;
             if (name === 'Renace al Monstruo' || name === 'Raigeki' || name === 'Dark Hole' || name === 'Llamado de la Tumba' || name === 'Fusión') maxC = 1;
-            let canAddMore = (inDeck < maxC);
+            let canAddMore = info.isExtra ? ((exCounts[name] || 0) < 3 && (s.extra || []).length < 15) : (inDeck < maxC);
 
             let cardColor = info.isMonster ? (info.isExtra ? '#00e5ff' : '#d4af37') : (info.type === 'TRAP' ? '#ff80ab' : '#4caf50');
 
@@ -8343,7 +8377,13 @@ window.customShowDeckEditor = function() {
                         alert('⚠️ El Extra Deck está lleno (máximo 15 cartas).');
                         return;
                     }
+                    if (s.extra.filter(x => x === name).length >= 3) {
+                        alert('Ya tienes el límite máximo permitido (3) de ' + name + ' en el Extra Deck.');
+                        return;
+                    }
                     s.extra.push(name);
+                    s.decksMundo3 = s.decksMundo3 || {};
+                    s.decksMundo3['Extra'] = s.extra;
                     persistSave();
                     window.playHoverSound && window.playHoverSound();
                     renderDeckBar();
@@ -9936,7 +9976,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     if (is5DDuel) {
       if (sSave && sSave.decksMundo3) {
-        var aKey = sSave.activeDeckMundo3 || 'Principal';
+        var aKey = (sSave.activeDeckMundo3 && sSave.activeDeckMundo3 !== 'Extra') ? sSave.activeDeckMundo3 : 'Principal';
         var candDeck = Array.isArray(sSave.decksMundo3[aKey]) ? sSave.decksMundo3[aKey] : sSave.decksMundo3['Principal'];
         if (Array.isArray(candDeck) && candDeck.length === 40 && !window.isTaintedTristanDeck(candDeck)) {
           var hasInvalid5D = candDeck.some(function(c) { return !window.isCardAllowedInWorld(c, 3); });
