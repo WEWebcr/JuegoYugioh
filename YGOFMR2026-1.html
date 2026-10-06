@@ -14638,12 +14638,14 @@ window.customShowShop = function() {
         <input type="text" id="shop-search" placeholder="Buscar por nombre..." autocomplete="off" style="padding: 8px 14px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; font-family:'Segoe UI'; width: 240px; font-size: 14px;">
         <select id="shop-filter-type" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; font-size: 14px;">
             <option value="">Todas las cartas</option>
-            <option value="MONSTER">Solo Monstruos</option>
-            <option value="SPELL">Todas las Magias</option>
+            <option value="MONSTER">Monstruos (Todos)</option>
+            <option value="MAIN_MONSTER">Monstruos (Deck Principal)</option>
+            <option value="EXTRA">⚡ Extra Deck (Sincronía / Fusión)</option>
+            <option value="SPELL">📖 Todas las Magias</option>
             <option value="SPELL_NORMAL">Magias Normales</option>
+            <option value="SPELL_EQUIP">⚔️ Magias de Equipo</option>
             <option value="SPELL_FIELD">Magias de Campo</option>
-            <option value="SPELL_EQUIP">Magias de Equipo</option>
-            <option value="TRAP">Solo Trampas</option>
+            <option value="TRAP">🛡️ Solo Trampas</option>
         </select>
     `;
     rightSide.appendChild(filterBar);
@@ -14929,14 +14931,18 @@ window.customShowShop = function() {
             let isEquip = typeof window.isEquipSpell === 'function' ? window.isEquipSpell(info) : (GENERAL_EQUIPS.has(item.name.toLowerCase().trim()) || SPECIFIC_EQUIPS.has(item.name.toLowerCase().trim()));
             let isSpell = info.isSpell || isField || isEquip;
 
-            if (fType === 'MONSTER' && !info.isMonster) return;
+            let isSynchroItem = is5D && (item.kind === 'SYNCHRO' || (item.tier && item.tier.includes('SINCRON')) || (window.isSynchroCard && window.isSynchroCard(item.name)));
+            let isExtraItem = isSynchroItem || (typeof isFusionOrExtra === 'function' && isFusionOrExtra(item));
+            let isMainMonster = (info.isMonster || item.kind === 'MONSTER') && !isExtraItem;
+
+            if (fType === 'MONSTER' && (!info.isMonster && !isExtraItem)) return;
+            if (fType === 'MAIN_MONSTER' && !isMainMonster) return;
+            if (fType === 'EXTRA' && !isExtraItem) return;
             if (fType === 'SPELL' && !isSpell) return;
             if (fType === 'SPELL_NORMAL' && (!isSpell || isField || isEquip)) return;
             if (fType === 'SPELL_FIELD' && (!isSpell || !isField)) return;
             if (fType === 'SPELL_EQUIP' && (!isSpell || !isEquip)) return;
             if (fType === 'TRAP' && !info.isTrap) return;
-            
-            let isSynchroItem = is5D && (item.kind === 'SYNCHRO' || (item.tier && item.tier.includes('SINCRON')));
             let ownCount = s.collection[item.name] || 0;
             let inDeck = isSynchroItem ? ((s.extra || []).filter(x => x === item.name).length) : (counts[item.name] || 0);
             let canBuy = (s.pm >= item.price) && (ownCount < 3 || isSynchroItem);
@@ -18505,12 +18511,14 @@ window.customShowCollection = function() {
     filterBar.innerHTML = `
         <select id="f-cardtype" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
             <option value="">Todas las cartas</option>
-            <option value="MONSTER">Solo Monstruos</option>
-            <option value="SPELL">Todas las Magias</option>
+            <option value="MONSTER">Monstruos (Todos)</option>
+            <option value="MAIN_MONSTER">Monstruos (Deck Principal)</option>
+            <option value="EXTRA">⚡ Extra Deck (Sincronía / Fusión)</option>
+            <option value="SPELL">📖 Todas las Magias</option>
             <option value="SPELL_NORMAL">Magias Normales</option>
+            <option value="SPELL_EQUIP">⚔️ Magias de Equipo</option>
             <option value="SPELL_FIELD">Magias de Campo</option>
-            <option value="SPELL_EQUIP">Magias de Equipo</option>
-            <option value="TRAP">Solo Trampas</option>
+            <option value="TRAP">🛡️ Solo Trampas</option>
         </select>
         <select id="f-attr" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
             <option value="">Todos los Atributos</option>
@@ -18641,7 +18649,19 @@ window.customShowCollection = function() {
             let isEquip = typeof window.isEquipSpell === 'function' ? window.isEquipSpell(c) : false;
             let isSpell = !c.isMonster && (c.type === 'SPELL' || c.kind === 'SPELL' || isField || isEquip) && c.type !== 'TRAP' && c.kind !== 'TRAP';
 
-            if (fCard === 'MONSTER' && !c.isMonster) return;
+            let isExtra = Boolean(
+                c.isExtra ||
+                c.kind === 'SYNCHRO' || c.kind === 'FUSION' ||
+                c.type === 'Synchro' || c.type === 'Fusion' ||
+                (window.isSynchroCard && window.isSynchroCard(c.name || c)) ||
+                (typeof window.isFusionMonster === 'function' && window.isFusionMonster(c)) ||
+                (window.FUSION_MONSTER_NAMES && window.FUSION_MONSTER_NAMES.has(c.name))
+            );
+            let isMainMonster = (c.isMonster || c.kind === 'MONSTER') && !isExtra;
+
+            if (fCard === 'MONSTER' && (!c.isMonster && !isExtra)) return;
+            if (fCard === 'MAIN_MONSTER' && !isMainMonster) return;
+            if (fCard === 'EXTRA' && !isExtra) return;
             if (fCard === 'SPELL' && !isSpell) return;
             if (fCard === 'SPELL_NORMAL' && (!isSpell || isField || isEquip)) return;
             if (fCard === 'SPELL_FIELD' && (!isSpell || !isField)) return;
