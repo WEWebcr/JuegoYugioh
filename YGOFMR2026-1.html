@@ -14743,28 +14743,63 @@ window.customShowShop = function() {
 
         let activeShopCards = [];
         if (is5D) {
-            // Mundo 3: Catálogo exclusivo de 5D's y Monstruos de Sincronía
+            // Mundo 3: Catálogo exclusivo de 5D's y soporte para Satellite
+            const NEW_5D_SPELL_TRAPS = new Set([
+                'Soul Charge', 'Black Whirlwind', 'Allure of Darkness', 'De-Synchro',
+                'Trap Stun', 'Book of Moon', 'Crimson Gaia', 'Resonator Call'
+            ]);
+
+            // Cartas insignia y Sincronías que son EXCLUSIVAS de recompensa por vencer a los rivales (NO se venden en la tienda)
+            const REWARD_ONLY_5D_CARDS = new Set([
+                // 1. Todos los Monstruos de Sincronía del Extra Deck
+                'Shooting Quasar Dragon', 'Shooting Star Dragon', 'Accel Synchro Stardust Dragon',
+                'Junk Speeder', 'Formula Synchron', 'Road Warrior', 'Ancient Fairy Dragon',
+                'Baronne de Fleur', 'Adamancipator Risen - Dragite', 'Crystal Wing Synchro Dragon',
+                'Clear Wing Synchro Dragon', 'Red Nova Dragon - Burning Soul', 'Hot Red Dragon Archfiend Abyss',
+                'Scarred Dragon Archfiend', 'Hot Red Dragon Archfiend', 'Hot Red Dragon Archfiend Bane',
+                'Chaos Angel', 'Black-Winged Assault Dragon', 'Blackwing Full Armor Master',
+                'Blackwing - Silverwind the Ascendant', 'Assault Blackwing - Raikiri the Rain Shower',
+                'Blackwing - Armor Master', 'Blackwing Armed Wing', 'Stardust Dragon', 'Red Dragon Archfiend',
+                'Black Rose Dragon', 'Power Tool Dragon', 'Goyo Guardian', 'Junk Warrior',
+                // 2. Cantantes e Insignias exclusivas de los rivales principales (Jack, Yusei, Crow)
+                'Soul Resonator', 'Crimson Resonator', 'Vision Resonator',
+                'Stardust Synchron',
+                'Blackwing - Auster the South Wind', 'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North'
+            ]);
+
             if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
                 window.CARDS_DATA.filter(c => c && c.world === 3).forEach(c => {
-                    let isSynchro = (c.kind === 'SYNCHRO');
-                    let isTuner = typeof window.isTunerMonster === 'function' ? window.isTunerMonster(c) : false;
+                    if (REWARD_ONLY_5D_CARDS.has(c.name)) return; // Exclusiva de recompensa por duelos
+
                     let isSpellTrap = (c.kind === 'SPELL' || c.kind === 'TRAP');
-                    let price = 4000;
-                    let tier = 'MONSTRUO 5D\'S';
-                    if (isSynchro) {
-                        let lv = Number(c.level || 0);
-                        price = lv >= 8 ? 45000 : (lv >= 7 ? 30000 : 20000);
-                        tier = 'SINCRONÍA (EXTRA DECK)';
+                    let isTuner = typeof window.isTunerMonster === 'function' ? window.isTunerMonster(c) : false;
+                    let price = 5000;
+                    let tier = 'SOPORTE 5D\'S';
+
+                    if (NEW_5D_SPELL_TRAPS.has(c.name)) {
+                        price = 20000;
+                        tier = 'MAGIA/TRAMPA 5D\'S (20k)';
+                    } else if (c.name === 'Quickdraw Synchron' || c.name === 'Revolution Synchron') {
+                        price = 10000;
+                        tier = 'CANTANTE AVANZADO (10k)';
+                    } else if (c.name === 'Stardust Trail' || c.name === 'Bone Archfiend') {
+                        price = 8000;
+                        tier = 'SOPORTE AVANZADO (8k)';
+                    } else if (c.name === 'Darkness Resonator' || c.name === 'Synkron Resonator') {
+                        price = 7000;
+                        tier = 'CANTANTE RESONADOR (7k)';
                     } else if (isTuner) {
                         price = 6000;
-                        tier = 'CANTANTE (TUNER)';
+                        tier = 'CANTANTE BÁSICO (TUNER)';
                     } else if (isSpellTrap) {
-                        price = 4000;
-                        tier = 'MAGIA/TRAMPA 5D\'S';
+                        price = 8000;
+                        tier = 'MAGIA/TRAMPA DE SOPORTE';
                     } else {
                         let atk = Number(c.atk || 0);
                         price = atk >= 2000 ? 6000 : 3500;
+                        tier = 'MONSTRUO DE SOPORTE';
                     }
+
                     activeShopCards.push({
                         name: c.name,
                         price: price,
@@ -14786,9 +14821,7 @@ window.customShowShop = function() {
                 { name: 'Sakuretsu Armor', price: 5000, tier: 'TRAMPA NORMAL', desc: 'Cuando un monstruo adversario declara un ataque, destruye ese monstruo.' },
                 { name: 'United We Stand', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Gana 800 ATK/DEF por cada monstruo boca arriba que controles.' },
                 { name: 'Axe of Despair', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Equipa solo a un monstruo. Gana 1000 ATK.' },
-                { name: 'Mage Power', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Gana 500 ATK/DEF por cada carta Mágica/Trampa que controles.' },
-                { name: 'Red Medicine', price: 1500, tier: 'MAGIA NORMAL', desc: 'Aumenta tus Life Points en 500.' },
-                { name: 'Dian Keto the Cure Master', price: 2500, tier: 'MAGIA NORMAL', desc: 'Aumenta tus Life Points en 1000.' }
+                { name: 'Mage Power', price: 20000, tier: 'EQUIPO GENERAL (20k)', desc: 'Gana 500 ATK/DEF por cada carta Mágica/Trampa que controles.' }
             ];
             let curNames = new Set(activeShopCards.map(c => c.name.toLowerCase().trim()));
             M3_STAPLES.forEach(st => {
