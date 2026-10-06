@@ -3595,6 +3595,9 @@ window.customShowMap = function() {
         btnSwitchWorld.onclick = () => {
             if (window.playViolinClick) window.playViolinClick();
             s.world = 1;
+            let m1Act = (s.activeDeck && s.decks && s.decks[s.activeDeck]) ? s.activeDeck : (Object.keys(s.decks || {}).filter(k => k !== 'Extra')[0] || 'Deck 1');
+            s.activeDeck = m1Act;
+            if (s.decks && s.decks[m1Act]) s.deck = [...s.decks[m1Act]];
             if (window.persistUserSave) window.persistUserSave(s);
             else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             window.customShowMap();
@@ -3605,6 +3608,9 @@ window.customShowMap = function() {
         btnSwitchWorld.onclick = () => {
             if (window.playViolinClick) window.playViolinClick();
             s.world = 3;
+            let m3Act = (s.activeDeckMundo3 && s.decksMundo3 && s.decksMundo3[s.activeDeckMundo3]) ? s.activeDeckMundo3 : 'Principal';
+            s.activeDeckMundo3 = m3Act;
+            if (s.decksMundo3 && s.decksMundo3[m3Act]) s.deck = [...s.decksMundo3[m3Act]];
             if (window.persistUserSave) window.persistUserSave(s);
             else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             window.customShowMap();
@@ -3615,6 +3621,9 @@ window.customShowMap = function() {
         btnSwitchWorld.onclick = () => {
             if (window.playViolinClick) window.playViolinClick();
             s.world = 2;
+            let m1Act = (s.activeDeck && s.decks && s.decks[s.activeDeck]) ? s.activeDeck : (Object.keys(s.decks || {}).filter(k => k !== 'Extra')[0] || 'Deck 1');
+            s.activeDeck = m1Act;
+            if (s.decks && s.decks[m1Act]) s.deck = [...s.decks[m1Act]];
             if (window.persistUserSave) window.persistUserSave(s);
             else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             window.customShowMap();
@@ -3632,7 +3641,8 @@ window.customShowMap = function() {
     let deckBadge = document.createElement('div');
     deckBadge.style.cssText = 'background:#142036; border:1px solid #3d6499; border-radius:6px; padding:4px 10px; color:#90caf9; font-family:VT323, monospace; font-size:15px; cursor:pointer;';
     deckBadge.title = 'Haz clic para ir al Editor de Decks';
-    deckBadge.textContent = `🎴 DECK: ${s.activeDeck || 'Deck 1'} (${activeDeckCount}/40)`;
+    let curActiveDeckName = is5D ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1');
+    deckBadge.textContent = `🎴 DECK: ${curActiveDeckName} (${activeDeckCount}/40)`;
     deckBadge.onclick = () => {
         if (window.playViolinClick) window.playViolinClick();
         if (window.customShowDeckEditor) window.customShowDeckEditor();
@@ -4742,7 +4752,7 @@ window.cleanSaveCollection = function(s) {
   }
   if (s.decks && typeof s.decks === 'object') {
     for (var dName in s.decks) {
-      if (dName.endsWith('_extra')) {
+      if (dName.endsWith('_extra') || dName === 'Extra') {
         var exList = s.decks[dName];
         if (Array.isArray(exList)) {
           exList.forEach(function(cName) {
@@ -4759,19 +4769,51 @@ window.cleanSaveCollection = function(s) {
         delete s.decks[dName];
         modified = true;
       } else if (Array.isArray(s.decks[dName])) {
-        s.decks[dName] = sanitizeClassicDeck(s.decks[dName]);
+        var synchroCount = s.decks[dName].filter(function(c) { return window.isSynchroCard && window.isSynchroCard(c); }).length;
+        var fiveDCount = s.decks[dName].filter(function(c) { return window.is5DCard && window.is5DCard(c); }).length;
+        if (dName === 'Principal' || synchroCount > 0 || fiveDCount > 0) {
+          s.decksMundo3 = s.decksMundo3 || {};
+          if (!s.decksMundo3[dName]) {
+            s.decksMundo3[dName] = s.decks[dName].slice();
+          }
+          delete s.decks[dName];
+          modified = true;
+        } else {
+          s.decks[dName] = sanitizeClassicDeck(s.decks[dName]);
+        }
       }
     }
   }
 
+  // Asegurar que s.decks tenga al menos un deck válido clásico
+  s.decks = s.decks || {};
+  delete s.decks['Extra'];
+  delete s.decks['Principal'];
+  var classicKeys = Object.keys(s.decks);
+  if (classicKeys.length === 0) {
+    s.decks['Deck 1'] = (Array.isArray(s.deck) && s.deck.length === 40) ? [...s.deck] : [...(window.FMR_CANONICAL_STARTER_DECK || [])];
+    classicKeys = ['Deck 1'];
+    modified = true;
+  }
+  if (!s.activeDeck || s.activeDeck === 'Extra' || s.activeDeck === 'Principal' || !s.decks[s.activeDeck]) {
+    s.activeDeck = classicKeys[0] || 'Deck 1';
+    modified = true;
+  }
+
   // 4. Limpiar decks de Mundo 3 (s.decksMundo3)
   if (s.decksMundo3 && typeof s.decksMundo3 === 'object') {
-    if (s.activeDeckMundo3 === 'Extra') {
-      s.activeDeckMundo3 = 'Principal';
-      modified = true;
+    delete s.decksMundo3['Deck 1'];
+    for (var m3Key in s.decksMundo3) {
+      if (m3Key !== 'Principal' && m3Key !== 'Extra') {
+        var has5D = Array.isArray(s.decksMundo3[m3Key]) && s.decksMundo3[m3Key].some(function(c) { return window.is5DCard && window.is5DCard(c); });
+        if (!has5D) {
+          delete s.decksMundo3[m3Key];
+          modified = true;
+        }
+      }
     }
-    if (s.activeDeck === 'Extra') {
-      s.activeDeck = 'Principal';
+    if (s.activeDeckMundo3 === 'Extra' || !s.activeDeckMundo3 || !s.decksMundo3[s.activeDeckMundo3]) {
+      s.activeDeckMundo3 = 'Principal';
       modified = true;
     }
     if (s.decksMundo3['Principal'] && (s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal']))) {
@@ -5404,16 +5446,17 @@ window.customShowShop = function() {
     if (!s) return;
 
     let is5D = ((s.world || 1) === 3);
-    let m1DecksBackup = s.decks;
-    let m1CollectionBackup = s.collection;
-    let m1ActiveDeckBackup = s.activeDeck;
-    let m1DeckBackup = s.deck;
-
     if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
 
+    s.decks = s.decks || {};
+    s.decksMundo3 = s.decksMundo3 || {};
+    s.collection = s.collection || {};
+    s.collectionMundo3 = s.collectionMundo3 || {};
+
     if (is5D) {
-        s.decksMundo3 = s.decksMundo3 || {};
-        s.collectionMundo3 = s.collectionMundo3 || {};
+        if (!s.activeDeckMundo3 || s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) {
+            s.activeDeckMundo3 = 'Principal';
+        }
         if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal'])) {
             s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
             if (!Array.isArray(s.decksMundo3['Extra'])) {
@@ -5427,23 +5470,18 @@ window.customShowShop = function() {
                 s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Extra'].filter(x => x === n).length);
             });
         }
-        s.decks = s.decksMundo3;
-        s.collection = s.collectionMundo3;
-        s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
-        s.activeDeckMundo3 = s.activeDeck;
         s.extra = Array.isArray(s.decksMundo3['Extra']) ? s.decksMundo3['Extra'] : [];
-        s.deck = s.decks[s.activeDeck] || s.decks['Principal'] || [];
+        s.deck = [...(s.decksMundo3[s.activeDeckMundo3] || s.decksMundo3['Principal'] || [])];
+        s.collection = s.collectionMundo3;
     } else {
-        s.collection = s.collection || {};
-        s.deck = s.deck || [];
-        s.decks = s.decks || {};
         if (Object.keys(s.decks).length === 0) {
-            s.decks['Deck 1'] = [...s.deck];
+            s.decks['Deck 1'] = [...(s.deck && s.deck.length === 40 ? s.deck : [])];
         }
-        s.activeDeck = s.activeDeck || Object.keys(s.decks)[0] || 'Deck 1';
-        if (s.decks[s.activeDeck]) {
-            s.deck = [...s.decks[s.activeDeck]];
+        if (!s.activeDeck || !s.decks[s.activeDeck] || s.activeDeck === 'Extra') {
+            let kList = Object.keys(s.decks).filter(k => k !== 'Extra');
+            s.activeDeck = kList[0] || 'Deck 1';
         }
+        s.deck = [...(s.decks[s.activeDeck] || [])];
     }
     
     let existingOverlay = document.getElementById('custom-shop-dashboard');
@@ -5565,31 +5603,20 @@ window.customShowShop = function() {
     
     function persistShopSave() {
         if (is5D) {
-            s.decksMundo3 = s.decks || s.decksMundo3 || {};
-            if (s.activeDeck === 'Extra') s.activeDeck = 'Principal';
-            s.decksMundo3[s.activeDeck || 'Principal'] = [...s.deck];
+            let aKey = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
+            s.decksMundo3 = s.decksMundo3 || {};
+            s.decksMundo3[aKey] = [...s.deck];
             s.decksMundo3['Extra'] = [...(s.extra || [])];
-            s.activeDeckMundo3 = s.activeDeck || 'Principal';
             s.collectionMundo3 = s.collection;
-            s.decks = m1DecksBackup;
-            s.collection = m1CollectionBackup;
-            s.activeDeck = m1ActiveDeckBackup;
-            s.deck = m1DeckBackup;
         } else {
-            if (s.decks && s.activeDeck) s.decks[s.activeDeck] = [...s.deck];
+            let aKey = (s.activeDeck && s.activeDeck !== 'Extra') ? s.activeDeck : 'Deck 1';
+            s.decks = s.decks || {};
+            s.decks[aKey] = [...s.deck];
         }
         if (window.persistUserSave) window.persistUserSave(s);
         else {
             origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
-        }
-        if (is5D) {
-            s.decks = s.decksMundo3;
-            s.collection = s.collectionMundo3;
-            s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
-            s.activeDeckMundo3 = s.activeDeck;
-            s.extra = s.decksMundo3['Extra'] || [];
-            s.deck = s.decks[s.activeDeck] || [];
         }
     }
 
@@ -5911,12 +5938,14 @@ window.customShowShop = function() {
                     }
                 } else {
                     if (s.deck.length < 40) {
+                        let curActiveDeckKey = is5D ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1');
                         s.deck.push(item.name);
                         persistShopSave();
-                        alert(`¡${item.name} añadida a tu Deck activo ("${s.activeDeck || 'Principal'}")! (Total: ${s.deck.length}/40)`);
+                        alert(`¡${item.name} añadida a tu Deck activo ("${curActiveDeckKey}")! (Total: ${s.deck.length}/40)`);
                     } else {
+                        let curActiveDeckKey = is5D ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1');
                         let lowest = findLowestMonsterInDeck(s.deck);
-                        if (confirm(`Tu Deck activo ("${s.activeDeck || 'Principal'}") ya tiene 40 cartas.\n¿Deseas equipar ${item.name} reemplazando a ${lowest.name} (ATK ${lowest.atk})?`)) {
+                        if (confirm(`Tu Deck activo ("${curActiveDeckKey}") ya tiene 40 cartas.\n¿Deseas equipar ${item.name} reemplazando a ${lowest.name} (ATK ${lowest.atk})?`)) {
                             s.deck.splice(lowest.index, 1, item.name);
                             persistShopSave();
                             alert(`¡${item.name} equipada en tu Deck activo!\n(Reemplazó a ${lowest.name} de ATK ${lowest.atk})`);
@@ -7304,22 +7333,22 @@ window.customShowDeckEditor = function() {
 
     let is5D = ((s.world || 1) === 3);
     let targetWorld = is5D ? 3 : 1;
-    let m1DecksBackup = s.decks;
-    let m1CollectionBackup = s.collection;
-    let m1ActiveDeckBackup = s.activeDeck;
-    let m1DeckBackup = s.deck;
+
+    s.decks = s.decks || {};
+    s.decksMundo3 = s.decksMundo3 || {};
+    s.collection = s.collection || {};
+    s.collectionMundo3 = s.collectionMundo3 || {};
 
     const generatedDeck = (typeof window.generateForbiddenMemoriesStarterDeck === 'function') ? window.generateForbiddenMemoriesStarterDeck() : null;
     const DEF = (generatedDeck && generatedDeck.length === 40 && !window.isTaintedTristanDeck(generatedDeck)) 
         ? generatedDeck 
         : ((window.DEFAULT_DECK && !window.isTaintedTristanDeck(window.DEFAULT_DECK)) ? window.DEFAULT_DECK : (window.FMR_CANONICAL_STARTER_DECK || []));
     
+    let workingDecks;
+    let workingCollection;
+    let currentActiveKey;
+
     if (is5D) {
-        s.decksMundo3 = s.decksMundo3 || {};
-        s.collectionMundo3 = s.collectionMundo3 || {};
-        if (s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) {
-            s.activeDeckMundo3 = 'Principal';
-        }
         if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal'])) {
             s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
             if (!Array.isArray(s.decksMundo3['Extra'])) {
@@ -7333,15 +7362,18 @@ window.customShowDeckEditor = function() {
                 s.collectionMundo3[n] = Math.max(s.collectionMundo3[n] || 0, s.decksMundo3['Extra'].filter(x => x === n).length);
             });
         }
-        s.decks = s.decksMundo3;
-        s.collection = s.collectionMundo3;
-        s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
-        s.activeDeckMundo3 = s.activeDeck;
-        s.extra = Array.isArray(s.decksMundo3['Extra']) ? s.decksMundo3['Extra'] : [];
-        s.deck = s.decks[s.activeDeck] || s.decks['Principal'] || [];
+        if (!Array.isArray(s.decksMundo3['Extra'])) {
+            s.decksMundo3['Extra'] = window.generate5DExtraDeck ? window.generate5DExtraDeck() : [];
+        }
+        if (!s.activeDeckMundo3 || s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) {
+            s.activeDeckMundo3 = 'Principal';
+        }
+        workingDecks = s.decksMundo3;
+        workingCollection = s.collectionMundo3;
+        currentActiveKey = s.activeDeckMundo3 || 'Principal';
+        s.extra = s.decksMundo3['Extra'];
+        s.deck = [...(workingDecks[currentActiveKey] || workingDecks['Principal'] || [])];
     } else {
-        s.collection = s.collection || {};
-        s.decks = s.decks || {};
         if (!s.deck || s.deck.length === 0 || window.isTaintedTristanDeck(s.deck)) {
             s.deck = [...DEF];
             DEF.forEach(n => s.collection[n] = Math.max(s.collection[n] || 0, DEF.filter(x => x === n).length));
@@ -7353,28 +7385,30 @@ window.customShowDeckEditor = function() {
             let kList = Object.keys(s.decks).filter(k => k !== 'Extra');
             s.activeDeck = kList[0] || 'Deck 1';
         }
-        if (s.decks[s.activeDeck]) {
-            s.deck = [...s.decks[s.activeDeck]];
-        }
+        workingDecks = s.decks;
+        workingCollection = s.collection;
+        currentActiveKey = s.activeDeck || 'Deck 1';
+        s.extra = [];
+        s.deck = [...(workingDecks[currentActiveKey] || [])];
     }
     
-    let currentDeckKey = (s.activeDeck === 'Extra') ? (is5D ? 'Principal' : 'Deck 1') : (s.activeDeck || (is5D ? 'Principal' : 'Deck 1'));
+    let currentDeckKey = currentActiveKey;
+    if (currentDeckKey === 'Extra') currentDeckKey = is5D ? 'Principal' : 'Deck 1';
 
     function persistSave() {
         if (is5D) {
-            if (s.activeDeck === 'Extra') s.activeDeck = 'Principal';
-            s.decksMundo3 = s.decks;
-            s.activeDeckMundo3 = s.activeDeck;
-            s.collectionMundo3 = s.collection;
-            s.decksMundo3['Extra'] = s.extra;
-            s.decks = m1DecksBackup;
-            s.collection = m1CollectionBackup;
-            s.activeDeck = m1ActiveDeckBackup;
-            s.deck = m1DeckBackup;
+            if (s.activeDeckMundo3 === 'Extra') s.activeDeckMundo3 = 'Principal';
+            s.decksMundo3 = workingDecks;
+            s.activeDeckMundo3 = currentActiveKey;
+            s.decksMundo3['Extra'] = s.extra || [];
+            s.collectionMundo3 = workingCollection;
+            s.deck = [...(workingDecks[currentActiveKey] || [])];
         } else {
-            if (s.decks && s.activeDeck && s.decks[s.activeDeck]) {
-                s.deck = [...s.decks[s.activeDeck]];
-            }
+            if (s.activeDeck === 'Extra') s.activeDeck = Object.keys(workingDecks).filter(k => k !== 'Extra')[0] || 'Deck 1';
+            s.decks = workingDecks;
+            s.activeDeck = currentActiveKey;
+            s.collection = workingCollection;
+            s.deck = [...(workingDecks[currentActiveKey] || [])];
         }
         if (window.persistUserSave) {
             window.persistUserSave(s);
@@ -7384,16 +7418,139 @@ window.customShowDeckEditor = function() {
             origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
             if (window.nativeAPI && window.nativeAPI.setMemorySave) window.nativeAPI.setMemorySave(s);
         }
-        if (is5D) {
-            s.decks = s.decksMundo3;
-            s.collection = s.collectionMundo3;
-            s.activeDeck = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
-            s.activeDeckMundo3 = s.activeDeck;
-            s.extra = s.decksMundo3['Extra'] || [];
-            s.deck = s.decks[s.activeDeck] || [];
-        }
     }
     
+    if (!document.getElementById('fmr-deck-editor-responsive-styles')) {
+        let st = document.createElement('style');
+        st.id = 'fmr-deck-editor-responsive-styles';
+        st.textContent = `
+            @media (max-width: 850px) {
+                #custom-deck-editor {
+                    flex-direction: column !important;
+                    padding: 8px 6px !important;
+                }
+                #deck-editor-left-preview {
+                    display: none !important;
+                }
+                #deck-editor-right-main {
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+                #deck-editor-header {
+                    flex-wrap: wrap !important;
+                    gap: 6px !important;
+                    padding-bottom: 6px !important;
+                    margin-bottom: 6px !important;
+                }
+                .deck-header-title {
+                    font-size: 18px !important;
+                }
+                #deck-search {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    order: 3;
+                    margin-top: 4px;
+                    font-size: 13px !important;
+                    padding: 6px 10px !important;
+                }
+                #deck-count {
+                    font-size: 12px !important;
+                    padding: 4px 8px !important;
+                }
+                #btn-exit-deck {
+                    padding: 6px 14px !important;
+                    font-size: 14px !important;
+                }
+                #deck-manager-bar {
+                    padding: 6px 8px !important;
+                    gap: 6px !important;
+                    justify-content: space-between !important;
+                }
+                #deck-manager-bar select {
+                    font-size: 12px !important;
+                    padding: 5px 8px !important;
+                }
+                #deck-manager-bar button {
+                    padding: 5px 8px !important;
+                    font-size: 11px !important;
+                }
+                #deck-filter-bar {
+                    gap: 4px !important;
+                    overflow-x: auto !important;
+                    white-space: nowrap !important;
+                    padding-bottom: 4px !important;
+                    -webkit-overflow-scrolling: touch;
+                }
+                #deck-filter-bar select, #deck-filter-bar input, #deck-filter-bar button {
+                    font-size: 11px !important;
+                    padding: 4px 6px !important;
+                }
+                #deck-mobile-nav-tabs {
+                    display: flex !important;
+                    gap: 6px;
+                    margin-bottom: 6px;
+                    flex-shrink: 0;
+                }
+                .deck-m-tab-btn {
+                    flex: 1;
+                    padding: 8px 6px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    font-size: 13px;
+                    cursor: pointer;
+                    text-align: center;
+                    transition: all 0.2s;
+                }
+                .deck-m-tab-btn.active-tab-deck {
+                    background: linear-gradient(180deg, #1565c0, #0d47a1) !important;
+                    color: #fff !important;
+                    border: 1.5px solid #64b5f6 !important;
+                    box-shadow: 0 0 10px rgba(33, 150, 243, 0.4);
+                }
+                .deck-m-tab-btn.active-tab-banca {
+                    background: linear-gradient(180deg, #6d4c18, #3e2704) !important;
+                    color: #ffd700 !important;
+                    border: 1.5px solid #ffd700 !important;
+                    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+                }
+                .deck-m-tab-btn.inactive-tab {
+                    background: #1e1e24 !important;
+                    color: #888 !important;
+                    border: 1px solid #444 !important;
+                }
+                .mobile-hide-section {
+                    display: none !important;
+                }
+                #deck-dual-container {
+                    gap: 6px !important;
+                }
+                .deck-table-wrap {
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .deck-table-wrap table {
+                    min-width: 580px;
+                    font-size: 12px !important;
+                }
+                .deck-table-wrap th, .deck-table-wrap td {
+                    padding: 5px 6px !important;
+                }
+            }
+            @media (min-width: 851px) {
+                #deck-mobile-nav-tabs {
+                    display: none !important;
+                }
+                #custom-deck-editor {
+                    flex-direction: row !important;
+                }
+                #deck-editor-left-preview {
+                    display: flex !important;
+                }
+            }
+        `;
+        document.head.appendChild(st);
+    }
+
     let overlay = document.createElement('div');
     overlay.id = 'custom-deck-editor';
     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: #1a1a1a; z-index:9999999; display:flex; flex-direction:row; padding: 20px; box-sizing:border-box; color: #fff; font-family: "Segoe UI", Arial, sans-serif;';
@@ -7427,9 +7584,10 @@ window.customShowDeckEditor = function() {
     rightSide.style.cssText = 'flex: 1; display:flex; flex-direction:column; overflow:hidden;';
     
     let header = document.createElement('div');
+    header.id = 'deck-editor-header';
     header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #e4c06b; padding-bottom: 10px; margin-bottom: 8px; flex-shrink:0;';
     header.innerHTML = `
-        <div style="font-family:VT323, monospace; color:#ffcc00; font-size: 24px; text-shadow: 2px 2px 0 #000;">DASHBOARD DEL DECK</div>
+        <div class="deck-header-title" style="font-family:VT323, monospace; color:#ffcc00; font-size: 24px; text-shadow: 2px 2px 0 #000;">DASHBOARD DEL DECK</div>
         <input type="text" id="deck-search" placeholder="Buscar nombre..." autocomplete="off" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; font-family:'Segoe UI'; width: 200px; font-size: 14px;">
         <div style="font-size: 16px; font-weight: bold; background: #333; padding: 6px 16px; border-radius: 8px; border: 1px solid #555;" id="deck-count"></div>
         <button id="btn-exit-deck" style="background:#8b0000; color:#fff; border:2px solid #ff4d4d; padding:8px 18px; border-radius:6px; cursor:pointer; font-weight:bold; font-family:VT323, monospace; font-size:16px;">VOLVER</button>
@@ -7519,6 +7677,15 @@ window.customShowDeckEditor = function() {
     `;
     rightSide.appendChild(filterBar);
 
+    // Mobile Navigation Tabs (Deck vs Banca)
+    let mobileNav = document.createElement('div');
+    mobileNav.id = 'deck-mobile-nav-tabs';
+    mobileNav.innerHTML = `
+        <button id="deck-tab-view-deck" class="deck-m-tab-btn active-tab-deck">⚔️ MI DECK (<span id="m-tab-deck-num">40/40</span>)</button>
+        <button id="deck-tab-view-banca" class="deck-m-tab-btn inactive-tab">📦 BANCA (<span id="m-tab-banca-num">0</span>)</button>
+    `;
+    rightSide.appendChild(mobileNav);
+
     let cardDict = {};
     let extraText = {};
     let globalNum = 1;
@@ -7600,23 +7767,23 @@ window.customShowDeckEditor = function() {
     s.extra = s.extra || [];
 
     // Ensure all cards in any deck or extra are in collection count
-    Object.values(s.decks).forEach(dArr => {
+    Object.values(workingDecks).forEach(dArr => {
         if (Array.isArray(dArr)) dArr.forEach(n => {
             if (window.isCardAllowedInWorld(n, targetWorld)) {
-                if ((s.collection[n] || 0) < 1) s.collection[n] = 1;
+                if ((workingCollection[n] || 0) < 1) workingCollection[n] = 1;
             }
         });
     });
     if (is5D && Array.isArray(s.extra)) {
         s.extra.forEach(n => {
             if (window.isCardAllowedInWorld(n, 3)) {
-                if ((s.collection[n] || 0) < 1) s.collection[n] = 1;
+                if ((workingCollection[n] || 0) < 1) workingCollection[n] = 1;
             }
         });
     }
 
-    let ownedSet = new Set(Object.keys(s.collection).filter(n => (s.collection[n] > 0) && window.isCardAllowedInWorld(n, targetWorld)));
-    Object.values(s.decks).forEach(dArr => {
+    let ownedSet = new Set(Object.keys(workingCollection).filter(n => (workingCollection[n] > 0) && window.isCardAllowedInWorld(n, targetWorld)));
+    Object.values(workingDecks).forEach(dArr => {
         if (Array.isArray(dArr)) dArr.forEach(n => {
             if (window.isCardAllowedInWorld(n, targetWorld)) ownedSet.add(n);
         });
@@ -7736,10 +7903,12 @@ window.customShowDeckEditor = function() {
 
     // CONTAINER FOR DUAL DASHBOARDS (Top: Deck, Bottom: Banca)
     let dualContainer = document.createElement('div');
+    dualContainer.id = 'deck-dual-container';
     dualContainer.style.cssText = 'flex: 1; display:flex; flex-direction:column; gap:10px; overflow:hidden;';
     
     // 1. TOP SECTION: DECK ACTUAL
     let topSection = document.createElement('div');
+    topSection.id = 'deck-top-section';
     topSection.style.cssText = 'flex: 1; display:flex; flex-direction:column; min-height:180px; overflow:hidden; border: 1px solid #336699; border-radius: 8px; background: #16202d;';
     topSection.innerHTML = `
         <div style="background: linear-gradient(90deg, #1e3a5f, #0d1e33); padding: 6px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #336699; flex-wrap:wrap; gap:8px;">
@@ -7754,7 +7923,7 @@ window.customShowDeckEditor = function() {
                 <button class="deck-view-btn" data-zone="EXTRA" style="background:#263238; color:#00e5ff; border:1px solid #00838f; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;" id="deck-tab-extra">⚡ Extra Deck</button>
             </div>
         </div>
-        <div style="flex:1; overflow-y:auto; box-shadow: inset 0 0 10px #000;">
+        <div class="deck-table-wrap" style="flex:1; overflow-y:auto; box-shadow: inset 0 0 10px #000;">
             <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
                 <thead style="background:#1b2838; position:sticky; top:0; z-index:5;">
                     <tr>
@@ -7775,6 +7944,7 @@ window.customShowDeckEditor = function() {
 
     // 2. BOTTOM SECTION: BANCA / BAÚL DE RESERVA
     let bottomSection = document.createElement('div');
+    bottomSection.id = 'deck-bottom-section';
     bottomSection.style.cssText = 'flex: 1; display:flex; flex-direction:column; min-height:180px; overflow:hidden; border: 1px solid #8b6b23; border-radius: 8px; background: #201b14;';
     bottomSection.innerHTML = `
         <div style="background: linear-gradient(90deg, #4a3810, #221a08); padding: 6px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #8b6b23; flex-wrap:wrap; gap:8px;">
@@ -7792,7 +7962,7 @@ window.customShowDeckEditor = function() {
                 <button class="bench-filter-btn" data-type="TRAP" style="background:#201b14; color:#ff80ab; border:1px solid #c2185b; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">🛡️ Trampas</button>
             </div>
         </div>
-        <div style="flex:1; overflow-y:auto; box-shadow: inset 0 0 10px #000;">
+        <div class="deck-table-wrap" style="flex:1; overflow-y:auto; box-shadow: inset 0 0 10px #000;">
             <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
                 <thead style="background:#2a2012; position:sticky; top:0; z-index:5;">
                     <tr>
@@ -7812,6 +7982,43 @@ window.customShowDeckEditor = function() {
     dualContainer.appendChild(bottomSection);
 
     rightSide.appendChild(dualContainer);
+
+    let activeMobileTab = 'DECK';
+    function updateMobileTabDisplay() {
+        let isSmallScreen = window.innerWidth <= 850;
+        if (!isSmallScreen) {
+            topSection.classList.remove('mobile-hide-section');
+            bottomSection.classList.remove('mobile-hide-section');
+            return;
+        }
+        if (activeMobileTab === 'DECK') {
+            topSection.classList.remove('mobile-hide-section');
+            bottomSection.classList.add('mobile-hide-section');
+            let bDeck = document.getElementById('deck-tab-view-deck');
+            let bBanca = document.getElementById('deck-tab-view-banca');
+            if (bDeck) bDeck.className = 'deck-m-tab-btn active-tab-deck';
+            if (bBanca) bBanca.className = 'deck-m-tab-btn inactive-tab';
+        } else {
+            topSection.classList.add('mobile-hide-section');
+            bottomSection.classList.remove('mobile-hide-section');
+            let bDeck = document.getElementById('deck-tab-view-deck');
+            let bBanca = document.getElementById('deck-tab-view-banca');
+            if (bDeck) bDeck.className = 'deck-m-tab-btn inactive-tab';
+            if (bBanca) bBanca.className = 'deck-m-tab-btn active-tab-banca';
+        }
+    }
+    window.addEventListener('resize', updateMobileTabDisplay);
+    let tabDeckBtn = mobileNav.querySelector('#deck-tab-view-deck');
+    if (tabDeckBtn) tabDeckBtn.onclick = () => {
+        activeMobileTab = 'DECK';
+        updateMobileTabDisplay();
+    };
+    let tabBancaBtn = mobileNav.querySelector('#deck-tab-view-banca');
+    if (tabBancaBtn) tabBancaBtn.onclick = () => {
+        activeMobileTab = 'BANCA';
+        updateMobileTabDisplay();
+    };
+    updateMobileTabDisplay();
     overlay.appendChild(rightSide);
     document.body.appendChild(overlay);
 
@@ -7987,6 +8194,44 @@ window.customShowDeckEditor = function() {
         return true;
     }
 
+    function showMobileCardDetail(name, info, cardColor) {
+        let existingModal = document.getElementById('deck-mobile-card-modal');
+        if (existingModal) existingModal.remove();
+
+        let modal = document.createElement('div');
+        modal.id = 'deck-mobile-card-modal';
+        modal.style.cssText = 'position:fixed; inset:0; z-index:10000000; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:12px; box-sizing:border-box; animation:fadeIn 0.2s ease;';
+
+        let descText = extraText[name] || '';
+        let atkDefHtml = info.isMonster ? `<div style="font-size:14px; font-weight:bold; margin-top:4px;"><span style="color:#ff5252">ATK ${info.atk}</span> / <span style="color:#2196f3">DEF ${info.def}</span></div>` : '';
+
+        modal.innerHTML = `
+            <div style="background:linear-gradient(180deg, #1e2630 0%, #10161d 100%); border:2px solid ${cardColor}; border-radius:12px; max-width:340px; width:100%; max-height:85vh; overflow-y:auto; display:flex; flex-direction:column; align-items:center; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.9); color:#fff; font-family:'Segoe UI', sans-serif;">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="font-size:12px; color:#888;">#${String(info.num).replace(/[^\\d]/g, '').padStart(3, '0')}</span>
+                    <span style="font-size:16px; font-weight:bold; color:${cardColor}; text-align:center; flex:1; padding:0 8px;">${info.name}</span>
+                    <button id="m-modal-close" style="background:#8b0000; color:#fff; border:none; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer; font-size:14px;">✕</button>
+                </div>
+                <div style="width:180px; height:260px; border:2px solid #a67c00; border-radius:8px; overflow:hidden; background:#000; display:flex; align-items:center; justify-content:center; margin-bottom:10px; box-shadow:0 4px 12px rgba(0,0,0,0.6);">
+                    <img src="${getCardImageUrl(name)}" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div style="font-size:12px; color:#aaa; margin-bottom:4px;">
+                    [${info.type}] ${info.attr !== '-' ? ' · ' + info.attr : ''} ${info.isMonster && info.sign !== '-' ? ' · ' + info.sign : ''}
+                </div>
+                ${atkDefHtml}
+                ${descText ? `<div style="background:#151b22; border:1px solid #334; border-radius:6px; padding:8px 10px; margin-top:10px; font-size:12px; line-height:1.4; color:#ffeb3b; width:100%; box-sizing:border-box;">${descText}</div>` : ''}
+                <button id="m-modal-ok" style="margin-top:14px; background:linear-gradient(180deg, #1565c0, #0d47a1); color:#fff; border:1px solid #42a5f5; border-radius:6px; padding:8px 24px; font-weight:bold; cursor:pointer; font-size:13px; width:100%;">ENTENDIDO</button>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.onclick = (e) => {
+            if (e.target === modal || e.target.id === 'm-modal-close' || e.target.id === 'm-modal-ok') {
+                modal.remove();
+            }
+        };
+    }
+
     function wireHover(tr, name, info, cardColor) {
         tr.onmouseover = () => {
             tr.style.background = '#2a2a2a';
@@ -8001,24 +8246,31 @@ window.customShowDeckEditor = function() {
             `;
         };
         tr.onmouseout = () => tr.style.background = 'transparent';
+        tr.onclick = (e) => {
+            if (e.target.closest('button')) return;
+            previewImg.src = getCardImageUrl(name);
+            if (window.innerWidth <= 850) {
+                showMobileCardDetail(name, info, cardColor);
+            }
+        };
     }
 
     function renderDeckBar() {
-        let deckKeys = Object.keys(s.decks).filter(k => k !== 'Extra');
+        let deckKeys = Object.keys(workingDecks).filter(k => k !== 'Extra');
         if (deckKeys.length === 0) {
             let defKey = is5D ? 'Principal' : 'Deck 1';
-            s.decks[defKey] = [...(s.deck || [])];
+            workingDecks[defKey] = [...(s.deck || [])];
             deckKeys = [defKey];
         }
         if (!deckKeys.includes(currentDeckKey)) currentDeckKey = deckKeys[0];
-        if (!deckKeys.includes(s.activeDeck)) s.activeDeck = deckKeys[0];
+        if (!deckKeys.includes(currentActiveKey)) currentActiveKey = deckKeys[0];
 
-        let isActive = (currentDeckKey === s.activeDeck);
-        let curCount = (s.decks[currentDeckKey] || []).length;
+        let isActive = (currentDeckKey === currentActiveKey);
+        let curCount = (workingDecks[currentDeckKey] || []).length;
         
         let optionsHtml = deckKeys.map(k => {
-            let cnt = (s.decks[k] || []).length;
-            let actTag = (k === s.activeDeck) ? ' ⭐ [DECK ACTIVO]' : '';
+            let cnt = (workingDecks[k] || []).length;
+            let actTag = (k === currentActiveKey) ? ' ⭐ [DECK ACTIVO]' : '';
             return `<option value="${k}" ${k === currentDeckKey ? 'selected' : ''}>${k} (${cnt}/40)${actTag}</option>`;
         }).join('');
 
@@ -8068,7 +8320,7 @@ window.customShowDeckEditor = function() {
         let actBtn = deckBar.querySelector('#btn-activate-current-deck');
         if (actBtn) {
             actBtn.onclick = () => {
-                let curArr = s.decks[currentDeckKey] || [];
+                let curArr = workingDecks[currentDeckKey] || [];
                 if (curArr.length !== 40) {
                     alert(`⚠️ Para activar este deck para los duelos debe tener EXACTAMENTE 40 cartas.\n(Actualmente tiene ${curArr.length}/40 cartas).`);
                     return;
@@ -8083,7 +8335,12 @@ window.customShowDeckEditor = function() {
                     alert(`⚠️ Este deck contiene monstruos Synchro en el Deck Principal (${synchroInMain.slice(0, 3).join(', ')}).\nLos monstruos Synchro solo pueden ir en el Extra Deck.`);
                     return;
                 }
-                s.activeDeck = currentDeckKey;
+                currentActiveKey = currentDeckKey;
+                if (is5D) {
+                    s.activeDeckMundo3 = currentDeckKey;
+                } else {
+                    s.activeDeck = currentDeckKey;
+                }
                 s.deck = [...curArr];
                 persistSave();
                 window.playViolinClick && window.playViolinClick();
@@ -8095,8 +8352,8 @@ window.customShowDeckEditor = function() {
 
         let newBtn = deckBar.querySelector('#btn-new-deck');
         newBtn.onclick = () => {
-            let nextNum = Object.keys(s.decks).filter(k => k !== 'Extra').length + 1;
-            let name = prompt('Nombre para el nuevo Deck:', 'Deck ' + nextNum);
+            let nextNum = Object.keys(workingDecks).filter(k => k !== 'Extra').length + 1;
+            let name = prompt('Nombre para el nuevo Deck:', (is5D ? 'Deck 5D ' : 'Deck ') + nextNum);
             if (!name) return;
             name = name.trim();
             if (!name) return;
@@ -8104,13 +8361,13 @@ window.customShowDeckEditor = function() {
                 alert('El nombre "Extra" está reservado para el Extra Deck. Por favor elige otro nombre.');
                 return;
             }
-            if (s.decks[name]) {
+            if (workingDecks[name]) {
                 alert('Ya existe un deck llamado "' + name + '". Por favor elige otro nombre.');
                 return;
             }
             let copyCurrent = confirm(`¿Deseas duplicar las cartas del deck actual ("${currentDeckKey}") en el nuevo deck?\n\n(Aceptar = Duplicar actual / Cancelar = Iniciar deck vacío)`);
-            let sourceArr = s.decks[currentDeckKey] || [];
-            s.decks[name] = copyCurrent ? sourceArr.filter(c => window.isCardAllowedInWorld(c, targetWorld) && !(window.isSynchroCard && window.isSynchroCard(c))) : [];
+            let sourceArr = workingDecks[currentDeckKey] || [];
+            workingDecks[name] = copyCurrent ? sourceArr.filter(c => window.isCardAllowedInWorld(c, targetWorld) && !(window.isSynchroCard && window.isSynchroCard(c))) : [];
             currentDeckKey = name;
             persistSave();
             window.playViolinClick && window.playViolinClick();
@@ -8128,14 +8385,16 @@ window.customShowDeckEditor = function() {
                 alert('El nombre "Extra" está reservado para el Extra Deck. Por favor elige otro nombre.');
                 return;
             }
-            if (s.decks[newName]) {
+            if (workingDecks[newName]) {
                 alert('Ya existe un deck llamado "' + newName + '".');
                 return;
             }
-            s.decks[newName] = s.decks[currentDeckKey];
-            delete s.decks[currentDeckKey];
-            if (s.activeDeck === currentDeckKey) {
-                s.activeDeck = newName;
+            workingDecks[newName] = workingDecks[currentDeckKey];
+            delete workingDecks[currentDeckKey];
+            if (currentActiveKey === currentDeckKey) {
+                currentActiveKey = newName;
+                if (is5D) s.activeDeckMundo3 = newName;
+                else s.activeDeck = newName;
             }
             currentDeckKey = newName;
             persistSave();
@@ -8146,20 +8405,22 @@ window.customShowDeckEditor = function() {
 
         let delBtn = deckBar.querySelector('#btn-delete-deck');
         delBtn.onclick = () => {
-            let keys = Object.keys(s.decks).filter(k => k !== 'Extra');
+            let keys = Object.keys(workingDecks).filter(k => k !== 'Extra');
             if (keys.length <= 1) {
                 alert('No puedes eliminar el único deck disponible.');
                 return;
             }
             if (!confirm(`¿Seguro que deseas eliminar el deck "${currentDeckKey}"?\nEsta acción no se puede deshacer.`)) return;
-            delete s.decks[currentDeckKey];
-            let remainingKeys = Object.keys(s.decks).filter(k => k !== 'Extra');
-            if (s.activeDeck === currentDeckKey) {
-                s.activeDeck = remainingKeys[0] || (is5D ? 'Principal' : 'Deck 1');
-                s.deck = [...(s.decks[s.activeDeck] || [])];
-                alert(`⚠️ Se ha asignado "${s.activeDeck}" como tu nuevo Deck Activo.`);
+            delete workingDecks[currentDeckKey];
+            let remainingKeys = Object.keys(workingDecks).filter(k => k !== 'Extra');
+            if (currentActiveKey === currentDeckKey) {
+                currentActiveKey = remainingKeys[0] || (is5D ? 'Principal' : 'Deck 1');
+                if (is5D) s.activeDeckMundo3 = currentActiveKey;
+                else s.activeDeck = currentActiveKey;
+                s.deck = [...(workingDecks[currentActiveKey] || [])];
+                alert(`⚠️ Se ha asignado "${currentActiveKey}" como tu nuevo Deck Activo.`);
             }
-            currentDeckKey = s.activeDeck;
+            currentDeckKey = currentActiveKey;
             persistSave();
             window.playViolinClick && window.playViolinClick();
             renderDeckBar();
@@ -8169,23 +8430,22 @@ window.customShowDeckEditor = function() {
 
     function renderRows() {
         if (currentDeckKey === 'Extra') currentDeckKey = is5D ? 'Principal' : 'Deck 1';
-        let currentDeck = s.decks[currentDeckKey] = s.decks[currentDeckKey] || [];
+        let currentDeck = workingDecks[currentDeckKey] = workingDecks[currentDeckKey] || [];
         let illegalCards = currentDeck.filter(c => !window.isCardAllowedInWorld(c, targetWorld));
         if (illegalCards.length > 0) {
-            currentDeck = s.decks[currentDeckKey] = currentDeck.filter(c => window.isCardAllowedInWorld(c, targetWorld));
-            if (currentDeckKey === s.activeDeck) s.deck = [...currentDeck];
+            currentDeck = workingDecks[currentDeckKey] = currentDeck.filter(c => window.isCardAllowedInWorld(c, targetWorld));
+            if (currentDeckKey === currentActiveKey) s.deck = [...currentDeck];
             persistSave();
         }
         let synchrosInDeck = currentDeck.filter(c => window.isSynchroCard && window.isSynchroCard(c));
         if (synchrosInDeck.length > 0) {
-            currentDeck = s.decks[currentDeckKey] = currentDeck.filter(c => !(window.isSynchroCard && window.isSynchroCard(c)));
+            currentDeck = workingDecks[currentDeckKey] = currentDeck.filter(c => !(window.isSynchroCard && window.isSynchroCard(c)));
             if (is5D) {
                 synchrosInDeck.forEach(c => {
-                    s.collection[c] = Math.max(s.collection[c] || 0, 1);
-                    if (s.collectionMundo3) s.collectionMundo3[c] = Math.max(s.collectionMundo3[c] || 0, 1);
+                    workingCollection[c] = Math.max(workingCollection[c] || 0, 1);
                 });
             }
-            if (currentDeckKey === s.activeDeck) s.deck = [...currentDeck];
+            if (currentDeckKey === currentActiveKey) s.deck = [...currentDeck];
             persistSave();
         }
         if (is5D && Array.isArray(s.extra)) {
@@ -8202,14 +8462,14 @@ window.customShowDeckEditor = function() {
         let deckCounts = {};
         currentDeck.forEach(n => deckCounts[n] = (deckCounts[n] || 0) + 1);
         let exCounts = {};
-        s.extra.forEach(n => exCounts[n] = (exCounts[n] || 0) + 1);
+        (s.extra || []).forEach(n => exCounts[n] = (exCounts[n] || 0) + 1);
 
         let dLen = currentDeck.length;
         let isDeckValid = (dLen === 40);
 
         let titleEl = document.getElementById('deck-section-title');
         if (titleEl) {
-            titleEl.textContent = `⚔️ ${currentDeckKey.toUpperCase()}` + (currentDeckKey === s.activeDeck ? ' ⭐ (ACTIVO)' : '');
+            titleEl.textContent = `⚔️ ${currentDeckKey.toUpperCase()}` + (currentDeckKey === currentActiveKey ? ' ⭐ (ACTIVO)' : '');
         }
 
         let exLen = (s.extra || []).length;
@@ -8225,7 +8485,7 @@ window.customShowDeckEditor = function() {
         let statusBadge = document.getElementById('deck-status-badge');
         if (statusBadge) {
             if (isDeckValid) {
-                statusBadge.textContent = '✓ 40/40 COMPLETO' + (currentDeckKey === s.activeDeck ? ' (ACTIVO)' : '');
+                statusBadge.textContent = '✓ 40/40 COMPLETO' + (currentDeckKey === currentActiveKey ? ' (ACTIVO)' : '');
                 statusBadge.style.background = '#1b5e20';
                 statusBadge.style.color = '#a5d6a7';
                 statusBadge.style.border = '1px solid #4caf50';
@@ -8244,8 +8504,8 @@ window.customShowDeckEditor = function() {
 
         // Migrar cualquier carta residual en s.extra a la colección (solo en Mundos clásicos)
         if (!is5D && s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
-            s.collection = s.collection || {};
-            s.extra.forEach(n => { if (n) s.collection[n] = (s.collection[n] || 0) + 1; });
+            workingCollection = workingCollection || {};
+            s.extra.forEach(n => { if (n) workingCollection[n] = (workingCollection[n] || 0) + 1; });
             s.extra = [];
             persistSave();
         }
@@ -8264,7 +8524,7 @@ window.customShowDeckEditor = function() {
             if (inDeck <= 0) return;
 
             deckRowsRendered++;
-            let ownCount = s.collection[name] || inDeck;
+            let ownCount = workingCollection[name] || inDeck;
             let cardColor = info.isMonster ? (info.isExtra ? '#00e5ff' : '#d4af37') : (info.type === 'TRAP' ? '#ff80ab' : '#4caf50');
 
             let tr = document.createElement('tr');
@@ -8297,10 +8557,8 @@ window.customShowDeckEditor = function() {
                     let idx = arr.indexOf(name);
                     if (idx >= 0) {
                         arr.splice(idx, 1);
-                        s.decksMundo3 = s.decksMundo3 || {};
-                        s.decksMundo3['Extra'] = s.extra;
-                        s.collection[name] = Math.max(s.collection[name] || 0, 1);
-                        if (s.collectionMundo3) s.collectionMundo3[name] = Math.max(s.collectionMundo3[name] || 0, 1);
+                        s.extra = arr;
+                        workingCollection[name] = Math.max(workingCollection[name] || 0, 1);
                         if (!ownedSet.has(name)) {
                             ownedSet.add(name);
                             owned.push(name);
@@ -8316,7 +8574,7 @@ window.customShowDeckEditor = function() {
                 let idx = arr.indexOf(name);
                 if (idx >= 0) {
                     arr.splice(idx, 1);
-                    if (currentDeckKey === s.activeDeck) {
+                    if (currentDeckKey === currentActiveKey) {
                         s.deck = [...currentDeck];
                     }
                     persistSave();
@@ -8342,7 +8600,7 @@ window.customShowDeckEditor = function() {
 
         benchList.forEach(name => {
             let info = cardDict[name];
-            let ownCount = s.collection[name] || 0;
+            let ownCount = workingCollection[name] || 0;
             let inDeck = info.isExtra ? (exCounts[name] || 0) : (deckCounts[name] || 0);
             let inBench = Math.max(0, ownCount - inDeck);
             totalBenchCards += inBench;
@@ -8404,8 +8662,6 @@ window.customShowDeckEditor = function() {
                         return;
                     }
                     s.extra.push(name);
-                    s.decksMundo3 = s.decksMundo3 || {};
-                    s.decksMundo3['Extra'] = s.extra;
                     persistSave();
                     window.playHoverSound && window.playHoverSound();
                     renderDeckBar();
@@ -8421,7 +8677,7 @@ window.customShowDeckEditor = function() {
                 // Main Deck
                 if (currentDeck.length < 40) {
                     currentDeck.push(name);
-                    if (currentDeckKey === s.activeDeck) {
+                    if (currentDeckKey === currentActiveKey) {
                         s.deck = [...currentDeck];
                     }
                     persistSave();
@@ -8433,7 +8689,7 @@ window.customShowDeckEditor = function() {
                     let lowest = findLowestMonsterInDeck(currentDeck, cardDict);
                     if (confirm('El deck "' + currentDeckKey + '" ya tiene 40 cartas.\n\n¿Deseas enviar a la Banca a ' + lowest.name + ' (ATK ' + lowest.atk + ') para incluir a ' + name + '?\n\n(O puedes cancelar y enviar manualmente cualquier carta a la banca con [ ⬇ ]).')) {
                         currentDeck.splice(lowest.index, 1, name);
-                        if (currentDeckKey === s.activeDeck) {
+                        if (currentDeckKey === currentActiveKey) {
                             s.deck = [...currentDeck];
                         }
                         persistSave();
@@ -8452,6 +8708,12 @@ window.customShowDeckEditor = function() {
             benchBadge.textContent = totalBenchCards + ' Cartas en Banca';
         }
 
+        // Actualizar contadores móviles de pestañas
+        let mTabDeckNum = document.getElementById('m-tab-deck-num');
+        if (mTabDeckNum) mTabDeckNum.textContent = dLen + '/40' + (is5D ? ' +' + exLen : '');
+        let mTabBancaNum = document.getElementById('m-tab-banca-num');
+        if (mTabBancaNum) mTabBancaNum.textContent = String(totalBenchCards);
+
         if (benchRowsRendered === 0) {
             bancaTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:18px; color:#888; font-style:italic;">No hay cartas en la Banca que coincidan con la búsqueda/filtros.</td></tr>`;
         }
@@ -8461,9 +8723,9 @@ window.customShowDeckEditor = function() {
     renderRows();
 
     document.getElementById('btn-exit-deck').onclick = () => {
-        let activeDeckCards = s.decks[s.activeDeck] || s.deck || [];
+        let activeDeckCards = workingDecks[currentActiveKey] || s.deck || [];
         if (activeDeckCards.length !== 40) {
-            alert('⚠️ TU DECK ACTIVO NO ESTÁ LISTO (' + activeDeckCards.length + '/40) ⚠️\n\nTu Deck Activo ("' + (s.activeDeck || 'Principal') + '") debe tener EXACTAMENTE 40 cartas para poder salir y combatir en duelos.\n\nAsegúrate de seleccionarlo y agregar ' + (activeDeckCards.length < 40 ? (40 - activeDeckCards.length) + ' carta(s) desde la Banca [ ⬆ Enviar al Deck ].' : (activeDeckCards.length - 40) + ' carta(s) de más [ ⬇ Enviar a la Banca ].'));
+            alert('⚠️ TU DECK ACTIVO NO ESTÁ LISTO (' + activeDeckCards.length + '/40) ⚠️\n\nTu Deck Activo ("' + (currentActiveKey || 'Principal') + '") debe tener EXACTAMENTE 40 cartas para poder salir y combatir en duelos.\n\nAsegúrate de seleccionarlo y agregar ' + (activeDeckCards.length < 40 ? (40 - activeDeckCards.length) + ' carta(s) desde la Banca [ ⬆ Enviar al Deck ].' : (activeDeckCards.length - 40) + ' carta(s) de más [ ⬇ Enviar a la Banca ].'));
             return;
         }
         s.deck = [...activeDeckCards];
