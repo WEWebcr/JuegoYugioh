@@ -26672,122 +26672,161 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
     return false;
   };
 
-  // Buscar materiales válidos en el campo del jugador para un monstruo Sincro
-  window.findSynchroMaterialsFor = function(sc) {
-    if (typeof game === 'undefined' || !game || !sc) return null;
+  // Buscar todas las combinaciones válidas de materiales en el campo para un monstruo Sincro
+  window.findAllSynchroMaterialCombinations = function(sc) {
+    if (typeof game === 'undefined' || !game || !sc) return [];
     var targetLevel = Number(sc.level || sc[1] || 0);
     if (!targetLevel) {
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
       if (foundCd && foundCd.level) targetLevel = Number(foundCd.level);
     }
-    if (!targetLevel) return null;
+    if (!targetLevel) return [];
 
     var reqText = (sc.text || sc.desc || '').toLowerCase();
     if (!reqText) {
-      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
-      if (foundCd && (foundCd.text || foundCd.desc)) reqText = (foundCd.text || foundCd.desc).toLowerCase();
+      var foundCd2 = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
+      if (foundCd2 && (foundCd2.text || foundCd2.desc)) reqText = (foundCd2.text || foundCd2.desc).toLowerCase();
     }
     var scName = sc.name || '';
     var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"') || scName === 'Junk Warrior';
     var isDoubleTuning = scName.includes('Red Nova') || scName.includes('Burning Soul');
 
-    // 1. Si el jugador ya seleccionó monstruos en el campo:
-    var selField = (game.selected || [])
-      .filter(function(x) { return x && x[0] === 'f'; })
-      .map(function(x) { return { idx: x[1], card: game.field[x[1]] }; })
-      .filter(function(x) { return x.card && !x.card.faceDown && !x.card.faceDownSet103; });
-
-    if (selField.length >= 2) {
-      var sTuners = selField.filter(function(x) { return window.isTunerMonster(x.card); });
-      var sNonTuners = selField.filter(function(x) { return !window.isTunerMonster(x.card); });
-      var sumSel = selField.reduce(function(s, x) {
-        return s + (Number(x.card.level) || Number(x.card[1]) || 0);
-      }, 0);
-
-      if (isDoubleTuning) {
-        if (sTuners.length === 2 && sNonTuners.length >= 1 && sumSel === targetLevel) {
-          return selField.map(function(x) { return x.idx; });
-        }
-      } else if (sTuners.length === 1 && sNonTuners.length >= 1) {
-        var tName = (sTuners[0].card.name || '').toLowerCase();
-        if (!reqJunk || tName.includes('junk')) {
-          if (sumSel === targetLevel) {
-            return selField.map(function(x) { return x.idx; });
-          }
-        }
-      }
-    }
-
-    // 2. Si NO hay selección previa (o no coincide): buscar automáticamente entre los monstruos boca arriba
     var faceUp = (game.field || [])
       .map(function(c, idx) { return { idx: idx, card: c }; })
       .filter(function(x) { return x.card && !x.card.faceDown && !x.card.faceDownSet103; });
 
     var fTuners = faceUp.filter(function(x) { return window.isTunerMonster(x.card); });
     var fNonTuners = faceUp.filter(function(x) { return !window.isTunerMonster(x.card); });
-    if (fTuners.length === 0 || fNonTuners.length === 0) return null;
+    if (fTuners.length === 0 || fNonTuners.length === 0) return [];
 
-    // Caso Double Tuning: 2 Tuners + 1 no-Tuner (Red Nova Dragon)
+    var combos = [];
+    var comboKeys = new Set();
+
+    function addCombo(arr) {
+      var sorted = arr.slice().sort(function(a, b) { return a - b; });
+      var key = sorted.join(',');
+      if (!comboKeys.has(key)) {
+        comboKeys.add(key);
+        combos.push(sorted);
+      }
+    }
+
+    // Double Tuning: 2 Tuners + 1+ Non-Tuners (Red Nova Dragon, etc.)
     if (isDoubleTuning && fTuners.length >= 2 && fNonTuners.length >= 1) {
       for (var t1 = 0; t1 < fTuners.length; t1++) {
         var t1Lvl = Number(fTuners[t1].card.level || fTuners[t1].card[1] || 0);
         for (var t2 = t1 + 1; t2 < fTuners.length; t2++) {
           var t2Lvl = Number(fTuners[t2].card.level || fTuners[t2].card[1] || 0);
-          for (var nti = 0; nti < fNonTuners.length; nti++) {
-            var ntiLvl = Number(fNonTuners[nti].card.level || fNonTuners[nti].card[1] || 0);
-            if ((t1Lvl + t2Lvl + ntiLvl) === targetLevel) {
-              return [fTuners[t1].idx, fTuners[t2].idx, fNonTuners[nti].idx];
+          for (var nt = 0; nt < fNonTuners.length; nt++) {
+            var ntLvl = Number(fNonTuners[nt].card.level || fNonTuners[nt].card[1] || 0);
+            if ((t1Lvl + t2Lvl + ntLvl) === targetLevel) {
+              addCombo([fTuners[t1].idx, fTuners[t2].idx, fNonTuners[nt].idx]);
             }
           }
-        }
-      }
-    }
-
-    // Probar 1 Tuner + 1 no-Tuner
-    for (var t = 0; t < fTuners.length; t++) {
-      var tCard = fTuners[t].card;
-      var tNameLower = (tCard.name || '').toLowerCase();
-      if (reqJunk && !tNameLower.includes('junk')) continue;
-      var tLvl = Number(tCard.level || tCard[1] || 0);
-
-      for (var nt = 0; nt < fNonTuners.length; nt++) {
-        var ntCard = fNonTuners[nt].card;
-        var ntLvl = Number(ntCard.level || ntCard[1] || 0);
-        if ((tLvl + ntLvl) === targetLevel) {
-          return [fTuners[t].idx, fNonTuners[nt].idx];
-        }
-      }
-
-      // Probar 1 Tuner + 2 no-Tuners
-      if (fNonTuners.length >= 2) {
-        for (var i = 0; i < fNonTuners.length; i++) {
-          var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
-          for (var j = i + 1; j < fNonTuners.length; j++) {
-            var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
-            if ((tLvl + nt1Lvl + nt2Lvl) === targetLevel) {
-              return [fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx];
-            }
-          }
-        }
-      }
-
-      // Probar 1 Tuner + 3 no-Tuners (para Quasar Dragon o monstruos nivel 10-12)
-      if (fNonTuners.length >= 3) {
-        for (var i = 0; i < fNonTuners.length; i++) {
-          var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
-          for (var j = i + 1; j < fNonTuners.length; j++) {
-            var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
-            for (var k = j + 1; k < fNonTuners.length; k++) {
-              var nt3Lvl = Number(fNonTuners[k].card.level || fNonTuners[k].card[1] || 0);
-              if ((tLvl + nt1Lvl + nt2Lvl + nt3Lvl) === targetLevel) {
-                return [fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx, fNonTuners[k].idx];
+          for (var nt1 = 0; nt1 < fNonTuners.length; nt1++) {
+            var nt1Lvl = Number(fNonTuners[nt1].card.level || fNonTuners[nt1].card[1] || 0);
+            for (var nt2 = nt1 + 1; nt2 < fNonTuners.length; nt2++) {
+              var nt2Lvl = Number(fNonTuners[nt2].card.level || fNonTuners[nt2].card[1] || 0);
+              if ((t1Lvl + t2Lvl + nt1Lvl + nt2Lvl) === targetLevel) {
+                addCombo([fTuners[t1].idx, fTuners[t2].idx, fNonTuners[nt1].idx, fNonTuners[nt2].idx]);
               }
             }
           }
         }
       }
     }
-    return null;
+
+    // Sincronía estándar: 1 Tuner + 1+ Non-Tuners
+    if (!isDoubleTuning) {
+      for (var t = 0; t < fTuners.length; t++) {
+        var tCard = fTuners[t].card;
+        var tNameLower = (tCard.name || '').toLowerCase();
+        if (reqJunk && !tNameLower.includes('junk')) continue;
+        var tLvl = Number(tCard.level || tCard[1] || 0);
+
+        // 1 Tuner + 1 non-Tuner
+        for (var nt = 0; nt < fNonTuners.length; nt++) {
+          var ntCard = fNonTuners[nt].card;
+          var ntLvl = Number(ntCard.level || ntCard[1] || 0);
+          if ((tLvl + ntLvl) === targetLevel) {
+            addCombo([fTuners[t].idx, fNonTuners[nt].idx]);
+          }
+        }
+
+        // 1 Tuner + 2 non-Tuners
+        if (fNonTuners.length >= 2) {
+          for (var i = 0; i < fNonTuners.length; i++) {
+            var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
+            for (var j = i + 1; j < fNonTuners.length; j++) {
+              var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
+              if ((tLvl + nt1Lvl + nt2Lvl) === targetLevel) {
+                addCombo([fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx]);
+              }
+            }
+          }
+        }
+
+        // 1 Tuner + 3 non-Tuners
+        if (fNonTuners.length >= 3) {
+          for (var i = 0; i < fNonTuners.length; i++) {
+            var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
+            for (var j = i + 1; j < fNonTuners.length; j++) {
+              var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
+              for (var k = j + 1; k < fNonTuners.length; k++) {
+                var nt3Lvl = Number(fNonTuners[k].card.level || fNonTuners[k].card[1] || 0);
+                if ((tLvl + nt1Lvl + nt2Lvl + nt3Lvl) === targetLevel) {
+                  addCombo([fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx, fNonTuners[k].idx]);
+                }
+              }
+            }
+          }
+        }
+
+        // 1 Tuner + 4 non-Tuners
+        if (fNonTuners.length >= 4) {
+          for (var i = 0; i < fNonTuners.length; i++) {
+            var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
+            for (var j = i + 1; j < fNonTuners.length; j++) {
+              var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
+              for (var k = j + 1; k < fNonTuners.length; k++) {
+                var nt3Lvl = Number(fNonTuners[k].card.level || fNonTuners[k].card[1] || 0);
+                for (var l = k + 1; l < fNonTuners.length; l++) {
+                  var nt4Lvl = Number(fNonTuners[l].card.level || fNonTuners[l].card[1] || 0);
+                  if ((tLvl + nt1Lvl + nt2Lvl + nt3Lvl + nt4Lvl) === targetLevel) {
+                    addCombo([fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx, fNonTuners[k].idx, fNonTuners[l].idx]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return combos;
+  };
+
+  // Buscar una combinación válida (o verificar la selección manual en campo)
+  window.findSynchroMaterialsFor = function(sc) {
+    if (typeof game === 'undefined' || !game || !sc) return null;
+    var allCombos = window.findAllSynchroMaterialCombinations(sc);
+    if (!allCombos || allCombos.length === 0) return null;
+
+    // Si el jugador ya tenía monstruos seleccionados en el campo, verificar si coinciden con algún combo:
+    var selField = (game.selected || [])
+      .filter(function(x) { return x && x[0] === 'f'; })
+      .map(function(x) { return x[1]; })
+      .sort(function(a, b) { return a - b; });
+
+    if (selField.length >= 2) {
+      var selKey = selField.join(',');
+      var matched = allCombos.find(function(combo) {
+        return combo.slice().sort(function(a, b) { return a - b; }).join(',') === selKey;
+      });
+      if (matched) return matched;
+    }
+
+    return allCombos[0];
   };
 
   // Comprueba si el jugador puede realizar alguna invocación por Sincronía en este momento
@@ -26868,6 +26907,294 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
   };
   try { extraCardHTML = window.extraCardHTML; } catch(_) {}
 
+  // Modal interactivo de Selección de Materiales para Sincronía
+  window.showSynchroMaterialSelectModal = function(sc, extraIndex, allCombos, onConfirm, onCancel) {
+    var existing = document.getElementById('synchro-mat-modal');
+    if (existing) existing.remove();
+
+    var targetLevel = Number(sc.level || sc[1] || 0);
+    if (!targetLevel) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
+      if (foundCd && foundCd.level) targetLevel = Number(foundCd.level);
+    }
+    var scName = sc.name || 'Monstruo Sincro';
+    var scAtk = sc.atk !== undefined ? sc.atk : (sc[4] !== undefined ? sc[4] : '-');
+    var scDef = sc.def !== undefined ? sc.def : (sc[5] !== undefined ? sc[5] : '-');
+
+    var reqText = (sc.text || sc.desc || '').toLowerCase();
+    var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"') || scName === 'Junk Warrior';
+    var isDoubleTuning = scName.includes('Red Nova') || scName.includes('Burning Soul');
+
+    // Obtener todos los monstruos boca arriba en el campo del jugador
+    var faceUpMonsters = (game.field || [])
+      .map(function(c, idx) { return { idx: idx, card: c }; })
+      .filter(function(x) { return x.card && !x.card.faceDown && !x.card.faceDownSet103; });
+
+    var selectedSet = new Set(allCombos[0] || []);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'synchro-mat-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,4,12,0.88); z-index:99999999; display:flex; justify-content:center; align-items:center; padding:15px; font-family:"Segoe UI", Arial, sans-serif; backdrop-filter:blur(3px);';
+
+    var box = document.createElement('div');
+    box.style.cssText = 'width:min(820px, 96vw); max-height:88vh; background:linear-gradient(180deg, #091322 0%, #040912 100%); border:2.5px solid #00e5ff; border-radius:14px; box-shadow:0 0 35px rgba(0, 229, 255, 0.45), 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+    // Header
+    var header = document.createElement('div');
+    header.style.cssText = 'background:rgba(4, 20, 36, 0.95); padding:14px 20px; border-bottom:2px solid #00e5ff; text-align:center; position:relative;';
+    var reqDesc = isDoubleTuning ? '2 Cantantes + 1+ no-Cantantes' : (reqJunk ? '1 Cantante "Junk" + 1+ no-Cantantes' : '1 Cantante + 1 o más no-Cantantes');
+    header.innerHTML = `
+      <div style="font-family:VT323, monospace; font-size:26px; color:#e0f7fa; text-shadow:0 0 12px #00e5ff; letter-spacing:1.5px;">
+        ⭐ INVOCACIÓN POR SINCRONÍA · SELECCIONA MATERIALES
+      </div>
+      <div style="color:#b2ebf2; font-size:13px; margin-top:4px;">
+        Invocando a <b style="color:#ffd700;">${scName}</b> (★<b>${targetLevel}</b> · ⚔${scAtk} / 🛡${scDef})
+      </div>
+      <div style="color:#80deea; font-size:11.5px; margin-top:2px;">
+        Requisito: <b>${reqDesc}</b> cuya suma de niveles sea exactamente <b>${targetLevel}</b>
+      </div>
+    `;
+    box.appendChild(header);
+
+    // Body container
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:16px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:14px;';
+
+    // Quick combo bar (if multiple combos exist)
+    var quickCombosDiv = document.createElement('div');
+    quickCombosDiv.style.cssText = 'background:rgba(0, 229, 255, 0.06); border:1px solid rgba(0, 229, 255, 0.25); border-radius:8px; padding:10px 14px;';
+    
+    function renderQuickCombos() {
+      if (allCombos.length <= 1) {
+        quickCombosDiv.style.display = 'none';
+        return;
+      }
+      quickCombosDiv.style.display = 'block';
+      quickCombosDiv.innerHTML = '<div style="font-size:11px; font-weight:bold; color:#00e5ff; margin-bottom:6px; letter-spacing:0.5px;">⚡ COMBINACIONES RÁPIDAS DISPONIBLES (Haz clic para autoseleccionar):</div>';
+      var chipsDiv = document.createElement('div');
+      chipsDiv.style.cssText = 'display:flex; flex-wrap:wrap; gap:8px;';
+
+      allCombos.forEach(function(combo, cIdx) {
+        var names = combo.map(function(idx) {
+          var mon = game.field[idx];
+          return (mon && (mon.name || mon[0])) || ('Slot ' + (idx + 1));
+        });
+        var isCurrent = combo.length === selectedSet.size && combo.every(function(idx) { return selectedSet.has(idx); });
+        
+        var chip = document.createElement('button');
+        chip.style.cssText = 'background:' + (isCurrent ? 'linear-gradient(180deg, #00b4d8, #0077b6)' : '#071828') + '; border:1.5px solid ' + (isCurrent ? '#00e5ff' : '#0077b6') + '; color:' + (isCurrent ? '#fff' : '#b2ebf2') + '; padding:5px 12px; border-radius:16px; font-size:11px; font-weight:bold; cursor:pointer; transition:all 0.15s ease; box-shadow:' + (isCurrent ? '0 0 10px rgba(0,229,255,0.5)' : 'none') + ';';
+        chip.innerHTML = 'Opción ' + (cIdx + 1) + ': ' + names.join(' + ');
+        chip.onclick = function() {
+          selectedSet = new Set(combo);
+          updateUI();
+        };
+        chipsDiv.appendChild(chip);
+      });
+      quickCombosDiv.appendChild(chipsDiv);
+    }
+
+    body.appendChild(quickCombosDiv);
+
+    // Monsters on Field grid
+    var gridHeader = document.createElement('div');
+    gridHeader.style.cssText = 'font-size:12px; font-weight:bold; color:#e0f7fa; margin-bottom:-4px;';
+    gridHeader.innerHTML = '🃏 Monstruos en tu Campo (Haz clic en las cartas para elegirlas o cambiarlas):';
+    body.appendChild(gridHeader);
+
+    var grid = document.createElement('div');
+    grid.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:12px; justify-items:center;';
+
+    function renderMonstersGrid() {
+      grid.innerHTML = '';
+      faceUpMonsters.forEach(function(item) {
+        var idx = item.idx;
+        var mon = item.card;
+        var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(mon.name || mon[0]) : null;
+        var name = (meta && meta.name) || mon.name || mon[0] || ('Monstruo ' + (idx + 1));
+        var lvl = Number(mon.level || mon[1] || 0);
+        var isTuner = window.isTunerMonster(mon);
+        var atk = mon.atk !== undefined ? mon.atk : (mon[4] !== undefined ? mon[4] : '-');
+        var def = mon.def !== undefined ? mon.def : (mon[5] !== undefined ? mon[5] : '-');
+        var imgUrl = (meta && meta.imgUrl) || mon.imgUrl || (mon.id ? 'imagenescartas/Mundo3/' + mon.id + '.jpg' : 'https://i.imgur.com/vHqR8Kq.png');
+        var isSelected = selectedSet.has(idx);
+
+        var cardDiv = document.createElement('div');
+        cardDiv.style.cssText = 'width:130px; background:' + (isSelected ? '#0c2738' : '#071320') + '; border:2.5px solid ' + (isSelected ? '#00e5ff' : (isTuner ? '#ffd700' : '#455a64')) + '; border-radius:10px; padding:8px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:all 0.18s ease; box-shadow:' + (isSelected ? '0 0 18px rgba(0, 229, 255, 0.6)' : '0 4px 10px rgba(0,0,0,0.5)') + '; position:relative;';
+
+        var roleBadge = isTuner
+          ? '<span style="background:linear-gradient(90deg, #ff8f00, #ffb300); color:#000; font-weight:bold; font-size:9.5px; padding:2px 6px; border-radius:4px; margin-bottom:4px; letter-spacing:0.5px;">🎵 CANTANTE</span>'
+          : '<span style="background:#263238; color:#90a4ae; font-weight:bold; font-size:9.5px; padding:2px 6px; border-radius:4px; margin-bottom:4px;">NO-CANTANTE</span>';
+
+        var checkBadge = isSelected
+          ? '<div style="position:absolute; top:6px; right:6px; background:#00e5ff; color:#000; font-size:10px; font-weight:bold; padding:1px 5px; border-radius:50%; box-shadow:0 0 6px #00e5ff;">✔</div>'
+          : '';
+
+        cardDiv.innerHTML = `
+          ${checkBadge}
+          ${roleBadge}
+          <div style="width:100%; height:110px; background:#000; border-radius:4px; overflow:hidden; margin-bottom:6px; display:flex; align-items:center; justify-content:center;">
+            <img src="${imgUrl}" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png';">
+          </div>
+          <div style="font-weight:bold; font-size:11px; color:#e0f7fa; text-align:center; height:26px; overflow:hidden; line-height:1.2; margin-bottom:3px;">
+            ${name}
+          </div>
+          <div style="font-size:10.5px; color:#ffd700; margin-bottom:3px; font-weight:bold;">
+            ★${lvl} Nivel
+          </div>
+          <div style="font-size:9.5px; color:#aaa; background:rgba(0,0,0,0.4); padding:2px 4px; border-radius:3px; width:100%; text-align:center;">
+            ⚔ ${atk} / 🛡 ${def}
+          </div>
+          <button style="margin-top:6px; width:100%; padding:4px 0; background:${isSelected ? 'linear-gradient(180deg, #00b4d8, #0077b6)' : '#1a2936'}; border:1px solid ${isSelected ? '#00e5ff' : '#37474f'}; color:#fff; border-radius:4px; font-size:10px; font-weight:bold; cursor:pointer;">
+            ${isSelected ? '✔ SELECCIONADO' : '+ ELEGIR'}
+          </button>
+        `;
+
+        cardDiv.onclick = function() {
+          if (window.playViolinClick) window.playViolinClick();
+          if (selectedSet.has(idx)) {
+            selectedSet.delete(idx);
+          } else {
+            selectedSet.add(idx);
+          }
+          updateUI();
+        };
+
+        grid.appendChild(cardDiv);
+      });
+    }
+
+    body.appendChild(grid);
+
+    // Status Summary Card
+    var statusCard = document.createElement('div');
+    statusCard.style.cssText = 'background:rgba(0, 15, 30, 0.9); border:1.5px solid #0077b6; border-radius:8px; padding:12px 16px; display:flex; flex-direction:column; gap:6px;';
+
+    function updateStatusCard() {
+      var selArr = Array.from(selectedSet).sort(function(a, b) { return a - b; });
+      var selKey = selArr.join(',');
+      var isValidCombo = allCombos.some(function(combo) {
+        return combo.slice().sort(function(a, b) { return a - b; }).join(',') === selKey;
+      });
+
+      var currentSum = 0;
+      var tunerCount = 0;
+      var nonTunerCount = 0;
+      var selCardsDesc = [];
+
+      selArr.forEach(function(idx) {
+        var mon = game.field[idx];
+        if (mon) {
+          var lvl = Number(mon.level || mon[1] || 0);
+          currentSum += lvl;
+          var isT = window.isTunerMonster(mon);
+          if (isT) tunerCount++; else nonTunerCount++;
+          selCardsDesc.push((mon.name || mon[0] || 'Monstruo') + ' (★' + lvl + (isT ? ' Cantante' : '') + ')');
+        }
+      });
+
+      var statusMsg = '';
+      var statusColor = '#00e5ff';
+
+      if (isValidCombo) {
+        statusMsg = '✅ ¡Combinación VÁLIDA para invocar a ' + scName + '!';
+        statusColor = '#7cff7c';
+      } else if (selArr.length === 0) {
+        statusMsg = 'ℹ️ Selecciona 1 Cantante y 1 o más no-Cantantes en el campo.';
+        statusColor = '#80deea';
+      } else if (currentSum !== targetLevel) {
+        if (currentSum < targetLevel) {
+          statusMsg = '⚠️ Suma actual: ★' + currentSum + ' / ' + targetLevel + ' (Faltan ' + (targetLevel - currentSum) + ' niveles).';
+        } else {
+          statusMsg = '⚠️ Suma actual: ★' + currentSum + ' / ' + targetLevel + ' (Supera el nivel objetivo por ' + (currentSum - targetLevel) + ').';
+        }
+        statusColor = '#ffb74d';
+      } else if (isDoubleTuning && tunerCount !== 2) {
+        statusMsg = '⚠️ Double Tuning requiere exactamente 2 Cantantes y al menos 1 no-Cantante.';
+        statusColor = '#ff8a80';
+      } else if (!isDoubleTuning && tunerCount !== 1) {
+        statusMsg = tunerCount === 0 ? '⚠️ Debes seleccionar exactamente 1 monstruo Cantante.' : '⚠️ Solo se permite 1 monstruo Cantante.';
+        statusColor = '#ff8a80';
+      } else if (nonTunerCount < 1) {
+        statusMsg = '⚠️ Debes seleccionar al menos 1 monstruo no-Cantante.';
+        statusColor = '#ff8a80';
+      } else if (reqJunk) {
+        statusMsg = '⚠️ Esta Sincronía requiere específicamente que el Cantante sea "Junk".';
+        statusColor = '#ff8a80';
+      } else {
+        statusMsg = '⚠️ Los materiales seleccionados no cumplen las condiciones de invocación.';
+        statusColor = '#ff8a80';
+      }
+
+      statusCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="font-size:12.5px; color:#e0f7fa;">
+            <b>Materiales seleccionados:</b> ${selCardsDesc.length ? selCardsDesc.join(' + ') : '<i>Ninguno</i>'}
+          </div>
+          <div style="font-size:14px; font-weight:bold; color:${currentSum === targetLevel ? '#7cff7c' : '#ffd700'};">
+            Nivel: ★ ${currentSum} / ${targetLevel}
+          </div>
+        </div>
+        <div style="font-size:12px; font-weight:bold; color:${statusColor}; margin-top:2px;">
+          ${statusMsg}
+        </div>
+      `;
+
+      // Update Confirm Button
+      var confirmBtn = document.getElementById('synchro-confirm-btn');
+      if (confirmBtn) {
+        confirmBtn.disabled = !isValidCombo;
+        confirmBtn.style.opacity = isValidCombo ? '1' : '0.4';
+        confirmBtn.style.cursor = isValidCombo ? 'pointer' : 'not-allowed';
+        confirmBtn.style.boxShadow = isValidCombo ? '0 0 15px rgba(0,229,255,0.7)' : 'none';
+      }
+    }
+
+    body.appendChild(statusCard);
+    box.appendChild(body);
+
+    // Footer actions
+    var footer = document.createElement('div');
+    footer.style.cssText = 'background:rgba(4, 20, 36, 0.95); padding:12px 20px; border-top:1px solid rgba(0,229,255,0.3); display:flex; justify-content:space-between; align-items:center;';
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.textContent = '❌ Cancelar';
+    cancelBtn.style.cssText = 'background:#263238; border:1px solid #455a64; color:#cfd8dc; padding:8px 18px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; transition:all 0.15s ease;';
+    cancelBtn.onclick = function() {
+      overlay.remove();
+      if (typeof onCancel === 'function') onCancel();
+    };
+    footer.appendChild(cancelBtn);
+
+    var confirmBtn = document.createElement('button');
+    confirmBtn.id = 'synchro-confirm-btn';
+    confirmBtn.innerHTML = '⚡ REALIZAR SINCRONÍA';
+    confirmBtn.style.cssText = 'background:linear-gradient(180deg, #00b4d8, #0077b6); border:1.5px solid #00e5ff; color:#fff; padding:9px 24px; border-radius:6px; font-size:13px; font-weight:bold; transition:all 0.15s ease;';
+    confirmBtn.onclick = function() {
+      var selArr = Array.from(selectedSet).sort(function(a, b) { return a - b; });
+      var selKey = selArr.join(',');
+      var isValid = allCombos.some(function(combo) {
+        return combo.slice().sort(function(a, b) { return a - b; }).join(',') === selKey;
+      });
+      if (!isValid) return;
+
+      overlay.remove();
+      if (typeof onConfirm === 'function') onConfirm(selArr);
+    };
+    footer.appendChild(confirmBtn);
+
+    box.appendChild(footer);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    function updateUI() {
+      renderQuickCombos();
+      renderMonstersGrid();
+      updateStatusCard();
+    }
+
+    updateUI();
+  };
+
   // Invocación por Sincronía del Jugador
   window.extraClick = function(i) {
     if (typeof game === 'undefined' || !game) return;
@@ -26879,103 +27206,106 @@ window.triggerBlackWhirlwindIfAny = function(summonedMonster) {
       c.kind = (foundCd && foundCd.kind) ? foundCd.kind : 'SYNCHRO';
     }
 
-    var mats = window.findSynchroMaterialsFor(c);
-    if (!mats || mats.length < 2) {
+    var allCombos = window.findAllSynchroMaterialCombinations(c);
+    if (!allCombos || allCombos.length === 0) {
       if (typeof log === 'function') log('Esa carta no puede sincronizarse con los materiales disponibles en el campo.');
       if (typeof duelToast === 'function') duelToast('Necesitas 1 Cantante (Tuner) + 1 o más no-Cantantes cuyo nivel sume ' + (c.level || 0));
       return;
     }
 
-    // Enviar materiales al cementerio
-    mats.sort(function(a, b) { return b - a; });
-    var matNames = [];
-    mats.forEach(function(idx) {
-      var mat = game.field[idx];
-      if (mat) {
-        matNames.push(mat.name || 'Monstruo');
-        game.grave.push(mat);
-        game.field[idx] = null;
-      }
-    });
+    window.showSynchroMaterialSelectModal(c, i, allCombos, function(mats) {
+      // Enviar materiales seleccionados al cementerio
+      mats.sort(function(a, b) { return b - a; });
+      var matNames = [];
+      mats.forEach(function(idx) {
+        var mat = game.field[idx];
+        if (mat) {
+          matNames.push(mat.name || 'Monstruo');
+          game.grave.push(mat);
+          game.field[idx] = null;
+        }
+      });
 
-    // Encontrar slot libre en el campo
-    var slot = game.field.findIndex(function(x) { return !x; });
-    if (slot < 0) slot = mats[0];
+      // Encontrar slot libre en el campo
+      var slot = game.field.findIndex(function(x) { return !x; });
+      if (slot < 0) slot = mats[0];
 
-    var sc = JSON.parse(JSON.stringify(c));
-    sc.pos = 'ATK';
-    sc.faceUp = true;
-    sc.kind = 'SYNCHRO';
-    sc.summonedTurn = game.turnNo;
-    game.field[slot] = sc;
+      var sc = JSON.parse(JSON.stringify(c));
+      sc.pos = 'ATK';
+      sc.faceUp = true;
+      sc.kind = 'SYNCHRO';
+      sc.summonedTurn = game.turnNo;
+      game.field[slot] = sc;
 
-    game.extraUsed = game.extraUsed || [];
-    game.extraUsed.push(c.name);
-    game.selected = [];
+      game.extraUsed = game.extraUsed || [];
+      game.extraUsed.push(c.name);
+      game.selected = [];
 
-    // Remover del Extra Deck del jugador
-    game.extra.splice(i, 1);
+      // Remover del Extra Deck del jugador
+      game.extra.splice(i, 1);
 
-    // Disparar efectos de Invocación por Sincronía
-    if (sc.name === 'Junk Speeder' || sc.name.includes('Junk Speeder')) {
-      var summonedSyncs = [];
-      var usedLevels = new Set();
-      for (var dIdx = game.deck.length - 1; dIdx >= 0; dIdx--) {
-        var dCard = game.deck[dIdx];
-        if (dCard && (dCard.name || '').includes('Synchron') && window.isTunerMonster(dCard)) {
-          var dLvl = Number(dCard.level || dCard[1] || 0);
-          if (!usedLevels.has(dLvl)) {
-            var freeSlot = game.field.findIndex(function(x) { return !x; });
-            if (freeSlot >= 0) {
-              usedLevels.add(dLvl);
-              game.deck.splice(dIdx, 1);
-              var synMon = window.mk ? (window.mk(dCard) || Object.assign({}, dCard)) : Object.assign({}, dCard);
-              synMon.pos = 'DEF';
-              synMon.faceUp = true;
-              game.field[freeSlot] = synMon;
-              summonedSyncs.push(synMon.name || dCard.name);
+      // Disparar efectos de Invocación por Sincronía
+      if (sc.name === 'Junk Speeder' || sc.name.includes('Junk Speeder')) {
+        var summonedSyncs = [];
+        var usedLevels = new Set();
+        for (var dIdx = game.deck.length - 1; dIdx >= 0; dIdx--) {
+          var dCard = game.deck[dIdx];
+          if (dCard && (dCard.name || '').includes('Synchron') && window.isTunerMonster(dCard)) {
+            var dLvl = Number(dCard.level || dCard[1] || 0);
+            if (!usedLevels.has(dLvl)) {
+              var freeSlot = game.field.findIndex(function(x) { return !x; });
+              if (freeSlot >= 0) {
+                usedLevels.add(dLvl);
+                game.deck.splice(dIdx, 1);
+                var synMon = window.mk ? (window.mk(dCard) || Object.assign({}, dCard)) : Object.assign({}, dCard);
+                synMon.pos = 'DEF';
+                synMon.faceUp = true;
+                game.field[freeSlot] = synMon;
+                summonedSyncs.push(synMon.name || dCard.name);
+              }
             }
           }
         }
+        if (summonedSyncs.length > 0) {
+          if (typeof log === 'function') log('¡Efecto de Junk Speeder! Invoca de modo especial desde el Deck: ' + summonedSyncs.join(', ') + ' en Defensa.');
+          if (typeof duelToast === 'function') duelToast('¡Junk Speeder invoca ' + summonedSyncs.length + ' Cantante(s)!');
+        }
+      } else if (sc.name === 'Formula Synchron' || sc.name.includes('Formula Synchron')) {
+        if (game.deck.length > 0) {
+          var drawn = game.deck.pop();
+          game.hand.push(drawn);
+          if (typeof log === 'function') log('¡Efecto de Formula Synchron! Robas ' + (drawn.name || '1 carta') + ' del Deck.');
+          if (typeof duelToast === 'function') duelToast('¡Formula Synchron roba 1 carta!');
+        }
       }
-      if (summonedSyncs.length > 0) {
-        if (typeof log === 'function') log('¡Efecto de Junk Speeder! Invoca de modo especial desde el Deck: ' + summonedSyncs.join(', ') + ' en Defensa.');
-        if (typeof duelToast === 'function') duelToast('¡Junk Speeder invoca ' + summonedSyncs.length + ' Cantante(s)!');
-      }
-    } else if (sc.name === 'Formula Synchron' || sc.name.includes('Formula Synchron')) {
-      if (game.deck.length > 0) {
-        var drawn = game.deck.pop();
-        game.hand.push(drawn);
-        if (typeof log === 'function') log('¡Efecto de Formula Synchron! Robas ' + (drawn.name || '1 carta') + ' del Deck.');
-        if (typeof duelToast === 'function') duelToast('¡Formula Synchron roba 1 carta!');
-      }
-    }
 
-    // Efecto de Stardust Trail (desde mano o cementerio al ser usado material de Sincronía)
-    var stardustTrailIdx = (game.hand || []).findIndex(function(x) { return x && ((x.name || '').includes('Stardust Trail') || (x.name || '').includes('Rastro de Polvo')); });
-    var inGraveTrail = false;
-    if (stardustTrailIdx < 0) {
-      stardustTrailIdx = (game.grave || []).findIndex(function(x) { return x && ((x.name || '').includes('Stardust Trail') || (x.name || '').includes('Rastro de Polvo')); });
-      inGraveTrail = (stardustTrailIdx >= 0);
-    }
-    if (stardustTrailIdx >= 0) {
-      var trailFreeSlot = game.field.findIndex(function(x) { return !x; });
-      if (trailFreeSlot >= 0) {
-        var trailCard = inGraveTrail ? game.grave.splice(stardustTrailIdx, 1)[0] : game.hand.splice(stardustTrailIdx, 1)[0];
-        var trailMon = window.mk ? (window.mk(trailCard) || Object.assign({}, trailCard)) : Object.assign({}, trailCard);
-        trailMon.pos = 'DEF';
-        trailMon.faceUp = true;
-        game.field[trailFreeSlot] = trailMon;
-        if (typeof log === 'function') log('¡Efecto de Stardust Trail! Se invoca de modo especial al campo en Defensa.');
-        if (typeof duelToast === 'function') duelToast('¡Stardust Trail invocado!');
+      // Efecto de Stardust Trail (desde mano o cementerio al ser usado material de Sincronía)
+      var stardustTrailIdx = (game.hand || []).findIndex(function(x) { return x && ((x.name || '').includes('Stardust Trail') || (x.name || '').includes('Rastro de Polvo')); });
+      var inGraveTrail = false;
+      if (stardustTrailIdx < 0) {
+        stardustTrailIdx = (game.grave || []).findIndex(function(x) { return x && ((x.name || '').includes('Stardust Trail') || (x.name || '').includes('Rastro de Polvo')); });
+        inGraveTrail = (stardustTrailIdx >= 0);
       }
-    }
+      if (stardustTrailIdx >= 0) {
+        var trailFreeSlot = game.field.findIndex(function(x) { return !x; });
+        if (trailFreeSlot >= 0) {
+          var trailCard = inGraveTrail ? game.grave.splice(stardustTrailIdx, 1)[0] : game.hand.splice(stardustTrailIdx, 1)[0];
+          var trailMon = window.mk ? (window.mk(trailCard) || Object.assign({}, trailCard)) : Object.assign({}, trailCard);
+          trailMon.pos = 'DEF';
+          trailMon.faceUp = true;
+          game.field[trailFreeSlot] = trailMon;
+          if (typeof log === 'function') log('¡Efecto de Stardust Trail! Se invoca de modo especial al campo en Defensa.');
+          if (typeof duelToast === 'function') duelToast('¡Stardust Trail invocado!');
+        }
+      }
 
-    if (typeof closePile === 'function') closePile();
-    if (typeof render === 'function') render();
-    if (typeof log === 'function') log('¡INVOCACIÓN POR SINCRONÍA! ⭐ ' + sc.name + ' (Nv ' + sc.level + ') invocada al campo enviando ' + matNames.join(' + ') + ' al Cementerio.');
-    if (typeof duelToast === 'function') duelToast('¡Sincronización! ' + sc.name);
-    if (window.playViolinClick) window.playViolinClick();
+      if (typeof closePile === 'function') closePile();
+      if (typeof render === 'function') render();
+      if (typeof log === 'function') log('¡INVOCACIÓN POR SINCRONÍA! ⭐ ' + sc.name + ' (Nv ' + sc.level + ') invocada al campo enviando ' + matNames.join(' + ') + ' al Cementerio.');
+      if (typeof duelToast === 'function') duelToast('¡Sincronización! ' + sc.name);
+      if (window.playViolinClick) window.playViolinClick();
+      if (window.playSummonSound) window.playSummonSound();
+    });
   };
   try { extraClick = window.extraClick; } catch(_) {}
 
