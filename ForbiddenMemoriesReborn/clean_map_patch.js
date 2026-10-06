@@ -14504,6 +14504,199 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    var fiveDDuelistsCheck = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+    var is5DCheck = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
+                    (window.currentWorld === 3) ||
+                    fiveDDuelistsCheck.includes(String(opp || '').toLowerCase());
+
+    // Invocaciones especiales preliminares de 5D's antes de la Invocación Normal
+    if (is5DCheck && typeof window.aiExtraSummon === 'function') {
+      try { window.aiExtraSummon(); } catch(_) {}
+    }
+
+    // A0.2 IA ACTIVA MAGIAS Y TRAMPAS EXCLUSIVAS DE 5D's
+    // Allure of Darkness (Roba 2 cartas, destierra 1 DARK o descarta la mano)
+    var allureIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Allure of Darkness' || (c.value && c.value === 'ALLURE_OF_DARKNESS'));
+    });
+    if (allureIdx >= 0 && Array.isArray(game.enemyDeck)) {
+      var aCard = game.enemyHand.splice(allureIdx, 1)[0];
+      game.enemyGrave.push(Object.assign({}, aCard, { faceUp: true, set: false }));
+      for (var d = 0; d < 2; d++) {
+        if (game.enemyDeck.length) game.enemyHand.push(game.enemyDeck.pop());
+      }
+      var darkIdx = game.enemyHand.findIndex(function(c) {
+        if (!c || isST(c)) return false;
+        var meta = typeof window.getCardMetadata === 'function' ? window.getCardMetadata(c.name || c[0]) : null;
+        if (meta && (meta.attribute === 'DARK' || meta.type === 'DARK' || meta.attr === 'DARK')) return true;
+        var n = (c.name || c[0] || '').toLowerCase();
+        return n.includes('resonator') || n.includes('blackwing') || n.includes('archfiend') || n.includes('vice dragon');
+      });
+      if (darkIdx >= 0) {
+        var banished = game.enemyHand.splice(darkIdx, 1)[0];
+        if (!game.enemyBanish) game.enemyBanish = [];
+        game.enemyBanish.push(banished);
+        duelToast('🌑 ¡' + opp.toUpperCase() + ' activa Allure of Darkness! Roba 2 cartas y destierra a ' + (banished.name || banished[0]) + '.');
+      } else {
+        while (game.enemyHand.length > 0) {
+          game.enemyGrave.push(game.enemyHand.pop());
+        }
+        duelToast('🌑 ¡' + opp.toUpperCase() + ' activa Allure of Darkness! No tenía monstruos DARK y descartó su mano.');
+      }
+      if (window.playDrawSound) window.playDrawSound();
+      if (typeof render === 'function') render();
+    }
+
+    // Soul Charge (Revive monstruos del cementerio perdiendo 1000 LP por cada uno)
+    var scIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Soul Charge' || (c.value && c.value === 'SOUL_CHARGE'));
+    });
+    if (scIdx >= 0) {
+      var freeSlots = [];
+      for (var sIdx = 0; sIdx < (game.enemy || []).length; sIdx++) {
+        if (!game.enemy[sIdx]) freeSlots.push(sIdx);
+      }
+      var curELP = Number(game.enemyLP !== undefined ? game.enemyLP : (game.elp !== undefined ? game.elp : 8000));
+      var reviveCount = Math.min(freeSlots.length, Math.floor((curELP - 1000) / 1000), 2);
+      if (reviveCount > 0 && Array.isArray(game.enemyGrave) && game.enemyGrave.length > 0) {
+        var graveMons = [];
+        for (var gi = game.enemyGrave.length - 1; gi >= 0; gi--) {
+          var gc = game.enemyGrave[gi];
+          if (gc && !isST(gc) && (gc.atk !== undefined || gc[4] !== undefined)) {
+            graveMons.push({ index: gi, card: gc });
+          }
+        }
+        if (graveMons.length >= 1) {
+          var soulCard = game.enemyHand.splice(scIdx, 1)[0];
+          game.enemyGrave.push(Object.assign({}, soulCard, { faceUp: true, set: false }));
+          var actualRevived = Math.min(reviveCount, graveMons.length);
+          for (var r = 0; r < actualRevived; r++) {
+            var targetObj = graveMons[r];
+            var revCard = game.enemyGrave.splice(targetObj.index, 1)[0];
+            var rm = window.mk ? (window.mk(revCard) || window.mk(revCard.name || revCard[0])) : Object.assign({}, revCard);
+            if (!rm) rm = Object.assign({}, revCard);
+            rm.pos = 'DEF';
+            rm.faceUp = true;
+            rm.summonedTurn = game.turnNo;
+            game.enemy[freeSlots[r]] = rm;
+          }
+          var lpCost = actualRevived * 1000;
+          if (typeof game.enemyLP === 'number') game.enemyLP = Math.max(100, game.enemyLP - lpCost);
+          if (typeof game.elp === 'number') game.elp = Math.max(100, game.elp - lpCost);
+          duelToast('⚡ ¡' + opp.toUpperCase() + ' activa SOUL CHARGE! Revive ' + actualRevived + ' monstruos (-' + lpCost + ' LP).');
+          if (typeof log === 'function') log('¡Soul Charge! ' + opp.toUpperCase() + ' revive ' + actualRevived + ' monstruos perdiendo ' + lpCost + ' LP.');
+          if (typeof render === 'function') render();
+        }
+      }
+    }
+
+    // Resonator Call (Busca 1 Cantante Resonador del Deck a la Mano)
+    var rcIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Resonator Call' || (c.value && c.value === 'RESONATOR_CALL'));
+    });
+    if (rcIdx >= 0 && Array.isArray(game.enemyDeck)) {
+      var dResIdx = game.enemyDeck.findIndex(function(c) {
+        return c && (c.name || c[0] || '').includes('Resonator');
+      });
+      if (dResIdx >= 0) {
+        var rSpell = game.enemyHand.splice(rcIdx, 1)[0];
+        game.enemyGrave.push(Object.assign({}, rSpell, { faceUp: true, set: false }));
+        var foundRes = game.enemyDeck.splice(dResIdx, 1)[0];
+        game.enemyHand.push(foundRes);
+        duelToast('🎵 ¡' + opp.toUpperCase() + ' activa Resonator Call y añade a ' + (foundRes.name || foundRes[0]) + ' a su mano!');
+        if (typeof log === 'function') log('¡Resonator Call! ' + opp.toUpperCase() + ' busca a ' + (foundRes.name || foundRes[0]) + ' en su baraja.');
+        if (typeof render === 'function') render();
+      }
+    }
+
+    // Crimson Gaia (Busca Red Dragon Archfiend o Resonator)
+    var cgIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Crimson Gaia' || (c.value && c.value === 'CRIMSON_GAIA'));
+    });
+    if (cgIdx >= 0 && Array.isArray(game.enemyDeck)) {
+      var cgTargetIdx = game.enemyDeck.findIndex(function(c) {
+        var n = (c && (c.name || c[0] || '')) || '';
+        return n.includes('Resonator') || n.includes('Red Dragon Archfiend') || n.includes('Archfiend');
+      });
+      if (cgTargetIdx >= 0) {
+        var cgCard = game.enemyHand.splice(cgIdx, 1)[0];
+        var backSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+        if (backSlot >= 0) {
+          game.enemyBack[backSlot] = Object.assign({}, cgCard, { faceUp: true, set: false });
+        } else {
+          game.enemyGrave.push(Object.assign({}, cgCard, { faceUp: true, set: false }));
+        }
+        var foundCG = game.enemyDeck.splice(cgTargetIdx, 1)[0];
+        game.enemyHand.push(foundCG);
+        duelToast('🌋 ¡' + opp.toUpperCase() + ' activa Crimson Gaia y añade a ' + (foundCG.name || foundCG[0]) + ' a su mano!');
+        if (typeof log === 'function') log('¡Crimson Gaia! ' + opp.toUpperCase() + ' añade a ' + (foundCG.name || foundCG[0]) + ' a su mano.');
+        if (typeof render === 'function') render();
+      }
+    }
+
+    // Black Whirlwind (Colocar boca arriba en el campo)
+    var bwSpellIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Black Whirlwind' || (c.value && c.value === 'BLACK_WHIRLWIND'));
+    });
+    if (bwSpellIdx >= 0) {
+      var backSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+      if (backSlot >= 0) {
+        var bwCard = game.enemyHand.splice(bwSpellIdx, 1)[0];
+        game.enemyBack[backSlot] = Object.assign({}, bwCard, { faceUp: true, set: false });
+        duelToast('🌪️ ¡' + opp.toUpperCase() + ' activa la Magia Continua Black Whirlwind!');
+        if (typeof log === 'function') log('¡Black Whirlwind activada en el campo rival!');
+        if (typeof render === 'function') render();
+      }
+    }
+
+    // Book of Moon (Voltear al monstruo más peligroso del jugador boca abajo en Defensa)
+    var bomIdx = game.enemyHand.findIndex(function(c) {
+      return c && (c.name === 'Book of Moon' || (c.value && c.value === 'BOOK_OF_MOON'));
+    });
+    if (bomIdx >= 0 && Array.isArray(game.field)) {
+      var strongPlayerMon = null;
+      var spIdx = -1;
+      var maxPatk = 1600;
+      for (var pi = 0; pi < game.field.length; pi++) {
+        var pm = game.field[pi];
+        if (pm && pm.faceUp && pm.pos === 'ATK') {
+          var patk = Number(pm.atk || pm[4] || 0);
+          if (patk >= maxPatk) {
+            maxPatk = patk;
+            strongPlayerMon = pm;
+            spIdx = pi;
+          }
+        }
+      }
+      if (strongPlayerMon && spIdx >= 0) {
+        var bomCard = game.enemyHand.splice(bomIdx, 1)[0];
+        game.enemyGrave.push(Object.assign({}, bomCard, { faceUp: true, set: false }));
+        strongPlayerMon.pos = 'DEF';
+        strongPlayerMon.faceUp = false;
+        strongPlayerMon.faceDownSet103 = true;
+        duelToast('🌙 ¡' + opp.toUpperCase() + ' activa Book of Moon y voltea a ' + (strongPlayerMon.name || 'tu monstruo') + ' boca abajo en Defensa!');
+        if (typeof log === 'function') log('¡Book of Moon! ' + (strongPlayerMon.name || 'El monstruo') + ' es volteado boca abajo en Posición de Defensa.');
+        if (typeof render === 'function') render();
+      }
+    }
+
+    // Trap Stun (Activar si el jugador tiene cartas colocadas en su fila trasera)
+    for (var b = 0; b < (game.enemyBack || []).length; b++) {
+      var bCard = game.enemyBack[b];
+      if (bCard && (bCard.name === 'Trap Stun' || (bCard.value && bCard.value === 'TRAP_STUN'))) {
+        var pHasBack = (game.playerBack || []).some(function(x) { return x && x.set; });
+        if (pHasBack) {
+          game.enemyBack[b] = null;
+          game.enemyGrave.push(Object.assign({}, bCard, { faceUp: true, set: false }));
+          game._trapStunActiveTurn = game.turnNo;
+          duelToast('🚫 ¡' + opp.toUpperCase() + ' activa TRAP STUN! Todas las cartas Trampa son negadas durante este turno.');
+          if (typeof log === 'function') log('¡Trap Stun! Las cartas Trampa quedan sin efecto durante este turno.');
+          if (typeof render === 'function') render();
+          break;
+        }
+      }
+    }
+
     // A. Colocar Trampas en la fila trasera
     for (var h = game.enemyHand.length - 1; h >= 0; h--) {
       var c = game.enemyHand[h];
@@ -14819,6 +15012,35 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (typeof log === 'function') log('El rival invoca a ' + (summoned.name || 'un monstruo') + ' en ' + (summoned.pos === 'ATK' ? 'ATAQUE' : 'DEFENSA') + ' (' + sAtk + ' ATK / ' + sDef + ' DEF).');
         if (typeof render === 'function') render();
         if (typeof window.checkSummonTraps === 'function') window.checkSummonTraps(summoned, 'enemy', openSlot);
+
+        // Disparo de Black Whirlwind para la IA
+        var sName = summoned.name || summoned[0] || '';
+        if (sName.includes('Blackwing') || sName.includes('Alanegra')) {
+          var hasWhirlwind = (game.enemyBack || []).some(function(b) {
+            return b && !b.set && (b.name === 'Black Whirlwind' || (b.value && b.value === 'BLACK_WHIRLWIND'));
+          });
+          if (hasWhirlwind && Array.isArray(game.enemyDeck)) {
+            var searchBwIdx = game.enemyDeck.findIndex(function(c) {
+              if (!c || isST(c)) return false;
+              var cn = c.name || c[0] || '';
+              if (!cn.includes('Blackwing') && !cn.includes('Alanegra')) return false;
+              var cAtk = Number(c.atk !== undefined ? c.atk : (c[4] || 0));
+              return cAtk <= sAtk;
+            });
+            if (searchBwIdx >= 0) {
+              var searchedBw = game.enemyDeck.splice(searchBwIdx, 1)[0];
+              game.enemyHand.push(searchedBw);
+              duelToast('🌪️ [Efecto Black Whirlwind] ' + opp.toUpperCase() + ' busca y añade a ' + (searchedBw.name || searchedBw[0]) + ' a su mano.');
+              if (typeof log === 'function') log('¡Black Whirlwind añade a ' + (searchedBw.name || searchedBw[0]) + ' a la mano del rival!');
+              if (typeof render === 'function') render();
+            }
+          }
+        }
+
+        // Si es Mundo 3, verificar si ahora se puede invocar por Sincronía con el nuevo monstruo
+        if (is5DCheck && typeof window.aiExtraSummon === 'function') {
+          try { window.aiExtraSummon(); } catch(_) {}
+        }
       }
     }
   };
@@ -16955,11 +17177,72 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
   };
   try { extraClick = window.extraClick; } catch(_) {}
 
+  // Función auxiliar de disparo de efectos post-sincronía para la IA
+  function triggerAISynchroEffects(sc) {
+    if (!sc) return;
+    var scName = sc.name || sc[0] || '';
+    var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase();
+
+    // 1. Junk Speeder: Invoca cantantes Synchron con diferentes niveles desde el Deck en Defensa
+    if (scName === 'Junk Speeder' && Array.isArray(game.enemyDeck)) {
+      var summonedLevels = new Set();
+      for (var d = game.enemyDeck.length - 1; d >= 0; d--) {
+        var dc = game.enemyDeck[d];
+        if (dc && window.isTunerMonster(dc) && ((dc.name || dc[0] || '').includes('Synchron') || (dc.name || dc[0] || '').includes('Sincrón'))) {
+          var dLvl = Number(dc.level || dc[1] || 0);
+          if (!summonedLevels.has(dLvl)) {
+            var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+            if (fSlot >= 0) {
+              game.enemyDeck.splice(d, 1);
+              var dm = window.mk ? (window.mk(dc) || window.mk(dc.name || dc[0])) : Object.assign({}, dc);
+              if (!dm) dm = Object.assign({}, dc);
+              dm.pos = 'DEF';
+              dm.faceUp = true;
+              dm.summonedTurn = game.turnNo;
+              game.enemy[fSlot] = dm;
+              summonedLevels.add(dLvl);
+              if (typeof log === 'function') log('⚡ [Efecto Junk Speeder] ¡Invoca a ' + (dm.name || dm[0]) + ' (Nv ' + dLvl + ') desde el Deck en Defensa!');
+              if (summonedLevels.size >= 2) break; // Hasta 2 cantantes para balance
+            }
+          }
+        }
+      }
+      duelToast('⚡ ¡Efecto de Junk Speeder! Invoca cantantes Synchron desde el mazo.');
+    }
+
+    // 2. Formula Synchron: Roba 1 carta del Deck
+    if (scName === 'Formula Synchron' && Array.isArray(game.enemyDeck) && game.enemyDeck.length > 0) {
+      game.enemyHand.push(game.enemyDeck.pop());
+      if (window.playDrawSound) window.playDrawSound();
+      duelToast('✨ ¡Efecto Formula Synchron! El rival roba 1 carta.');
+      if (typeof log === 'function') log('¡Formula Synchron permite al rival robar 1 carta!');
+    }
+
+    // 3. Stardust Trail: Si está en mano o cementerio tras una sincronía, se autoinvoca de modo especial
+    var trailHandIdx = (game.enemyHand || []).findIndex(function(c) { return c && (c.name || c[0] || '') === 'Stardust Trail'; });
+    if (trailHandIdx >= 0) {
+      var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+      if (fSlot >= 0) {
+        var tc = game.enemyHand.splice(trailHandIdx, 1)[0];
+        var tm = window.mk ? (window.mk(tc) || window.mk(tc.name || tc[0])) : Object.assign({}, tc);
+        if (!tm) tm = Object.assign({}, tc);
+        tm.pos = 'DEF';
+        tm.faceUp = true;
+        tm.summonedTurn = game.turnNo;
+        game.enemy[fSlot] = tm;
+        duelToast('⭐ ¡Efecto de Stardust Trail! Se autoinvoca de modo especial.');
+        if (typeof log === 'function') log('¡Stardust Trail se invoca de modo especial tras la Sincronía!');
+      }
+    }
+  }
+
   // Invocación por Sincronía y Jugadas Especiales de la IA rival en Mundo 3
   window.aiExtraSummon = function() {
     if (typeof game === 'undefined' || !game) return;
     var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
     if (!is5D) return;
+
+    var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
 
     // 1. Invocaciones Especiales de la IA desde la Mano en Mundo 3
     if (Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
@@ -16985,7 +17268,74 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         }
       }
 
-      // b) Blackwing - Gale the Whirlwind o Bora the Spear: si la IA ya controla otro Blackwing
+      // b) Crimson Resonator: si la IA no controla monstruos
+      var crIdx = game.enemyHand.findIndex(function(c) {
+        return c && (c.name || c[0] || '') === 'Crimson Resonator';
+      });
+      if (crIdx >= 0) {
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        var eHasMon = (game.enemy || []).some(Boolean);
+        if (!eHasMon && fSlot >= 0) {
+          var crc = game.enemyHand.splice(crIdx, 1)[0];
+          var crm = window.mk ? (window.mk(crc) || window.mk(crc.name || crc[0])) : Object.assign({}, crc);
+          if (!crm) crm = Object.assign({}, crc);
+          crm.pos = 'DEF';
+          crm.faceUp = true;
+          crm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = crm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ Crimson Resonator invocado al campo en Defensa.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a Crimson Resonator!');
+        }
+      }
+
+      // c) Vision Resonator: si la IA controla un monstruo DARK de Nivel 5 o superior
+      var vrIdx = game.enemyHand.findIndex(function(c) {
+        return c && (c.name || c[0] || '') === 'Vision Resonator';
+      });
+      if (vrIdx >= 0) {
+        var hasLv5Dark = (game.enemy || []).some(function(m) {
+          if (!m) return false;
+          var mlvl = Number(m.level || m[1] || 0);
+          return mlvl >= 5;
+        });
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (hasLv5Dark && fSlot >= 0) {
+          var vrc = game.enemyHand.splice(vrIdx, 1)[0];
+          var vrm = window.mk ? (window.mk(vrc) || window.mk(vrc.name || vrc[0])) : Object.assign({}, vrc);
+          if (!vrm) vrm = Object.assign({}, vrc);
+          vrm.pos = 'ATK';
+          vrm.faceUp = true;
+          vrm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = vrm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ Vision Resonator invocado al campo.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a Vision Resonator!');
+        }
+      }
+
+      // d) Synkron Resonator: si la IA controla un Monstruo Sincronía
+      var srIdx = game.enemyHand.findIndex(function(c) {
+        return c && (c.name || c[0] || '') === 'Synkron Resonator';
+      });
+      if (srIdx >= 0) {
+        var hasSynchro = (game.enemy || []).some(function(m) {
+          if (!m) return false;
+          return (m.kind || '').toUpperCase() === 'SYNCHRO' || (m.type || '').toUpperCase() === 'SYNCHRO';
+        });
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (hasSynchro && fSlot >= 0) {
+          var src = game.enemyHand.splice(srIdx, 1)[0];
+          var srm = window.mk ? (window.mk(src) || window.mk(src.name || src[0])) : Object.assign({}, src);
+          if (!srm) srm = Object.assign({}, src);
+          srm.pos = 'DEF';
+          srm.faceUp = true;
+          srm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = srm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ Synkron Resonator invocado al campo en Defensa.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a Synkron Resonator!');
+        }
+      }
+
+      // e) Blackwing - Gale the Whirlwind o Bora the Spear: si la IA ya controla otro Blackwing
       var bwIdx = game.enemyHand.findIndex(function(c) {
         var n = (c && (c.name || c[0] || '')) || '';
         return n.includes('Gale the Whirlwind') || n.includes('Bora the Spear');
@@ -17004,6 +17354,73 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           bwm.summonedTurn = game.turnNo;
           game.enemy[fSlot] = bwm;
           if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ El rival invoca a ' + (bwm.name || bwm[0]) + ' desde su mano.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a ' + (bwm.name || bwm[0]) + '!');
+        }
+      }
+
+      // f) Blackwing - Auster the South Wind: si la IA controla un Blackwing
+      var austerIdx = game.enemyHand.findIndex(function(c) {
+        return c && (c.name || c[0] || '') === 'Blackwing - Auster the South Wind';
+      });
+      if (austerIdx >= 0) {
+        var eHasOtherBw = (game.enemy || []).some(function(m) {
+          return m && ((m.name || m[0] || '').includes('Blackwing') || (m.name || m[0] || '').includes('Ala Negra'));
+        });
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (eHasOtherBw && fSlot >= 0) {
+          var ac = game.enemyHand.splice(austerIdx, 1)[0];
+          var am = window.mk ? (window.mk(ac) || window.mk(ac.name || ac[0])) : Object.assign({}, ac);
+          if (!am) am = Object.assign({}, ac);
+          am.pos = 'ATK';
+          am.faceUp = true;
+          am.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = am;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ Blackwing - Auster the South Wind desciende al campo.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a Auster the South Wind!');
+        }
+      }
+
+      // g) Quickdraw Synchron: descarta 1 monstruo de la mano para invocarse
+      var qdIdx = game.enemyHand.findIndex(function(c) {
+        return c && (c.name || c[0] || '') === 'Quickdraw Synchron';
+      });
+      if (qdIdx >= 0 && game.enemyHand.length >= 2) {
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        var otherMonIdx = game.enemyHand.findIndex(function(c, i) {
+          return i !== qdIdx && c && !isST(c);
+        });
+        if (fSlot >= 0 && otherMonIdx >= 0) {
+          var discMon = game.enemyHand.splice(otherMonIdx, 1)[0];
+          var newQdIdx = game.enemyHand.findIndex(function(c) { return c && (c.name || c[0] || '') === 'Quickdraw Synchron'; });
+          var qdc = game.enemyHand.splice(newQdIdx, 1)[0];
+          game.enemyGrave.push(discMon);
+          var qdm = window.mk ? (window.mk(qdc) || window.mk(qdc.name || qdc[0])) : Object.assign({}, qdc);
+          if (!qdm) qdm = Object.assign({}, qdc);
+          qdm.pos = 'ATK';
+          qdm.faceUp = true;
+          qdm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = qdm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ Quickdraw Synchron invocado descartando a ' + (discMon.name || discMon[0]) + '.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a Quickdraw Synchron!');
+        }
+      }
+
+      // h) Stardust Synchron: invocación especial
+      var ssIdx = game.enemyHand.findIndex(function(c) {
+        return c && (c.name || c[0] || '') === 'Stardust Synchron';
+      });
+      if (ssIdx >= 0) {
+        var fSlot = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (fSlot >= 0) {
+          var ssc = game.enemyHand.splice(ssIdx, 1)[0];
+          var ssm = window.mk ? (window.mk(ssc) || window.mk(ssc.name || ssc[0])) : Object.assign({}, ssc);
+          if (!ssm) ssm = Object.assign({}, ssc);
+          ssm.pos = 'ATK';
+          ssm.faceUp = true;
+          ssm.summonedTurn = game.turnNo;
+          game.enemy[fSlot] = ssm;
+          if (typeof log === 'function') log('¡Invocación Especial Rival! ⚡ Stardust Synchron invocado al campo.');
+          duelToast('¡' + opp.toUpperCase() + ' invoca de modo especial a Stardust Synchron!');
         }
       }
     }
@@ -17050,69 +17467,37 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (tuners.length === 0) return;
 
     var nonTuners = eMonsters.filter(x => !window.isTunerMonster(x.card));
-    if (nonTuners.length === 0) return;
 
-    // Buscar si alguna combinación de 1 Tuner + 1 o más no-Tuners suma el nivel de un Synchro del Extra Deck
-    for (var t = 0; t < tuners.length; t++) {
-      var tunerObj = tuners[t];
-      var tLvl = Number(tunerObj.card.level || tunerObj.card[1] || 0);
+    // A) DOBLE AFINACIÓN (Double Tuning): 2 Cantantes + 1 no-Cantante = 12 (Red Nova Dragon)
+    var redNovaIdx = game.enemyExtra.findIndex(function(sc) {
+      var n = sc.name || sc[0] || '';
+      return n.includes('Red Nova Dragon') || (Number(sc.level || 0) === 12 && tuners.length >= 2 && nonTuners.length >= 1);
+    });
+    if (redNovaIdx >= 0 && tuners.length >= 2 && nonTuners.length >= 1) {
+      for (var t1 = 0; t1 < tuners.length; t1++) {
+        for (var t2 = t1 + 1; t2 < tuners.length; t2++) {
+          for (var nt = 0; nt < nonTuners.length; nt++) {
+            var sumDT = Number(tuners[t1].card.level || 0) + Number(tuners[t2].card.level || 0) + Number(nonTuners[nt].card.level || 0);
+            if (sumDT === 12) {
+              var targetDT = game.enemyExtra.splice(redNovaIdx, 1)[0];
+              game.enemyGrave.push(tuners[t1].card, tuners[t2].card, nonTuners[nt].card);
+              game.enemy[tuners[t1].idx] = null;
+              game.enemy[tuners[t2].idx] = null;
+              game.enemy[nonTuners[nt].idx] = null;
 
-      // Probar 1 Tuner + 1 no-Tuner
-      for (var nt = 0; nt < nonTuners.length; nt++) {
-        var ntObj = nonTuners[nt];
-        var ntLvl = Number(ntObj.card.level || ntObj.card[1] || 0);
-        var comboSum = tLvl + ntLvl;
+              var freeSlot = game.enemy.findIndex(x => !x);
+              if (freeSlot < 0) freeSlot = tuners[t1].idx;
 
-        var synchroIdx = game.enemyExtra.findIndex(sc => Number(sc.level || sc[1] || 0) === comboSum && (sc.kind || '').toUpperCase() === 'SYNCHRO');
-        if (synchroIdx >= 0) {
-          var targetSynchro = game.enemyExtra[synchroIdx];
-          // Enviar materiales al cementerio enemigo
-          game.enemyGrave.push(tunerObj.card, ntObj.card);
-          game.enemy[tunerObj.idx] = null;
-          game.enemy[ntObj.idx] = null;
+              var scDT = JSON.parse(JSON.stringify(targetDT));
+              scDT.pos = 'ATK';
+              scDT.faceUp = true;
+              scDT.summonedTurn = game.turnNo;
+              game.enemy[freeSlot] = scDT;
 
-          var freeSlot = game.enemy.findIndex(x => !x);
-          if (freeSlot < 0) freeSlot = tunerObj.idx;
-
-          var sc = JSON.parse(JSON.stringify(targetSynchro));
-          sc.pos = 'ATK';
-          sc.faceUp = true;
-          sc.summonedTurn = game.turnNo;
-          game.enemy[freeSlot] = sc;
-          game.enemyExtra.splice(synchroIdx, 1);
-
-          if (typeof log === 'function') log('¡Sincronía Rival! ⚡ El rival sincroniza a ' + sc.name + ' (Nivel ' + sc.level + ').');
-          if (typeof duelToast === 'function') duelToast('¡Sincronía Rival! ' + sc.name);
-          if (typeof render === 'function') render();
-          return;
-        }
-      }
-
-      // Probar 1 Tuner + 2 no-Tuners si hay al menos 2 no-tuners
-      if (nonTuners.length >= 2) {
-        for (var i = 0; i < nonTuners.length; i++) {
-          for (var j = i + 1; j < nonTuners.length; j++) {
-            var sum3 = tLvl + Number(nonTuners[i].card.level || 0) + Number(nonTuners[j].card.level || 0);
-            var sIdx = game.enemyExtra.findIndex(sc => Number(sc.level || sc[1] || 0) === sum3 && (sc.kind || '').toUpperCase() === 'SYNCHRO');
-            if (sIdx >= 0) {
-              var tSynchro = game.enemyExtra[sIdx];
-              game.enemyGrave.push(tunerObj.card, nonTuners[i].card, nonTuners[j].card);
-              game.enemy[tunerObj.idx] = null;
-              game.enemy[nonTuners[i].idx] = null;
-              game.enemy[nonTuners[j].idx] = null;
-
-              var fSlot = game.enemy.findIndex(x => !x);
-              if (fSlot < 0) fSlot = tunerObj.idx;
-
-              var sc3 = JSON.parse(JSON.stringify(tSynchro));
-              sc3.pos = 'ATK';
-              sc3.faceUp = true;
-              sc3.summonedTurn = game.turnNo;
-              game.enemy[fSlot] = sc3;
-              game.enemyExtra.splice(sIdx, 1);
-
-              if (typeof log === 'function') log('¡Sincronía Rival! ⚡ El rival sincroniza a ' + sc3.name + ' (Nivel ' + sc3.level + ').');
-              if (typeof duelToast === 'function') duelToast('¡Sincronía Rival! ' + sc3.name);
+              if (window.playViolinClick) window.playViolinClick();
+              if (typeof log === 'function') log('🔥 ¡DOBLE AFINACIÓN RIVAL! Jack sincroniza con 2 Cantantes a ' + scDT.name + ' (4500 ATK).');
+              duelToast('🔥 ¡DOBLE AFINACIÓN: ' + scDT.name.toUpperCase() + '!');
+              triggerAISynchroEffects(scDT);
               if (typeof render === 'function') render();
               return;
             }
@@ -17120,7 +17505,91 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         }
       }
     }
+
+    // B) Sincronías de 1 Tuner + 1 o más no-Tuners (Priorizando el monstruo de mayor ATK)
+    game.enemyExtra.sort(function(a, b) {
+      var aAtk = Number(a.atk !== undefined ? a.atk : (a[4] || 0));
+      var bAtk = Number(b.atk !== undefined ? b.atk : (b[4] || 0));
+      return bAtk - aAtk;
+    });
+
+    for (var sIdx = 0; sIdx < game.enemyExtra.length; sIdx++) {
+      var candidateSynchro = game.enemyExtra[sIdx];
+      var reqLvl = Number(candidateSynchro.level || candidateSynchro[1] || 0);
+      if (reqLvl <= 0) continue;
+
+      // 1 Tuner + 1 no-Tuner
+      for (var t = 0; t < tuners.length; t++) {
+        var tunerObj = tuners[t];
+        var tLvl = Number(tunerObj.card.level || tunerObj.card[1] || 0);
+        for (var nt = 0; nt < nonTuners.length; nt++) {
+          var ntObj = nonTuners[nt];
+          var ntLvl = Number(ntObj.card.level || ntObj.card[1] || 0);
+          if (tLvl + ntLvl === reqLvl) {
+            var targetSynchro = game.enemyExtra.splice(sIdx, 1)[0];
+            game.enemyGrave.push(tunerObj.card, ntObj.card);
+            game.enemy[tunerObj.idx] = null;
+            game.enemy[ntObj.idx] = null;
+
+            var freeSlot = game.enemy.findIndex(x => !x);
+            if (freeSlot < 0) freeSlot = tunerObj.idx;
+
+            var sc = JSON.parse(JSON.stringify(targetSynchro));
+            sc.pos = 'ATK';
+            sc.faceUp = true;
+            sc.summonedTurn = game.turnNo;
+            game.enemy[freeSlot] = sc;
+
+            if (window.playViolinClick) window.playViolinClick();
+            if (typeof log === 'function') log('¡Sincronía Rival! ⚡ El rival sincroniza a ' + sc.name + ' (Nivel ' + sc.level + ' / ' + (sc.atk || 0) + ' ATK).');
+            duelToast('¡Sincronía Rival! ' + sc.name);
+
+            triggerAISynchroEffects(sc);
+            if (typeof render === 'function') render();
+            return;
+          }
+        }
+      }
+
+      // 1 Tuner + 2 no-Tuners (para Nivel 10 - 12)
+      if (nonTuners.length >= 2) {
+        for (var t = 0; t < tuners.length; t++) {
+          var tunerObj = tuners[t];
+          var tLvl = Number(tunerObj.card.level || tunerObj.card[1] || 0);
+          for (var i = 0; i < nonTuners.length; i++) {
+            for (var j = i + 1; j < nonTuners.length; j++) {
+              var sum3 = tLvl + Number(nonTuners[i].card.level || 0) + Number(nonTuners[j].card.level || 0);
+              if (sum3 === reqLvl) {
+                var targetSynchro3 = game.enemyExtra.splice(sIdx, 1)[0];
+                game.enemyGrave.push(tunerObj.card, nonTuners[i].card, nonTuners[j].card);
+                game.enemy[tunerObj.idx] = null;
+                game.enemy[nonTuners[i].idx] = null;
+                game.enemy[nonTuners[j].idx] = null;
+
+                var freeSlot = game.enemy.findIndex(x => !x);
+                if (freeSlot < 0) freeSlot = tunerObj.idx;
+
+                var sc3 = JSON.parse(JSON.stringify(targetSynchro3));
+                sc3.pos = 'ATK';
+                sc3.faceUp = true;
+                sc3.summonedTurn = game.turnNo;
+                game.enemy[freeSlot] = sc3;
+
+                if (window.playViolinClick) window.playViolinClick();
+                if (typeof log === 'function') log('¡Sincronía Suprema Rival! ⚡ El rival sincroniza a ' + sc3.name + ' (Nivel ' + sc3.level + ').');
+                duelToast('¡Sincronía Rival! ' + sc3.name);
+
+                triggerAISynchroEffects(sc3);
+                if (typeof render === 'function') render();
+                return;
+              }
+            }
+          }
+        }
+      }
+    }
   };
+  try { aiExtraSummon = window.aiExtraSummon; } catch(_) {}
   try { aiExtraSummon = window.aiExtraSummon; } catch(_) {}
 
   var prevPlaceLinkMaster = window.placeLink;
