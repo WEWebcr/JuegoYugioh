@@ -16590,14 +16590,6 @@ window.customShowDeckEditor = function() {
                 .deck-header-title {
                     font-size: 18px !important;
                 }
-                #deck-search {
-                    width: 100% !important;
-                    max-width: 100% !important;
-                    order: 3;
-                    margin-top: 4px;
-                    font-size: 13px !important;
-                    padding: 6px 10px !important;
-                }
                 #deck-count {
                     font-size: 12px !important;
                     padding: 4px 8px !important;
@@ -16619,16 +16611,15 @@ window.customShowDeckEditor = function() {
                     padding: 5px 8px !important;
                     font-size: 11px !important;
                 }
-                #deck-filter-bar {
-                    gap: 4px !important;
-                    overflow-x: auto !important;
-                    white-space: nowrap !important;
-                    padding-bottom: 4px !important;
-                    -webkit-overflow-scrolling: touch;
-                }
-                #deck-filter-bar select, #deck-filter-bar input, #deck-filter-bar button {
+                #deck-search-input, #banca-search-input {
                     font-size: 11px !important;
                     padding: 4px 6px !important;
+                    width: 100% !important;
+                    max-width: 160px !important;
+                }
+                #deck-filter-cardtype, #banca-filter-type, #banca-filter-attr {
+                    font-size: 11px !important;
+                    padding: 3px 5px !important;
                 }
                 #deck-mobile-nav-tabs {
                     display: flex !important;
@@ -16730,10 +16721,9 @@ window.customShowDeckEditor = function() {
     
     let header = document.createElement('div');
     header.id = 'deck-editor-header';
-    header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #e4c06b; padding-bottom: 10px; margin-bottom: 8px; flex-shrink:0;';
+    header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #e4c06b; padding-bottom: 8px; margin-bottom: 8px; flex-shrink:0;';
     header.innerHTML = `
         <div class="deck-header-title" style="font-family:VT323, monospace; color:#ffcc00; font-size: 24px; text-shadow: 2px 2px 0 #000;">DASHBOARD DEL DECK</div>
-        <input type="text" id="deck-search" placeholder="Buscar nombre..." autocomplete="off" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #555; background: #222; color: #fff; font-family:'Segoe UI'; width: 200px; font-size: 14px;">
         <div style="font-size: 16px; font-weight: bold; background: #333; padding: 6px 16px; border-radius: 8px; border: 1px solid #555;" id="deck-count"></div>
         <button id="btn-exit-deck" style="background:#8b0000; color:#fff; border:2px solid #ff4d4d; padding:8px 18px; border-radius:6px; cursor:pointer; font-weight:bold; font-family:VT323, monospace; font-size:16px;">VOLVER</button>
     `;
@@ -16744,83 +16734,6 @@ window.customShowDeckEditor = function() {
     deckBar.id = 'deck-manager-bar';
     deckBar.style.cssText = 'display:flex; align-items:center; gap:10px; background:#1b2430; padding:8px 12px; border-radius:6px; border:1px solid #336699; margin-bottom:8px; flex-shrink:0; flex-wrap:wrap;';
     rightSide.appendChild(deckBar);
-
-    let filterBar = document.createElement('div');
-    filterBar.id = 'deck-filter-bar';
-    filterBar.style.cssText = 'display:flex; gap:8px; margin-bottom: 8px; align-items:center; flex-wrap:wrap; font-size: 13px; flex-shrink:0;';
-    filterBar.innerHTML = `
-        <select id="filter-cardtype" style="padding: 6px 10px; background: #252b36; color: #fff; border: 1px solid #4a90e2; border-radius: 4px; font-weight:bold;">
-            <option value="">🗂️ Todas las cartas</option>
-            <option value="MONSTER">🐉 Monstruos (Todos)</option>
-            <option value="MAIN_MONSTER">🃏 Monstruos (Deck Principal)</option>
-            <option value="EXTRA">⚡ Extra Deck (Sincronía / Fusión)</option>
-            <option value="SPELL">📖 Magias (Todas)</option>
-            <option value="EQUIP">⚔️ Equipamientos (Magias de Equipo)</option>
-            <option value="TRAP">🛡️ Trampas</option>
-        </select>
-        <select id="filter-zone" style="padding: 6px 10px; background: #252b36; color: #66c0f4; border: 1px solid #336699; border-radius: 4px;">
-            <option value="">🌐 Zona: Principal + Extra</option>
-            <option value="MAIN">🃏 Solo Deck Principal</option>
-            <option value="EXTRA">⚡ Solo Extra Deck</option>
-        </select>
-        <select id="filter-sort" style="padding: 6px 10px; background: #1a2736; color: #ffd700; border: 1px solid #ffd700; border-radius: 4px; font-weight:bold;">
-            <option value="NUM_ASC">🔢 Ordenar: N° (# 001 - 999)</option>
-            <option value="NUM_DESC">🔢 Ordenar: N° (# 999 - 001)</option>
-            <option value="NAME_ASC">🔤 Ordenar: Alfabético (A - Z)</option>
-            <option value="NAME_DESC">🔤 Ordenar: Alfabético (Z - A)</option>
-            <option value="ATK_DESC">⚔️ Ordenar: Mayor Ataque (ATK ↓)</option>
-            <option value="ATK_ASC">⚔️ Ordenar: Menor Ataque (ATK ↑)</option>
-            <option value="DEF_DESC">🛡️ Ordenar: Mayor Defensa (DEF ↓)</option>
-            <option value="DEF_ASC">🛡️ Ordenar: Menor Defensa (DEF ↑)</option>
-            <option value="TYPE_ASC">🧬 Ordenar: Tipo / Raza (A - Z)</option>
-            <option value="ATTR_ASC">✨ Ordenar: Atributo (A - Z)</option>
-            <option value="ZONE_EXTRA">⚡ Ordenar: Extra Deck primero</option>
-            <option value="ZONE_MAIN">🃏 Ordenar: Principal primero</option>
-        </select>
-        <select id="filter-attr" style="padding: 6px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
-            <option value="">Todos los Atributos</option>
-            <option value="LIGHT">LUZ</option>
-            <option value="DARK">OSCURIDAD</option>
-            <option value="EARTH">TIERRA</option>
-            <option value="WATER">AGUA</option>
-            <option value="FIRE">FUEGO</option>
-            <option value="WIND">VIENTO</option>
-            <option value="DIVINE">DIVINO</option>
-        </select>
-        <select id="filter-type" style="padding: 6px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
-            <option value="">Todos los Tipos / Razas</option>
-            <option value="Dragon">Dragón</option>
-            <option value="Spellcaster">Lanzador de Conjuros</option>
-            <option value="Zombie">Zombi</option>
-            <option value="Warrior">Guerrero</option>
-            <option value="Beast-Warrior">Guerrero-Bestia</option>
-            <option value="Beast">Bestia</option>
-            <option value="Winged Beast">Bestia Alada</option>
-            <option value="Fiend">Demonio</option>
-            <option value="Fairy">Hada</option>
-            <option value="Insect">Insecto</option>
-            <option value="Dinosaur">Dinosaurio</option>
-            <option value="Reptile">Reptil</option>
-            <option value="Fish">Pez</option>
-            <option value="Sea Serpent">Serpiente Marina</option>
-            <option value="Machine">Máquina</option>
-            <option value="Thunder">Trueno</option>
-            <option value="Aqua">Aqua</option>
-            <option value="Pyro">Piro</option>
-            <option value="Rock">Roca</option>
-            <option value="Plant">Planta</option>
-            <option value="Psychic">Psíquico</option>
-            <option value="Cyberse">Ciberso (Cyberse)</option>
-            <option value="Wyrm">Wyrm</option>
-            <option value="Divine-Beast">Bestia Divina</option>
-        </select>
-        <input type="number" id="filter-atk" placeholder="ATK Mín" style="padding: 6px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; width: 75px;">
-        <input type="number" id="filter-def" placeholder="DEF Mín" style="padding: 6px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; width: 75px;">
-        <button id="btn-clear-filters" style="background:#37474f; color:#eceff1; border:1px solid #78909c; padding:6px 12px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px; display:inline-flex; align-items:center; gap:4px;" title="Restablecer filtros">
-            🔄 Limpiar
-        </button>
-    `;
-    rightSide.appendChild(filterBar);
 
     // Mobile Navigation Tabs (Deck vs Banca)
     let mobileNav = document.createElement('div');
@@ -17051,7 +16964,7 @@ window.customShowDeckEditor = function() {
     dualContainer.id = 'deck-dual-container';
     dualContainer.style.cssText = 'flex: 1; display:flex; flex-direction:column; gap:10px; overflow:hidden;';
     
-    // 1. TOP SECTION: DECK ACTUAL
+    // 1. TOP SECTION: DECK ACTUAL (con su propio filtro individual)
     let topSection = document.createElement('div');
     topSection.id = 'deck-top-section';
     topSection.style.cssText = 'flex: 1; display:flex; flex-direction:column; min-height:180px; overflow:hidden; border: 1px solid #336699; border-radius: 8px; background: #16202d;';
@@ -17061,22 +16974,31 @@ window.customShowDeckEditor = function() {
                 <span id="deck-section-title">⚔️ DECK</span>
                 <span id="deck-status-badge" style="padding:2px 8px; border-radius:4px; font-size:12px; font-weight:bold;"></span>
             </div>
-            <div style="display:flex; align-items:center; gap:6px; font-size:12px;">
-                <span style="color:#aaa;">Ver:</span>
-                <button class="deck-view-btn active" data-zone="" style="background:#0277bd; color:#fff; border:1px solid #29b6f6; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">⚔️ Todo</button>
-                <button class="deck-view-btn" data-zone="MAIN" style="background:#263238; color:#cfd8dc; border:1px solid #455a64; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;" id="deck-tab-main">🃏 Principal</button>
-                <button class="deck-view-btn" data-zone="EXTRA" style="background:#263238; color:#00e5ff; border:1px solid #00838f; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;" id="deck-tab-extra">⚡ Extra Deck</button>
+            <div style="display:flex; align-items:center; gap:6px; font-size:12px; flex-wrap:wrap;">
+                <input type="text" id="deck-search-input" placeholder="🔍 Buscar en Deck..." autocomplete="off" style="padding:4px 8px; border-radius:4px; border:1px solid #4a90e2; background:#0e1722; color:#fff; font-size:12px; width:135px;">
+                <select id="deck-filter-cardtype" style="padding:4px 6px; background:#0e1722; color:#fff; border:1px solid #4a90e2; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer;">
+                    <option value="">🗂️ Todos</option>
+                    <option value="MONSTER">🐉 Monstruos</option>
+                    <option value="SPELL">📖 Magias</option>
+                    <option value="EQUIP">⚔️ Equipos</option>
+                    <option value="TRAP">🛡️ Trampas</option>
+                </select>
+                <span style="color:#aaa; font-size:11px;">Ver:</span>
+                <button class="deck-view-btn active" data-zone="" style="background:#0277bd; color:#fff; border:1px solid #29b6f6; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">⚔️ Todo</button>
+                <button class="deck-view-btn" data-zone="MAIN" style="background:#263238; color:#cfd8dc; border:1px solid #455a64; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;" id="deck-tab-main">🃏 Principal</button>
+                <button class="deck-view-btn" data-zone="EXTRA" style="background:#263238; color:#00e5ff; border:1px solid #00838f; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;" id="deck-tab-extra">⚡ Extra Deck</button>
+                <button id="btn-clear-deck-filter" style="background:#263238; color:#cfd8dc; border:1px solid #455a64; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;" title="Limpiar búsqueda y filtros del Deck">✕</button>
             </div>
         </div>
         <div class="deck-table-wrap" style="flex:1; overflow-y:auto; box-shadow: inset 0 0 10px #000;">
             <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
                 <thead style="background:#1b2838; position:sticky; top:0; z-index:5;">
                     <tr>
-                        <th class="th-sort" data-sort="NUM" style="padding:6px 10px; border-bottom:1px solid #336699; width:55px; cursor:pointer; user-select:none;" title="Clic para ordenar por N°">N° ⇕</th>
-                        <th class="th-sort" data-sort="NAME" style="padding:6px 10px; border-bottom:1px solid #336699; cursor:pointer; user-select:none;" title="Clic para ordenar Alfabéticamente (A-Z / Z-A)">Nombre ⇕</th>
-                        <th class="th-sort" data-sort="TYPE" style="padding:6px 10px; border-bottom:1px solid #336699; width:130px; cursor:pointer; user-select:none;" title="Clic para ordenar por Tipo">Tipo ⇕</th>
-                        <th class="th-sort" data-sort="ATK" style="padding:6px 10px; border-bottom:1px solid #336699; width:110px; cursor:pointer; user-select:none;" title="Clic para ordenar por Ataque">ATK/DEF ⇕</th>
-                        <th class="th-sort" data-sort="ZONE" style="padding:6px 10px; border-bottom:1px solid #336699; text-align:center; width:90px; cursor:pointer; user-select:none;" title="Clic para ordenar por Zona">Zona ⇕</th>
+                        <th class="th-deck-sort" data-sort="NUM" style="padding:6px 10px; border-bottom:1px solid #336699; width:55px; cursor:pointer; user-select:none;" title="Clic para ordenar por N°">N° ⇕</th>
+                        <th class="th-deck-sort" data-sort="NAME" style="padding:6px 10px; border-bottom:1px solid #336699; cursor:pointer; user-select:none;" title="Clic para ordenar Alfabéticamente (A-Z / Z-A)">Nombre ⇕</th>
+                        <th class="th-deck-sort" data-sort="TYPE" style="padding:6px 10px; border-bottom:1px solid #336699; width:130px; cursor:pointer; user-select:none;" title="Clic para ordenar por Tipo">Tipo ⇕</th>
+                        <th class="th-deck-sort" data-sort="ATK" style="padding:6px 10px; border-bottom:1px solid #336699; width:110px; cursor:pointer; user-select:none;" title="Clic para ordenar por Ataque">ATK/DEF ⇕</th>
+                        <th class="th-deck-sort" data-sort="ZONE" style="padding:6px 10px; border-bottom:1px solid #336699; text-align:center; width:90px; cursor:pointer; user-select:none;" title="Clic para ordenar por Zona">Zona ⇕</th>
                         <th style="padding:6px 10px; border-bottom:1px solid #336699; text-align:center; width:110px;">En Deck</th>
                         <th style="padding:6px 10px; border-bottom:1px solid #336699; text-align:center; width:160px;">Acción</th>
                     </tr>
@@ -17087,7 +17009,7 @@ window.customShowDeckEditor = function() {
     `;
     dualContainer.appendChild(topSection);
 
-    // 2. BOTTOM SECTION: BANCA / BAÚL DE RESERVA
+    // 2. BOTTOM SECTION: BANCA / BAÚL DE RESERVA (con su propio filtro individual)
     let bottomSection = document.createElement('div');
     bottomSection.id = 'deck-bottom-section';
     bottomSection.style.cssText = 'flex: 1; display:flex; flex-direction:column; min-height:180px; overflow:hidden; border: 1px solid #8b6b23; border-radius: 8px; background: #201b14;';
@@ -17097,25 +17019,63 @@ window.customShowDeckEditor = function() {
                 <span>📦 BANCA / BAÚL DE RESERVA</span>
                 <span id="bench-status-badge" style="padding:2px 8px; border-radius:4px; font-size:12px; font-weight:bold; background:#332600; color:#ffd700; border:1px solid #8b6b23;"></span>
             </div>
-            <div style="display:flex; align-items:center; gap:5px; font-size:12px;">
-                <span style="color:#bbb;">Filtro Rápido:</span>
-                <button class="bench-filter-btn active" data-type="" style="background:#8b6b23; color:#fff; border:1px solid #ffd700; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">📦 Todo</button>
-                <button class="bench-filter-btn" data-type="EXTRA" style="background:#201b14; color:#00e5ff; border:1px solid #00838f; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">⚡ Extra Deck</button>
-                <button class="bench-filter-btn" data-type="MONSTER" style="background:#201b14; color:#d4af37; border:1px solid #8b6b23; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">🐉 Monstruos</button>
-                <button class="bench-filter-btn" data-type="SPELL" style="background:#201b14; color:#a5d6a7; border:1px solid #2e7d32; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">📖 Magias</button>
-                <button class="bench-filter-btn" data-type="EQUIP" style="background:#201b14; color:#81d4fa; border:1px solid #0277bd; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">⚔️ Equipos</button>
-                <button class="bench-filter-btn" data-type="TRAP" style="background:#201b14; color:#ff80ab; border:1px solid #c2185b; padding:3px 8px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">🛡️ Trampas</button>
+            <div style="display:flex; align-items:center; gap:6px; font-size:12px; flex-wrap:wrap;">
+                <input type="text" id="banca-search-input" placeholder="🔍 Buscar en Banca..." autocomplete="off" style="padding:4px 8px; border-radius:4px; border:1px solid #ffd700; background:#181308; color:#fff; font-size:12px; width:135px;">
+                <select id="banca-filter-type" style="padding:4px 6px; background:#181308; color:#ffd700; border:1px solid #8b6b23; border-radius:4px; font-size:11px; cursor:pointer;">
+                    <option value="">Raza / Tipo</option>
+                    <option value="Dragon">Dragón</option>
+                    <option value="Spellcaster">Lanzador Conjuros</option>
+                    <option value="Zombie">Zombi</option>
+                    <option value="Warrior">Guerrero</option>
+                    <option value="Beast-Warrior">Guerrero-Bestia</option>
+                    <option value="Beast">Bestia</option>
+                    <option value="Winged Beast">Bestia Alada</option>
+                    <option value="Fiend">Demonio</option>
+                    <option value="Fairy">Hada</option>
+                    <option value="Insect">Insecto</option>
+                    <option value="Dinosaur">Dinosaurio</option>
+                    <option value="Reptile">Reptil</option>
+                    <option value="Fish">Pez</option>
+                    <option value="Sea Serpent">Serpiente Marina</option>
+                    <option value="Machine">Máquina</option>
+                    <option value="Thunder">Trueno</option>
+                    <option value="Aqua">Aqua</option>
+                    <option value="Pyro">Piro</option>
+                    <option value="Rock">Roca</option>
+                    <option value="Plant">Planta</option>
+                    <option value="Psychic">Psíquico</option>
+                    <option value="Cyberse">Ciberso</option>
+                    <option value="Wyrm">Wyrm</option>
+                    <option value="Divine-Beast">Bestia Divina</option>
+                </select>
+                <select id="banca-filter-attr" style="padding:4px 6px; background:#181308; color:#ffd700; border:1px solid #8b6b23; border-radius:4px; font-size:11px; cursor:pointer;">
+                    <option value="">Atributo</option>
+                    <option value="LIGHT">LUZ</option>
+                    <option value="DARK">OSCURIDAD</option>
+                    <option value="EARTH">TIERRA</option>
+                    <option value="WATER">AGUA</option>
+                    <option value="FIRE">FUEGO</option>
+                    <option value="WIND">VIENTO</option>
+                    <option value="DIVINE">DIVINO</option>
+                </select>
+                <button class="bench-filter-btn active" data-type="" style="background:#8b6b23; color:#fff; border:1px solid #ffd700; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">📦 Todo</button>
+                <button class="bench-filter-btn" data-type="EXTRA" style="background:#201b14; color:#00e5ff; border:1px solid #00838f; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">⚡ Extra</button>
+                <button class="bench-filter-btn" data-type="MONSTER" style="background:#201b14; color:#d4af37; border:1px solid #8b6b23; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">🐉 Monstruos</button>
+                <button class="bench-filter-btn" data-type="SPELL" style="background:#201b14; color:#a5d6a7; border:1px solid #2e7d32; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">📖 Magias</button>
+                <button class="bench-filter-btn" data-type="EQUIP" style="background:#201b14; color:#81d4fa; border:1px solid #0277bd; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">⚔️ Equipos</button>
+                <button class="bench-filter-btn" data-type="TRAP" style="background:#201b14; color:#ff80ab; border:1px solid #c2185b; padding:3px 7px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:11px;">🛡️ Trampas</button>
+                <button id="btn-clear-banca-filter" style="background:#332600; color:#ffd700; border:1px solid #8b6b23; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;" title="Limpiar búsqueda y filtros de la Banca">✕</button>
             </div>
         </div>
         <div class="deck-table-wrap" style="flex:1; overflow-y:auto; box-shadow: inset 0 0 10px #000;">
             <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px;">
                 <thead style="background:#2a2012; position:sticky; top:0; z-index:5;">
                     <tr>
-                        <th class="th-sort" data-sort="NUM" style="padding:6px 10px; border-bottom:1px solid #8b6b23; width:55px; cursor:pointer; user-select:none;" title="Clic para ordenar por N°">N° ⇕</th>
-                        <th class="th-sort" data-sort="NAME" style="padding:6px 10px; border-bottom:1px solid #8b6b23; cursor:pointer; user-select:none;" title="Clic para ordenar Alfabéticamente (A-Z / Z-A)">Nombre ⇕</th>
-                        <th class="th-sort" data-sort="TYPE" style="padding:6px 10px; border-bottom:1px solid #8b6b23; width:130px; cursor:pointer; user-select:none;" title="Clic para ordenar por Tipo">Tipo ⇕</th>
-                        <th class="th-sort" data-sort="ATK" style="padding:6px 10px; border-bottom:1px solid #8b6b23; width:110px; cursor:pointer; user-select:none;" title="Clic para ordenar por Ataque">ATK/DEF ⇕</th>
-                        <th class="th-sort" data-sort="ZONE" style="padding:6px 10px; border-bottom:1px solid #8b6b23; text-align:center; width:90px; cursor:pointer; user-select:none;" title="Clic para ordenar por Zona">Zona ⇕</th>
+                        <th class="th-banca-sort" data-sort="NUM" style="padding:6px 10px; border-bottom:1px solid #8b6b23; width:55px; cursor:pointer; user-select:none;" title="Clic para ordenar por N°">N° ⇕</th>
+                        <th class="th-banca-sort" data-sort="NAME" style="padding:6px 10px; border-bottom:1px solid #8b6b23; cursor:pointer; user-select:none;" title="Clic para ordenar Alfabéticamente (A-Z / Z-A)">Nombre ⇕</th>
+                        <th class="th-banca-sort" data-sort="TYPE" style="padding:6px 10px; border-bottom:1px solid #8b6b23; width:130px; cursor:pointer; user-select:none;" title="Clic para ordenar por Tipo">Tipo ⇕</th>
+                        <th class="th-banca-sort" data-sort="ATK" style="padding:6px 10px; border-bottom:1px solid #8b6b23; width:110px; cursor:pointer; user-select:none;" title="Clic para ordenar por Ataque">ATK/DEF ⇕</th>
+                        <th class="th-banca-sort" data-sort="ZONE" style="padding:6px 10px; border-bottom:1px solid #8b6b23; text-align:center; width:90px; cursor:pointer; user-select:none;" title="Clic para ordenar por Zona">Zona ⇕</th>
                         <th style="padding:6px 10px; border-bottom:1px solid #8b6b23; text-align:center; width:110px;">Disponibles</th>
                         <th style="padding:6px 10px; border-bottom:1px solid #8b6b23; text-align:center; width:160px;">Acción</th>
                     </tr>
@@ -17169,118 +17129,151 @@ window.customShowDeckEditor = function() {
 
     let deckTbody = document.getElementById('deck-tbody');
     let bancaTbody = document.getElementById('banca-tbody');
-    let searchInput = document.getElementById('deck-search');
-    let typeSelect = document.getElementById('filter-cardtype');
-    let zoneSelect = document.getElementById('filter-zone');
-    let sortSelect = document.getElementById('filter-sort');
-    let attrSelect = document.getElementById('filter-attr');
-    let raceSelect = document.getElementById('filter-type');
-    let atkInput = document.getElementById('filter-atk');
-    let defInput = document.getElementById('filter-def');
-    let clearBtn = document.getElementById('btn-clear-filters');
 
-    let currentFilter = {
+    // FILTROS INDIVIDUALES PARA DECK
+    let deckFilter = {
         text: '',
         cardType: '',
         zone: '', // '', 'MAIN', 'EXTRA'
-        attr: '',
-        race: '',
-        atk: 0,
-        def: 0,
         sort: 'NUM_ASC'
     };
 
-    function applyFilters() {
-        currentFilter.text = (searchInput.value || '').toLowerCase().trim();
-        currentFilter.cardType = typeSelect.value;
-        currentFilter.zone = zoneSelect ? zoneSelect.value : '';
-        currentFilter.sort = sortSelect ? sortSelect.value : 'NUM_ASC';
-        currentFilter.attr = attrSelect.value;
-        currentFilter.race = raceSelect.value;
-        currentFilter.atk = parseInt(atkInput.value) || 0;
-        currentFilter.def = parseInt(defInput.value) || 0;
-        updateQuickTabStyles();
-        renderRows();
+    let deckSearchInput = document.getElementById('deck-search-input');
+    let deckTypeSelect = document.getElementById('deck-filter-cardtype');
+    let clearDeckBtn = document.getElementById('btn-clear-deck-filter');
+
+    if (deckSearchInput) {
+        deckSearchInput.oninput = () => {
+            deckFilter.text = (deckSearchInput.value || '').toLowerCase().trim();
+            renderRows();
+        };
     }
-
-    searchInput.oninput = applyFilters;
-    typeSelect.onchange = applyFilters;
-    if (zoneSelect) zoneSelect.onchange = applyFilters;
-    if (sortSelect) sortSelect.onchange = applyFilters;
-    attrSelect.onchange = applyFilters;
-    raceSelect.onchange = applyFilters;
-    atkInput.oninput = applyFilters;
-    defInput.oninput = applyFilters;
-
-    if (clearBtn) {
-        clearBtn.onclick = () => {
-            searchInput.value = '';
-            typeSelect.value = '';
-            if (zoneSelect) zoneSelect.value = '';
-            if (sortSelect) sortSelect.value = 'NUM_ASC';
-            attrSelect.value = '';
-            raceSelect.value = '';
-            atkInput.value = '';
-            defInput.value = '';
-            applyFilters();
+    if (deckTypeSelect) {
+        deckTypeSelect.onchange = () => {
+            deckFilter.cardType = deckTypeSelect.value;
+            renderRows();
+        };
+    }
+    if (clearDeckBtn) {
+        clearDeckBtn.onclick = () => {
+            if (deckSearchInput) deckSearchInput.value = '';
+            if (deckTypeSelect) deckTypeSelect.value = '';
+            deckFilter.text = '';
+            deckFilter.cardType = '';
+            deckFilter.zone = '';
+            deckFilter.sort = 'NUM_ASC';
+            updateDeckZoneButtonStyles();
+            renderRows();
         };
     }
 
-    // Quick View Buttons on Top Section (Deck)
     overlay.querySelectorAll('.deck-view-btn').forEach(btn => {
         btn.onclick = () => {
             let z = btn.getAttribute('data-zone') || '';
-            if (zoneSelect) zoneSelect.value = z;
-            currentFilter.zone = z;
-            updateQuickTabStyles();
+            deckFilter.zone = z;
+            updateDeckZoneButtonStyles();
             renderRows();
         };
     });
 
-    // Quick Filter Buttons on Bottom Section (Banca)
-    overlay.querySelectorAll('.bench-filter-btn').forEach(btn => {
-        btn.onclick = () => {
-            let t = btn.getAttribute('data-type') || '';
-            typeSelect.value = t;
-            currentFilter.cardType = t;
-            updateQuickTabStyles();
-            renderRows();
-        };
-    });
-
-    function updateQuickTabStyles() {
+    function updateDeckZoneButtonStyles() {
         overlay.querySelectorAll('.deck-view-btn').forEach(b => {
             let z = b.getAttribute('data-zone') || '';
-            let isActive = (z === currentFilter.zone);
+            let isActive = (z === deckFilter.zone);
             b.style.background = isActive ? '#0277bd' : '#263238';
             b.style.color = isActive ? '#fff' : (z === 'EXTRA' ? '#00e5ff' : '#cfd8dc');
             b.style.borderColor = isActive ? '#29b6f6' : (z === 'EXTRA' ? '#00838f' : '#455a64');
         });
+    }
+
+    overlay.querySelectorAll('.th-deck-sort').forEach(th => {
+        th.onclick = () => {
+            let col = th.getAttribute('data-sort');
+            let cur = deckFilter.sort;
+            if (col === 'NUM') deckFilter.sort = (cur === 'NUM_ASC') ? 'NUM_DESC' : 'NUM_ASC';
+            else if (col === 'NAME') deckFilter.sort = (cur === 'NAME_ASC') ? 'NAME_DESC' : 'NAME_ASC';
+            else if (col === 'ATK') deckFilter.sort = (cur === 'ATK_DESC') ? 'ATK_ASC' : 'ATK_DESC';
+            else if (col === 'TYPE') deckFilter.sort = (cur === 'TYPE_ASC') ? 'NUM_ASC' : 'TYPE_ASC';
+            else if (col === 'ZONE') deckFilter.sort = (cur === 'ZONE_EXTRA') ? 'ZONE_MAIN' : 'ZONE_EXTRA';
+            window.playViolinClick && window.playViolinClick();
+            renderRows();
+        };
+    });
+
+    // FILTROS INDIVIDUALES PARA BANCA
+    let bancaFilter = {
+        text: '',
+        cardType: '',
+        race: '',
+        attr: '',
+        sort: 'NUM_ASC'
+    };
+
+    let bancaSearchInput = document.getElementById('banca-search-input');
+    let bancaRaceSelect = document.getElementById('banca-filter-type');
+    let bancaAttrSelect = document.getElementById('banca-filter-attr');
+    let clearBancaBtn = document.getElementById('btn-clear-banca-filter');
+
+    if (bancaSearchInput) {
+        bancaSearchInput.oninput = () => {
+            bancaFilter.text = (bancaSearchInput.value || '').toLowerCase().trim();
+            renderRows();
+        };
+    }
+    if (bancaRaceSelect) {
+        bancaRaceSelect.onchange = () => {
+            bancaFilter.race = bancaRaceSelect.value;
+            renderRows();
+        };
+    }
+    if (bancaAttrSelect) {
+        bancaAttrSelect.onchange = () => {
+            bancaFilter.attr = bancaAttrSelect.value;
+            renderRows();
+        };
+    }
+    if (clearBancaBtn) {
+        clearBancaBtn.onclick = () => {
+            if (bancaSearchInput) bancaSearchInput.value = '';
+            if (bancaRaceSelect) bancaRaceSelect.value = '';
+            if (bancaAttrSelect) bancaAttrSelect.value = '';
+            bancaFilter.text = '';
+            bancaFilter.cardType = '';
+            bancaFilter.race = '';
+            bancaFilter.attr = '';
+            bancaFilter.sort = 'NUM_ASC';
+            updateBancaQuickTabStyles();
+            renderRows();
+        };
+    }
+
+    overlay.querySelectorAll('.bench-filter-btn').forEach(btn => {
+        btn.onclick = () => {
+            let t = btn.getAttribute('data-type') || '';
+            bancaFilter.cardType = t;
+            updateBancaQuickTabStyles();
+            renderRows();
+        };
+    });
+
+    function updateBancaQuickTabStyles() {
         overlay.querySelectorAll('.bench-filter-btn').forEach(b => {
             let t = b.getAttribute('data-type') || '';
-            let isActive = (t === currentFilter.cardType);
+            let isActive = (t === bancaFilter.cardType);
             b.style.background = isActive ? '#8b6b23' : '#201b14';
             b.style.borderColor = isActive ? '#ffd700' : '#4a3810';
         });
     }
 
-    // Clickable Table Headers Sorting
-    overlay.querySelectorAll('.th-sort').forEach(th => {
+    overlay.querySelectorAll('.th-banca-sort').forEach(th => {
         th.onclick = () => {
             let col = th.getAttribute('data-sort');
-            let cur = currentFilter.sort;
-            if (col === 'NUM') {
-                currentFilter.sort = (cur === 'NUM_ASC') ? 'NUM_DESC' : 'NUM_ASC';
-            } else if (col === 'NAME') {
-                currentFilter.sort = (cur === 'NAME_ASC') ? 'NAME_DESC' : 'NAME_ASC';
-            } else if (col === 'ATK') {
-                currentFilter.sort = (cur === 'ATK_DESC') ? 'ATK_ASC' : 'ATK_DESC';
-            } else if (col === 'TYPE') {
-                currentFilter.sort = (cur === 'TYPE_ASC') ? 'NUM_ASC' : 'TYPE_ASC';
-            } else if (col === 'ZONE') {
-                currentFilter.sort = (cur === 'ZONE_EXTRA') ? 'ZONE_MAIN' : 'ZONE_EXTRA';
-            }
-            if (sortSelect) sortSelect.value = currentFilter.sort;
+            let cur = bancaFilter.sort;
+            if (col === 'NUM') bancaFilter.sort = (cur === 'NUM_ASC') ? 'NUM_DESC' : 'NUM_ASC';
+            else if (col === 'NAME') bancaFilter.sort = (cur === 'NAME_ASC') ? 'NAME_DESC' : 'NAME_ASC';
+            else if (col === 'ATK') bancaFilter.sort = (cur === 'ATK_DESC') ? 'ATK_ASC' : 'ATK_DESC';
+            else if (col === 'TYPE') bancaFilter.sort = (cur === 'TYPE_ASC') ? 'NUM_ASC' : 'TYPE_ASC';
+            else if (col === 'ZONE') bancaFilter.sort = (cur === 'ZONE_EXTRA') ? 'ZONE_MAIN' : 'ZONE_EXTRA';
             window.playViolinClick && window.playViolinClick();
             renderRows();
         };
@@ -17300,42 +17293,51 @@ window.customShowDeckEditor = function() {
         return 'https://i.imgur.com/vHqR8Kq.png'; 
     }
 
-    function matchesFilter(name, info) {
+    function matchesDeckFilter(name, info) {
         if (!window.isCardAllowedInWorld(name, targetWorld)) return false;
-        if (currentFilter.text && !name.toLowerCase().includes(currentFilter.text)) return false;
+        if (deckFilter.text && !name.toLowerCase().includes(deckFilter.text)) return false;
 
         // Zone filter (Principal vs Extra)
-        if (currentFilter.zone === 'MAIN' && info.isExtra) return false;
-        if (currentFilter.zone === 'EXTRA' && !info.isExtra) return false;
+        if (deckFilter.zone === 'MAIN' && info.isExtra) return false;
+        if (deckFilter.zone === 'EXTRA' && !info.isExtra) return false;
 
         // Card Type filter
-        if (currentFilter.cardType) {
+        if (deckFilter.cardType) {
             var isSpell = (info.type === 'SPELL' || info.type === 'EQUIP' || info.kind === 'SPELL' || info.kind === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(info)) || (!info.isMonster && info.type !== 'TRAP'));
             var isEquip = (info.type === 'EQUIP' || info.kind === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(info)));
             var isTrap = (info.type === 'TRAP' || info.kind === 'TRAP');
             
-            if (currentFilter.cardType === 'MONSTER' && !info.isMonster) return false;
-            if (currentFilter.cardType === 'MAIN_MONSTER' && (!info.isMonster || info.isExtra)) return false;
-            if (currentFilter.cardType === 'EXTRA' && !info.isExtra) return false;
-            if (currentFilter.cardType === 'SPELL' && !isSpell) return false;
-            if (currentFilter.cardType === 'EQUIP' && !isEquip) return false;
-            if (currentFilter.cardType === 'TRAP' && !isTrap) return false;
+            if (deckFilter.cardType === 'MONSTER' && !info.isMonster) return false;
+            if (deckFilter.cardType === 'SPELL' && !isSpell) return false;
+            if (deckFilter.cardType === 'EQUIP' && !isEquip) return false;
+            if (deckFilter.cardType === 'TRAP' && !isTrap) return false;
+        }
+        return true;
+    }
+
+    function matchesBancaFilter(name, info) {
+        if (!window.isCardAllowedInWorld(name, targetWorld)) return false;
+        if (bancaFilter.text && !name.toLowerCase().includes(bancaFilter.text)) return false;
+
+        // Card Type / Extra filter
+        if (bancaFilter.cardType) {
+            var isSpell = (info.type === 'SPELL' || info.type === 'EQUIP' || info.kind === 'SPELL' || info.kind === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(info)) || (!info.isMonster && info.type !== 'TRAP'));
+            var isEquip = (info.type === 'EQUIP' || info.kind === 'EQUIP' || (typeof isEquipSpell === 'function' && isEquipSpell(info)));
+            var isTrap = (info.type === 'TRAP' || info.kind === 'TRAP');
+            
+            if (bancaFilter.cardType === 'EXTRA' && !info.isExtra) return false;
+            if (bancaFilter.cardType === 'MONSTER' && !info.isMonster) return false;
+            if (bancaFilter.cardType === 'SPELL' && !isSpell) return false;
+            if (bancaFilter.cardType === 'EQUIP' && !isEquip) return false;
+            if (bancaFilter.cardType === 'TRAP' && !isTrap) return false;
         }
 
-        if (currentFilter.attr && info.attr !== currentFilter.attr) return false;
-        if (currentFilter.race) {
+        if (bancaFilter.attr && info.attr !== bancaFilter.attr) return false;
+        if (bancaFilter.race) {
             let raceStr = String(info.type || '');
-            if (!raceStr.toLowerCase().includes(currentFilter.race.toLowerCase())) return false;
+            if (!raceStr.toLowerCase().includes(bancaFilter.race.toLowerCase())) return false;
         }
 
-        if (info.isMonster) {
-            let atkNum = (typeof info.atk === 'number') ? info.atk : parseInt(String(info.atk).replace(/[^\d]/g, ''), 10) || 0;
-            let defNum = (typeof info.def === 'number') ? info.def : parseInt(String(info.def).replace(/[^\d]/g, ''), 10) || 0;
-            if (currentFilter.atk > 0 && atkNum < currentFilter.atk) return false;
-            if (currentFilter.def > 0 && defNum < currentFilter.def) return false;
-        } else {
-            if (currentFilter.atk > 0 || currentFilter.def > 0) return false;
-        }
         return true;
     }
 
@@ -17658,12 +17660,12 @@ window.customShowDeckEditor = function() {
         // Render 1: TOP TABLE (Cartas actualmente en el DECK SELECCIONADO)
         deckTbody.innerHTML = '';
         let deckUnique = Array.from(new Set([...currentDeck, ...(is5D ? (s.extra || []) : [])])).filter(n => cardDict[n]);
-        deckUnique = sortCardList(deckUnique, currentFilter.sort);
+        deckUnique = sortCardList(deckUnique, deckFilter.sort);
 
         let deckRowsRendered = 0;
         deckUnique.forEach(name => {
             let info = cardDict[name];
-            if (!matchesFilter(name, info)) return;
+            if (!matchesDeckFilter(name, info)) return;
 
             let inDeck = info.isExtra ? (exCounts[name] || 0) : (deckCounts[name] || 0);
             if (inDeck <= 0) return;
@@ -17741,7 +17743,7 @@ window.customShowDeckEditor = function() {
         let benchRowsRendered = 0;
         let totalBenchCards = 0;
 
-        let benchList = sortCardList(owned, currentFilter.sort);
+        let benchList = sortCardList(owned, bancaFilter.sort);
 
         benchList.forEach(name => {
             let info = cardDict[name];
@@ -17751,7 +17753,7 @@ window.customShowDeckEditor = function() {
             totalBenchCards += inBench;
 
             if (inBench <= 0) return;
-            if (!matchesFilter(name, info)) return;
+            if (!matchesBancaFilter(name, info)) return;
 
             benchRowsRendered++;
             let maxC = 3;
