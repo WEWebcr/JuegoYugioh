@@ -3283,6 +3283,27 @@ window.FIVE_D_CARD_NAMES = new Set([
   'Synchro Blast Wave', 'Urgent Tuning'
 ]);
 
+window.SYNCHRO_CARD_NAMES = new Set([
+  'Junk Warrior', 'Goyo Guardian', 'Blackwing Armed Wing', 'Black Rose Dragon',
+  'Power Tool Dragon', 'Blackwing - Armor Master', 'Stardust Dragon', 'Red Dragon Archfiend'
+]);
+
+window.isSynchroCard = function(cardOrName) {
+  if (!cardOrName) return false;
+  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || cardOrName[1] || '')).trim();
+  if (name && window.SYNCHRO_CARD_NAMES && window.SYNCHRO_CARD_NAMES.has(name)) return true;
+  var kind = String((cardOrName && cardOrName.kind) || (cardOrName && cardOrName[6]) || '').toUpperCase();
+  if (kind === 'SYNCHRO') return true;
+  var meta = (typeof cardOrName === 'object' && cardOrName.kind) ? cardOrName : (window.getCardMetadata ? window.getCardMetadata(name) : null);
+  if (meta && (meta.kind === 'SYNCHRO' || meta.isExtra)) return true;
+  if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+    var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
+    if (cd && (cd.kind === 'SYNCHRO' || (cd.meta && cd.meta.kind === 'SYNCHRO'))) return true;
+  }
+  return false;
+};
+
+
 window.MUNDO3_ALLOWED_STAPLES = new Set([
   'Mystical Space Typhoon', 'Dust Tornado', 'Swords of Revealing Light',
   'Dark Hole', 'Fissure', 'Trap Hole', 'Waboku', 'Sakuretsu Armor',
@@ -4661,6 +4682,7 @@ window.cleanSaveCollection = function(s) {
     var defaultM3Fillers = ['Speed Warrior', 'Sonic Chick', 'Junk Synchron', 'Quillbolt Hedgehog', 'Assault Dog'];
     function sanitizeMundo3Deck(deckArr) {
       if (!Array.isArray(deckArr)) return deckArr;
+      var synchros = [];
       var filtered = deckArr.filter(function(cardName) {
         if (!window.isCardProgrammed(cardName)) {
           modified = true;
@@ -4670,8 +4692,20 @@ window.cleanSaveCollection = function(s) {
           modified = true;
           return false;
         }
+        if (typeof window.isSynchroCard === 'function' && window.isSynchroCard(cardName)) {
+          synchros.push(cardName);
+          modified = true;
+          return false;
+        }
         return true;
       });
+      if (synchros.length > 0 && Array.isArray(s.decksMundo3['Extra'])) {
+        synchros.forEach(function(sc) {
+          if (s.decksMundo3['Extra'].length < 15 && s.decksMundo3['Extra'].filter(function(x) { return x === sc; }).length < 3) {
+            s.decksMundo3['Extra'].push(sc);
+          }
+        });
+      }
       var fIdx = 0;
       while (filtered.length < 40 && filtered.length > 0) {
         filtered.push(defaultM3Fillers[fIdx % defaultM3Fillers.length]);
@@ -4685,7 +4719,7 @@ window.cleanSaveCollection = function(s) {
       if (m3Key === 'Extra') {
         if (Array.isArray(s.decksMundo3['Extra'])) {
           s.decksMundo3['Extra'] = s.decksMundo3['Extra'].filter(function(c) {
-            return typeof window.is5DCard === 'function' && window.is5DCard(c);
+            return typeof window.is5DCard === 'function' && window.is5DCard(c) && (typeof window.isSynchroCard === 'function' ? window.isSynchroCard(c) : true);
           });
         }
       } else if (Array.isArray(s.decksMundo3[m3Key])) {
@@ -7211,13 +7245,17 @@ window.customShowDeckEditor = function() {
     
     function isAdvanced(c) {
         let kind = String(c.kind || (c[6] && typeof c[6] === 'string' ? c[6] : '')).toUpperCase();
-        if (is5D && kind === 'SYNCHRO') return false;
+        if (is5D && (kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(c.name || c)))) return false;
         return kind === 'LINK' || kind === 'XYZ' || kind === 'SYNCHRO' || kind === 'PENDULUM';
     }
     
     function isExtraDeck(c) {
+        if (!c) return false;
+        let name = typeof c === 'string' ? c : (c.name || c[1] || '');
+        if (window.isSynchroCard && (window.isSynchroCard(name) || window.isSynchroCard(c))) return true;
         let kind = String((c && c.kind) || (c && c[6]) || '').toUpperCase();
-        if (is5D && kind === 'SYNCHRO') return true;
+        if (kind === 'SYNCHRO' || kind === 'FUSION') return true;
+        if (c && c.isExtra) return true;
         return false;
     }
 
@@ -7232,7 +7270,7 @@ window.customShowDeckEditor = function() {
                 cardDict[c.name] = { 
                     num: num, name: c.name, type: c.type, attr: c.attr, 
                     atk: c.atk, def: c.def, sign: (c.sign1 || '-') + (c.sign2 ? ' / ' + c.sign2 : ''), 
-                    isMonster: true, isExtra: isExtraDeck(c) 
+                    isMonster: true, isExtra: isExtraDeck(c) || (window.isSynchroCard && window.isSynchroCard(c.name))
                 };
             }
         });
@@ -7254,7 +7292,7 @@ window.customShowDeckEditor = function() {
     let gDict = window.getGlobalCardDict ? window.getGlobalCardDict() : {};
     Object.keys(gDict).forEach(name => {
         if (!cardDict[name]) {
-            cardDict[name] = Object.assign({}, gDict[name], { isExtra: isExtraDeck(gDict[name]) });
+            cardDict[name] = Object.assign({}, gDict[name], { isExtra: isExtraDeck(gDict[name]) || (window.isSynchroCard && window.isSynchroCard(name)) });
         }
     });
 
@@ -7272,7 +7310,7 @@ window.customShowDeckEditor = function() {
                     def: meta.def,
                     sign: '-',
                     isMonster: meta.isMonster,
-                    isExtra: isExtraDeck(cd)
+                    isExtra: isExtraDeck(cd) || (window.isSynchroCard && window.isSynchroCard(cd.name))
                 };
                 if (meta.desc) extraText[cd.name] = meta.desc;
             }
@@ -7332,7 +7370,7 @@ window.customShowDeckEditor = function() {
                 def: (meta && meta.def != null) ? meta.def : '-',
                 sign: '-',
                 isMonster: meta ? meta.isMonster : false,
-                isExtra: isExtraDeck(meta)
+                isExtra: isExtraDeck(meta) || (window.isSynchroCard && window.isSynchroCard(name))
             };
             if (meta && meta.desc) extraText[name] = meta.desc;
         }
@@ -7564,6 +7602,11 @@ window.customShowDeckEditor = function() {
                     alert(`⚠️ Este deck contiene cartas no compatibles con este mundo (${invalidInDeck.slice(0, 3).join(', ')}).\nPor favor cámbialas antes de activarlo.`);
                     return;
                 }
+                let synchroInMain = curArr.filter(c => window.isSynchroCard && window.isSynchroCard(c));
+                if (synchroInMain.length > 0) {
+                    alert(`⚠️ Este deck contiene monstruos Synchro en el Deck Principal (${synchroInMain.slice(0, 3).join(', ')}).\nLos monstruos Synchro solo pueden ir en el Extra Deck.`);
+                    return;
+                }
                 s.activeDeck = currentDeckKey;
                 s.deck = [...curArr];
                 persistSave();
@@ -7587,7 +7630,7 @@ window.customShowDeckEditor = function() {
             }
             let copyCurrent = confirm(`¿Deseas duplicar las cartas del deck actual ("${currentDeckKey}") en el nuevo deck?\n\n(Aceptar = Duplicar actual / Cancelar = Iniciar deck vacío)`);
             let sourceArr = s.decks[currentDeckKey] || [];
-            s.decks[name] = copyCurrent ? sourceArr.filter(c => window.isCardAllowedInWorld(c, targetWorld)) : [];
+            s.decks[name] = copyCurrent ? sourceArr.filter(c => window.isCardAllowedInWorld(c, targetWorld) && !(window.isSynchroCard && window.isSynchroCard(c))) : [];
             currentDeckKey = name;
             persistSave();
             window.playViolinClick && window.playViolinClick();
@@ -7647,10 +7690,24 @@ window.customShowDeckEditor = function() {
             if (currentDeckKey === s.activeDeck) s.deck = [...currentDeck];
             persistSave();
         }
+        let synchrosInDeck = currentDeck.filter(c => window.isSynchroCard && window.isSynchroCard(c));
+        if (synchrosInDeck.length > 0) {
+            currentDeck = s.decks[currentDeckKey] = currentDeck.filter(c => !(window.isSynchroCard && window.isSynchroCard(c)));
+            if (is5D) {
+                s.extra = s.extra || [];
+                synchrosInDeck.forEach(c => {
+                    if (s.extra.length < 15 && s.extra.filter(x => x === c).length < 3) {
+                        s.extra.push(c);
+                    }
+                });
+            }
+            if (currentDeckKey === s.activeDeck) s.deck = [...currentDeck];
+            persistSave();
+        }
         if (is5D && Array.isArray(s.extra)) {
-            let illegalExtra = s.extra.filter(c => !window.is5DCard(c));
+            let illegalExtra = s.extra.filter(c => !window.is5DCard(c) || !(window.isSynchroCard && window.isSynchroCard(c)));
             if (illegalExtra.length > 0) {
-                s.extra = s.extra.filter(c => window.is5DCard(c));
+                s.extra = s.extra.filter(c => window.is5DCard(c) && (window.isSynchroCard ? window.isSynchroCard(c) : true));
                 persistSave();
             }
         }
@@ -7733,8 +7790,8 @@ window.customShowDeckEditor = function() {
                     <span style="color:#4caf50;">x${inDeck}</span> <span style="color:#888; font-size:11px;">(Total: ${ownCount})</span>
                 </td>
                 <td style="padding: 6px 10px; text-align:center;">
-                    <button class="bench-btn" style="background:#c62828; color:#fff; border:1px solid #ef5350; padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px; display:inline-flex; align-items:center; gap:4px;">
-                        ⬇ Enviar a la Banca
+                    <button class="bench-btn" style="background:${info.isExtra ? '#00695c' : '#c62828'}; color:#fff; border:1px solid ${info.isExtra ? '#00e5ff' : '#ef5350'}; padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px; display:inline-flex; align-items:center; gap:4px;">
+                        ${info.isExtra ? '⬇ Sacar del Extra' : '⬇ Enviar a la Banca'}
                     </button>
                 </td>
             `;
@@ -7813,8 +7870,8 @@ window.customShowDeckEditor = function() {
                     <span style="color:#ffd700;">x${inBench}</span> <span style="color:#888; font-size:11px;">(Total: ${ownCount})</span>
                 </td>
                 <td style="padding: 6px 10px; text-align:center;">
-                    <button class="deck-btn" style="background:#2e7d32; color:#fff; border:1px solid #4caf50; padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px; display:inline-flex; align-items:center; gap:4px; ${!canAddMore ? 'opacity:0.5; cursor:not-allowed;' : ''}">
-                        ⬆ Enviar al Deck
+                    <button class="deck-btn" style="${info.isExtra ? 'background:linear-gradient(180deg, #00838f, #004d40); color:#e0f7fa; border:1px solid #00e5ff;' : 'background:#2e7d32; color:#fff; border:1px solid #4caf50;'} padding:4px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px; display:inline-flex; align-items:center; gap:4px; ${!canAddMore ? 'opacity:0.5; cursor:not-allowed;' : ''}">
+                        ${info.isExtra ? '➕ Al Extra Deck' : '⬆ Enviar al Deck'}
                     </button>
                 </td>
             `;
@@ -7829,14 +7886,14 @@ window.customShowDeckEditor = function() {
                     return;
                 }
                 if (!canAddMore) {
-                    alert('Ya tienes el límite máximo permitido (' + maxC + ') de ' + name + ' en este Deck.');
+                    alert('Ya tienes el límite máximo permitido (' + maxC + ') de ' + name + (info.isExtra ? ' en el Extra Deck.' : ' en este Deck.'));
                     return;
                 }
 
-                if (info.isExtra) {
+                if (info.isExtra || (window.isSynchroCard && window.isSynchroCard(name))) {
                     s.extra = s.extra || [];
                     if (s.extra.length >= 15) {
-                        alert('El Extra Deck no puede exceder las 15 cartas.');
+                        alert('⚠️ El Extra Deck está lleno (máximo 15 cartas).');
                         return;
                     }
                     s.extra.push(name);
@@ -7844,6 +7901,11 @@ window.customShowDeckEditor = function() {
                     window.playHoverSound && window.playHoverSound();
                     renderDeckBar();
                     renderRows();
+                    return;
+                }
+
+                if (window.isSynchroCard && window.isSynchroCard(name)) {
+                    alert('⚠️ Los monstruos Synchro solo pueden pertenecer al Extra Deck.');
                     return;
                 }
 
@@ -8679,10 +8741,11 @@ window.getGlobalCardDict = function() {
         if (cd) {
             let cdKind = String(cd.kind || '').toUpperCase();
             let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
-            if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
-                cardEntry = { num, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: false, text: cd.text || cd.desc || '' };
+            let isExtra = (cdKind === 'SYNCHRO' || cdKind === 'FUSION' || (window.isSynchroCard && window.isSynchroCard(cd.name)));
+            if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'SYNCHRO' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
+                cardEntry = { num, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: isExtra, kind: cdKind || (isExtra ? 'SYNCHRO' : 'MONSTER'), text: cd.text || cd.desc || '' };
             } else {
-                cardEntry = { num, name: cd.name, type: cd.type || cd.kind || (cdKind === 'TRAP' ? 'TRAP' : 'SPELL'), isMonster: false, atk: '-', def: '-', text: cd.text || cd.desc || '', isExtra: false };
+                cardEntry = { num, name: cd.name, type: cd.type || cd.kind || (cdKind === 'TRAP' ? 'TRAP' : 'SPELL'), isMonster: false, atk: '-', def: '-', text: cd.text || cd.desc || '', isExtra: false, kind: cdKind };
             }
         } else {
             let st = window.FMR_ST_POOL_V1 && window.FMR_ST_POOL_V1.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
