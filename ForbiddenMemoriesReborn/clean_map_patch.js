@@ -3280,12 +3280,39 @@ window.FIVE_D_CARD_NAMES = new Set([
   'Mad Archfiend', 'Twin-Shield Defender', 'Blackwing - Bora the Spear',
   'Blackwing - Shura the Blue Flame', 'Botanical Lion', 'Lord Poison',
   'Morphtronic Radion', 'Assault Dog',
-  'Synchro Blast Wave', 'Urgent Tuning'
+  'Synchro Blast Wave', 'Urgent Tuning',
+  'Junk Speeder', 'Formula Synchron', 'Road Warrior', 'Road Dragon',
+  'Shooting Quasar Dragon', 'Quasar Dragon', 'Shooting Star Dragon',
+  'Accel Synchro Stardust Dragon', 'Ancient Fairy Dragon', 'Baronne de Fleur',
+  'Adamancipator Risen - Dragite', 'Crystal Wing Synchro Dragon', 'Clear Wing Synchro Dragon',
+  'Blackwing Full Armor Master', 'Blackwing - Silverwind the Ascendant',
+  'Assault Blackwing - Raikiri the Rain Shower',
+  'Hot Red Dragon Archfiend Abyss', 'Scarred Dragon Archfiend',
+  'Black-Winged Assault Dragon', 'Hot Red Dragon Archfiend',
+  'Red Nova Dragon - Burning Soul', 'Red Nova Dragon',
+  'Hot Red Dragon Archfiend Bane', 'Chaos Angel',
+  'Quickdraw Synchron', 'Stardust Synchron', 'Revolution Synchron',
+  'Stardust Trail', 'Blackwing - Auster the South Wind',
+  'Soul Resonator', 'Crimson Resonator', 'Vision Resonator',
+  'Bone Archfiend', 'Synkron Resonator', 'Darkness Resonator',
+  'Soul Charge', 'Black Whirlwind', 'Allure of Darkness',
+  'De-Synchro', 'Trap Stun', 'Book of Moon',
+  'Crimson Gaia', 'Resonator Call'
 ]);
 
 window.SYNCHRO_CARD_NAMES = new Set([
   'Junk Warrior', 'Goyo Guardian', 'Blackwing Armed Wing', 'Black Rose Dragon',
-  'Power Tool Dragon', 'Blackwing - Armor Master', 'Stardust Dragon', 'Red Dragon Archfiend'
+  'Power Tool Dragon', 'Blackwing - Armor Master', 'Stardust Dragon', 'Red Dragon Archfiend',
+  'Junk Speeder', 'Formula Synchron', 'Road Warrior', 'Road Dragon',
+  'Shooting Quasar Dragon', 'Quasar Dragon', 'Shooting Star Dragon',
+  'Accel Synchro Stardust Dragon', 'Ancient Fairy Dragon', 'Baronne de Fleur',
+  'Adamancipator Risen - Dragite', 'Crystal Wing Synchro Dragon', 'Clear Wing Synchro Dragon',
+  'Blackwing Full Armor Master', 'Blackwing - Silverwind the Ascendant',
+  'Assault Blackwing - Raikiri the Rain Shower',
+  'Hot Red Dragon Archfiend Abyss', 'Scarred Dragon Archfiend',
+  'Black-Winged Assault Dragon', 'Hot Red Dragon Archfiend',
+  'Red Nova Dragon - Burning Soul', 'Red Nova Dragon',
+  'Hot Red Dragon Archfiend Bane', 'Chaos Angel'
 ]);
 
 window.isSynchroCard = function(cardOrName) {
@@ -3319,14 +3346,14 @@ window.is5DCard = function(cardOrName) {
   if (meta) {
     if (meta.world === 3 || meta.kind === 'SYNCHRO' || meta.isTuner === true) return true;
     var num = Number(meta.num || meta.id || 0);
-    if (num >= 950 && num <= 979) return true;
+    if (num >= 950 && num <= 1050) return true;
   }
   if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
     var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
     if (cd) {
       if (cd.world === 3 || cd.kind === 'SYNCHRO' || cd.isTuner === true) return true;
       var id = Number(cd.id || 0);
-      if (id >= 950 && id <= 979) return true;
+      if (id >= 950 && id <= 1050) return true;
     }
   }
   return false;
@@ -4073,12 +4100,9 @@ window.openFreeDuelMenu = function() {
     
     let title = document.createElement('div');
     title.innerHTML = 'DUELO LIBRE';
-    title.style.cssText = 'color: #ffcc00; font-family: VT323, monospace; font-size: 32px; text-shadow: 4px 4px 0 #000; margin-bottom: 40px; text-align: center;';
+    title.style.cssText = 'color: #ffcc00; font-family: VT323, monospace; font-size: 32px; text-shadow: 4px 4px 0 #000; margin-bottom: 20px; text-align: center;';
     overlay.appendChild(title);
-    
-    let grid = document.createElement('div');
-    grid.style.cssText = 'display:flex; flex-wrap:wrap; justify-content:center; gap: 30px; max-width: 1000px;';
-    
+
     let cleared = [];
     let wins = {};
     let losses = {};
@@ -4093,89 +4117,144 @@ window.openFreeDuelMenu = function() {
             if (saved && saved.losses) losses = saved.losses;
         }
     } catch(e) {}
-    
-    let allNodes = [...(window.CUSTOM_NODES || []), ...(window.CUSTOM_NODES_GX || []), ...(window.CUSTOM_NODES_5D || [])];
-    let seenChars = new Set();
-    allNodes.forEach(n => {
-        if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop' || n.id === '5d_shop') return;
-        let cid = n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase();
-        if (seenChars.has(cid)) return;
-        seenChars.add(cid);
-        let isDefeated = cleared.includes(cid) || (saved && Array.isArray(saved.clearedGX) && saved.clearedGX.map(x => String(x).toLowerCase()).includes(cid)) || (saved && Array.isArray(saved.cleared5D) && saved.cleared5D.map(x => String(x).toLowerCase()).includes(cid));
-        if (isDefeated) {
-            let p = portraitMap[n.char];
-            let w = wins[cid] || 0;
-            let l = losses[cid] || 0;
-            let card = document.createElement('div');
-            card.style.cssText = 'width: 150px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition: transform 0.2s;';
-            card.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #e4c06b; overflow: hidden; box-shadow: 0 0 15px #000; background: #000; margin-bottom: 10px;">
-                <img src="ImagenesPersonajes/${p}" style="width: 100%; height: 100%; object-fit: cover; object-position: top;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png'">
-            </div><div style="background: rgba(0,0,0,0.8); border: 2px solid #a67c00; padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 14px; font-family:VT323, monospace; text-shadow: 2px 2px 0px #000; text-align:center; width: 100%; box-sizing: border-box;">
-                ${n.label}<br><span style="font-size:10px; color:#aaa; display:block; margin-top:5px;">W:${w} / L:${l}</span>
-            </div>`;
-            card.onmouseover = () => { card.style.transform = 'scale(1.1)'; window.playHoverSound(); };
-            card.onmouseout = () => { card.style.transform = 'scale(1)'; };
-            card.onclick = () => {
-                let sCheckStr = origGet('FMR_SAVE_' + window.activeAccount);
-                if (sCheckStr) {
-                    try {
-                        let sCheck = JSON.parse(sCheckStr);
-                        if (sCheck) {
-                            let is5DCheck = (sCheck.world === 3);
-                            let curDeck = is5DCheck 
-                                ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
-                                : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                            let curName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
-                            if (!is5DCheck && sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
-                                sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
-                                if (window.persistUserSave) window.persistUserSave(sCheck);
-                            }
-                            if (curDeck && curDeck.length !== 40) {
-                                alert('⚠️ DECK ACTIVO NO VÁLIDO (' + curDeck.length + '/40) ⚠️\n\nTu Deck Activo ("' + curName + '") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.');
-                                return;
-                            }
-                        }
-                    } catch(e) {}
-                }
-                let startDuelFn = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
-                if (!startDuelFn) {
-                    alert("API nativa no cargada.");
-                    return;
-                }
-                window.playViolinClick();
-                window.isFreeDuelMode = true;
-                if (window.cleanAllOverlays) window.cleanAllOverlays();
-                else overlay.remove();
-                let cCamp = document.getElementById('campaign3000');
-                if (cCamp) {
-                    cCamp.innerHTML = '';
-                    cCamp.classList.add('hidden');
-                    cCamp.style.display = 'none';
-                }
-                if (typeof hideShell === 'function') hideShell();
-                if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
-                window.lastDuelOpponent = cid;
-                // Disable native music and play minijefes.mp3
-                if (window.FMRMusic302) {
-                    window.FMRMusic302.start = function(){};
-                    window.FMRMusic302.stop = function(){};
-                }
-                if(window.showDuelBoard) window.showDuelBoard(); 
-                startDuelFn(cid);
-                window.playCustomMusic(window.getDuelMusic(cid));
-            };
-            grid.appendChild(card);
-        }
-    });
-    
-    if (grid.children.length === 0) {
-        let msg = document.createElement('div');
-        msg.innerHTML = 'Aún no has derrotado a ningún oponente en la Campaña para desbloquearlo en Duelo Libre.';
-        msg.style.cssText = 'color: #fff; font-family: VT323, monospace; font-size: 18px; margin-top: 50px; text-align:center; text-shadow: 2px 2px 4px #000;';
-        grid.appendChild(msg);
-    }
-    
+
+    let activeWorldTab = (saved && saved.world) ? saved.world : 1;
+
+    let worlds = [
+        { id: 1, label: '🌍 MUNDO 1: DUEL MONSTERS', nodes: window.CUSTOM_NODES || [] },
+        { id: 2, label: '⚔️ MUNDO 2: GX / ACADEMIA', nodes: window.CUSTOM_NODES_GX || [] },
+        { id: 3, label: '⚡ MUNDO 3: 5D\'S / NEO DOMINO', nodes: window.CUSTOM_NODES_5D || [] }
+    ];
+
+    let tabBar = document.createElement('div');
+    tabBar.style.cssText = 'display:flex; gap:12px; margin-bottom:25px; flex-wrap:wrap; justify-content:center; z-index:10;';
+    overlay.appendChild(tabBar);
+
+    let grid = document.createElement('div');
+    grid.style.cssText = 'display:flex; flex-wrap:wrap; justify-content:center; gap: 30px; max-width: 1000px; min-height: 250px;';
     overlay.appendChild(grid);
+
+    function renderWorldTabs() {
+        tabBar.innerHTML = '';
+        worlds.forEach(w => {
+            let btn = document.createElement('button');
+            let isAct = (w.id === activeWorldTab);
+            btn.textContent = w.label;
+            btn.style.cssText = `padding: 10px 18px; border-radius: 8px; font-weight: bold; font-family: VT323, monospace; font-size: 18px; cursor: pointer; transition: all 0.2s; ${
+                isAct 
+                ? 'background: linear-gradient(180deg, #ffcc00, #b8860b); color: #000; border: 2px solid #fff; box-shadow: 0 0 12px rgba(255,204,0,0.6);' 
+                : 'background: rgba(20, 30, 45, 0.85); color: #88bbdd; border: 1.5px solid #335577;'
+            }`;
+            btn.onclick = () => {
+                activeWorldTab = w.id;
+                if (window.playViolinClick) window.playViolinClick();
+                renderWorldTabs();
+                renderDuelists();
+            };
+            tabBar.appendChild(btn);
+        });
+    }
+
+    function renderDuelists() {
+        grid.innerHTML = '';
+        let targetConfig = worlds.find(w => w.id === activeWorldTab) || worlds[0];
+        let nodes = targetConfig.nodes;
+        let seenChars = new Set();
+        let renderedCount = 0;
+
+        nodes.forEach(n => {
+            if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop' || n.id === '5d_shop') return;
+            let cid = n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase();
+            if (seenChars.has(cid)) return;
+            seenChars.add(cid);
+
+            let isDefeated = false;
+            if (activeWorldTab === 1) {
+                isDefeated = cleared.includes(cid);
+            } else if (activeWorldTab === 2) {
+                let gxList = (saved && Array.isArray(saved.clearedGX)) ? saved.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(saved.cleared) ? saved.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []);
+                isDefeated = gxList.includes(cid);
+            } else if (activeWorldTab === 3) {
+                let d5List = (saved && Array.isArray(saved.cleared5D)) ? saved.cleared5D.map(x => String(x).toLowerCase()) : [];
+                isDefeated = d5List.includes(cid);
+            }
+
+            if (isDefeated) {
+                renderedCount++;
+                let p = portraitMap[n.char];
+                let w = wins[cid] || 0;
+                let l = losses[cid] || 0;
+                let card = document.createElement('div');
+                card.style.cssText = 'width: 150px; display:flex; flex-direction:column; align-items:center; cursor:pointer; transition: transform 0.2s;';
+                card.innerHTML = `<div style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid #e4c06b; overflow: hidden; box-shadow: 0 0 15px #000; background: #000; margin-bottom: 10px;">
+                    <img src="ImagenesPersonajes/${p}" style="width: 100%; height: 100%; object-fit: cover; object-position: top;" onerror="this.src='https://i.imgur.com/vHqR8Kq.png'">
+                </div><div style="background: rgba(0,0,0,0.8); border: 2px solid #a67c00; padding: 6px 10px; border-radius: 6px; color: #fff; font-size: 14px; font-family:VT323, monospace; text-shadow: 2px 2px 0px #000; text-align:center; width: 100%; box-sizing: border-box;">
+                    ${n.label}<br><span style="font-size:10px; color:#aaa; display:block; margin-top:5px;">W:${w} / L:${l}</span>
+                </div>`;
+                card.onmouseover = () => { card.style.transform = 'scale(1.1)'; window.playHoverSound && window.playHoverSound(); };
+                card.onmouseout = () => { card.style.transform = 'scale(1)'; };
+                card.onclick = () => {
+                    let sCheckStr = origGet('FMR_SAVE_' + window.activeAccount);
+                    if (sCheckStr) {
+                        try {
+                            let sCheck = JSON.parse(sCheckStr);
+                            if (sCheck) {
+                                let is5DCheck = (sCheck.world === 3);
+                                let curDeck = is5DCheck 
+                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                    : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
+                                let curName = is5DCheck ? (sCheck.activeDeckMundo3 || 'Principal') : (sCheck.activeDeck || 'Principal');
+                                if (!is5DCheck && sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
+                                    sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
+                                    if (window.persistUserSave) window.persistUserSave(sCheck);
+                                }
+                                if (curDeck && curDeck.length !== 40) {
+                                    alert('⚠️ DECK ACTIVO NO VÁLIDO (' + curDeck.length + '/40) ⚠️\n\nTu Deck Activo ("' + curName + '") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.');
+                                    return;
+                                }
+                            }
+                        } catch(e) {}
+                    }
+                    let startDuelFn = (window.nativeAPI && window.nativeAPI.beginStoryDuel) || window.beginStoryDuel;
+                    if (!startDuelFn) {
+                        alert("API nativa no cargada.");
+                        return;
+                    }
+                    window.playViolinClick();
+                    window.isFreeDuelMode = true;
+                    if (window.cleanAllOverlays) window.cleanAllOverlays();
+                    else overlay.remove();
+                    let cCamp = document.getElementById('campaign3000');
+                    if (cCamp) {
+                        cCamp.innerHTML = '';
+                        cCamp.classList.add('hidden');
+                        cCamp.style.display = 'none';
+                    }
+                    if (typeof hideShell === 'function') hideShell();
+                    if (window.nativeAPI && window.nativeAPI.hideShell) window.nativeAPI.hideShell();
+                    window.lastDuelOpponent = cid;
+                    if (window.FMRMusic302) {
+                        window.FMRMusic302.start = function(){};
+                        window.FMRMusic302.stop = function(){};
+                    }
+                    if(window.showDuelBoard) window.showDuelBoard(); 
+                    startDuelFn(cid);
+                    window.playCustomMusic(window.getDuelMusic(cid));
+                };
+                grid.appendChild(card);
+            }
+        });
+
+        if (renderedCount === 0) {
+            let msg = document.createElement('div');
+            msg.innerHTML = '⚠️ Aún no has derrotado a ningún oponente de este mundo en el Modo Historia para desbloquearlo en Duelo Libre.';
+            msg.style.cssText = 'color: #bbb; font-family: VT323, monospace; font-size: 20px; margin-top: 40px; text-align:center; text-shadow: 2px 2px 4px #000; background: rgba(0,0,0,0.6); padding: 20px 30px; border-radius: 8px; border: 1px solid #444;';
+            grid.appendChild(msg);
+        }
+    }
+
+    renderWorldTabs();
+    renderDuelists();
     
     let btnRow = document.createElement('div');
     btnRow.style.cssText = 'display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin-top:50px;';
@@ -6387,6 +6466,11 @@ window.openCustomShopMenu = function() {
         if (funcName === 'showShop') {
             overlay.remove();
             window.customShowShop();
+            return;
+        }
+        if (funcName === 'showCollection') {
+            overlay.remove();
+            window.customShowCollection();
             return;
         }
         if (window.nativeAPI && typeof window.nativeAPI[funcName] === 'function') {
@@ -8846,6 +8930,40 @@ window.customShowCollection = function() {
     `;
     rightSide.appendChild(header);
     
+    let activeWorldTab = (s && s.world) ? Number(s.world) : 1;
+    let worlds = [
+        { id: 1, label: '🌍 MUNDO 1: DUEL MONSTERS' },
+        { id: 2, label: '⚔️ MUNDO 2: GX / ACADEMIA' },
+        { id: 3, label: '⚡ MUNDO 3: 5D\'S / NEO DOMINO' }
+    ];
+
+    let worldTabBar = document.createElement('div');
+    worldTabBar.style.cssText = 'display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;';
+    rightSide.appendChild(worldTabBar);
+
+    function renderWorldTabs() {
+        worldTabBar.innerHTML = '';
+        worlds.forEach(w => {
+            let btn = document.createElement('button');
+            let isAct = (w.id === activeWorldTab);
+            btn.textContent = w.label;
+            btn.style.cssText = `padding: 8px 16px; border-radius: 6px; font-weight: bold; font-family: VT323, monospace; font-size: 17px; cursor: pointer; transition: all 0.2s; ${
+                isAct 
+                ? 'background: linear-gradient(180deg, #ffcc00, #b8860b); color: #000; border: 2px solid #fff; box-shadow: 0 0 10px rgba(255,204,0,0.6);' 
+                : 'background: rgba(30, 40, 55, 0.85); color: #88bbdd; border: 1.5px solid #335577;'
+            }`;
+            btn.onclick = () => {
+                if (activeWorldTab === w.id) return;
+                activeWorldTab = w.id;
+                if (window.playViolinClick) window.playViolinClick();
+                renderWorldTabs();
+                renderList();
+            };
+            worldTabBar.appendChild(btn);
+        });
+    }
+    renderWorldTabs();
+
     let filterBar = document.createElement('div');
     filterBar.style.cssText = 'display:flex; gap:10px; margin-bottom: 15px; align-items:center; flex-wrap:wrap; font-size: 14px;';
     filterBar.innerHTML = `
@@ -8957,13 +9075,29 @@ window.customShowCollection = function() {
         let fAtk = parseInt(overlay.querySelector('#f-atk').value) || -1;
         let fDef = parseInt(overlay.querySelector('#f-def').value) || -1;
         let fOwn = overlay.querySelector('#f-owned').value;
+        let colSource = (activeWorldTab === 3) ? (s.collectionMundo3 || {}) : (s.collection || {});
         
         tbody.innerHTML = '';
         
         allCards.forEach(c => {
             let name = c.name;
             let norm = name.toLowerCase().trim();
-            let count = (s.collection && (s.collection[name] !== undefined ? s.collection[name] : s.collection[norm])) || 0;
+
+            // Filtro estricto de catálogo por Mundo
+            let num = Number(c.num || c.id || 0);
+            let is5D = (window.is5DCard && window.is5DCard(c)) || (num >= 950 && num <= 1050);
+            if (activeWorldTab === 3) {
+                let isAllowedStaple = window.MUNDO3_ALLOWED_STAPLES && window.MUNDO3_ALLOWED_STAPLES.has(name);
+                if (!is5D && !isAllowedStaple) return;
+            } else if (activeWorldTab === 2) {
+                if (is5D) return;
+                if (num < 723 || num > 949) return;
+            } else if (activeWorldTab === 1) {
+                if (is5D) return;
+                if (num < 1 || num > 722) return;
+            }
+
+            let count = (colSource[name] !== undefined ? colSource[name] : colSource[norm]) || 0;
             
             // Filters
             if (q && !norm.includes(q)) return;
@@ -9030,6 +9164,9 @@ window.customShowCollection = function() {
     
     renderList();
 };
+
+if (window.nativeAPI) window.nativeAPI.showCollection = window.customShowCollection;
+window.showCollection = window.customShowCollection;
 
 function createDashboardBase(titleText, backAction) {
     let overlay = document.createElement('div');
@@ -13241,6 +13378,190 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (typeof log === 'function') log('Cybernetic Fusion Support activado: pagas 1000 LP y robas 1 carta.');
       return;
     }
+
+    // ALLURE OF DARKNESS
+    if (val === 'ALLURE_OF_DARKNESS' || cName === 'Allure of Darkness' || nUpperHand === 'ALLURE OF DARKNESS') {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      for (var d = 0; d < 2; d++) { if (g.deck.length) g.hand.push(g.deck.pop()); }
+      var darkIdx = g.hand.findIndex(function(m) {
+        return m && (m.isMonster || (m.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(m.type).toUpperCase()))) && (m.attr === 'DARK' || (m[3] && String(m[3]).toUpperCase() === 'DARK'));
+      });
+      if (darkIdx >= 0) {
+        var banished = g.hand.splice(darkIdx, 1)[0];
+        g.banished = g.banished || [];
+        g.banished.push(banished);
+        if (typeof log === 'function') log('Allure of Darkness: robas 2 cartas y destierras ' + (banished.name || 'un monstruo de OSCURIDAD') + '.');
+        duelToast('¡Allure of Darkness! Robas 2 y destierras ' + (banished.name || '1 OSCURIDAD') + '.');
+      } else {
+        while (g.hand.length > 0) { g.grave.push(g.hand.pop()); }
+        if (typeof log === 'function') log('Allure of Darkness: no tenías monstruos de OSCURIDAD en la mano; toda tu mano fue enviada al Cementerio.');
+        duelToast('¡Allure of Darkness! Sin OSCURIDAD: mano al Cementerio.');
+      }
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // SOUL CHARGE
+    if (val === 'SOUL_CHARGE' || cName === 'Soul Charge' || nUpperHand === 'SOUL CHARGE') {
+      var graveMonsters = (g.grave || []).filter(function(m) {
+        return m && (m.isMonster || (m.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(m.type).toUpperCase())));
+      });
+      var emptySlots = (g.field || []).map(function(x, idx) { return !x ? idx : -1; }).filter(function(idx) { return idx >= 0; });
+      if (graveMonsters.length === 0 || emptySlots.length === 0) {
+        duelToast('No hay monstruos en el Cementerio o no hay casillas libres.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var toReviveCount = Math.min(graveMonsters.length, emptySlots.length, 5);
+      var revivedNames = [];
+      for (var r = 0; r < toReviveCount; r++) {
+        var gIndex = g.grave.indexOf(graveMonsters[r]);
+        if (gIndex >= 0) {
+          var revCard = g.grave.splice(gIndex, 1)[0];
+          var revMon = window.mk ? (window.mk(revCard) || Object.assign({}, revCard)) : Object.assign({}, revCard);
+          revMon.pos = 'DEF';
+          revMon.faceUp = true;
+          g.field[emptySlots[r]] = revMon;
+          revivedNames.push(revMon.name || revCard.name);
+        }
+      }
+      var lpLoss = toReviveCount * 1000;
+      g.plp = Math.max(100, (g.plp || 8000) - lpLoss);
+      g._soulChargeActiveTurn = g.turnNo;
+      if (typeof log === 'function') log('¡Soul Charge! Revives ' + revivedNames.join(', ') + ' y pierdes ' + lpLoss + ' LP.');
+      duelToast('¡Soul Charge! Revives ' + toReviveCount + ' monstruo(s) (-' + lpLoss + ' LP).');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // BOOK OF MOON
+    if (val === 'BOOK_OF_MOON' || cName === 'Book of Moon' || nUpperHand === 'BOOK OF MOON' || nUpperHand.includes('LIBRO DE LA LUNA')) {
+      var targetMon = (g.enemy || []).find(function(m) { return m && !m.faceDown; });
+      if (!targetMon) {
+        targetMon = (g.field || []).find(function(m) { return m && !m.faceDown; });
+      }
+      if (!targetMon) {
+        duelToast('No hay monstruos boca arriba en el campo para voltear a Posición de Defensa boca abajo.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      targetMon.pos = 'DEF';
+      targetMon.faceDown = true;
+      targetMon.faceUp = false;
+      if (typeof log === 'function') log('¡Book of Moon! Pone a ' + (targetMon.name || 'un monstruo') + ' boca abajo en Posición de Defensa.');
+      duelToast('¡Book of Moon! ' + (targetMon.name || 'Monstruo') + ' volteado boca abajo.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // DE-SYNCHRO
+    if (val === 'DE_SYNCHRO' || cName === 'De-Synchro' || nUpperHand === 'DE-SYNCHRO' || nUpperHand.includes('DESINCRON')) {
+      var syncFieldIdx = (g.field || []).findIndex(function(m) { return m && (m.kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(m))); });
+      if (syncFieldIdx < 0) {
+        duelToast('No controlas ningún Monstruo Sincronía en el campo.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var synTarget = g.field[syncFieldIdx];
+      g.field[syncFieldIdx] = null;
+      g.extra = g.extra || [];
+      g.extra.push(synTarget);
+      
+      var graveMats = (g.grave || []).filter(function(m) { return m && (m.isMonster || (m.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(m.type).toUpperCase()))); });
+      var emptySlotsDe = (g.field || []).map(function(x, idx) { return !x ? idx : -1; }).filter(function(idx) { return idx >= 0; });
+      var deRevived = [];
+      var deCount = Math.min(graveMats.length, emptySlotsDe.length, 2);
+      for (var dr = 0; dr < deCount; dr++) {
+        var gMatIdx = g.grave.indexOf(graveMats[dr]);
+        if (gMatIdx >= 0) {
+          var dMatCard = g.grave.splice(gMatIdx, 1)[0];
+          var dMatMon = window.mk ? (window.mk(dMatCard) || Object.assign({}, dMatCard)) : Object.assign({}, dMatCard);
+          dMatMon.pos = 'DEF';
+          dMatMon.faceUp = true;
+          g.field[emptySlotsDe[dr]] = dMatMon;
+          deRevived.push(dMatMon.name || dMatCard.name);
+        }
+      }
+      if (typeof log === 'function') log('¡De-Synchro! ' + (synTarget.name || 'Sincro') + ' regresa al Extra Deck' + (deRevived.length ? ' e invoca sus materiales: ' + deRevived.join(', ') : '') + '.');
+      duelToast('¡De-Synchro! ' + (synTarget.name || 'Sincro') + ' regresa al Extra Deck.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // BLACK WHIRLWIND
+    if (val === 'BLACK_WHIRLWIND' || cName === 'Black Whirlwind' || nUpperHand === 'BLACK WHIRLWIND' || nUpperHand.includes('TORBELLINO NEGRO')) {
+      g.hand.splice(i, 1);
+      var placedSlot = (g.playerBack || []).findIndex(function(x) { return !x; });
+      if (placedSlot >= 0) {
+        g.playerBack[placedSlot] = Object.assign({}, c, { set: false, faceUp: true });
+      } else {
+        g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      }
+      var bwIdx = (g.deck || []).findIndex(function(x) { return x && ((x.name || '').includes('Blackwing') || (x.name || '').includes('Ala Negra')); });
+      if (bwIdx >= 0) {
+        var bwCard = g.deck.splice(bwIdx, 1)[0];
+        g.hand.push(bwCard);
+        if (typeof log === 'function') log('¡Black Whirlwind! Añades ' + (bwCard.name || 'Alanegra') + ' del Deck a tu mano.');
+        duelToast('¡Black Whirlwind! Añades ' + (bwCard.name || 'Alanegra') + ' a la mano.');
+      } else {
+        if (typeof log === 'function') log('Black Whirlwind activado en el campo.');
+        duelToast('¡Black Whirlwind activado!');
+      }
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // RESONATOR CALL
+    if (val === 'RESONATOR_CALL' || cName === 'Resonator Call' || nUpperHand === 'RESONATOR CALL' || nUpperHand.includes('LLAMADA DEL RESONADOR')) {
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var resIdx = (g.deck || []).findIndex(function(x) { return x && ((x.name || '').includes('Resonator') || (x.name || '').includes('Resonador')); });
+      if (resIdx >= 0) {
+        var resCard = g.deck.splice(resIdx, 1)[0];
+        g.hand.push(resCard);
+        if (typeof log === 'function') log('¡Resonator Call! Añades ' + (resCard.name || 'Resonador') + ' de tu Deck a tu mano.');
+        duelToast('¡Resonator Call! Añades ' + (resCard.name || 'Resonador') + ' a la mano.');
+      } else {
+        duelToast('No quedan monstruos Resonador en tu Deck.');
+      }
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // CRIMSON GAIA
+    if (val === 'CRIMSON_GAIA' || cName === 'Crimson Gaia' || nUpperHand === 'CRIMSON GAIA' || nUpperHand.includes('GAIA CARMES')) {
+      g.hand.splice(i, 1);
+      var gSlot = (g.playerBack || []).findIndex(function(x) { return !x; });
+      if (gSlot >= 0) {
+        g.playerBack[gSlot] = Object.assign({}, c, { set: false, faceUp: true });
+      } else {
+        g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      }
+      var pool = (g.deck || []).concat(g.grave || []);
+      var foundRda = pool.find(function(x) {
+        var xn = (x && x.name) || '';
+        return xn.includes('Red Dragon Archfiend') || xn.includes('Dragón Rojo') || xn.includes('Resonator') || xn.includes('Resonador');
+      });
+      if (foundRda) {
+        var dIdx = g.deck.indexOf(foundRda);
+        if (dIdx >= 0) g.deck.splice(dIdx, 1);
+        else {
+          var grIdx = g.grave.indexOf(foundRda);
+          if (grIdx >= 0) g.grave.splice(grIdx, 1);
+        }
+        g.hand.push(foundRda);
+        if (typeof log === 'function') log('¡Crimson Gaia! Añades ' + (foundRda.name || 'carta') + ' a tu mano.');
+        duelToast('¡Crimson Gaia! Añades ' + (foundRda.name || 'carta') + ' a tu mano.');
+      } else {
+        duelToast('¡Crimson Gaia activado!');
+      }
+      if (typeof render === 'function') render();
+      return;
+    }
     var prevHandLen = g.hand.length;
     if (prevActivateHand) prevActivateHand.apply(this, arguments);
     if (g.hand && g.hand.length === prevHandLen && g.hand[i] === c && c.kind !== 'TRAP') {
@@ -13402,12 +13723,32 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       return;
     }
 
+    // Activación de Magias desde SET (Allure of Darkness, Soul Charge, Book of Moon, De-Synchro, Resonator Call, Crimson Gaia)
+    if (['Allure of Darkness', 'Soul Charge', 'Book of Moon', 'De-Synchro', 'Resonator Call', 'Crimson Gaia'].includes(cName)) {
+      g.playerBack[i] = null;
+      var dummyIdx = g.hand.length;
+      g.hand.push(c);
+      window.activateSTFromHand(dummyIdx);
+      return;
+    }
+
     // 9. Trampas (chequeo de turno y manuales):
     var isTrapCard = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || val === 'DUST_TORNADO' || cName === 'Dust Tornado' || (val && String(val).includes('TRAP')));
     if (isTrapCard) {
       if (typeof window.isTrapReady === 'function' && !window.isTrapReady(c)) {
         duelToast(cName + ' fue colocada este turno. Debe permanecer SET hasta el próximo turno.');
         if (typeof log === 'function') log(cName + ' fue colocada este turno. Debe permanecer SET hasta el próximo turno.');
+        return;
+      }
+
+      // Trap Stun manual
+      if (val === 'TRAP_STUN' || cName === 'Trap Stun' || (cName && cName.toUpperCase().includes('TRAP STUN'))) {
+        g.playerBack[i] = null;
+        g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+        g._trapStunActiveTurn = g.turnNo;
+        if (typeof log === 'function') log('¡Trap Stun activado! Todos los efectos de Trampa en el campo quedan negados este turno.');
+        duelToast('¡Trap Stun activado! Trampas negadas este turno.');
+        if (typeof render === 'function') render();
         return;
       }
 
@@ -13735,6 +14076,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
     if (!g) return false;
+
+    // Negación por Trap Stun
+    if (g._trapStunActiveTurn === g.turnNo) return false;
 
     var currentTurn = Number(g.turnNo || 1);
     var currentSide = g.turn; // 'player' or 'enemy'
@@ -15887,6 +16231,42 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       });
     }
 
+    // e) Blackwing - Auster the South Wind: Invocación Especial desde la mano
+    if (name.includes('Auster the South Wind') || name.includes('Auster')) {
+      return true;
+    }
+
+    // f) Crimson Resonator: si no controlas monstruos en el campo
+    if (name.includes('Crimson Resonator') || name.includes('Resonador Carmes')) {
+      return !(g.field || []).some(Boolean);
+    }
+
+    // g) Vision Resonator: si hay un monstruo de OSCURIDAD de Nivel 5+ en el campo
+    if (name.includes('Vision Resonator') || name.includes('Resonador de la Visión')) {
+      return (g.field || []).concat(g.enemy || []).some(function(m) {
+        return m && Number(m.level || m[1] || 0) >= 5 && (m.attr === 'DARK' || (m[3] && String(m[3]).toUpperCase() === 'DARK'));
+      });
+    }
+
+    // h) Synkron Resonator: si hay un Monstruo Sincronía en el campo
+    if (name.includes('Synkron Resonator') || name.includes('Resonador Sincrón')) {
+      return (g.field || []).concat(g.enemy || []).some(function(m) {
+        return m && (m.kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(m)));
+      });
+    }
+
+    // i) Stardust Synchron: si controlas al menos un monstruo en el campo
+    if (name.includes('Stardust Synchron') || name.includes('Sincrón de Polvo de Estrellas')) {
+      return (g.field || []).some(Boolean);
+    }
+
+    // j) Quickdraw Synchron: descartar 1 monstruo de la mano
+    if (name.includes('Quickdraw Synchron') || name.includes('Desenfundado Rápido')) {
+      return (g.hand || []).filter(function(x) {
+        return x !== c && (x.isMonster || (x.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(x.type).toUpperCase())));
+      }).length >= 1;
+    }
+
     return false;
   };
 
@@ -15937,6 +16317,20 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     window.closeSpecialSummonModal();
 
     var name = (c.name || c[0] || '').trim();
+
+    // Quickdraw Synchron: descartar 1 monstruo de la mano
+    if (name.includes('Quickdraw Synchron') || name.includes('Desenfundado Rápido')) {
+      var dIdx = g.hand.findIndex(function(x, di) {
+        return di !== idx && (x.isMonster || (x.type && !['SPELL','TRAP','EQUIP','FIELD'].includes(String(x.type).toUpperCase())));
+      });
+      if (dIdx >= 0) {
+        var discCard = g.hand.splice(dIdx, 1)[0];
+        g.grave.push(discCard);
+        if (idx > dIdx) idx--;
+        if (typeof log === 'function') log('Quickdraw Synchron: descartas ' + (discCard.name || 'un monstruo') + ' al Cementerio.');
+      }
+    }
+
     var monster = window.mk ? (window.mk(c) || window.mk(name)) : Object.assign({}, c);
     if (!monster) monster = Object.assign({}, c);
 
@@ -16016,6 +16410,18 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         effectNote = '⚡ Invocación por la presencia de un Monstruo Cantante (Tuner) en tu campo.';
       } else if (name.includes('Gale') || name.includes('Bora')) {
         effectNote = '🦅 Invocación por controlar otro monstruo Alanegra (Blackwing) en tu campo.';
+      } else if (name.includes('Auster the South Wind') || name.includes('Auster')) {
+        effectNote = '🦅 Invocación Especial como Monstruo Cantante Alanegra.';
+      } else if (name.includes('Crimson Resonator') || name.includes('Resonador Carmes')) {
+        effectNote = '🔥 Invocación por no controlar monstruos en tu campo.';
+      } else if (name.includes('Vision Resonator') || name.includes('Resonador de la Visión')) {
+        effectNote = '👁 Invocación por controlar un monstruo de OSCURIDAD de Nivel 5+ en el campo.';
+      } else if (name.includes('Synkron Resonator') || name.includes('Resonador Sincrón')) {
+        effectNote = '⚡ Invocación por haber un Monstruo Sincronía en el campo.';
+      } else if (name.includes('Stardust Synchron') || name.includes('Sincrón de Polvo de Estrellas')) {
+        effectNote = '✨ Invocación Especial por controlar un monstruo en tu campo.';
+      } else if (name.includes('Quickdraw Synchron') || name.includes('Desenfundado Rápido')) {
+        effectNote = '🎯 Invocación Especial descartando 1 monstruo de tu mano al Cementerio.';
       } else {
         effectNote = '⚡ Invocación Especial desde la mano.';
       }
@@ -16143,9 +16549,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var TUNER_NAMES = [
       'Junk Synchron', 'Nitro Synchron', 'Dark Resonator', 'Flare Resonator',
       'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North',
-      'Twilight Rose Knight', 'Jutte Fighter', 'Debris Dragon', 'Formula Synchron'
+      'Twilight Rose Knight', 'Jutte Fighter', 'Debris Dragon', 'Formula Synchron',
+      'Quickdraw Synchron', 'Stardust Synchron', 'Revolution Synchron',
+      'Blackwing - Auster the South Wind', 'Soul Resonator', 'Crimson Resonator',
+      'Vision Resonator', 'Synkron Resonator', 'Darkness Resonator'
     ];
-    return TUNER_NAMES.some(function(tn) { return tn.toLowerCase() === name.toLowerCase(); });
+    if (TUNER_NAMES.some(function(tn) { return tn.toLowerCase() === name.toLowerCase(); })) return true;
+    var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === name; });
+    if (foundCd && foundCd.isTuner === true) return true;
+    return false;
   };
 
   // Buscar materiales válidos en el campo del jugador para un monstruo Sincro
@@ -16163,7 +16575,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === sc.name; });
       if (foundCd && (foundCd.text || foundCd.desc)) reqText = (foundCd.text || foundCd.desc).toLowerCase();
     }
-    var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"') || sc.name === 'Junk Warrior';
+    var scName = sc.name || '';
+    var reqJunk = reqText.includes("'junk'") || reqText.includes('"junk"') || scName === 'Junk Warrior';
+    var isDoubleTuning = scName.includes('Red Nova') || scName.includes('Burning Soul');
 
     // 1. Si el jugador ya seleccionó monstruos en el campo:
     var selField = (game.selected || [])
@@ -16174,12 +16588,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (selField.length >= 2) {
       var sTuners = selField.filter(function(x) { return window.isTunerMonster(x.card); });
       var sNonTuners = selField.filter(function(x) { return !window.isTunerMonster(x.card); });
-      if (sTuners.length === 1 && sNonTuners.length >= 1) {
+      var sumSel = selField.reduce(function(s, x) {
+        return s + (Number(x.card.level) || Number(x.card[1]) || 0);
+      }, 0);
+
+      if (isDoubleTuning) {
+        if (sTuners.length === 2 && sNonTuners.length >= 1 && sumSel === targetLevel) {
+          return selField.map(function(x) { return x.idx; });
+        }
+      } else if (sTuners.length === 1 && sNonTuners.length >= 1) {
         var tName = (sTuners[0].card.name || '').toLowerCase();
         if (!reqJunk || tName.includes('junk')) {
-          var sumSel = selField.reduce(function(s, x) {
-            return s + (Number(x.card.level) || Number(x.card[1]) || 0);
-          }, 0);
           if (sumSel === targetLevel) {
             return selField.map(function(x) { return x.idx; });
           }
@@ -16195,6 +16614,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var fTuners = faceUp.filter(function(x) { return window.isTunerMonster(x.card); });
     var fNonTuners = faceUp.filter(function(x) { return !window.isTunerMonster(x.card); });
     if (fTuners.length === 0 || fNonTuners.length === 0) return null;
+
+    // Caso Double Tuning: 2 Tuners + 1 no-Tuner (Red Nova Dragon)
+    if (isDoubleTuning && fTuners.length >= 2 && fNonTuners.length >= 1) {
+      for (var t1 = 0; t1 < fTuners.length; t1++) {
+        var t1Lvl = Number(fTuners[t1].card.level || fTuners[t1].card[1] || 0);
+        for (var t2 = t1 + 1; t2 < fTuners.length; t2++) {
+          var t2Lvl = Number(fTuners[t2].card.level || fTuners[t2].card[1] || 0);
+          for (var nti = 0; nti < fNonTuners.length; nti++) {
+            var ntiLvl = Number(fNonTuners[nti].card.level || fNonTuners[nti].card[1] || 0);
+            if ((t1Lvl + t2Lvl + ntiLvl) === targetLevel) {
+              return [fTuners[t1].idx, fTuners[t2].idx, fNonTuners[nti].idx];
+            }
+          }
+        }
+      }
+    }
 
     // Probar 1 Tuner + 1 no-Tuner
     for (var t = 0; t < fTuners.length; t++) {
@@ -16219,6 +16654,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
             if ((tLvl + nt1Lvl + nt2Lvl) === targetLevel) {
               return [fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx];
+            }
+          }
+        }
+      }
+
+      // Probar 1 Tuner + 3 no-Tuners (para Quasar Dragon o monstruos nivel 10-12)
+      if (fNonTuners.length >= 3) {
+        for (var i = 0; i < fNonTuners.length; i++) {
+          var nt1Lvl = Number(fNonTuners[i].card.level || fNonTuners[i].card[1] || 0);
+          for (var j = i + 1; j < fNonTuners.length; j++) {
+            var nt2Lvl = Number(fNonTuners[j].card.level || fNonTuners[j].card[1] || 0);
+            for (var k = j + 1; k < fNonTuners.length; k++) {
+              var nt3Lvl = Number(fNonTuners[k].card.level || fNonTuners[k].card[1] || 0);
+              if ((tLvl + nt1Lvl + nt2Lvl + nt3Lvl) === targetLevel) {
+                return [fTuners[t].idx, fNonTuners[i].idx, fNonTuners[j].idx, fNonTuners[k].idx];
+              }
             }
           }
         }
@@ -16352,6 +16803,61 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
 
     // Remover del Extra Deck del jugador
     game.extra.splice(i, 1);
+
+    // Disparar efectos de Invocación por Sincronía
+    if (sc.name === 'Junk Speeder' || sc.name.includes('Junk Speeder')) {
+      var summonedSyncs = [];
+      var usedLevels = new Set();
+      for (var dIdx = game.deck.length - 1; dIdx >= 0; dIdx--) {
+        var dCard = game.deck[dIdx];
+        if (dCard && (dCard.name || '').includes('Synchron') && window.isTunerMonster(dCard)) {
+          var dLvl = Number(dCard.level || dCard[1] || 0);
+          if (!usedLevels.has(dLvl)) {
+            var freeSlot = game.field.findIndex(function(x) { return !x; });
+            if (freeSlot >= 0) {
+              usedLevels.add(dLvl);
+              game.deck.splice(dIdx, 1);
+              var synMon = window.mk ? (window.mk(dCard) || Object.assign({}, dCard)) : Object.assign({}, dCard);
+              synMon.pos = 'DEF';
+              synMon.faceUp = true;
+              game.field[freeSlot] = synMon;
+              summonedSyncs.push(synMon.name || dCard.name);
+            }
+          }
+        }
+      }
+      if (summonedSyncs.length > 0) {
+        if (typeof log === 'function') log('¡Efecto de Junk Speeder! Invoca de modo especial desde el Deck: ' + summonedSyncs.join(', ') + ' en Defensa.');
+        if (typeof duelToast === 'function') duelToast('¡Junk Speeder invoca ' + summonedSyncs.length + ' Cantante(s)!');
+      }
+    } else if (sc.name === 'Formula Synchron' || sc.name.includes('Formula Synchron')) {
+      if (game.deck.length > 0) {
+        var drawn = game.deck.pop();
+        game.hand.push(drawn);
+        if (typeof log === 'function') log('¡Efecto de Formula Synchron! Robas ' + (drawn.name || '1 carta') + ' del Deck.');
+        if (typeof duelToast === 'function') duelToast('¡Formula Synchron roba 1 carta!');
+      }
+    }
+
+    // Efecto de Stardust Trail (desde mano o cementerio al ser usado material de Sincronía)
+    var stardustTrailIdx = (game.hand || []).findIndex(function(x) { return x && ((x.name || '').includes('Stardust Trail') || (x.name || '').includes('Rastro de Polvo')); });
+    var inGraveTrail = false;
+    if (stardustTrailIdx < 0) {
+      stardustTrailIdx = (game.grave || []).findIndex(function(x) { return x && ((x.name || '').includes('Stardust Trail') || (x.name || '').includes('Rastro de Polvo')); });
+      inGraveTrail = (stardustTrailIdx >= 0);
+    }
+    if (stardustTrailIdx >= 0) {
+      var trailFreeSlot = game.field.findIndex(function(x) { return !x; });
+      if (trailFreeSlot >= 0) {
+        var trailCard = inGraveTrail ? game.grave.splice(stardustTrailIdx, 1)[0] : game.hand.splice(stardustTrailIdx, 1)[0];
+        var trailMon = window.mk ? (window.mk(trailCard) || Object.assign({}, trailCard)) : Object.assign({}, trailCard);
+        trailMon.pos = 'DEF';
+        trailMon.faceUp = true;
+        game.field[trailFreeSlot] = trailMon;
+        if (typeof log === 'function') log('¡Efecto de Stardust Trail! Se invoca de modo especial al campo en Defensa.');
+        if (typeof duelToast === 'function') duelToast('¡Stardust Trail invocado!');
+      }
+    }
 
     if (typeof closePile === 'function') closePile();
     if (typeof render === 'function') render();
