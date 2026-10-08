@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
 
     public static final String PREFS_NAME = "FMR_PREFS";
     public static final String KEY_SERVER_URL = "server_url";
-    public static final String DEFAULT_URL = "https://juegoyugioh.onrender.com/";
+    public static final String DEFAULT_URL = "https://yugiohreborn.onrender.com/";
 
     private WebView mWebView;
     private ProgressBar mProgressBar;
@@ -123,6 +123,10 @@ public class MainActivity extends Activity {
 
     public void loadGameUrl() {
         String url = mPrefs.getString(KEY_SERVER_URL, DEFAULT_URL);
+        if (url != null && url.contains("juegoyugioh.onrender.com")) {
+            url = DEFAULT_URL;
+            mPrefs.edit().putString(KEY_SERVER_URL, DEFAULT_URL).apply();
+        }
         mWebView.loadUrl(url);
     }
 

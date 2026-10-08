@@ -776,7 +776,7 @@ app.post('/api/subscription/notify-payment', async (req, res) => {
           </div>
 
           <div style="text-align:center; margin:30px 0;">
-            <a href="https://juegoyugioh.onrender.com/admin" style="background:linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; text-decoration:none; padding:12px 28px; border-radius:6px; font-weight:bold; font-size:15px; display:inline-block;">
+            <a href="https://yugiohreborn.onrender.com/admin" style="background:linear-gradient(180deg, #ffd700 0%, #b8860b 100%); color:#000; text-decoration:none; padding:12px 28px; border-radius:6px; font-weight:bold; font-size:15px; display:inline-block;">
               IR AL PANEL DE USUARIOS PARA ACTIVAR (+6 MESES)
             </a>
           </div>
