@@ -60,6 +60,10 @@ public class MainActivity extends Activity {
             }
         }
         @Override
+        public void onReceivedSslError(WebView view, android.webkit.SslErrorHandler handler, android.net.http.SslError error) {
+            if (handler != null) handler.proceed();
+        }
+        @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             if (activity != null) {
@@ -115,6 +119,7 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/3.0.0");
 
         mWebView.setWebChromeClient(new CustomChromeClient(mProgressBar));
@@ -123,7 +128,7 @@ public class MainActivity extends Activity {
 
     public void loadGameUrl() {
         String url = mPrefs.getString(KEY_SERVER_URL, DEFAULT_URL);
-        if (url != null && url.contains("juegoyugioh.onrender.com")) {
+        if (url == null || url.isEmpty() || url.contains("juegoyugioh") || !url.contains("yugiohreborn")) {
             url = DEFAULT_URL;
             mPrefs.edit().putString(KEY_SERVER_URL, DEFAULT_URL).apply();
         }
