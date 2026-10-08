@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-let html = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/FMR_V3_0_7_BANDAI1998_MENU.html', 'utf8');
+const ROOT = __dirname;
+let html = fs.readFileSync(path.join(ROOT, 'ForbiddenMemoriesReborn', 'FMR_V3_0_7_BANDAI1998_MENU.html'), 'utf8');
 
 // 1. Fix native missing <script> tag before V3.0.5
 html = html.replace(/(<\/script>\s*\r?\n)(\s*\/\*\s*V3\.0\.5)/i, (m, p1, p2) => m.includes('<script>') ? m : p1 + '<script>\n' + p2);
@@ -140,18 +141,18 @@ html = html
 
 let mappings = {};
 try {
-    mappings = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/card_mappings.json', 'utf8'));
+    mappings = JSON.parse(fs.readFileSync(path.join(ROOT, 'card_mappings.json'), 'utf8'));
 } catch(e) {}
 
 let cardsData = [];
 try {
-    cardsData = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/data/cards.json', 'utf8'));
+    cardsData = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cards.json'), 'utf8'));
 } catch(e) {}
 
 // 4. Scan Images
 let customImages = {};
 try {
-    const files = fs.readdirSync('C:/Deploy/proyectoygo/imagenescartas/Mundo1');
+    const files = fs.readdirSync(path.join(ROOT, 'imagenescartas', 'Mundo1'));
     files.forEach(f => {
         let match = f.match(/^(\d+)\.(jpg|jpeg|png)$/i);
         if (match) {
@@ -181,12 +182,12 @@ function scanDirRecursive(dir) {
     });
 }
 try {
-    scanDirRecursive('C:/Deploy/proyectoygo/imagenescartas/Mundo2');
+    scanDirRecursive(path.join(ROOT, 'imagenescartas', 'Mundo2'));
 } catch(e) {
     console.log('Mundo2 images folder error:', e.message);
 }
 try {
-    scanDirRecursive('C:/Deploy/proyectoygo/imagenescartas/Mundo3');
+    scanDirRecursive(path.join(ROOT, 'imagenescartas', 'Mundo3'));
 } catch(e) {
     console.log('Mundo3 images folder error:', e.message);
 }
@@ -203,10 +204,10 @@ if (Array.isArray(cardsData)) {
 
 let characterDecks = {};
 try {
-    const deckFiles = fs.readdirSync('C:/Deploy/proyectoygo/data/decks');
+    const deckFiles = fs.readdirSync(path.join(ROOT, 'data', 'decks'));
     deckFiles.forEach(f => {
         if (f.endsWith('.json')) {
-            const d = JSON.parse(fs.readFileSync('C:/Deploy/proyectoygo/data/decks/' + f, 'utf8'));
+            const d = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'decks', f), 'utf8'));
             const key = d.character || f.replace('.json', '');
             characterDecks[key] = d;
         }
@@ -215,10 +216,10 @@ try {
     console.log('Decks folder not found during build');
 }
 
-let patch = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/clean_map_patch.js', 'utf8');
+let patch = fs.readFileSync(path.join(ROOT, 'ForbiddenMemoriesReborn', 'clean_map_patch.js'), 'utf8');
 let mobilePatch = '';
 try {
-    mobilePatch = fs.readFileSync('C:/Deploy/proyectoygo/ForbiddenMemoriesReborn/mobile_patch.js', 'utf8');
+    mobilePatch = fs.readFileSync(path.join(ROOT, 'ForbiddenMemoriesReborn', 'mobile_patch.js'), 'utf8');
 } catch(e) {
     console.log('mobile_patch.js not found');
 }
@@ -226,5 +227,6 @@ try {
 // 5. Append patch cleanly at end of HTML
 let outHtml = html + '\n<script>\nwindow.CUSTOM_LOCAL_IMAGES = ' + JSON.stringify(customImages) + ';\nwindow.CARD_MAPPINGS = ' + JSON.stringify(mappings) + ';\nwindow.CARDS_DATA = ' + JSON.stringify(cardsData) + ';\nwindow.CHARACTER_DECKS = ' + JSON.stringify(characterDecks) + ';\n</script>\n<script>\n' + patch + '\n</script>\n<script>\n' + mobilePatch + '\n</script>\n';
 
-fs.writeFileSync('C:/Deploy/proyectoygo/YGOFMR2026-1.html', outHtml);
+fs.writeFileSync(path.join(ROOT, 'YGOFMR2026-1.html'), outHtml);
 console.log('Build V6 successful! Output size: ' + outHtml.length + ' bytes');
+
