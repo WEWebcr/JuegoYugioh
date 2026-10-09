@@ -14477,9 +14477,20 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     // 2. Zoa y Metalzoa también son recompensas muy raras.
     const ULTRA_RARE_BOSS_CARDS = ['Blue-Eyes Ultimate Dragon', 'Gate Guardian', 'Dragon Master Knight'];
     const VERY_RARE_CARDS = ['Zoa', 'Metalzoa'];
+    const DARK_SIGNER_ACE_REWARD_MAP = {
+        kalin: 'Earthbound Immortal Ccapac Apu',
+        carly: 'Earthbound Immortal Aslla piscu',
+        roman: 'Earthbound Immortal Uru',
+        misty: 'Earthbound Immortal Ccarayhua',
+        devack: 'Earthbound Immortal Cusillu',
+        greiger: 'Earthbound Immortal Chacu Challhua',
+        goodwin: 'Earthbound Immortal Wiraqocha Rasca'
+    };
+    const EARTHBOUND_IMMORTALS_SET = new Set(Object.values(DARK_SIGNER_ACE_REWARD_MAP));
 
     // Asegurar que NO aparezcan en el cardPool general de otros duelistas
-    cardPool = cardPool.filter(c => !ULTRA_RARE_BOSS_CARDS.includes(c) && !VERY_RARE_CARDS.includes(c));
+    // Los Inmortales Terrestres NUNCA caen en pools generales ni se pueden obtener de otra manera
+    cardPool = cardPool.filter(c => !ULTRA_RARE_BOSS_CARDS.includes(c) && !VERY_RARE_CARDS.includes(c) && !EARTHBOUND_IMMORTALS_SET.has(c));
 
     // Shuffle pool and select 3 cards
     let curCollection = is5DOpponent ? (s.collectionMundo3 || {}) : (s.collection || {});
@@ -14537,7 +14548,14 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
                 'Road Warrior',
                 'Stardust Dragon',
                 'Junk Warrior'
-            ]
+            ],
+            kalin: ['Infernity General', 'Infernity Destroyer', 'Infernity Archfiend'],
+            carly: ['Fortune Lady Dark', 'Fortune Lady Earth'],
+            roman: ['Mother Spider', 'Relinquished Spider'],
+            misty: ['Reptilianne Vaskii', 'Reptilianne Medusa'],
+            devack: ['Zeman the Ape King', 'Behemoth the King of All Animals'],
+            greiger: ['Flying Fortress SKY FIRE', 'Summon Reactor SK', 'Cyber Dragon'],
+            goodwin: ['Sun Dragon Inti', 'Moon Dragon Quilla', 'Oracle of the Sun']
         };
         let rivalTunersMap = {
             trudge: ['Jutte Fighter', 'Junk Synchron'],
@@ -14564,7 +14582,14 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
                 'Formula Synchron',
                 'Junk Synchron',
                 'Nitro Synchron'
-            ]
+            ],
+            kalin: ['Infernity Archfiend', 'Infernity Guardian', 'Infernity Beast'],
+            carly: ['Fortune Lady Water', 'Fortune Lady Wind', 'Fortune Lady Fire'],
+            roman: ['Ground Spider', 'Spyder Spider', 'Dark Spider'],
+            misty: ['Reptilianne Scylla', 'Reptilianne Gorgon', 'Reptilianne Viper'],
+            devack: ['Berserk Gorilla', 'Ape Fighter', 'Ape Magician'],
+            greiger: ['Spell Reactor RE', 'Trap Reactor Y FI'],
+            goodwin: ['Fire Ant Ascator', 'Supay', 'Apocatequil', 'Weeping Idol']
         };
         let rivalSupportMap = {
             trudge: ['Assault Dog', 'Twin-Shield Defender', 'Urgent Tuning', 'Sakuretsu Armor'],
@@ -14597,7 +14622,14 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
                 'Sonic Chick',
                 'Synchro Blast Wave',
                 'Urgent Tuning'
-            ]
+            ],
+            kalin: ['Allure of Darkness', 'Book of Moon', 'Call of the Haunted', 'Torrential Tribute'],
+            carly: ['Soul Charge', 'Book of Moon', 'Magic Cylinder', 'Trap Stun'],
+            roman: ['Insect Barrier', 'Insect Imitation', 'Bottomless Trap Hole', 'Waboku'],
+            misty: ['Allure of Darkness', 'Book of Moon', 'Call of the Haunted', 'Bottomless Trap Hole'],
+            devack: ['Soul Charge', 'Gaia Power', 'Magic Cylinder', 'Sakuretsu Armor'],
+            greiger: ['Limiter Removal', 'Book of Moon', 'Trap Stun', 'Bottomless Trap Hole'],
+            goodwin: ['Soul Charge', 'Book of Moon', 'Call of the Haunted', 'Solemn Judgment']
         };
 
         let possibleBosses = boss5DMap[normalizedOpp] || ['Stardust Dragon', 'Junk Warrior'];
@@ -14643,6 +14675,23 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             if (DM_FILLER_SET.has(selected3[i])) {
                 let fallbackPool = ['Speed Warrior', 'Quillbolt Hedgehog', 'Sonic Chick', 'Junk Synchron', 'Urgent Tuning', 'Synchro Blast Wave'];
                 selected3[i] = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+            }
+        }
+
+        // ── RECOMPENSA ULTRA RARA: INMORTAL TERRESTRE (BAJA PROBABILIDAD) ──
+        // ÚNICA FORMA DE OBTENCIÓN EN TODO EL JUEGO: Derrotar a su respectivo Portador Oscuro
+        if (DARK_SIGNER_ACE_REWARD_MAP[normalizedOpp]) {
+            let targetAce = DARK_SIGNER_ACE_REWARD_MAP[normalizedOpp];
+            let ownAceCount = curCollection[targetAce] || 0;
+            // Probabilidad muy baja de recompensa legendaria: S: 3%, A: 2%, B: 1%, C: 0.5%
+            let aceDropChance = rankStr.includes('S') ? 0.03 : (rankStr.includes('A') ? 0.02 : (rankStr.includes('B') ? 0.01 : 0.005));
+            if (oppWins >= 5 && aceDropChance < 0.05) aceDropChance += 0.015;
+
+            if (ownAceCount < 3 && Math.random() < aceDropChance) {
+                selected3[0] = targetAce; // Posición de honor estelar
+                if (typeof log === 'function') {
+                    log('🌟 ¡DESTINO OSCURO! ¡Has obtenido como recompensa ultra rara al ' + targetAce + '!');
+                }
             }
         }
     } else if (isGXOpponent) {
@@ -14770,8 +14819,17 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
         let cardColor = info.isMonster ? '#d4af37' : (info.isTrap ? '#ff80ab' : '#4caf50');
         let ownCount = is5DOpponent ? ((s.collectionMundo3 && s.collectionMundo3[cardName]) || 0) : ((s.collection && s.collection[cardName]) || 0);
         
+        let isEarthbound = (typeof EARTHBOUND_IMMORTALS_SET !== 'undefined' && EARTHBOUND_IMMORTALS_SET.has(cardName));
         let cardBox = document.createElement('div');
-        cardBox.style.cssText = 'background: rgba(22, 22, 32, 0.95); border: 2px solid #a67c00; border-radius: 10px; padding: 16px; width: 240px; display:flex; flex-direction:column; align-items:center; box-shadow: 0 8px 25px rgba(0,0,0,0.8); transition: transform 0.2s, box-shadow 0.2s; box-sizing:border-box;';
+        let boxBorder = isEarthbound ? '#e040fb' : '#a67c00';
+        let boxShadow = isEarthbound ? '0 0 25px rgba(224,64,251,0.6), 0 8px 25px rgba(0,0,0,0.9)' : '0 8px 25px rgba(0,0,0,0.8)';
+        cardBox.style.cssText = 'position:relative; background: rgba(22, 22, 32, 0.95); border: 2px solid ' + boxBorder + '; border-radius: 10px; padding: 16px; width: 240px; display:flex; flex-direction:column; align-items:center; box-shadow: ' + boxShadow + '; transition: transform 0.2s, box-shadow 0.2s; box-sizing:border-box;';
+        if (isEarthbound) {
+            let badge = document.createElement('div');
+            badge.style.cssText = 'background:linear-gradient(90deg, #6a1b9a, #ab47bc); border:1px solid #e040fb; color:#fff; font-size:10px; font-weight:bold; padding:2px 8px; border-radius:10px; margin-bottom:8px; letter-spacing:1px; box-shadow:0 0 8px #e040fb;';
+            badge.textContent = '🌟 ¡RECOMPENSA ULTRA RARA!';
+            cardBox.appendChild(badge);
+        }
         cardBox.onmouseover = () => {
             cardBox.style.transform = 'translateY(-8px)';
             cardBox.style.boxShadow = '0 0 25px #ffd700';
@@ -15105,7 +15163,15 @@ window.customShowShop = function() {
                 // 2. Cantantes e Insignias exclusivas de los rivales principales (Jack, Yusei, Crow)
                 'Soul Resonator', 'Crimson Resonator', 'Vision Resonator',
                 'Stardust Synchron',
-                'Blackwing - Auster the South Wind', 'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North'
+                'Blackwing - Auster the South Wind', 'Blackwing - Gale the Whirlwind', 'Blackwing - Blizzard the Far North',
+                // 3. INMORTALES TERRESTRES (PROHIBIDOS EN LA TIENDA - SOLO RECOMPENSA ULTRA RARA DE DUELO)
+                'Earthbound Immortal Ccapac Apu',
+                'Earthbound Immortal Aslla piscu',
+                'Earthbound Immortal Uru',
+                'Earthbound Immortal Ccarayhua',
+                'Earthbound Immortal Cusillu',
+                'Earthbound Immortal Chacu Challhua',
+                'Earthbound Immortal Wiraqocha Rasca'
             ]);
 
             if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
