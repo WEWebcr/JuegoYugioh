@@ -690,7 +690,11 @@ const portraitMap = {
     // 5D's characters (Mundo 3)
     'TRUDGE': 'Trudge.png', 'LEO': 'Leo.png', 'AKIZA': 'Akiza.png',
     'CROW': 'Crow.png', 'JACK': 'Jack.png', 'YUSEI': 'Yusei.png',
-    'RALLY': 'Rally.png'
+    'RALLY': 'Rally.png',
+    // Dark Signers (Portadores Oscuros)
+    'KALIN': 'Kalin.png', 'CARLY': 'Carly.png', 'ROMAN': 'Roman.png',
+    'MISTY': 'Misty.png', 'DEVACK': 'Devack.png', 'GREIGER': 'Greiger.png',
+    'GOODWIN': 'Goodwin.png'
 };
 
 const dialogPortraitMap = {
@@ -731,7 +735,15 @@ const dialogPortraitMap = {
     'CROW': 'Crow.png',
     'JACK': 'Jack.png',
     'YUSEI': 'Yusei.png',
-    'RALLY': 'Rally.png'
+    'RALLY': 'Rally.png',
+    // Dark Signers
+    'KALIN': 'Kalin.png',
+    'CARLY': 'Carly.png',
+    'ROMAN': 'Roman.png',
+    'MISTY': 'Misty.png',
+    'DEVACK': 'Devack.png',
+    'GREIGER': 'Greiger.png',
+    'GOODWIN': 'Goodwin.png'
 };
 
 window.DUELISTS_NAMES = {
@@ -769,7 +781,15 @@ window.DUELISTS_NAMES = {
     'crow': 'Crow Hogan',
     'jack': 'Jack Atlas',
     'yusei': 'Yusei Fudo',
-    'rally': 'Rally Dawson'
+    'rally': 'Rally Dawson',
+    // Dark Signers
+    'kalin': 'Kalin Kessler',
+    'carly': 'Carly Carmine',
+    'roman': 'Román Goodwin',
+    'misty': 'Misty Tredwell',
+    'devack': 'Devack',
+    'greiger': 'Greiger',
+    'goodwin': 'Rex Goodwin'
 };
 
 const introDialog = [
@@ -885,7 +905,7 @@ window.getDuelMusic = function(charId) {
     var curWorld = (g && g._currentWorld) || (window.currentWorld) || 1;
 
     // ── MUNDO 3: NEO DOMINO CITY (5D's) ──
-    var is5DChar = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'rally'].includes(charId);
+    var is5DChar = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'rally', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'].includes(charId);
     if (curWorld === 3 || is5DChar) {
         if (charId === 'jack' || charId === 'yusei') {
             return 'duelo_5d_boss.mp3';
@@ -3179,6 +3199,187 @@ window.showMillenniumItemCelebration = function(wonItem, charId, onDone) {
     document.body.appendChild(modal);
 };
 
+
+// ════════════════════════════════════════════════════════════════
+//  SISTEMA CENTRAL DE LAS 7 INSIGNIAS DE NAZCA (PORTADORES OSCUROS)
+// ════════════════════════════════════════════════════════════════
+window.getNazcaInsignias = function(s) {
+    s = s || {};
+    const cleared5D = Array.isArray(s.cleared5D) ? s.cleared5D.map(x => String(x).toLowerCase()) : [];
+    return [
+      {
+        id: 'gigante',
+        name: 'Insignia del Gigante',
+        shortName: 'Gigante',
+        bearer: 'Kalin Kessler',
+        bearerId: 'kalin',
+        immortal: 'Earthbound Immortal Ccapac Apu',
+        atk: 3000,
+        def: 2500,
+        icon: '🗿',
+        color: '#ab47bc',
+        desc: 'Línea de Nazca del Gigante. Su titánico poder de 3000 ATK devora las defensas rivales.',
+        unlocked: cleared5D.includes('kalin')
+      },
+      {
+        id: 'colibri',
+        name: 'Insignia del Colibrí',
+        shortName: 'Colibrí',
+        bearer: 'Carly Carmine',
+        bearerId: 'carly',
+        immortal: 'Earthbound Immortal Aslla piscu',
+        atk: 2500,
+        def: 2500,
+        icon: '🕊️',
+        color: '#ec407a',
+        desc: 'Línea de Nazca del Colibrí. El aleteo de Aslla piscu purga el campo rival e inflige daño devastador.',
+        unlocked: cleared5D.includes('carly')
+      },
+      {
+        id: 'arana',
+        name: 'Insignia de la Araña',
+        shortName: 'Araña',
+        bearer: 'Román Goodwin',
+        bearerId: 'roman',
+        immortal: 'Earthbound Immortal Uru',
+        atk: 3000,
+        def: 3000,
+        icon: '🕷️',
+        color: '#e53935',
+        desc: 'Línea de Nazca de la Araña. Las redes de Uru atrapan y controlan a los monstruos del oponente.',
+        unlocked: cleared5D.includes('roman')
+      },
+      {
+        id: 'lagarto',
+        name: 'Insignia del Lagarto',
+        shortName: 'Lagarto',
+        bearer: 'Misty Tredwell',
+        bearerId: 'misty',
+        immortal: 'Earthbound Immortal Ccarayhua',
+        atk: 2800,
+        def: 1800,
+        icon: '🦎',
+        color: '#26a69a',
+        desc: 'Línea de Nazca del Lagarto. La ponzoña de Ccarayhua desata un cataclismo sobre todo el tablero.',
+        unlocked: cleared5D.includes('misty')
+      },
+      {
+        id: 'mono',
+        name: 'Insignia del Mono',
+        shortName: 'Mono',
+        bearer: 'Devack',
+        bearerId: 'devack',
+        immortal: 'Earthbound Immortal Cusillu',
+        atk: 2800,
+        def: 2400,
+        icon: '🐒',
+        color: '#ffa726',
+        desc: 'Línea de Nazca del Mono. La furia salvaje de Cusillu reduce a la mitad los puntos de vida enemigos.',
+        unlocked: cleared5D.includes('devack')
+      },
+      {
+        id: 'orca',
+        name: 'Insignia de la Orca',
+        shortName: 'Orca',
+        bearer: 'Greiger',
+        bearerId: 'greiger',
+        immortal: 'Earthbound Immortal Chacu Challhua',
+        atk: 2900,
+        def: 2400,
+        icon: '🐋',
+        color: '#29b6f6',
+        desc: 'Línea de Nazca de la Orca / Pez. Congela la fase de batalla enemiga e inflige daño directo.',
+        unlocked: cleared5D.includes('greiger')
+      },
+      {
+        id: 'condor',
+        name: 'Insignia del Cóndor',
+        shortName: 'Cóndor',
+        bearer: 'Rex Goodwin',
+        bearerId: 'goodwin',
+        immortal: 'Earthbound Immortal Wiraqocha Rasca',
+        atk: 100,
+        def: 100,
+        icon: '🦅',
+        color: '#ffd700',
+        desc: 'Línea de Nazca del Cóndor Supremo. La última marca ancestral capaz de abrir la puerta hacia el Nuevo Mundo.',
+        unlocked: cleared5D.includes('goodwin')
+      }
+    ];
+};
+
+window.showNazcaInsigniaCelebration = function(wonInsignia, charId, onDone) {
+    if (window.playCustomMusic) window.playCustomMusic('dueloterminado.mp3');
+    if (window.playViolinClick) window.playViolinClick();
+    
+    let modal = document.createElement('div');
+    modal.id = 'nazca-celebration-modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:radial-gradient(circle at center, rgba(30,10,40,0.96) 0%, rgba(5,2,10,0.99) 100%); z-index:9999999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; box-sizing:border-box; font-family:"Segoe UI", sans-serif;';
+    
+    let aura = document.createElement('div');
+    aura.style.cssText = 'position:absolute; width:480px; height:480px; background:radial-gradient(circle, rgba(171,71,188,0.4) 0%, rgba(106,27,154,0.2) 50%, rgba(0,0,0,0) 75%); border-radius:50%; pointer-events:none; animation:relicBadgePulse 2.5s infinite ease-in-out;';
+    modal.appendChild(aura);
+    
+    let iconBox = document.createElement('div');
+    iconBox.style.cssText = 'font-size:72px; margin-bottom:15px; filter:drop-shadow(0 0 25px #e040fb) drop-shadow(0 0 45px rgba(224,64,251,0.8)); z-index:2; line-height:1;';
+    iconBox.textContent = wonInsignia.icon;
+    modal.appendChild(iconBox);
+    
+    let subtitle = document.createElement('div');
+    subtitle.style.cssText = 'font-family:VT323, monospace; font-size:24px; color:#e040fb; letter-spacing:3px; text-shadow:0 0 12px #e040fb; z-index:2; margin-bottom:6px;';
+    subtitle.textContent = '🪐 ¡INSIGNIA DE NAZCA CONQUISTADA! 🪐';
+    modal.appendChild(subtitle);
+    
+    let title = document.createElement('div');
+    title.style.cssText = 'font-family:"Cinzel", serif, "Times New Roman"; font-size:32px; font-weight:900; color:#fff; letter-spacing:2px; text-shadow:0 0 25px rgba(224,64,251,0.8), 2px 2px 0 #000; z-index:2; margin-bottom:6px;';
+    title.textContent = wonInsignia.name.toUpperCase();
+    modal.appendChild(title);
+    
+    let bearerText = document.createElement('div');
+    bearerText.style.cssText = 'font-size:15px; color:#ce93d8; font-family:"Segoe UI", sans-serif; z-index:2; margin-bottom:12px;';
+    bearerText.textContent = `Reclamada a ${wonInsignia.bearer} tras doblegar a ${wonInsignia.immortal} (${wonInsignia.atk} ATK)`;
+    modal.appendChild(bearerText);
+    
+    let descBox = document.createElement('div');
+    descBox.style.cssText = 'max-width:540px; background:rgba(30,10,40,0.85); border:1.5px solid #ab47bc; border-radius:10px; padding:12px 20px; color:#f3e5f5; font-size:14px; line-height:1.5; font-style:italic; font-family:"Segoe UI", sans-serif; z-index:2; margin-bottom:18px; box-shadow:0 4px 15px rgba(0,0,0,0.6);';
+    descBox.textContent = `"${wonInsignia.desc}"`;
+    modal.appendChild(descBox);
+    
+    let sStr = origGet('FMR_SAVE_' + window.activeAccount);
+    let s = {};
+    try { s = JSON.parse(sStr) || {}; } catch(_) {}
+    let allInsignias = window.getNazcaInsignias(s);
+    let nowUnlocked = allInsignias.filter(x => x.unlocked).length;
+    let allSeven = (nowUnlocked >= 7);
+    
+    let counterPill = document.createElement('div');
+    counterPill.style.cssText = 'background:#240b36; border:2px solid #e040fb; border-radius:24px; padding:6px 20px; color:#e040fb; font-family:VT323, monospace; font-size:20px; font-weight:bold; letter-spacing:2px; box-shadow:0 0 15px rgba(224,64,251,0.5); z-index:2; margin-bottom:20px;';
+    counterPill.textContent = `🪐 INSIGNIAS DE NAZCA: ${nowUnlocked} / 7`;
+    modal.appendChild(counterPill);
+    
+    if (allSeven) {
+        let unlockBanner = document.createElement('div');
+        unlockBanner.style.cssText = 'background:linear-gradient(90deg, rgba(255,215,0,0.2), rgba(224,64,251,0.4), rgba(255,215,0,0.2)); border:2px solid #ffd700; border-radius:12px; padding:10px 24px; color:#fff; font-family:VT323, monospace; font-size:22px; font-weight:bold; letter-spacing:2px; text-shadow:0 0 15px #ffd700; z-index:2; margin-bottom:20px; animation:relicBadgePulse 2s infinite;';
+        unlockBanner.innerHTML = '🌌 ¡EL SELLO DE NAZCA HA SIDO ROTO!<br><span style="font-size:16px; color:#ffd700;">¡EL PORTAL HACIA EL NUEVO MUNDO HA SIDO ABIERTO!</span>';
+        modal.appendChild(unlockBanner);
+        s.newWorldUnlocked = true;
+        if (window.persistUserSave) window.persistUserSave(s);
+    }
+    
+    let btnContinue = document.createElement('button');
+    btnContinue.className = 'campBtn3000 ps1-btn ps1-btn-blue';
+    btnContinue.style.cssText = 'padding:12px 36px; font-size:20px; font-family:VT323, monospace; letter-spacing:2px; cursor:pointer; z-index:2; box-shadow:0 0 20px rgba(171,71,188,0.6);';
+    btnContinue.textContent = allSeven ? '🌌 ENTRAR AL NUEVO MUNDO' : '🪐 CONTINUAR';
+    btnContinue.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        modal.remove();
+        if (typeof onDone === 'function') onDone();
+    };
+    modal.appendChild(btnContinue);
+    
+    document.body.appendChild(modal);
+};
+
 // ════════════════════════════════════════════════════════════════
 //  NODOS Y RUTA DEL MAPA DE CAMPAÑA
 // ════════════════════════════════════════════════════════════════
@@ -3252,13 +3453,22 @@ const MAP_EDGES_GX = [
 //  NODOS Y RUTA DEL MAPA MUNDO 3: NEO DOMINO CITY (5D's)
 // ════════════════════════════════════════════════════════════════
 window.CUSTOM_NODES_5D = [
-    { id: '5d_1', left: '50%', top: '84%', label: 'TRUDGE', char: 'TRUDGE', req: [] },
-    { id: '5d_2', left: '35%', top: '72%', label: 'LEO', char: 'LEO', req: ['trudge'] },
-    { id: '5d_3', left: '65%', top: '60%', label: 'AKIZA', char: 'AKIZA', req: ['leo'] },
-    { id: '5d_4', left: '35%', top: '48%', label: 'CROW', char: 'CROW', req: ['akiza'] },
-    { id: '5d_5', left: '65%', top: '34%', label: 'JACK ATLAS', char: 'JACK', req: ['crow'] },
-    { id: '5d_6', left: '50%', top: '18%', label: 'YUSEI FUDO', char: 'YUSEI', req: ['jack'] },
-    { id: '5d_shop', left: '88%', top: '84%', label: 'TIENDA 5D', char: 'RALLY', req: [] }
+    // Fase 1: Copa Fortuna (Neo Domino)
+    { id: '5d_1', left: '50%', top: '92%', label: 'TRUDGE', char: 'TRUDGE', req: [] },
+    { id: '5d_2', left: '35%', top: '85%', label: 'LEO', char: 'LEO', req: ['trudge'] },
+    { id: '5d_3', left: '65%', top: '78%', label: 'AKIZA', char: 'AKIZA', req: ['leo'] },
+    { id: '5d_4', left: '35%', top: '71%', label: 'CROW', char: 'CROW', req: ['akiza'] },
+    { id: '5d_5', left: '65%', top: '64%', label: 'JACK ATLAS', char: 'JACK', req: ['crow'] },
+    { id: '5d_6', left: '50%', top: '57%', label: 'YUSEI FUDO', char: 'YUSEI', req: ['jack'] },
+    { id: '5d_shop', left: '88%', top: '92%', label: 'TIENDA 5D', char: 'RALLY', req: [] },
+    // Fase 2: Los 7 Portadores Oscuros (Dark Signers)
+    { id: '5d_7', left: '35%', top: '50%', label: 'KALIN KESSLER', char: 'KALIN', req: ['yusei'], insigniaKey: 'gigante', insigniaName: 'Insignia del Gigante', insigniaIcon: '🗿' },
+    { id: '5d_8', left: '65%', top: '43%', label: 'CARLY CARMINE', char: 'CARLY', req: ['kalin'], insigniaKey: 'colibri', insigniaName: 'Insignia del Colibrí', insigniaIcon: '🕊️' },
+    { id: '5d_9', left: '35%', top: '36%', label: 'ROMÁN GOODWIN', char: 'ROMAN', req: ['carly'], insigniaKey: 'arana', insigniaName: 'Insignia de la Araña', insigniaIcon: '🕷️' },
+    { id: '5d_10', left: '65%', top: '29%', label: 'MISTY TREDWELL', char: 'MISTY', req: ['roman'], insigniaKey: 'lagarto', insigniaName: 'Insignia del Lagarto', insigniaIcon: '🦎' },
+    { id: '5d_11', left: '35%', top: '22%', label: 'DEVACK', char: 'DEVACK', req: ['misty'], insigniaKey: 'mono', insigniaName: 'Insignia del Mono', insigniaIcon: '🐒' },
+    { id: '5d_12', left: '65%', top: '15%', label: 'GREIGER', char: 'GREIGER', req: ['devack'], insigniaKey: 'orca', insigniaName: 'Insignia de la Orca', insigniaIcon: '🐋' },
+    { id: '5d_13', left: '50%', top: '7%', label: 'REX GOODWIN', char: 'GOODWIN', req: ['greiger'], insigniaKey: 'condor', insigniaName: 'Insignia del Cóndor', insigniaIcon: '🦅' }
 ];
 
 const MAP_EDGES_5D = [
@@ -3267,6 +3477,13 @@ const MAP_EDGES_5D = [
     ['5d_3', '5d_4'],
     ['5d_4', '5d_5'],
     ['5d_5', '5d_6'],
+    ['5d_6', '5d_7'],
+    ['5d_7', '5d_8'],
+    ['5d_8', '5d_9'],
+    ['5d_9', '5d_10'],
+    ['5d_10', '5d_11'],
+    ['5d_11', '5d_12'],
+    ['5d_12', '5d_13'],
     ['5d_1', '5d_shop']
 ];
 
@@ -3297,7 +3514,20 @@ window.FIVE_D_CARD_NAMES = new Set([
   'Bone Archfiend', 'Synkron Resonator', 'Darkness Resonator',
   'Soul Charge', 'Black Whirlwind', 'Allure of Darkness',
   'De-Synchro', 'Trap Stun', 'Book of Moon',
-  'Crimson Gaia', 'Resonator Call'
+  'Crimson Gaia', 'Resonator Call',
+  // Earthbound Immortals (Inmortales Terrestres)
+  'Earthbound Immortal Ccapac Apu', 'Earthbound Immortal Aslla piscu', 'Earthbound Immortal Uru',
+  'Earthbound Immortal Ccarayhua', 'Earthbound Immortal Cusillu', 'Earthbound Immortal Chacu Challhua',
+  'Earthbound Immortal Wiraqocha Rasca',
+  // Dark Signer Anime Monsters
+  'Infernity Archfiend', 'Infernity Destroyer', 'Infernity Guardian', 'Infernity General', 'Infernity Beast',
+  'Fortune Lady Dark', 'Fortune Lady Earth', 'Fortune Lady Fire', 'Fortune Lady Water', 'Fortune Lady Wind',
+  'Mother Spider', 'Relinquished Spider', 'Ground Spider', 'Spyder Spider', 'Dark Spider',
+  'Reptilianne Vaskii', 'Reptilianne Medusa', 'Reptilianne Scylla', 'Reptilianne Gorgon', 'Reptilianne Viper',
+  'Ape Fighter', 'Ape Magician', 'Berserk Gorilla', 'Behemoth the King of All Animals', 'Mad Dog of Darkness',
+  'Flying Fortress SKY FIRE', 'Summon Reactor SK', 'Spell Reactor RE', 'Trap Reactor Y FI',
+  'Oracle of the Sun', 'Apocatequil', 'Fire Ant Ascator', 'Supay', 'Weeping Idol',
+  'Sun Dragon Inti', 'Moon Dragon Quilla', 'Zeman the Ape King'
 ]);
 
 window.SYNCHRO_CARD_NAMES = new Set([
@@ -3312,7 +3542,8 @@ window.SYNCHRO_CARD_NAMES = new Set([
   'Hot Red Dragon Archfiend Abyss', 'Scarred Dragon Archfiend',
   'Black-Winged Assault Dragon', 'Hot Red Dragon Archfiend',
   'Red Nova Dragon - Burning Soul', 'Red Nova Dragon',
-  'Hot Red Dragon Archfiend Bane', 'Chaos Angel'
+  'Hot Red Dragon Archfiend Bane', 'Chaos Angel',
+  'Sun Dragon Inti', 'Moon Dragon Quilla', 'Zeman the Ape King'
 ]);
 
 window.isSynchroCard = function(cardOrName) {
@@ -3335,7 +3566,10 @@ window.MUNDO3_ALLOWED_STAPLES = new Set([
   'Mystical Space Typhoon', 'Dust Tornado', 'Swords of Revealing Light',
   'Dark Hole', 'Fissure', 'Trap Hole', 'Waboku', 'Sakuretsu Armor',
   'United We Stand', 'Axe of Despair', 'Mage Power',
-  'Red Medicine', 'Dian Keto the Cure Master'
+  'Red Medicine', 'Dian Keto the Cure Master',
+  'Mirror Force', 'Torrential Tribute', 'Bottomless Trap Hole', 'Call of the Haunted',
+  'Solemn Judgment', 'Pot of Greed', 'Renace al Monstruo', 'Raigeki', 'Heavy Storm',
+  'Magic Cylinder', 'Insect Barrier', 'Insect Imitation', 'Gaia Power', 'Limiter Removal'
 ]);
 
 window.is5DCard = function(cardOrName) {
@@ -3346,14 +3580,14 @@ window.is5DCard = function(cardOrName) {
   if (meta) {
     if (meta.world === 3 || meta.kind === 'SYNCHRO' || meta.isTuner === true) return true;
     var num = Number(meta.num || meta.id || 0);
-    if (num >= 950 && num <= 1050) return true;
+    if (num >= 950 && num <= 1100) return true;
   }
   if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
     var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
     if (cd) {
       if (cd.world === 3 || cd.kind === 'SYNCHRO' || cd.isTuner === true) return true;
       var id = Number(cd.id || 0);
-      if (id >= 950 && id <= 1050) return true;
+      if (id >= 950 && id <= 1100) return true;
     }
   }
   return false;
@@ -3472,7 +3706,7 @@ window.customShowMap = function() {
     
     let mapStage = document.createElement('div');
     mapStage.id = 'map-stage-track';
-    mapStage.style.cssText = 'position:relative; width:100%; min-height:100vh;';
+    mapStage.style.cssText = 'position:relative; width:100%; min-height:' + (is5D ? '1800px' : '100vh') + ';';
     
     // Inyección de estilos de animación para el mapa si no existen
     if (!document.getElementById('custom-map-animations')) {
@@ -3549,9 +3783,29 @@ window.customShowMap = function() {
     if (is5D) {
         let fiveDBar = document.createElement('div');
         fiveDBar.id = 'map-relics-bar';
-        fiveDBar.style.cssText = 'display:flex; align-items:center; gap:8px; background:rgba(0,20,40,0.75); padding:4px 14px; border-radius:20px; border:1px solid #00e5ff; box-shadow:0 0 10px rgba(0,229,255,0.3);';
-        let fiveDClearedCount = cleared.filter(c => ['trudge','leo','akiza','crow','jack','yusei'].includes(c)).length;
-        fiveDBar.innerHTML = `<span style="font-size:16px;">🏍️</span><span style="font-size:12px; font-weight:bold; color:#00e5ff; font-family:'Segoe UI', sans-serif;">NEO DOMINO: ${fiveDClearedCount} / 6 DERROTADOS</span>`;
+        fiveDBar.style.cssText = 'display:flex; align-items:center; gap:5px; background:rgba(0,10,25,0.85); padding:3px 10px; border-radius:20px; border:1.5px solid #ab47bc; box-shadow:0 0 12px rgba(171,71,188,0.4);';
+        
+        const NAZCA_INSIGNIAS = window.getNazcaInsignias(s);
+        const unlockedInsigniasCount = NAZCA_INSIGNIAS.filter(it => it.unlocked).length;
+        
+        let leadChip = document.createElement('div');
+        leadChip.style.cssText = 'font-size:11px; font-weight:bold; color:#e040fb; font-family:VT323, monospace; letter-spacing:1px; margin-right:4px;';
+        leadChip.innerHTML = `🪐 NAZCA: ${unlockedInsigniasCount}/7`;
+        fiveDBar.appendChild(leadChip);
+        
+        NAZCA_INSIGNIAS.forEach(it => {
+            let chip = document.createElement('div');
+            chip.style.cssText = `display:flex; align-items:center; gap:3px; padding:2px 7px; border-radius:12px; cursor:pointer; transition:transform 0.18s ease; ${it.unlocked ? 'background:linear-gradient(135deg, rgba(171,71,188,0.45), rgba(15,5,25,0.9)); border:1.5px solid #e040fb; box-shadow:0 0 8px rgba(224,64,251,0.6);' : 'background:rgba(20,5,25,0.7); border:1px solid #4a148c; opacity:0.5;'}`;
+            chip.title = it.unlocked ? `${it.name}: ¡CONQUISTADA de ${it.bearer}! (${it.immortal})` : `${it.name}: En poder de ${it.bearer} (${it.immortal}). ¡Derrótalo para reclamarla!`;
+            chip.innerHTML = `<span style="font-size:13px;">${it.unlocked ? it.icon : '🔒'}</span><span style="font-size:10px; font-weight:bold; color:${it.unlocked ? '#e040fb' : '#9575cd'}; font-family:'Segoe UI', sans-serif;">${it.shortName}</span>`;
+            chip.onmouseover = () => { chip.style.transform = 'scale(1.15)'; };
+            chip.onmouseout = () => { chip.style.transform = 'scale(1)'; };
+            chip.onclick = () => {
+                if (window.playViolinClick) window.playViolinClick();
+                alert(`${it.icon} ${it.name.toUpperCase()}\n\nPortador Oscuro: ${it.bearer}\nInmortal Terrestre: ${it.immortal} (${it.atk} ATK)\n\n"${it.desc}"\n\nEstado: ${it.unlocked ? '✅ CONQUISTADA (' + (unlockedInsigniasCount === 7 ? '¡SELLO DE NAZCA ROTO - PORTAL AL NUEVO MUNDO ABIERTO!' : unlockedInsigniasCount + '/7 Insignias') + ')' : '🔒 BLOQUEADA (Derrótalo en la Campaña)'}`);
+            };
+            fiveDBar.appendChild(chip);
+        });
         topBar.appendChild(fiveDBar);
     } else if (isGX) {
         let gxBar = document.createElement('div');
@@ -4051,6 +4305,23 @@ window.customShowMap = function() {
                         introLines = [{ role: 'system', speaker: 'JACK', text: '¡Solo hay un Rey en Neo Domino, y ese soy yo! ¡Arrodíllate ante el poder absoluto de mi Dragón Rojo Archidemonio!' }];
                     } else if (charKey === 'yusei') {
                         introLines = [{ role: 'system', speaker: 'YUSEI', text: 'Los lazos con nuestras cartas nunca se romperán si creemos en el mañana. ¡Aceleremos el duelo! ¡Vamos, Dragón de Polvo de Estrellas!' }];
+                    } else if (charKey === 'kalin') {
+                        introLines = [{ role: 'system', speaker: 'KALIN', text: '¡Jajajaja! ¿Creíste que el Equipo Satisfacción duraría por siempre? ¡Mi alma arde en el inframundo! ¡Aparece, Inmortal Terrestre Ccapac Apu!' }];
+                    } else if (charKey === 'carly') {
+                        introLines = [{ role: 'system', speaker: 'CARLY', text: 'El destino de las cartas ya predijo tu caída... ¡Las Damas de la Fortuna y mi Inmortal Terrestre Aslla piscu te arrastrarán a las tinieblas!' }];
+                    } else if (charKey === 'roman') {
+                        introLines = [{ role: 'system', speaker: 'ROMAN', text: 'Soy el líder de los Portadores Oscuros. La Marca de la Araña atrapará tu alma para siempre. ¡Despierta, Inmortal Terrestre Uru!' }];
+                    } else if (charKey === 'misty') {
+                        introLines = [{ role: 'system', speaker: 'MISTY', text: 'La venganza me consume... Tu campo será petrificado y reducido a cenizas. ¡Devora todo a tu paso, Inmortal Terrestre Ccarayhua!' }];
+                    } else if (charKey === 'devack') {
+                        introLines = [{ role: 'system', speaker: 'DEVACK', text: '¡Destruiré la conexión entre los humanos y los espíritus del duelo! ¡Siente la furia indomable de mi Inmortal Terrestre Cusillu!' }];
+                    } else if (charKey === 'greiger') {
+                        introLines = [{ role: 'system', speaker: 'GREIGER', text: 'Todo lo que amaba fue destruido por la codicia de Neo Domino... ¡Arrasaré la ciudad entera! ¡Surge de las profundidades, Inmortal Terrestre Chacu Challhua!' }];
+                    } else if (charKey === 'goodwin') {
+                        introLines = [
+                            { role: 'system', speaker: 'GOODWIN', text: 'Poseo tanto la luz del Salvador como las tinieblas de los Portadores Oscuros. ¡Voy a purificar y reiniciar este mundo en ruinas!' },
+                            { role: 'system', speaker: 'GOODWIN', text: '¡Desciende desde los cielos oscuros, el Inmortal supremo de Nazca: Inmortal Terrestre Wiraqocha Rasca!' }
+                        ];
                     }
                     
                     window.playCustomMusic('dialogos.mp3');
@@ -4969,7 +5240,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
 
     let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     const GX_OPPONENTS_SET = new Set(['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster']);
-    const FIVE_D_OPPONENTS_SET = new Set(['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei']);
+    const FIVE_D_OPPONENTS_SET = new Set(['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin']);
     let is5DOpponent = FIVE_D_OPPONENTS_SET.has(normalizedOpp) || (s && s.world === 3);
     let isGXOpponent = !is5DOpponent && GX_OPPONENTS_SET.has(normalizedOpp);
 
@@ -7027,6 +7298,13 @@ window.customFinishStoryDuel = function(win) {
         else if (id === 'crow') lossLines = [{ role: 'system', speaker: 'CROW', text: '¡Demasiado lento en la pista! Las Alanegra vuelan más rápido que cualquier otro duelista.' }];
         else if (id === 'jack') lossLines = [{ role: 'system', speaker: 'JACK', text: '¡Ja, ja, ja! ¿Creíste que podías destronar al Rey? ¡Vuelve a Satélite con las manos vacías!' }];
         else if (id === 'yusei') lossLines = [{ role: 'system', speaker: 'YUSEI', text: 'Fue un buen duelo. Afina tu baraja y sincroniza tus monstruos, volveremos a encontrarnos en la pista.' }];
+        else if (id === 'kalin') lossLines = [{ role: 'system', speaker: 'KALIN', text: '¡Ccapac Apu ha aplastado tus esperanzas! ¡Tu alma pertenece ahora a las sombras de Satélite!' }];
+        else if (id === 'carly') lossLines = [{ role: 'system', speaker: 'CARLY', text: 'El destino dictó tu derrota... Aslla piscu ha consumido tus puntos de vida por completo.' }];
+        else if (id === 'roman') lossLines = [{ role: 'system', speaker: 'ROMAN', text: 'Has caído en la telaraña de Uru. No hay escapatoria del inframundo.' }];
+        else if (id === 'misty') lossLines = [{ role: 'system', speaker: 'MISTY', text: 'La mirada petrificante de Ccarayhua terminó contigo. Nunca debiste intervenir en mi venganza.' }];
+        else if (id === 'devack') lossLines = [{ role: 'system', speaker: 'DEVACK', text: '¡Cusillu destruyó tus defensas! Los espíritus antiguos reclaman su territorio.' }];
+        else if (id === 'greiger') lossLines = [{ role: 'system', speaker: 'GREIGER', text: 'Chacu Challhua arrasó con todo. Mi ira no se apagará tan fácilmente.' }];
+        else if (id === 'goodwin') lossLines = [{ role: 'system', speaker: 'GOODWIN', text: 'Wiraqocha Rasca redujo tu destino a polvo. El mundo renacerá bajo mi nuevo orden.' }];
         
         window.playCustomMusic('dialogos.mp3');
         window.renderCustomStoryDialog(lossLines, 0, () => {
@@ -7047,7 +7325,7 @@ window.customFinishStoryDuel = function(win) {
             s.clearedGX.push(id);
         }
         if (!s.cleared5D) s.cleared5D = [];
-        var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+        var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
         if (fiveDDuelists.includes(id) && !s.cleared5D.includes(id)) {
             s.cleared5D.push(id);
         }
@@ -7059,7 +7337,7 @@ window.customFinishStoryDuel = function(win) {
             ishizu: 'odion', odion: 'marik', marik: 'kaiba', kaiba: 'yugi', yugi: 'atem',
             chumley: 'syrus', syrus: 'jaden', jaden: 'bastion', bastion: 'alexis',
             alexis: 'chazz', chazz: 'zane', zane: 'crowler', crowler: 'aster',
-            trudge: 'leo', leo: 'akiza', akiza: 'crow', crow: 'jack', jack: 'yusei'
+            trudge: 'leo', leo: 'akiza', akiza: 'crow', crow: 'jack', jack: 'yusei', yusei: 'kalin', kalin: 'carly', carly: 'roman', roman: 'misty', misty: 'devack', devack: 'greiger', greiger: 'goodwin'
         };
         const nextOpp = storyNextMap[id] || (typeof STORY_UNLOCK_NEXT !== 'undefined' && STORY_UNLOCK_NEXT[id]);
         if (nextOpp && !s.unlocked.includes(nextOpp)) s.unlocked.push(nextOpp);
@@ -7164,6 +7442,41 @@ window.customFinishStoryDuel = function(win) {
                 { role: 'system', speaker: 'YUSEI', text: '¡Un duelo legendario! Tus monstruos de Sincronía y tu espíritu han conectado con el corazón de todos en Neo Domino.' },
                 { role: 'system', speaker: 'YUSEI', text: 'Has conquistado el Gran Prix de Sincronía. ¡El camino hacia el futuro de los Turbo Duelos brilla gracias a ti!' }
             ];
+        } else if (id === 'kalin') {
+            winLines = [
+                { role: 'system', speaker: 'KALIN', text: '¡Maldición...! El poder de tu convicción... me recuerda a los viejos tiempos con el Equipo Satisfacción.' },
+                { role: 'system', speaker: 'KALIN', text: 'Toma la Insignia del Gigante... Tal vez tú seas capaz de detener esta locura antes de que el mundo se hunda.' }
+            ];
+        } else if (id === 'carly') {
+            winLines = [
+                { role: 'system', speaker: 'CARLY', text: '¡Jack...! Mis cartas... no pudieron cambiar este destino. Gracias por despertarme de esta pesadilla oscura.' },
+                { role: 'system', speaker: 'CARLY', text: 'Te confío la Insignia del Colibrí. ¡Por favor, salva a Neo Domino!' }
+            ];
+        } else if (id === 'roman') {
+            winLines = [
+                { role: 'system', speaker: 'ROMAN', text: 'Imposible... Uru fue derrotado... Pero mi hermano Rex Goodwin aún aguarda en la torre principal.' },
+                { role: 'system', speaker: 'ROMAN', text: 'La Insignia de la Araña es tuya. ¡El verdadero juicio de Nazca está por comenzar!' }
+            ];
+        } else if (id === 'misty') {
+            winLines = [
+                { role: 'system', speaker: 'MISTY', text: 'Por fin... el veneno de la venganza se disipa de mi corazón. Has liberado mi alma del tormento.' },
+                { role: 'system', speaker: 'MISTY', text: 'Toma la Insignia del Lagarto. Que tu luz guíe a los demás hacia la paz.' }
+            ];
+        } else if (id === 'devack') {
+            winLines = [
+                { role: 'system', speaker: 'DEVACK', text: '¡Increíble fuerza! Tus cartas resonaron con los verdaderos espíritus del duelo... Cusillu descansa en paz.' },
+                { role: 'system', speaker: 'DEVACK', text: 'Reclama la Insignia del Mono. ¡Adelante hacia la cumbre!' }
+            ];
+        } else if (id === 'greiger') {
+            winLines = [
+                { role: 'system', speaker: 'GREIGER', text: 'Veo la pureza en tus ojos... Mi venganza estaba cegándome. Mi aldea y mi gente no habrían querido esta destrucción.' },
+                { role: 'system', speaker: 'GREIGER', text: 'Te entrego la Insignia de la Orca. ¡Solo queda Rex Goodwin en la cima de Neo Domino!' }
+            ];
+        } else if (id === 'goodwin') {
+            winLines = [
+                { role: 'system', speaker: 'GOODWIN', text: '¡Wiraqocha Rasca... derrotado! La luz y la oscuridad finalmente se han armonizado en este duelo definitivo.' },
+                { role: 'system', speaker: 'GOODWIN', text: 'Has reunido las 7 Insignias de Nazca. El gran sello ancestral ha caído... ¡Un Nuevo Mundo ha abierto sus puertas para ti!' }
+            ];
         }
         
         // Show 3-card reward choice screen for the defeated character
@@ -7197,7 +7510,22 @@ window.customFinishStoryDuel = function(win) {
                         nextStep();
                     }
                 } else {
-                    nextStep();
+                    // Check if this defeated opponent carries a Nazca Insignia
+                    const allInsignias = window.getNazcaInsignias ? window.getNazcaInsignias(s) : [];
+                    const wonInsignia = allInsignias.find(it => (it.bearerId || '').toLowerCase() === id.toLowerCase());
+                    const insigniaClaimKey = 'FMR_INSIGNIA_CLAIMED_' + id.toLowerCase();
+                    const insigniaAlreadyClaimed = origGet(insigniaClaimKey);
+
+                    if (wonInsignia && !insigniaAlreadyClaimed) {
+                        origSet(insigniaClaimKey, '1');
+                        if (window.showNazcaInsigniaCelebration) {
+                            window.showNazcaInsigniaCelebration(wonInsignia, id, nextStep);
+                        } else {
+                            nextStep();
+                        }
+                    } else {
+                        nextStep();
+                    }
                 }
             });
         });
@@ -8750,7 +9078,7 @@ function applyFusionOverride() {
         const origFusionResult = window.fusionResult;
         window.fusionResult = function(names) {
             // En Mundo 3 (5D's), las fusiones retro están totalmente deshabilitadas
-            var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+            var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
             var oppStr = (typeof opp !== 'undefined' ? opp : (typeof window.storyOpponent !== 'undefined' ? window.storyOpponent : ''));
             var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
                        (window.currentWorld === 3) ||
@@ -9776,7 +10104,7 @@ window.customShowCollection = function() {
 
             // Filtro estricto de catálogo por Mundo
             let num = Number(c.num || c.id || 0);
-            let is5D = (window.is5DCard && window.is5DCard(c)) || (num >= 950 && num <= 1050);
+            let is5D = (window.is5DCard && window.is5DCard(c)) || (num >= 950 && num <= 1100);
             if (activeWorldTab === 3) {
                 let isAllowedStaple = window.MUNDO3_ALLOWED_STAPLES && window.MUNDO3_ALLOWED_STAPLES.has(name);
                 if (!is5D && !isAllowedStaple) return;
@@ -10242,7 +10570,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp])) {
         enemyCardNames = (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]).cards;
       } else {
-        var fiveDDuelistsCheck = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+        var fiveDDuelistsCheck = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
         if (fiveDDuelistsCheck.includes(opp)) {
           enemyCardNames = (window.CHARACTER_DECKS && window.CHARACTER_DECKS.trudge && window.CHARACTER_DECKS.trudge.cards) || [];
         } else {
@@ -10268,7 +10596,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               window.memorySave;
     }
     
-    var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+    var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
     var is5DDuel = fiveDDuelists.includes(opp) || (sSave && sSave.world === 3);
     var playerCardNames = null;
     var playerExtraNames = [];
@@ -10497,6 +10825,58 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       if (typeof duelToast === 'function') {
         duelToast('🎵 ¡Monstruo Cantante garantizado en mano!');
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  MANO INICIAL GARANTIZADA: INMORTALES TERRESTRES (DARK SIGNERS)
+    //  Garantiza que los 7 Portadores Oscuros SIEMPRE inicien con su
+    //  respectivo Inmortal Terrestre en mano y con su ataque correcto.
+    // ════════════════════════════════════════════════════════════════
+    var DARK_SIGNER_ACE_MAP = {
+      kalin: { name: 'Earthbound Immortal Ccapac Apu', atk: 3000, def: 2500 },
+      carly: { name: 'Earthbound Immortal Aslla piscu', atk: 2500, def: 2500 },
+      roman: { name: 'Earthbound Immortal Uru', atk: 3000, def: 3000 },
+      misty: { name: 'Earthbound Immortal Ccarayhua', atk: 2800, def: 1800 },
+      devack: { name: 'Earthbound Immortal Cusillu', atk: 2800, def: 2400 },
+      greiger: { name: 'Earthbound Immortal Chacu Challhua', atk: 2900, def: 2400 },
+      goodwin: { name: 'Earthbound Immortal Wiraqocha Rasca', atk: 100, def: 100 }
+    };
+    var darkSignerKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (DARK_SIGNER_ACE_MAP[darkSignerKey]) {
+      var aceInfo = DARK_SIGNER_ACE_MAP[darkSignerKey];
+      var hasAceInHand = (g.enemyHand || []).some(function(c) {
+        return (c.name || '').toLowerCase() === aceInfo.name.toLowerCase();
+      });
+      if (!hasAceInHand && Array.isArray(g.enemyHand) && g.enemyHand.length > 0) {
+        var dIdx = (g.enemyDeck || []).findIndex(function(c) {
+          return (c.name || '').toLowerCase() === aceInfo.name.toLowerCase();
+        });
+        if (dIdx >= 0) {
+          var aceCard = g.enemyDeck.splice(dIdx, 1)[0];
+          var replacedCard = g.enemyHand.pop();
+          if (replacedCard) g.enemyDeck.push(replacedCard);
+          g.enemyHand.unshift(aceCard);
+        } else {
+          var newAce = cardResolver(aceInfo.name);
+          if (newAce) {
+            g.enemyHand.pop();
+            g.enemyHand.unshift(newAce);
+          }
+        }
+      }
+      // Garantizar que la carta en mano tenga el ataque y defensa correctos
+      (g.enemyHand || []).forEach(function(c) {
+        if ((c.name || '').toLowerCase() === aceInfo.name.toLowerCase()) {
+          c.atk = aceInfo.atk;
+          c.def = aceInfo.def;
+        }
+      });
+      if (typeof log === 'function') {
+        log('🪐 [PORTADOR OSCURO] ¡' + darkSignerKey.toUpperCase() + ' comienza con su Inmortal Terrestre ' + aceInfo.name + ' (' + aceInfo.atk + ' ATK) garantizado en su mano inicial!');
+      }
+      if (typeof duelToast === 'function') {
+        duelToast('🪐 ¡' + aceInfo.name + ' (' + aceInfo.atk + ' ATK) en la mano inicial!');
       }
     }
 
@@ -15598,7 +15978,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       }
     }
 
-    var fiveDDuelistsCheck = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+    var fiveDDuelistsCheck = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
     var is5DCheck = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
                     (window.currentWorld === 3) ||
                     fiveDDuelistsCheck.includes(String(opp || '').toLowerCase());
@@ -15885,7 +16265,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       }
     }
 
-    var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+    var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
     var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
                (window.currentWorld === 3) ||
                fiveDDuelists.includes(String(opp || '').toLowerCase());
@@ -20301,7 +20681,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         if (typeof storyDuelActive !== 'undefined' && storyDuelActive && typeof storyOpponent !== 'undefined' && storyOpponent) {
           var dObj = (typeof DUELISTS !== 'undefined' && DUELISTS.find(function(x) { return x.id === storyOpponent; }));
           var dName = dObj ? dObj.name : String(storyOpponent).toUpperCase();
-          var fiveDD = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei'];
+          var fiveDD = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
           var oppIdLower = String(storyOpponent || '').toLowerCase();
           var wNum = 1;
           if (typeof game !== 'undefined' && game && game._currentWorld) {
