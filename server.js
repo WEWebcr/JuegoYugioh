@@ -372,7 +372,12 @@ app.use('/admin',              express.static(path.join(ROOT, 'admin')));
 app.use('/public_downloads',     express.static(path.join(ROOT, 'public_downloads')));
 
 // ── Juego principal ─────────────────────────────────────────────
-app.get('/', (req, res) => res.sendFile(path.join(ROOT, 'YGOFMR2026-1.html')));
+app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(ROOT, 'YGOFMR2026-1.html'));
+});
 
 // ── Descarga de APK Android ──────────────────────────────────────
 const APK_PATH = path.join(ROOT, 'YuGiOh-ForbiddenMemoriesReborn.apk');

@@ -13197,33 +13197,39 @@ window.customShowMap = function() {
         }
         
         let isCleared = n.char && cleared.includes(cid);
-        let hasItem = !!n.itemKey;
+        let hasItem = !!n.itemKey || !!n.insigniaKey;
+        let itemKeyIcon = n.itemIcon || n.insigniaIcon;
+        let itemKeyName = n.itemName || n.insigniaName;
         let itemRecovered = hasItem && isCleared;
         
         let p = portraitMap[n.char];
         if (p) {
             let filterStyle = isCleared ? 'filter: brightness(0.7) contrast(0.95);' : (!isUnlocked ? 'filter: brightness(0.35) grayscale(100%);' : '');
-            let borderStyle = isCleared ? 'border: 3px solid #4caf50;' : (isUnlocked ? (hasItem ? 'border: 3px solid #ffd700; animation: relicNodeGlow 2s infinite ease-in-out;' : 'border: 3px solid #e4c06b;') : 'border: 3px solid #443315;');
+            let borderGlow = n.insigniaKey ? '#e040fb' : '#ffd700';
+            let borderStyle = isCleared ? 'border: 3px solid #4caf50;' : (isUnlocked ? (hasItem ? 'border: 3px solid ' + borderGlow + '; animation: relicNodeGlow 2s infinite ease-in-out;' : 'border: 3px solid #e4c06b;') : 'border: 3px solid #443315;');
             
-            // 3.1 Insignia de Reliquia Flotante (para los 7 portadores)
+            // 3.1 Insignia de Reliquia o Nazca Flotante
             let relicBadgeHtml = '';
             if (hasItem) {
                 if (itemRecovered) {
                     relicBadgeHtml = `
                         <div class="map-node-badge" style="position:absolute; top:-16px; background:linear-gradient(135deg, #1b4d2e, #2e7d32); color:#d4edda; border:1.5px solid #a3e9a4; border-radius:12px; padding:2px 7px; font-size:10px; font-weight:bold; box-shadow:0 2px 6px rgba(0,0,0,0.85); white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25;">
-                            <span>✨</span> <span>${n.itemIcon} RECUPERADO</span>
+                            <span>✨</span> <span>${itemKeyIcon} CONQUISTADO</span>
                         </div>
                     `;
                 } else if (isUnlocked) {
+                    let badgeBg = n.insigniaKey ? 'linear-gradient(135deg, #6a1b9a, #ab47bc)' : 'linear-gradient(135deg, #b8860b, #ffd700)';
+                    let badgeColor = n.insigniaKey ? '#fff' : '#000';
+                    let badgeShadow = n.insigniaKey ? 'rgba(224,64,251,0.9)' : 'rgba(255,215,0,0.9)';
                     relicBadgeHtml = `
-                        <div class="map-node-badge" style="position:absolute; top:-18px; background:linear-gradient(135deg, #b8860b, #ffd700); color:#000; border:1.5px solid #fff; border-radius:12px; padding:2px 8px; font-size:10px; font-weight:900; box-shadow:0 0 12px rgba(255,215,0,0.9); white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25; animation:relicBadgePulse 1.8s infinite ease-in-out;">
-                            <span>${n.itemIcon}</span> <span>${n.itemName.toUpperCase()}</span>
+                        <div class="map-node-badge" style="position:absolute; top:-18px; background:${badgeBg}; color:${badgeColor}; border:1.5px solid #fff; border-radius:12px; padding:2px 8px; font-size:10px; font-weight:900; box-shadow:0 0 12px ${badgeShadow}; white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25; animation:relicBadgePulse 1.8s infinite ease-in-out;">
+                            <span>${itemKeyIcon}</span> <span>${itemKeyName.toUpperCase()}</span>
                         </div>
                     `;
                 } else {
                     relicBadgeHtml = `
                         <div class="map-node-badge" style="position:absolute; top:-14px; background:rgba(25,16,5,0.85); color:#b8860b; border:1px solid #7c5a14; border-radius:10px; padding:2px 6px; font-size:9px; white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25;">
-                            <span>🔒</span> <span>${n.itemName}</span>
+                            <span>🔒</span> <span>${itemKeyName}</span>
                         </div>
                     `;
                 }
