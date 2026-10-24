@@ -3429,68 +3429,82 @@ window.getZexalNumbers = function(s) {
     return [
       {
         id: 'grenosaurus',
-        name: 'Grenosaurus',
-        shortName: 'Grenosaur',
+        name: 'Número 34: Terror-Byte / Grenosaurus',
+        shortName: 'D-Gazer',
+        relicName: 'D-Gazer de Heartland',
+        relicIcon: '👓',
         bearer: 'Bronk Stone',
         bearerId: 'bronk',
         monster: 'Grenosaurus',
         rank: 3,
         atk: 2000,
         def: 1900,
-        icon: '🦖',
+        icon: '👓',
         color: '#ff7043',
+        relicDesc: 'Visor de Realidad Aumentada de Heartland City. Te permite ver el campo de duelo y las invocaciones holográficas.',
         desc: 'Monstruo Xyz de Rango 3. Al destruir un monstruo por batalla desacopla 1 material e inflige 1000 de daño.',
         unlocked: clearedZexal.includes('bronk')
       },
       {
         id: 'numero17',
         name: 'Número 17: Dragón Leviatán',
-        shortName: 'N° 17',
+        shortName: 'Estuche Xyz',
+        relicName: 'Estuche Táctico Xyz',
+        relicIcon: '🎴',
         bearer: 'Flip Turner',
         bearerId: 'flip',
         monster: 'Number 17: Leviathan Dragon',
         rank: 3,
         atk: 2000,
         def: 0,
-        icon: '🐉',
+        icon: '🎴',
         color: '#29b6f6',
+        relicDesc: 'Estuche reforzado de duelista para resguardar tus materiales y barajas Xyz con seguridad.',
         desc: 'Monstruo Xyz de Rango 3. Desacopla 1 material Xyz para ganar +500 ATK permanentemente.',
         unlocked: clearedZexal.includes('flip')
       },
       {
         id: 'numero32',
         name: 'Número 32: Draco Tiburón',
-        shortName: 'N° 32',
+        shortName: '1ª Pieza Corazón',
+        relicName: '1ª Pieza de Corazón (Heart Piece)',
+        relicIcon: '💛',
         bearer: 'Reginald Kastle (Shark)',
         bearerId: 'shark',
         monster: 'Number 32: Shark Drake',
         rank: 4,
         atk: 2800,
         def: 2100,
-        icon: '🦈',
+        icon: '💛',
         color: '#0288d1',
+        relicDesc: 'La primera de las 5 piezas sagradas del torneo de Heartland. Otorga paso a los sectores del río y el muelle.',
         desc: 'Monstruo Xyz de Rango 4. Al destruir un monstruo por batalla, lo revive en el campo rival y ataca de nuevo.',
         unlocked: clearedZexal.includes('shark')
       },
       {
         id: 'zerofyne',
         name: 'Bestia de Hielo Zerofyne',
-        shortName: 'Zerofyne',
+        shortName: '2ª Pieza Corazón',
+        relicName: '2ª Pieza de Corazón (Heart Piece)',
+        relicIcon: '💛',
         bearer: 'Rio Kastle',
         bearerId: 'rio',
         monster: 'Ice Beast Zerofyne',
         rank: 4,
         atk: 2000,
         def: 2200,
-        icon: '❄️',
+        icon: '💛',
         color: '#80deea',
+        relicDesc: 'La segunda pieza del corazón de Heartland. Imbuida con el poder gélido y elegante de Rio Kastle.',
         desc: 'Monstruo Xyz Bestia Alada de Rango 4. Niega los efectos de todas las cartas boca arriba que controle el adversario.',
         unlocked: clearedZexal.includes('rio')
       },
       {
         id: 'paladynamo',
         name: 'Paladinamo Starliege',
-        shortName: 'Paladinamo',
+        shortName: '3ª Pieza Corazón',
+        relicName: '3ª Pieza de Corazón (Heart Piece)',
+        relicIcon: '💛',
         bearer: 'Kite Tenjo',
         bearerId: 'kite',
         monster: 'Starliege Paladynamo',
@@ -3499,43 +3513,52 @@ window.getZexalNumbers = function(s) {
         def: 1000,
         icon: '💫',
         color: '#ffd54f',
+        relicDesc: 'La tercera pieza de corazón. ¡Con ella se desbloquea el puente hacia los sectores de la Familia Arclight!',
         desc: 'Monstruo Xyz de Rango 4. Desacopla 2 materiales: reduce el ATK de un monstruo a 0 y niega sus efectos.',
         unlocked: clearedZexal.includes('kite')
       },
       {
         id: 'numero33',
         name: 'Número 33: Machu Mech Cronómalo',
-        shortName: 'N° 33',
+        shortName: '4ª Pieza Corazón',
+        relicName: '4ª Pieza de Corazón (Heart Piece)',
+        relicIcon: '💛',
         bearer: 'Trey (III)',
         bearerId: 'trey',
         monster: 'Number 33: Chronomaly Machu Mech',
         rank: 5,
         atk: 2400,
         def: 1500,
-        icon: '🗿',
+        icon: '🏛️',
         color: '#ffb74d',
+        relicDesc: 'La cuarta pieza de corazón, forjada con tecnología de civilizaciones cronómalas antiguas.',
         desc: 'Monstruo Xyz de Rango 5. Inflige daño igual a la diferencia del ATK actual y original de un monstruo rival.',
         unlocked: clearedZexal.includes('trey')
       },
       {
         id: 'numero15',
         name: 'Número 15: Giant Grinder',
-        shortName: 'N° 15',
+        shortName: 'Corazón Completo',
+        relicName: '5ª Pieza de Corazón (¡Corazón Completo de Heartland!)',
+        relicIcon: '💖',
         bearer: 'Quattro (IV)',
         bearerId: 'quattro',
         monster: 'Number 15: Gimmick Puppet Giant Grinder',
         rank: 8,
         atk: 1500,
         def: 2500,
-        icon: '🎭',
+        icon: '💖',
         color: '#ab47bc',
+        relicDesc: '¡Las 5 piezas se unen para formar el Colgante del Corazón de Heartland! Abre el acceso directo a la Torre Heartland y a los Barians.',
         desc: 'Monstruo Xyz de Rango 8. Destruye monstruos invocados de modo especial del rival e inflige daño por su ATK.',
         unlocked: clearedZexal.includes('quattro')
       },
       {
         id: 'numero107',
         name: 'Número 107: Dragón Taquiónico',
-        shortName: 'N° 107',
+        shortName: 'Ojo Taquiónico',
+        relicName: 'Cristal del Ojo Taquiónico',
+        relicIcon: '🌌',
         bearer: 'Mizar',
         bearerId: 'mizar',
         monster: 'Number 107: Galaxy-Eyes Tachyon Dragon',
@@ -3544,13 +3567,16 @@ window.getZexalNumbers = function(s) {
         def: 2500,
         icon: '🌌',
         color: '#ffd700',
+        relicDesc: 'Artefacto cósmico de los 7 Emperadores Barianos. Capaz de manipular el flujo del tiempo durante el duelo.',
         desc: 'Monstruo Xyz Número Barian de Rango 8. Restablece el campo y puede realizar un segundo ataque devastador.',
         unlocked: clearedZexal.includes('mizar')
       },
       {
         id: 'numero104',
         name: 'Número 104: Mascarada',
-        shortName: 'N° 104',
+        shortName: 'Emblema Barian',
+        relicName: 'Emblema del Caos Barian',
+        relicIcon: '👁️',
         bearer: 'Vector',
         bearerId: 'vector',
         monster: 'Number 104: Masquerade',
@@ -3559,21 +3585,25 @@ window.getZexalNumbers = function(s) {
         def: 1200,
         icon: '👁️',
         color: '#d32f2f',
+        relicDesc: 'Emblema oscuro del Mundo Bariano. Canaliza el Caos y bloquea las habilidades del adversario.',
         desc: 'Monstruo Xyz de Rango 4. Niega la activación de efectos de monstruos en la Battle Phase y quema al rival.',
         unlocked: clearedZexal.includes('vector')
       },
       {
         id: 'utopia',
         name: 'Número 39: Utopía',
-        shortName: 'Utopía',
+        shortName: 'Llave Emperador',
+        relicName: 'La Llave del Emperador (Emperor\'s Key)',
+        relicIcon: '🔑',
         bearer: 'Yuma Tsukumo (& Astral)',
         bearerId: 'yuma',
         monster: 'Number 39: Utopia',
         rank: 4,
         atk: 2500,
         def: 2000,
-        icon: '⚔️',
+        icon: '🔑',
         color: '#ffd700',
+        relicDesc: '¡La máxima reliquia astral milenaria! Abre las puertas entre dimensiones y desbloquea el Portal al Nuevo Mundo.',
         desc: 'El Monstruo Xyz legendario de Yuma y Astral. Desacopla 1 material para negar el ataque de cualquier monstruo.',
         unlocked: clearedZexal.includes('yuma')
       }
@@ -3593,25 +3623,31 @@ window.showZexalNumberCelebration = function(wonNumber, charId, onDone) {
     modal.appendChild(aura);
     
     let iconBox = document.createElement('div');
-    iconBox.style.cssText = 'font-size:72px; margin-bottom:15px; filter:drop-shadow(0 0 25px #ffd700) drop-shadow(0 0 45px rgba(0,229,255,0.8)); z-index:2; line-height:1;';
-    iconBox.textContent = wonNumber.icon;
+    iconBox.style.cssText = 'font-size:72px; margin-bottom:12px; filter:drop-shadow(0 0 25px #ffd700) drop-shadow(0 0 45px rgba(0,229,255,0.8)); z-index:2; line-height:1;';
+    iconBox.textContent = wonNumber.relicIcon || wonNumber.icon || '✨';
     modal.appendChild(iconBox);
     
     let subtitle = document.createElement('div');
-    subtitle.style.cssText = 'font-family:VT323, monospace; font-size:24px; color:#ffd700; letter-spacing:3px; text-shadow:0 0 12px #ffd700; z-index:2; margin-bottom:6px;';
-    subtitle.textContent = '🌌 ¡CARTA NÚMERO XYZ PURIFICADA Y CONQUISTADA! 🌌';
+    subtitle.style.cssText = 'font-family:VT323, monospace; font-size:24px; color:#ffd700; letter-spacing:3px; text-shadow:0 0 12px #ffd700; z-index:2; margin-bottom:4px;';
+    subtitle.textContent = '🌌 ¡NUEVO ARTÍCULO Y CARTA NÚMERO CONQUISTADOS! 🌌';
     modal.appendChild(subtitle);
     
-    let title = document.createElement('div');
-    title.style.cssText = 'font-family:"Cinzel", serif, "Times New Roman"; font-size:28px; font-weight:900; color:#fff; text-shadow:0 0 20px #00e5ff; z-index:2; margin-bottom:12px;';
-    title.textContent = wonNumber.name.toUpperCase();
-    modal.appendChild(title);
+    let relicTitle = document.createElement('div');
+    relicTitle.style.cssText = 'font-family:"Cinzel", serif, "Times New Roman"; font-size:26px; font-weight:900; color:#ffd700; text-shadow:0 0 18px rgba(255,215,0,0.8); z-index:2; margin-bottom:6px;';
+    relicTitle.textContent = (wonNumber.relicName || wonNumber.name).toUpperCase();
+    modal.appendChild(relicTitle);
+
+    let monsterSub = document.createElement('div');
+    monsterSub.style.cssText = 'font-size:16px; font-weight:bold; color:#80deea; z-index:2; margin-bottom:14px;';
+    monsterSub.innerHTML = `Monstruo Xyz Purificado: <span style="color:#fff;">${wonNumber.name}</span> (Rango ${wonNumber.rank})`;
+    modal.appendChild(monsterSub);
     
     let descBox = document.createElement('div');
-    descBox.style.cssText = 'background:rgba(0,20,40,0.85); border:1.5px solid #00e5ff; border-radius:10px; padding:14px 20px; max-width:480px; color:#e1f5fe; font-size:14px; line-height:1.5; z-index:2; margin-bottom:16px; box-shadow:0 0 20px rgba(0,229,255,0.3);';
+    descBox.style.cssText = 'background:rgba(0,20,40,0.85); border:1.5px solid #00e5ff; border-radius:10px; padding:14px 20px; max-width:500px; color:#e1f5fe; font-size:14px; line-height:1.5; z-index:2; margin-bottom:16px; box-shadow:0 0 20px rgba(0,229,255,0.3);';
     descBox.innerHTML = `
-        <div style="font-weight:bold; color:#ffd700; margin-bottom:6px;">Portador: ${wonNumber.bearer} · Rango ${wonNumber.rank} · ${wonNumber.atk} ATK / ${wonNumber.def} DEF</div>
-        <div>"${wonNumber.desc}"</div>
+        <div style="font-weight:bold; color:#ffd700; margin-bottom:6px;">Portador: ${wonNumber.bearer}</div>
+        <div style="margin-bottom:6px; font-style:italic; color:#b2ebf2;">"${wonNumber.relicDesc || wonNumber.desc}"</div>
+        <div style="font-size:12px; color:#80deea;">Poder Xyz: ${wonNumber.desc}</div>
     `;
     modal.appendChild(descBox);
     
@@ -3740,19 +3776,19 @@ const MAP_EDGES_5D = [
 //  NODOS Y RUTA DEL MAPA MUNDO 4: HEARTLAND CITY (ZEXAL)
 // ════════════════════════════════════════════════════════════════
 window.CUSTOM_NODES_ZEXAL = [
-    // Fase 1: Torneo Heartland City
-    { id: 'zexal_1', left: '50%', top: '92%', label: 'BRONK STONE', char: 'BRONK', req: [] },
-    { id: 'zexal_2', left: '35%', top: '85%', label: 'FLIP TURNER', char: 'FLIP', req: ['bronk'] },
-    { id: 'zexal_3', left: '65%', top: '78%', label: 'SHARK', char: 'SHARK', req: ['flip'] },
-    { id: 'zexal_4', left: '35%', top: '71%', label: 'RIO KASTLE', char: 'RIO', req: ['shark'] },
-    { id: 'zexal_5', left: '65%', top: '64%', label: 'KITE TENJO', char: 'KITE', req: ['rio'] },
-    { id: 'zexal_shop', left: '88%', top: '92%', label: 'TIENDA HEARTLAND', char: 'CATHY', req: [] },
+    // Fase 1: Torneo Heartland City (Piezas de Corazón)
+    { id: 'zexal_1', left: '50%', top: '92%', label: 'BRONK STONE', char: 'BRONK', req: [], itemKey: 'dgazer', itemName: 'D-Gazer de Heartland', itemIcon: '👓' },
+    { id: 'zexal_2', left: '35%', top: '85%', label: 'FLIP TURNER', char: 'FLIP', req: ['bronk'], itemKey: 'estuche', itemName: 'Estuche Táctico Xyz', itemIcon: '🎴' },
+    { id: 'zexal_3', left: '65%', top: '78%', label: 'SHARK', char: 'SHARK', req: ['flip'], itemKey: 'corazon1', itemName: '1ª Pieza de Corazón', itemIcon: '💛' },
+    { id: 'zexal_4', left: '35%', top: '71%', label: 'RIO KASTLE', char: 'RIO', req: ['shark'], itemKey: 'corazon2', itemName: '2ª Pieza de Corazón', itemIcon: '💛' },
+    { id: 'zexal_5', left: '65%', top: '64%', label: 'KITE TENJO', char: 'KITE', req: ['rio'], itemKey: 'corazon3', itemName: '3ª Pieza de Corazón', itemIcon: '💛' },
+    { id: 'zexal_shop', left: '88%', top: '92%', label: 'TIENDA HEARTLAND', char: 'TORI', req: [] },
     // Fase 2: Batalla de los Números Barian
-    { id: 'zexal_6', left: '35%', top: '50%', label: 'TREY (III)', char: 'TREY', req: ['kite'], insigniaKey: 'numero33', insigniaName: 'Número 33: Machu Mech', insigniaIcon: '🏛️' },
-    { id: 'zexal_7', left: '65%', top: '42%', label: 'QUATTRO (IV)', char: 'QUATTRO', req: ['trey'], insigniaKey: 'numero15', insigniaName: 'Número 15: Giant Grinder', insigniaIcon: '🎭' },
-    { id: 'zexal_8', left: '35%', top: '34%', label: 'MIZAR', char: 'MIZAR', req: ['quattro'], insigniaKey: 'numero107', insigniaName: 'Número 107: Tachyon Dragon', insigniaIcon: '🌌' },
-    { id: 'zexal_9', left: '65%', top: '25%', label: 'VECTOR', char: 'VECTOR', req: ['mizar'], insigniaKey: 'numero104', insigniaName: 'Número 104: Masquerade', insigniaIcon: '👁️' },
-    { id: 'zexal_10', left: '50%', top: '10%', label: 'YUMA TSUKUMO (& ASTRAL)', char: 'YUMA', req: ['vector'], insigniaKey: 'utopia', insigniaName: 'Número 39: Utopía', insigniaIcon: '⚔️' }
+    { id: 'zexal_6', left: '35%', top: '50%', label: 'TREY (III)', char: 'TREY', req: ['kite'], itemKey: 'corazon4', itemName: '4ª Pieza de Corazón', itemIcon: '💛' },
+    { id: 'zexal_7', left: '65%', top: '42%', label: 'QUATTRO (IV)', char: 'QUATTRO', req: ['trey'], itemKey: 'corazon5', itemName: '5ª Pieza (Corazón Completo)', itemIcon: '💖' },
+    { id: 'zexal_8', left: '35%', top: '34%', label: 'MIZAR', char: 'MIZAR', req: ['quattro'], itemKey: 'ojo_taquion', itemName: 'Cristal Ojo Taquiónico', itemIcon: '🌌' },
+    { id: 'zexal_9', left: '65%', top: '25%', label: 'VECTOR', char: 'VECTOR', req: ['mizar'], itemKey: 'emblema_barian', itemName: 'Emblema del Caos Barian', itemIcon: '👁️' },
+    { id: 'zexal_10', left: '50%', top: '10%', label: 'YUMA TSUKUMO (& ASTRAL)', char: 'YUMA', req: ['vector'], itemKey: 'llave_emperador', itemName: 'Llave del Emperador (Abre Nuevo Mundo)', itemIcon: '🔑' }
 ];
 
 const MAP_EDGES_ZEXAL = [
@@ -6985,11 +7021,17 @@ window.openCustomShopMenu = function() {
     s.deck = s.deck || [];
     s.cleared = s.cleared || [];
     s.activeDeck = s.activeDeck || Object.keys(s.decks)[0] || 'Deck 1';
+    let isZexalShop = ((s.world || 1) === 4);
     let is5DShop = ((s.world || 1) === 3);
     let isGXShop = ((s.world || 1) === 2);
     window.playCustomMusic(window.getShopBgm(s ? s.world : 1));
     let curActiveDeck = s.decks[s.activeDeck] || s.deck;
-    if (is5DShop) {
+    if (isZexalShop) {
+        s.decksMundo4 = s.decksMundo4 || {};
+        s.collectionMundo4 = s.collectionMundo4 || {};
+        if (s.activeDeckMundo4 === 'Extra' || !s.decksMundo4[s.activeDeckMundo4]) s.activeDeckMundo4 = 'Principal';
+        curActiveDeck = s.decksMundo4[s.activeDeckMundo4] || [];
+    } else if (is5DShop) {
         s.decksMundo3 = s.decksMundo3 || {};
         s.collectionMundo3 = s.collectionMundo3 || {};
         if (s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) s.activeDeckMundo3 = 'Principal';
@@ -7430,10 +7472,16 @@ window.openCustomShopMenu = function() {
     overlay.appendChild(bgParticles);
 
     // 1. TOP HEADER STATUS BAR
-    let shopThemeColor = is5DShop ? '#00e5ff' : (isGXShop ? '#ffca28' : '#ffd700');
-    let shopBorderColor = is5DShop ? '#00838f' : (isGXShop ? '#d32f2f' : '#b8860b');
-    let shopBgHeader = is5DShop ? 'linear-gradient(180deg, rgba(8,20,30,0.95) 0%, rgba(4,10,18,0.7) 100%)' : (isGXShop ? 'linear-gradient(180deg, rgba(32,10,18,0.95) 0%, rgba(16,5,9,0.7) 100%)' : 'linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%)');
-    let thirdStatHtml = is5DShop ? `
+    let shopThemeColor = isZexalShop ? '#ffd700' : (is5DShop ? '#00e5ff' : (isGXShop ? '#ffca28' : '#ffd700'));
+    let shopBorderColor = isZexalShop ? '#00e5ff' : (is5DShop ? '#00838f' : (isGXShop ? '#d32f2f' : '#b8860b'));
+    let shopBgHeader = isZexalShop ? 'linear-gradient(180deg, rgba(2,12,32,0.95) 0%, rgba(1,6,18,0.7) 100%)' : (is5DShop ? 'linear-gradient(180deg, rgba(8,20,30,0.95) 0%, rgba(4,10,18,0.7) 100%)' : (isGXShop ? 'linear-gradient(180deg, rgba(32,10,18,0.95) 0%, rgba(16,5,9,0.7) 100%)' : 'linear-gradient(180deg, rgba(20,15,8,0.95) 0%, rgba(10,8,4,0.7) 100%)'));
+    let thirdStatHtml = isZexalShop ? `
+        <div class="shop-stat-badge" style="background:#041528; border:1px solid #00e5ff; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Monstruos Xyz en tu Extra Deck">
+            <span style="font-size:15px;">🌌</span>
+            <span style="color:#00e5ff; font-size:11px; font-weight:bold;">EXTRA DECK:</span>
+            <span style="color:#fff; font-weight:bold; font-size:12px;">${(s.decksMundo4 && s.decksMundo4['Extra'] ? s.decksMundo4['Extra'].length : 0)} / 15</span>
+        </div>
+    ` : (is5DShop ? `
         <div class="shop-stat-badge" style="background:#07212b; border:1px solid #00e5ff; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;" title="Monstruos Sincronía en tu Extra Deck">
             <span style="font-size:15px;">⭐</span>
             <span style="color:#00e5ff; font-size:11px; font-weight:bold;">EXTRA DECK:</span>
@@ -7451,23 +7499,23 @@ window.openCustomShopMenu = function() {
             <span style="color:#ffd700; font-size:11px; font-weight:bold;">MILENIO:</span>
             <span style="color:#fff; font-weight:bold; font-size:12px;">${unlockedCount} / 7</span>
         </div>
-    `);
+    `));
 
     let topBar = document.createElement('div');
     topBar.id = 'shop-top-bar';
     topBar.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:12px 28px; background:${shopBgHeader}; border-bottom:2px solid ${shopBorderColor}; box-shadow:0 4px 15px rgba(0,0,0,0.6); z-index:10;`;
     topBar.innerHTML = `
         <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-            <span style="font-size:24px; filter:drop-shadow(0 0 6px ${shopThemeColor}); flex-shrink:0;">${is5DShop ? '⚙️' : (isGXShop ? '🥪' : '🏺')}</span>
+            <span style="font-size:24px; filter:drop-shadow(0 0 6px ${shopThemeColor}); flex-shrink:0;">${isZexalShop ? '💛' : (is5DShop ? '⚙️' : (isGXShop ? '🥪' : '🏺'))}</span>
             <div style="min-width:0;">
-                <div class="shop-header-title" style="font-family:VT323, monospace; color:${shopThemeColor}; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px ${is5DShop ? 'rgba(0,229,255,0.5)' : (isGXShop ? 'rgba(255,202,40,0.5)' : 'rgba(255,215,0,0.5)')}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    ${is5DShop ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY' : (isGXShop ? 'ACADEMIA DE DUELOS · TIENDA DE DOROTHY' : 'KAME GAME · TIENDA DEL ABUELO MOTO')}
+                <div class="shop-header-title" style="font-family:VT323, monospace; color:${shopThemeColor}; font-size:26px; letter-spacing:1.5px; text-shadow:2px 2px 0 #000, 0 0 10px ${isZexalShop ? 'rgba(255,215,0,0.6)' : (is5DShop ? 'rgba(0,229,255,0.5)' : (isGXShop ? 'rgba(255,202,40,0.5)' : 'rgba(255,215,0,0.5)'))}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    ${isZexalShop ? 'CENTRO COMERCIAL HEARTLAND · TIENDA DE TORI' : (is5DShop ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY' : (isGXShop ? 'ACADEMIA DE DUELOS · TIENDA DE DOROTHY' : 'KAME GAME · TIENDA DEL ABUELO MOTO'))}
                 </div>
-                <div class="shop-header-subtitle" style="font-size:12px; color:${is5DShop ? '#80deea' : (isGXShop ? '#ffb74d' : '#c7a76d')}; letter-spacing:0.5px;">${is5DShop ? 'Chatarrería de Piezas, Cartas y Monstruos de Sincronía' : (isGXShop ? 'Boutique Escolar · Cartas Oficiales, Sándwiches y Sobres GX' : 'Bazar Ancestral de Cartas y Reliquias Milenarias')}</div>
+                <div class="shop-header-subtitle" style="font-size:12px; color:${isZexalShop ? '#ffe082' : (is5DShop ? '#80deea' : (isGXShop ? '#ffb74d' : '#c7a76d'))}; letter-spacing:0.5px;">${isZexalShop ? 'Boutique de Duelo · Cartas Xyz, Piezas de Corazón y Artefactos Astrales' : (is5DShop ? 'Chatarrería de Piezas, Cartas y Monstruos de Sincronía' : (isGXShop ? 'Boutique Escolar · Cartas Oficiales, Sándwiches y Sobres GX' : 'Bazar Ancestral de Cartas y Reliquias Milenarias'))}</div>
             </div>
         </div>
         <div class="shop-top-stats" style="display:flex; align-items:center; gap:12px; flex-shrink:0;">
-            <div class="shop-stat-badge" style="background:${is5DShop ? '#081c24' : (isGXShop ? '#200a12' : '#201608')}; border:1px solid ${shopThemeColor}; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
+            <div class="shop-stat-badge" style="background:${isZexalShop ? '#081c2e' : (is5DShop ? '#081c24' : (isGXShop ? '#200a12' : '#201608'))}; border:1px solid ${shopThemeColor}; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
                 <span style="font-size:15px;">💰</span>
                 <span style="color:#aaa; font-size:11px; font-weight:bold;">PM:</span>
                 <span style="color:${shopThemeColor}; font-weight:bold; font-size:15px; font-family:VT323, monospace;" id="shop-menu-pm">${s.pm || 0}</span>
@@ -7475,7 +7523,7 @@ window.openCustomShopMenu = function() {
             <div class="shop-stat-badge" style="background:#16202d; border:1px solid #4a90e2; border-radius:6px; padding:5px 12px; display:flex; align-items:center; gap:6px;">
                 <span style="font-size:15px;">🎴</span>
                 <span style="color:#aaa; font-size:11px; font-weight:bold;">DECK:</span>
-                <span style="color:#66c0f4; font-weight:bold; font-size:12px;">${(is5DShop ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1')).toUpperCase()}</span>
+                <span style="color:#66c0f4; font-weight:bold; font-size:12px;">${(isZexalShop ? (s.activeDeckMundo4 || 'Principal') : (is5DShop ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1'))).toUpperCase()}</span>
                 <span style="background:#0d47a1; color:#fff; font-size:10px; padding:1px 5px; border-radius:3px;">${activeDeckCount}/40</span>
             </div>
             ${thirdStatHtml}
@@ -7483,26 +7531,28 @@ window.openCustomShopMenu = function() {
     `;
     overlay.appendChild(topBar);
 
-    // 2. MIDDLE WORKSPACE (Left: Grandpa Moto / Dorothy / Rally with Speech Bubble, Right: Action Menu)
+    // 2. MIDDLE WORKSPACE (Left: Tori / Grandpa Moto / Dorothy / Rally with Speech Bubble, Right: Action Menu)
     let workspace = document.createElement('div');
     workspace.id = 'shop-workspace';
     workspace.style.cssText = 'flex: 1; display:flex; flex-direction:row; padding:10px 30px 4px 30px; box-sizing:border-box; overflow:hidden; position:relative; align-items:center; justify-content:space-between; gap:20px;';
 
-    // LEFT: GRANDPA MOTO / DOROTHY / RALLY + SPEECH BUBBLE
+    // LEFT: TORI / GRANDPA MOTO / DOROTHY / RALLY + SPEECH BUBBLE
     let grandpaWrap = document.createElement('div');
     grandpaWrap.id = 'shop-grandpa-wrap';
     grandpaWrap.style.cssText = 'flex: 1; height: 100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; max-width: 480px; box-sizing:border-box;';
 
-    let defaultGreeting = is5DShop 
-        ? '¡Hola, compañero! Encontré unas cartas geniales y repuestos en Satélite. ¿En qué puedo ayudarte hoy?'
-        : (isGXShop 
-            ? '¡Hola, querido duelista! Acaban de llegar nuevos sobres y los deliciosos sándwiches de la Academia. ¿En qué puedo ayudarte hoy?'
-            : '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?');
+    let defaultGreeting = isZexalShop
+        ? '¡Hola, duelista! ¡Bienvenido a Heartland City! Yuma y yo estamos buscando las mejores cartas para el torneo. ¿En qué puedo ayudarte hoy?'
+        : (is5DShop 
+            ? '¡Hola, compañero! Encontré unas cartas geniales y repuestos en Satélite. ¿En qué puedo ayudarte hoy?'
+            : (isGXShop 
+                ? '¡Hola, querido duelista! Acaban de llegar nuevos sobres y los deliciosos sándwiches de la Academia. ¿En qué puedo ayudarte hoy?'
+                : '¡Bienvenido a Kame Game, duelista! ¿En qué puedo ayudarte hoy para forjar tu destino?'));
 
     // Speech bubble
     let bubble = document.createElement('div');
     bubble.id = 'grandpa-speech-bubble';
-    bubble.style.cssText = `position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, ${is5DShop ? '#081a24' : (isGXShop ? '#240810' : '#2b2010')} 0%, ${is5DShop ? '#040d14' : (isGXShop ? '#120408' : '#181208')} 100%); border: 2px solid ${shopThemeColor}; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px ${is5DShop ? 'rgba(0,229,255,0.3)' : (isGXShop ? 'rgba(255,202,40,0.3)' : 'rgba(255,215,0,0.25)')}; z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;`;
+    bubble.style.cssText = `position:relative; width: 100%; max-width: 440px; background: linear-gradient(135deg, ${isZexalShop ? '#081c2e' : (is5DShop ? '#081a24' : (isGXShop ? '#240810' : '#2b2010'))} 0%, ${isZexalShop ? '#030d17' : (is5DShop ? '#040d14' : (isGXShop ? '#120408' : '#181208'))} 100%); border: 2px solid ${shopThemeColor}; border-radius: 12px; padding: 10px 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.8), 0 0 12px ${isZexalShop ? 'rgba(255,215,0,0.35)' : (is5DShop ? 'rgba(0,229,255,0.3)' : (isGXShop ? 'rgba(255,202,40,0.3)' : 'rgba(255,215,0,0.25)'))}; z-index: 5; transition: all 0.25s ease; min-height: 50px; display:flex; flex-direction:column; justify-content:center; box-sizing:border-box; margin-bottom: 8px;`;
     
     // Bubble pointer tail
     let bubbleTail = document.createElement('div');
@@ -7513,7 +7563,7 @@ window.openCustomShopMenu = function() {
     let bubbleTitle = document.createElement('div');
     bubbleTitle.id = 'grandpa-speech-title';
     bubbleTitle.style.cssText = `font-weight:bold; font-size:11px; color:${shopThemeColor}; font-family:VT323, monospace; letter-spacing:1px; margin-bottom:3px; display:flex; align-items:center; gap:5px;`;
-    bubbleTitle.innerHTML = is5DShop ? '<span>⚙️ RALLY DAWSON DICE:</span>' : (isGXShop ? '<span>🥪 SEÑORA DOROTHY DICE:</span>' : '<span>👴 ABUELO MOTO DICE:</span>');
+    bubbleTitle.innerHTML = isZexalShop ? '<span>💛 TORI MEADOWS DICE:</span>' : (is5DShop ? '<span>⚙️ RALLY DAWSON DICE:</span>' : (isGXShop ? '<span>🥪 SEÑORA DOROTHY DICE:</span>' : '<span>👴 ABUELO MOTO DICE:</span>'));
     bubble.appendChild(bubbleTitle);
 
     let bubbleText = document.createElement('div');
@@ -7527,22 +7577,33 @@ window.openCustomShopMenu = function() {
     // Radial aura behind character
     let auraGlow = document.createElement('div');
     auraGlow.id = 'shop-aura-glow';
-    auraGlow.style.cssText = is5DShop 
-        ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(0, 229, 255, 0.25) 0%, rgba(0, 150, 255, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
-        : (isGXShop 
-            ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 64, 129, 0.25) 0%, rgba(255, 193, 7, 0.12) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
-            : 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;');
+    auraGlow.style.cssText = isZexalShop
+        ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, rgba(0, 229, 255, 0.15) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
+        : (is5DShop 
+            ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(0, 229, 255, 0.25) 0%, rgba(0, 150, 255, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
+            : (isGXShop 
+                ? 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 64, 129, 0.25) 0%, rgba(255, 193, 7, 0.12) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'
+                : 'position:absolute; bottom: 0; width: 380px; height: 380px; background: radial-gradient(circle, rgba(255, 190, 40, 0.25) 0%, rgba(255, 140, 0, 0.1) 45%, rgba(0,0,0,0) 75%); border-radius: 50%; pointer-events:none; z-index: 1;'));
     grandpaWrap.appendChild(auraGlow);
 
     // Character Image (Interactive + Breathing animation)
     let grandpaImg = document.createElement('img');
     grandpaImg.id = 'shop-grandpa-img';
-    grandpaImg.src = is5DShop ? 'ImagenesPersonajes/Rally.png' : (isGXShop ? 'ImagenesPersonajes/Dorothy.png' : 'ImagenesPersonajes/abueloYugi.jpg');
-    grandpaImg.alt = is5DShop ? 'Rally Dawson' : (isGXShop ? 'Señora Dorothy' : 'Abuelo Moto');
-    grandpaImg.style.cssText = `height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px ${is5DShop ? 'rgba(0, 229, 255, 0.45)' : (isGXShop ? 'rgba(255, 202, 40, 0.45)' : 'rgba(255, 180, 0, 0.45)')}); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;`;
-    grandpaImg.title = is5DShop ? '¡Haz clic para hablar con Rally Dawson!' : (isGXShop ? '¡Haz clic para hablar con la Señora Dorothy!' : '¡Haz clic para hablar con el Abuelo Moto!');
+    grandpaImg.src = isZexalShop ? 'ImagenesPersonajes/Tori.png' : (is5DShop ? 'ImagenesPersonajes/Rally.png' : (isGXShop ? 'ImagenesPersonajes/Dorothy.png' : 'ImagenesPersonajes/abueloYugi.jpg'));
+    grandpaImg.alt = isZexalShop ? 'Tori Meadows' : (is5DShop ? 'Rally Dawson' : (isGXShop ? 'Señora Dorothy' : 'Abuelo Moto'));
+    grandpaImg.style.cssText = `height: 52vh; max-height: 440px; object-fit: contain; z-index: 2; cursor: pointer; filter: drop-shadow(0 0 16px ${isZexalShop ? 'rgba(255, 215, 0, 0.5)' : (is5DShop ? 'rgba(0, 229, 255, 0.45)' : (isGXShop ? 'rgba(255, 202, 40, 0.45)' : 'rgba(255, 180, 0, 0.45)'))}); animation: grandpaFloat 3.8s ease-in-out infinite; transition: transform 0.2s ease;`;
+    grandpaImg.title = isZexalShop ? '¡Haz clic para hablar con Tori Meadows!' : (is5DShop ? '¡Haz clic para hablar con Rally Dawson!' : (isGXShop ? '¡Haz clic para hablar con la Señora Dorothy!' : '¡Haz clic para hablar con el Abuelo Moto!'));
 
-    // Random wisdom quotes for clicking Grandpa / Dorothy / Rally
+    // Random wisdom quotes
+    const TORI_RANDOM_QUOTES = [
+      '¡Hola! ¡"¡A volar alto!"! Como siempre dice Yuma, ¡nunca te rindas sin importar lo difícil que sea el duelo!',
+      '¡Si juntas 2 monstruos con el mismo nivel en tu campo, podrás activar de inmediato la Invocación Xyz!',
+      '¡Al derrotar duelistas en Heartland City conseguirás las 5 Piezas de Corazón para desafiar a los mejores!',
+      'La Llave del Emperador que lleva Yuma es el artefacto sagrado que lo conecta con Astral y el Mundo Astral.',
+      '¡Kagetokage y Goblindbergh son fantásticos para invocar 2 monstruos de Nivel 4 en el mismo turno!',
+      '¡Cuida mucho tus cartas y prepara tu Extra Deck! ¡Sé que puedes convertirte en un gran campeón de Heartland!'
+    ];
+
     const GRANDPA_RANDOM_QUOTES = [
       '¡Cree siempre en el Corazón de las Cartas, muchacho! Ellas responderán a tu espíritu.',
       '¡Esa baraja tuya tiene un vínculo sagrado contigo! Cuida a cada uno de tus monstruos.',
@@ -7585,7 +7646,7 @@ window.openCustomShopMenu = function() {
         void grandpaImg.offsetWidth;
         grandpaImg.style.animation = 'grandpaBounce 0.55s ease, grandpaFloat 3.8s ease-in-out 0.55s infinite';
         
-        let pool = is5DShop ? RALLY_RANDOM_QUOTES : (isGXShop ? DOROTHY_RANDOM_QUOTES : GRANDPA_RANDOM_QUOTES);
+        let pool = isZexalShop ? TORI_RANDOM_QUOTES : (is5DShop ? RALLY_RANDOM_QUOTES : (isGXShop ? DOROTHY_RANDOM_QUOTES : GRANDPA_RANDOM_QUOTES));
         let randomQuote = pool[Math.floor(Math.random() * pool.length)];
         setGrandpaSpeech(randomQuote);
     };
@@ -7596,7 +7657,7 @@ window.openCustomShopMenu = function() {
     let clickHint = document.createElement('div');
     clickHint.id = 'shop-grandpa-hint';
     clickHint.style.cssText = `font-size:11px; color:${shopThemeColor}; background:rgba(0,0,0,0.7); border:1px solid ${shopBorderColor}; border-radius:12px; padding:2px 10px; margin-bottom:6px; z-index:3; cursor:pointer; font-weight:bold; box-shadow:0 2px 6px #000;`;
-    clickHint.textContent = is5DShop ? '💬 ¡Haz clic en Rally!' : (isGXShop ? '💬 ¡Haz clic en Dorothy!' : '💬 ¡Haz clic en el Abuelo!');
+    clickHint.textContent = isZexalShop ? '💬 ¡Haz clic en Tori!' : (is5DShop ? '💬 ¡Haz clic en Rally!' : (isGXShop ? '💬 ¡Haz clic en Dorothy!' : '💬 ¡Haz clic en el Abuelo!'));
     clickHint.onclick = grandpaImg.onclick;
     grandpaWrap.appendChild(clickHint);
 
@@ -7658,14 +7719,14 @@ window.openCustomShopMenu = function() {
             icon: '📜', 
             label: 'COLECCIÓN DE CARTAS', 
             desc: 'Visualiza todas las cartas que posees en tu archivo.',
-            speech: is5DShop ? '¡Aquí puedes revisar tu colección completa de cartas y repuestos de Satélite!' : (isGXShop ? '¡Aquí tienes todo el registro de cartas que has desbloqueado en la Academia!' : '¡Aquí puedes revisar tu colección completa de cartas! ¿Qué tesoros has encontrado en tus viajes?'),
+            speech: isZexalShop ? '¡Aquí puedes revisar tu colección de cartas y tus valiosos Monstruos Xyz de Heartland!' : (is5DShop ? '¡Aquí puedes revisar tu colección completa de cartas y repuestos de Satélite!' : (isGXShop ? '¡Aquí tienes todo el registro de cartas que has desbloqueado en la Academia!' : '¡Aquí puedes revisar tu colección completa de cartas! ¿Qué tesoros has encontrado en tus viajes?')),
             action: () => runNativeView('showCollection') 
         },
         { 
             icon: '⚔️', 
             label: 'EDITAR DECK (DASHBOARD)', 
             desc: 'Organiza tus decks y configura tu Deck Activo.',
-            speech: is5DShop ? '¡Configura tu baraja principal y tu Extra Deck para tus invocaciones por Sincronía!' : (isGXShop ? '¡Prepara tu mazo para los duelos de la Academia! Combina tus cartas y perfecciona tu estrategia.' : '¡El corazón del duelista! Ahora puedes crear varios decks y decidir cuál será tu Deck Activo para los combates.'),
+            speech: isZexalShop ? '¡Prepara tu Deck y tu Extra Deck para Invocar por Superposición y conseguir el poder de los Números!' : (is5DShop ? '¡Configura tu baraja principal y tu Extra Deck para tus invocaciones por Sincronía!' : (isGXShop ? '¡Prepara tu mazo para los duelos de la Academia! Combina tus cartas y perfecciona tu estrategia.' : '¡El corazón del duelista! Ahora puedes crear varios decks y decidir cuál será tu Deck Activo para los combates.')),
             action: () => {
                 window.playViolinClick();
                 overlay.remove();
@@ -7682,7 +7743,7 @@ window.openCustomShopMenu = function() {
             icon: '⚡', 
             label: 'DUELO LIBRE', 
             desc: 'Reta a duelistas superados para conseguir más cartas.',
-            speech: is5DShop ? '¿Quieres practicar tus combos de Sincronía? ¡Reta a los duelistas que ya has derrotado!' : (isGXShop ? '¿Listo para un duelo amistoso de práctica? ¡Reta a los mejores estudiantes de la Academia!' : '¿Buscas entrenar y ganar nuevas cartas? ¡Reta a cualquier rival que hayas derrotado en la cúpula de duelos!'),
+            speech: isZexalShop ? '¿Quieres practicar tus tácticas Xyz? ¡Reta de nuevo a los duelistas de Heartland!' : (is5DShop ? '¿Quieres practicar tus combos de Sincronía? ¡Reta a los duelistas que ya has derrotado!' : (isGXShop ? '¿Listo para un duelo amistoso de práctica? ¡Reta a los mejores estudiantes de la Academia!' : '¿Buscas entrenar y ganar nuevas cartas? ¡Reta a cualquier rival que hayas derrotado en la cúpula de duelos!')),
             action: () => { 
                 window.playViolinClick();
                 overlay.remove();
@@ -7693,7 +7754,7 @@ window.openCustomShopMenu = function() {
             icon: '💎', 
             label: 'TIENDA DE MEMORIAS (CARTAS)', 
             desc: 'Adquiere cartas mágicas, trampas y monstruos con PM.',
-            speech: is5DShop ? '¡Tengo cartas y repuestos de Satélite listos para intercambiar por tus PM!' : (isGXShop ? '¡Tengo sobres oficiales y cartas especiales recién llegadas para tus PM!' : '¡He traído cartas legendarias de todas partes del mundo! Puedes comprarlas usando los PM ganados en tus duelos.'),
+            speech: isZexalShop ? '¡Tengo cartas geniales de Heartland y monstruos de apoyo listos para intercambiar por tus PM!' : (is5DShop ? '¡Tengo cartas y repuestos de Satélite listos para intercambiar por tus PM!' : (isGXShop ? '¡Tengo sobres oficiales y cartas especiales recién llegadas para tus PM!' : '¡He traído cartas legendarias de todas partes del mundo! Puedes comprarlas usando los PM ganados en tus duelos.')),
             action: () => {
                 overlay.remove();
                 window.customShowShop();
@@ -7719,7 +7780,7 @@ window.openCustomShopMenu = function() {
             icon: '💾', 
             label: 'GUARDAR PARTIDA', 
             desc: 'Respalda tus progresos y decks en el navegador y servidor.',
-            speech: is5DShop ? '¡Aseguremos tus cartas y tus mejoras para que no se pierdan!' : (isGXShop ? '¡Aseguremos tu mazo y progresos académicos para tu próximo examen de duelo!' : '¡Una sabia decisión! Un duelista precavido siempre asegura sus cartas y progresos.'),
+            speech: isZexalShop ? '¡Aseguremos tus cartas, monstruos Xyz y tus progresos de Heartland!' : (is5DShop ? '¡Aseguremos tus cartas y tus mejoras para que no se pierdan!' : (isGXShop ? '¡Aseguremos tu mazo y progresos académicos para tu próximo examen de duelo!' : '¡Una sabia decisión! Un duelista precavido siempre asegura sus cartas y progresos.')),
             action: () => { 
                 if (window.persistUserSave) window.persistUserSave(s);
                 else {
@@ -7727,7 +7788,7 @@ window.openCustomShopMenu = function() {
                     origSet('FMR_REBORN_STORY_V3000', JSON.stringify(s));
                     if (window.nativeAPI && window.nativeAPI.saveGame) window.nativeAPI.saveGame();
                 }
-                setGrandpaSpeech(is5DShop ? '¡Partida guardada con éxito! Tus cartas de Sincronía y progresos están a salvo.' : (isGXShop ? '¡Partida guardada con éxito! Tus progresos en la Academia están a salvo.' : '¡Partida guardada exitosamente! Tus progresos, cartas y barajas están respaldados con total seguridad.'));
+                setGrandpaSpeech(isZexalShop ? '¡Partida guardada con éxito! Tus cartas Xyz y progresos en Heartland están a salvo.' : (is5DShop ? '¡Partida guardada con éxito! Tus cartas de Sincronía y progresos están a salvo.' : (isGXShop ? '¡Partida guardada con éxito! Tus progresos en la Academia están a salvo.' : '¡Partida guardada exitosamente! Tus progresos, cartas y barajas están respaldados con total seguridad.')));
                 alert('¡Partida y barajas guardadas exitosamente en el navegador y en el servidor!'); 
             } 
         },
@@ -7735,7 +7796,7 @@ window.openCustomShopMenu = function() {
             icon: '🗺️', 
             label: 'VOLVER AL MAPA', 
             desc: 'Regresa a la exploración de la campaña principal.',
-            speech: is5DShop ? '¡Ten cuidado ahí afuera en las calles de Satélite y Neo Domino!' : (isGXShop ? '¡Mucho éxito en tus clases y duelos en el campus de la Academia!' : '¡Que la fortuna y el Corazón de las Cartas te acompañen en tu próxima batalla!'),
+            speech: isZexalShop ? '¡Ánimo en Heartland City! ¡Demuéstrales cómo se siente el flujo (Kattobingu)!' : (is5DShop ? '¡Ten cuidado ahí afuera en las calles de Satélite y Neo Domino!' : (isGXShop ? '¡Mucho éxito en tus clases y duelos en el campus de la Academia!' : '¡Que la fortuna y el Corazón de las Cartas te acompañen en tu próxima batalla!')),
             action: () => {
                 if(window.hideDuelBoard) window.hideDuelBoard();
                 window.playViolinClick(); 
@@ -7778,20 +7839,37 @@ window.openCustomShopMenu = function() {
     workspace.appendChild(rightSide);
     overlay.appendChild(workspace);
 
-    // 3. BOTTOM SHOWCASE: VITRINA DE LOS 7 ARTÍCULOS DEL MILENIO
+    // 3. BOTTOM SHOWCASE: VITRINA DE LOS ARTÍCULOS / NÚMEROS
     let showcaseBar = document.createElement('div');
     showcaseBar.id = 'shop-millennium-showcase';
-    showcaseBar.style.cssText = 'background: linear-gradient(180deg, rgba(15,11,6,0.95) 0%, rgba(28,20,10,0.98) 100%); border-top: 2px solid #b8860b; padding: 6px 20px 8px 20px; box-shadow: 0 -6px 20px rgba(0,0,0,0.7); z-index: 10; display:flex; flex-direction:column; gap:6px; flex-shrink:0;';
+    showcaseBar.style.cssText = isZexalShop ? 
+        'background: linear-gradient(180deg, rgba(2,12,32,0.95) 0%, rgba(1,6,18,0.98) 100%); border-top: 2px solid #00e5ff; padding: 6px 20px 8px 20px; box-shadow: 0 -6px 20px rgba(0,0,0,0.7); z-index: 10; display:flex; flex-direction:column; gap:6px; flex-shrink:0;' :
+        'background: linear-gradient(180deg, rgba(15,11,6,0.95) 0%, rgba(28,20,10,0.98) 100%); border-top: 2px solid #b8860b; padding: 6px 20px 8px 20px; box-shadow: 0 -6px 20px rgba(0,0,0,0.7); z-index: 10; display:flex; flex-direction:column; gap:6px; flex-shrink:0;';
 
     // Collapsed by default on compact mobile landscape screens to prioritize full view of the 8 buttons
     if (window.innerHeight <= 580) {
         showcaseBar.classList.add('collapsed');
     }
 
+    const ZEXAL_ITEMS = isZexalShop && window.getZexalNumbers ? window.getZexalNumbers(s) : [];
+    const zexalUnlockedCount = ZEXAL_ITEMS.filter(x => x.unlocked).length;
+
     let showcaseHeader = document.createElement('div');
     showcaseHeader.id = 'showcase-header';
-    showcaseHeader.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-family:VT323, monospace; font-size:15px; color:#ffd700; letter-spacing:1px; cursor:pointer; user-select:none;';
-    showcaseHeader.innerHTML = `
+    showcaseHeader.style.cssText = `display:flex; justify-content:space-between; align-items:center; font-family:VT323, monospace; font-size:15px; color:${isZexalShop ? '#00e5ff' : '#ffd700'}; letter-spacing:1px; cursor:pointer; user-select:none;`;
+    showcaseHeader.innerHTML = isZexalShop ? `
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">🌌</span>
+            <span class="showcase-title">VITRINA DE ARTEFACTOS Y NÚMEROS XYZ · HEARTLAND CITY</span>
+            <span class="pedestal-count-badge" style="background:#041528; border:1px solid #00e5ff; color:#fff; font-size:12px; padding:1px 8px; border-radius:4px;">
+                ${zexalUnlockedCount} / ${ZEXAL_ITEMS.length}
+            </span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span class="showcase-desc-hint" style="font-size:12px; color:#80deea; font-family:'Segoe UI', sans-serif;">Toca para ver poderes</span>
+            <button id="btn-toggle-showcase" style="background:#021020; border:1px solid #00e5ff; color:#00e5ff; padding:2px 8px; border-radius:4px; font-size:12px; font-family:VT323, monospace; cursor:pointer;">▾ Ver / Ocultar</button>
+        </div>
+    ` : `
         <div style="display:flex; align-items:center; gap:8px;">
             <span style="font-size:18px;">🏺</span>
             <span class="showcase-title">VITRINA DE RELIQUIAS SAGRADAS · 7 ARTÍCULOS DEL MILENIO</span>
@@ -7814,52 +7892,148 @@ window.openCustomShopMenu = function() {
     itemsGrid.id = 'millennium-items-grid';
     itemsGrid.style.cssText = 'display:flex; justify-content:space-around; align-items:center; gap:10px; flex-wrap:nowrap; overflow-x:auto; padding:3px 0; -webkit-overflow-scrolling:touch;';
 
-    MILLENNIUM_ITEMS.forEach(it => {
-        let pedestal = document.createElement('div');
-        pedestal.className = 'millennium-pedestal';
-        pedestal.style.cssText = `flex: 1; min-width: 110px; max-width: 155px; height: 85px; background: ${it.unlocked ? 'linear-gradient(180deg, #332408 0%, #1a1204 100%)' : '#141416'}; border: 1.5px solid ${it.unlocked ? '#ffd700' : '#444'}; border-radius: 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 4px; box-sizing:border-box; position:relative; box-shadow: ${it.unlocked ? '0 0 12px rgba(255, 215, 0, 0.25)' : 'none'}; opacity: ${it.unlocked ? '1' : '0.55'};`;
+    if (isZexalShop) {
+        ZEXAL_ITEMS.forEach(it => {
+            let pedestal = document.createElement('div');
+            pedestal.className = 'millennium-pedestal';
+            pedestal.style.cssText = `flex: 1; min-width: 110px; max-width: 155px; height: 85px; background: ${it.unlocked ? 'linear-gradient(180deg, #072138 0%, #03101c 100%)' : '#10141a'}; border: 1.5px solid ${it.unlocked ? '#00e5ff' : '#334'}; border-radius: 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 4px; box-sizing:border-box; position:relative; box-shadow: ${it.unlocked ? '0 0 12px rgba(0, 229, 255, 0.35)' : 'none'}; opacity: ${it.unlocked ? '1' : '0.55'};`;
 
-        // SVG Render
-        let svgContainer = document.createElement('div');
-        svgContainer.className = 'pedestal-svg-box';
-        svgContainer.style.cssText = 'width: 42px; height: 42px; display:flex; align-items:center; justify-content:center; filter:' + (it.unlocked ? 'drop-shadow(0 0 6px #ffd700)' : 'grayscale(100%) opacity(40%)') + ';';
-        svgContainer.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">${it.svgPath}</svg>`;
-        pedestal.appendChild(svgContainer);
+            let iconContainer = document.createElement('div');
+            iconContainer.className = 'pedestal-svg-box';
+            iconContainer.style.cssText = 'width: 42px; height: 42px; display:flex; align-items:center; justify-content:center; font-size: 26px; filter:' + (it.unlocked ? 'drop-shadow(0 0 6px #00e5ff)' : 'grayscale(100%) opacity(40%)') + ';';
+            iconContainer.textContent = it.relicIcon || it.icon || '🌌';
+            pedestal.appendChild(iconContainer);
 
-        // Name
-        let nameEl = document.createElement('div');
-        nameEl.className = 'pedestal-name-box';
-        nameEl.style.cssText = 'font-weight:bold; font-size:11px; color:' + (it.unlocked ? '#ffd700' : '#888') + '; margin-top:3px; text-align:center; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; width:100%;';
-        nameEl.textContent = it.shortName;
-        pedestal.appendChild(nameEl);
+            let nameEl = document.createElement('div');
+            nameEl.className = 'pedestal-name-box';
+            nameEl.style.cssText = 'font-weight:bold; font-size:11px; color:' + (it.unlocked ? '#00e5ff' : '#888') + '; margin-top:3px; text-align:center; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; width:100%;';
+            nameEl.textContent = it.shortName || it.relicName;
+            pedestal.appendChild(nameEl);
 
-        // Badge
-        let badgeEl = document.createElement('div');
-        badgeEl.className = 'pedestal-status-badge';
-        badgeEl.style.cssText = 'font-size:9px; font-weight:bold; padding:1px 6px; border-radius:3px; margin-top:2px; ' + (it.unlocked ? 'background:#1b5e20; color:#a5d6a7; border:1px solid #4caf50;' : 'background:#222; color:#888; border:1px solid #444;');
-        badgeEl.textContent = it.unlocked ? '✨ ACTIVO' : '🔒 BLOQUEADO';
-        pedestal.appendChild(badgeEl);
+            let badgeEl = document.createElement('div');
+            badgeEl.className = 'pedestal-status-badge';
+            badgeEl.style.cssText = 'font-size:9px; font-weight:bold; padding:1px 6px; border-radius:3px; margin-top:2px; ' + (it.unlocked ? 'background:#004d40; color:#80cbc4; border:1px solid #00e5ff;' : 'background:#222; color:#888; border:1px solid #444;');
+            badgeEl.textContent = it.unlocked ? '✨ ACTIVO' : '🔒 BLOQUEADO';
+            pedestal.appendChild(badgeEl);
 
-        pedestal.onmouseenter = () => {
-            window.playHoverSound && window.playHoverSound();
-            if (it.unlocked) {
-                setGrandpaSpeech(it.grandpaQuote);
-            } else {
-                setGrandpaSpeech('El ' + it.name + ' aún no ha sido recuperado. ' + it.hint);
-            }
-        };
+            pedestal.onmouseenter = () => {
+                window.playHoverSound && window.playHoverSound();
+                if (it.unlocked) {
+                    setGrandpaSpeech('¡El ' + (it.relicName || it.name) + ' está en tu poder! ' + (it.relicDesc || it.desc));
+                } else {
+                    setGrandpaSpeech('Aún no has obtenido el ' + (it.relicName || it.name) + '. ¡Derrota a ' + it.bearer + ' para conseguirlo!');
+                }
+            };
 
-        pedestal.onclick = () => {
-            window.playViolinClick && window.playViolinClick();
-            showMillenniumItemModal(it);
-        };
+            pedestal.onclick = () => {
+                window.playViolinClick && window.playViolinClick();
+                showZexalItemModal(it);
+            };
 
-        itemsGrid.appendChild(pedestal);
-    });
+            itemsGrid.appendChild(pedestal);
+        });
+    } else {
+        MILLENNIUM_ITEMS.forEach(it => {
+            let pedestal = document.createElement('div');
+            pedestal.className = 'millennium-pedestal';
+            pedestal.style.cssText = `flex: 1; min-width: 110px; max-width: 155px; height: 85px; background: ${it.unlocked ? 'linear-gradient(180deg, #332408 0%, #1a1204 100%)' : '#141416'}; border: 1.5px solid ${it.unlocked ? '#ffd700' : '#444'}; border-radius: 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 4px; box-sizing:border-box; position:relative; box-shadow: ${it.unlocked ? '0 0 12px rgba(255, 215, 0, 0.25)' : 'none'}; opacity: ${it.unlocked ? '1' : '0.55'};`;
+
+            // SVG Render
+            let svgContainer = document.createElement('div');
+            svgContainer.className = 'pedestal-svg-box';
+            svgContainer.style.cssText = 'width: 42px; height: 42px; display:flex; align-items:center; justify-content:center; filter:' + (it.unlocked ? 'drop-shadow(0 0 6px #ffd700)' : 'grayscale(100%) opacity(40%)') + ';';
+            svgContainer.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">${it.svgPath}</svg>`;
+            pedestal.appendChild(svgContainer);
+
+            // Name
+            let nameEl = document.createElement('div');
+            nameEl.className = 'pedestal-name-box';
+            nameEl.style.cssText = 'font-weight:bold; font-size:11px; color:' + (it.unlocked ? '#ffd700' : '#888') + '; margin-top:3px; text-align:center; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; width:100%;';
+            nameEl.textContent = it.shortName;
+            pedestal.appendChild(nameEl);
+
+            // Badge
+            let badgeEl = document.createElement('div');
+            badgeEl.className = 'pedestal-status-badge';
+            badgeEl.style.cssText = 'font-size:9px; font-weight:bold; padding:1px 6px; border-radius:3px; margin-top:2px; ' + (it.unlocked ? 'background:#1b5e20; color:#a5d6a7; border:1px solid #4caf50;' : 'background:#222; color:#888; border:1px solid #444;');
+            badgeEl.textContent = it.unlocked ? '✨ ACTIVO' : '🔒 BLOQUEADO';
+            pedestal.appendChild(badgeEl);
+
+            pedestal.onmouseenter = () => {
+                window.playHoverSound && window.playHoverSound();
+                if (it.unlocked) {
+                    setGrandpaSpeech(it.grandpaQuote);
+                } else {
+                    setGrandpaSpeech('El ' + it.name + ' aún no ha sido recuperado. ' + it.hint);
+                }
+            };
+
+            pedestal.onclick = () => {
+                window.playViolinClick && window.playViolinClick();
+                showMillenniumItemModal(it);
+            };
+
+            itemsGrid.appendChild(pedestal);
+        });
+    }
 
     showcaseBar.appendChild(itemsGrid);
     if (!is5DShop) {
         overlay.appendChild(showcaseBar);
+    }
+
+    // MODAL DIALOG FOR ZEXAL ARTIFACTS / NUMBERS LORE
+    function showZexalItemModal(it) {
+        let existingModal = document.getElementById('millennium-lore-modal');
+        if (existingModal) existingModal.remove();
+
+        let modalOverlay = document.createElement('div');
+        modalOverlay.id = 'millennium-lore-modal';
+        modalOverlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:99999999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);';
+
+        let modalBox = document.createElement('div');
+        modalBox.style.cssText = 'background:linear-gradient(135deg, #051428 0%, #020914 100%); border:3px solid #00e5ff; border-radius:12px; width:480px; max-width:90vw; padding:25px; box-shadow:0 0 35px rgba(0,229,255,0.4); display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; color:#fff;';
+
+        modalBox.innerHTML = `
+            <div style="font-size:55px; margin-bottom:10px; filter:${it.unlocked ? 'drop-shadow(0 0 15px #00e5ff)' : 'grayscale(100%) opacity(40%)'};">
+                ${it.relicIcon || it.icon || '🌌'}
+            </div>
+            <div style="font-family:VT323, monospace; font-size:26px; color:#ffd700; text-shadow:2px 2px 0 #000; letter-spacing:1px;">
+                ${(it.relicName || it.name).toUpperCase()}
+            </div>
+            <div style="font-size:13px; color:#80deea; font-weight:bold; margin-top:4px;">
+                Portador / Rival: <span style="color:#fff;">${it.bearer}</span>
+            </div>
+            <div style="background:#041528; border:1px solid #00e5ff; border-radius:6px; padding:6px 14px; font-size:12px; color:#00e5ff; font-weight:bold; margin:14px 0 10px 0;">
+                ⚡ Monstruo Xyz: ${it.monster} (Rango ${it.rank || 4} · ${it.atk || 0} ATK / ${it.def || 0} DEF)
+            </div>
+            <div style="font-size:14px; color:#e0e0e0; line-height:1.5; margin-bottom:10px;">
+                ${it.relicDesc || it.desc}
+            </div>
+            <div style="font-size:12px; color:#ffd54f; line-height:1.4; margin-bottom:16px; font-style:italic;">
+                Efecto Xyz: ${it.desc}
+            </div>
+            <div style="padding:8px 14px; border-radius:6px; font-size:12px; font-weight:bold; width:100%; box-sizing:border-box; margin-bottom:18px; ${it.unlocked ? 'background:#004d40; color:#80cbc4; border:1px solid #00e5ff;' : 'background:#26180a; color:#ffcc80; border:1px solid #ff9800;'}">
+                ${it.unlocked ? '✨ ARTEFACTO / NÚMERO RECUPERADO · ACTIVO EN HEARTLAND' : '🔒 BLOQUEADO: Derrota a ' + it.bearer + ' en el mapa para desbloquearlo'}
+            </div>
+            <button id="btn-close-lore-modal" style="background:linear-gradient(180deg, #00e5ff 0%, #00838f 100%); color:#000; border:none; padding:10px 28px; border-radius:6px; font-weight:900; font-size:14px; cursor:pointer; font-family:VT323, monospace; letter-spacing:1px; box-shadow:0 4px 10px rgba(0,0,0,0.6);">
+                CERRAR
+            </button>
+        `;
+
+        modalOverlay.appendChild(modalBox);
+        document.body.appendChild(modalOverlay);
+
+        modalBox.querySelector('#btn-close-lore-modal').onclick = () => {
+            window.playViolinClick && window.playViolinClick();
+            modalOverlay.remove();
+        };
+        modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) {
+                window.playViolinClick && window.playViolinClick();
+                modalOverlay.remove();
+            }
+        };
     }
 
     // MODAL DIALOG FOR DETAILED ITEM LORE
