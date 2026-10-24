@@ -328,19 +328,99 @@
       border: 1px solid #4a3a28;
     }
 
-    /* Ajustes responsivos para teléfono en landscape (horizontal) */
+    /* ==========================================================================
+       TABLERO DE DUELO TÁCTICO INNOVADOR PARA MÓVILES (MOBILE-FIRST HUD)
+       ========================================================================== */
+
+    /* Eliminar textos redundantes que saturan la pantalla en móviles */
+    body.is-mobile-device .rowTitle,
+    body.is-mobile-device .section,
+    body.mobile-landscape .rowTitle,
+    body.mobile-landscape .section,
+    body.mobile-portrait .rowTitle,
+    body.mobile-portrait .section {
+      display: none !important;
+    }
+
+    /* Tablero General con Estilo Master Duel / Holográfico */
+    body.view-field .board,
+    body.in-duel .board {
+      background: radial-gradient(circle at 50% 50%, #2a1f14 0%, #15100a 60%, #090705 100%) !important;
+      border: 1px solid #735728 !important;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(212, 175, 55, 0.15) !important;
+    }
+
+    /* Zonas de Invocación Mejoradas con Borde Luminoso */
+    .zone, .zones .zone, .zones.backrow .zone,
+    #playerBack .zone, #enemyBack .zone, #player .zone, #enemy .zone {
+      border: 1.5px solid rgba(197, 160, 89, 0.45) !important;
+      border-radius: 7px !important;
+      background: rgba(18, 14, 10, 0.65) !important;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.7) !important;
+      transition: all 0.18s ease-in-out !important;
+    }
+    .zone:hover, .zone:active {
+      border-color: #ffd700 !important;
+      box-shadow: inset 0 0 14px rgba(255, 215, 0, 0.25), 0 0 10px rgba(255, 215, 0, 0.3) !important;
+    }
+
+    /* Cartas en el campo de batalla: Grandes, Claras y Nítidas */
+    .card {
+      border-radius: 6px !important;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.85), inset 0 0 0 1px rgba(255,255,255,0.15) !important;
+    }
+    .cardTop {
+      padding: 2px 4px !important;
+      background: rgba(8, 6, 4, 0.92) !important;
+      border-radius: 4px 4px 0 0 !important;
+    }
+    .cardTop .name {
+      font-weight: 800 !important;
+      letter-spacing: 0.3px !important;
+      text-shadow: 0 1px 3px #000 !important;
+    }
+    .cardArt {
+      border: 1px solid rgba(212, 175, 55, 0.6) !important;
+      border-radius: 4px !important;
+      background: #000 !important;
+    }
+    .stats {
+      background: rgba(6, 4, 2, 0.94) !important;
+      border: 1px solid rgba(180, 140, 70, 0.5) !important;
+      border-radius: 4px !important;
+      font-weight: 900 !important;
+      text-shadow: 0 1px 3px #000 !important;
+    }
+    .stats .atk {
+      color: #ffe066 !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 6px rgba(255, 224, 102, 0.5) !important;
+    }
+    .stats .def {
+      color: #64e3ff !important;
+      font-weight: 900 !important;
+      text-shadow: 0 0 6px rgba(100, 227, 255, 0.5) !important;
+    }
+
+    /* ==========================================================================
+       MODO HORIZONTAL / LANDSCAPE (OPTIMIZACIÓN PRINCIPAL PARA TELÉFONO)
+       ========================================================================== */
     @media (orientation: landscape) {
       #campaignDuelHud3000 { display: none !important; }
       body.view-field { display: block !important; min-height: unset !important; padding: 0 !important; }
+      
+      /* Eliminar zoom artificial: Aprovechar el 100% de la pantalla */
       body.view-field .wrap,
       body.in-duel .wrap,
       body.mobile-landscape.view-field .wrap {
-        padding: 0 4px !important;
+        padding: 0 !important;
         max-width: 100vw !important;
+        width: 100vw !important;
         margin: 0 auto !important;
-        zoom: 0.74 !important;
+        zoom: 1 !important;
       }
-      /* Barra de LP Sticky y destacada que nunca se corta ni desaparece */
+
+      /* Barra de LP Sticky Estilo Consola HD */
       body.view-field #duelTopHeader,
       body.in-duel #duelTopHeader,
       body.mobile-landscape.view-field #duelTopHeader,
@@ -352,14 +432,14 @@
         right: 0 !important;
         width: 100% !important;
         z-index: 1000 !important;
-        padding: max(4px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 4px max(12px, env(safe-area-inset-left)) !important;
-        background: linear-gradient(180deg, rgba(20, 14, 8, 0.98) 0%, rgba(10, 7, 4, 0.95) 100%) !important;
-        border-bottom: 1.5px solid #d4af37 !important;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.85) !important;
+        padding: max(4px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 4px max(14px, env(safe-area-inset-left)) !important;
+        background: linear-gradient(180deg, rgba(16, 11, 6, 0.98) 0%, rgba(8, 5, 2, 0.96) 100%) !important;
+        border-bottom: 2px solid #d4af37 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9) !important;
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        margin: 0 0 3px 0 !important;
+        margin: 0 0 2px 0 !important;
         box-sizing: border-box !important;
       }
       #duelTopHeader .mode,
@@ -370,74 +450,151 @@
       #duelTopHeader b,
       body.view-field #duelTopHeader b,
       body.mobile-landscape #duelTopHeader b {
-        font-size: 13px !important;
+        font-size: 13.5px !important;
         color: #ffd700 !important;
-        letter-spacing: 0.5px !important;
-        text-shadow: 1px 1px 2px #000 !important;
+        letter-spacing: 0.8px !important;
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.4) !important;
       }
       #duelTopHeader .lp,
       body.view-field #duelTopHeader .lp,
       body.mobile-landscape #duelTopHeader .lp,
       .lp {
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: 900 !important;
-        padding: 2px 10px !important;
-        border-radius: 6px !important;
-        background: rgba(0, 0, 0, 0.65) !important;
-        border: 1px solid rgba(212, 175, 55, 0.5) !important;
+        padding: 3px 12px !important;
+        border-radius: 8px !important;
+        background: rgba(0, 0, 0, 0.75) !important;
+        border: 1.5px solid rgba(212, 175, 55, 0.6) !important;
         color: #fff !important;
         display: flex !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 12px !important;
         white-space: nowrap !important;
-        text-shadow: 0 0 6px rgba(0, 0, 0, 0.9) !important;
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.8) !important;
       }
       #plp {
         color: #4df !important;
-        font-size: 18px !important;
+        font-size: 19px !important;
         font-weight: 900 !important;
+        text-shadow: 0 0 8px rgba(77, 221, 255, 0.7) !important;
       }
       #elp {
-        color: #ff5252 !important;
-        font-size: 18px !important;
+        color: #ff4757 !important;
+        font-size: 19px !important;
         font-weight: 900 !important;
+        text-shadow: 0 0 8px rgba(255, 71, 87, 0.7) !important;
       }
+
+      /* Rejilla de Combate Expandida: Maximizar el área central */
       .board {
-        padding: 4px !important;
-        gap: 4px !important;
+        padding: 4px 6px !important;
+        gap: 6px !important;
+        grid-template-columns: 52px minmax(0, 1fr) 64px !important;
       }
+
+      /* Altura de Cartas en Campo AUMENTADA (Casi el doble del original) */
       .zone, .zones .zone, .zones.backrow .zone,
       #playerBack .zone, #enemyBack .zone, #player .zone, #enemy .zone {
-        height: 64px !important;
-        min-height: 64px !important;
-        max-height: 64px !important;
+        height: clamp(92px, 18.5vh, 115px) !important;
+        min-height: clamp(92px, 18.5vh, 115px) !important;
+        max-height: clamp(92px, 18.5vh, 115px) !important;
       }
+
+      /* Contenido Interno de Cartas Ampliado */
       .cardTop .name {
-        font-size: 8px !important;
+        font-size: 9.5px !important;
+        line-height: 1.15 !important;
       }
       .cardArt {
-        min-height: 28px !important;
+        min-height: 48px !important;
+        margin: 2px 0 !important;
       }
       .artIcon {
-        font-size: 18px !important;
+        font-size: 26px !important;
       }
       .stats {
+        font-size: 10px !important;
+        padding: 2px 4px !important;
+      }
+
+      /* Pilas Laterales Compactas */
+      .pile {
+        width: 100% !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        padding: 2px !important;
+      }
+      .pileTitle {
+        font-size: 7px !important;
+        margin: 1px 0 !important;
+      }
+      .pileLabel {
         font-size: 8px !important;
-        padding: 1px 2px !important;
       }
       .sideLog {
-        height: 110px !important;
-        font-size: 7.5px !important;
+        height: 75px !important;
+        font-size: 8px !important;
       }
+
+      /* Barra de Fases Ergonómica */
       .phaseBar {
-        gap: 4px !important;
-        margin: 3px 0 !important;
+        gap: 6px !important;
+        margin: 2px 0 !important;
       }
       .phaseBtn {
-        min-width: 44px !important;
+        min-width: 52px !important;
+        padding: 5px 8px !important;
+        font-size: 12px !important;
+        font-weight: 900 !important;
+        border-radius: 6px !important;
+      }
+
+      /* Mano de Cartas Desplegable Inferior */
+      .hand {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 6px !important;
         padding: 4px 6px !important;
+      }
+      .hand .zone {
+        flex: 0 0 clamp(80px, 15vw, 105px) !important;
+        height: clamp(115px, 23vh, 140px) !important;
+        min-height: clamp(115px, 23vh, 140px) !important;
+        max-height: clamp(115px, 23vh, 140px) !important;
+      }
+      .hand .card {
+        min-height: 100% !important;
+      }
+      .hand .cardTop .name {
         font-size: 11px !important;
       }
+      .hand .cardArt {
+        min-height: 58px !important;
+      }
+      .hand .artIcon {
+        font-size: 36px !important;
+      }
+      .hand .stats {
+        font-size: 11px !important;
+      }
+
+      /* Acciones Rápidas Táctiles */
+      .btns.actionBtns {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        margin: 3px 0 !important;
+        justify-content: center !important;
+      }
+      .btns.actionBtns .btn {
+        padding: 5px 9px !important;
+        font-size: 10px !important;
+        font-weight: 800 !important;
+        border-radius: 5px !important;
+      }
+
       #fmr-mobile-floating-hud {
         top: auto !important;
         bottom: 8px !important;
@@ -445,41 +602,101 @@
       }
     }
 
-    /* Cuadro de Información Compacto en Modo Vertical / Portrait */
+    /* ==========================================================================
+       MODO VERTICAL / PORTRAIT (DUELO TÁCTICO VERTICAL)
+       ========================================================================== */
     @media (orientation: portrait), (max-width: 768px) {
       #campaignDuelHud3000 { display: none !important; }
       #duelTopHeader .mode, #duelTopHeader .mode::after { display: none !important; content: '' !important; }
+      
       body.view-field,
       body.mobile-portrait.view-field {
         min-height: 100vh !important;
         min-height: 100dvh !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        padding: 6px 4px 20px 4px !important;
+        padding: 0 0 10px 0 !important;
         box-sizing: border-box !important;
       }
       body.view-field .wrap,
       body.mobile-portrait.view-field .wrap {
-        margin: auto !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
+        margin: 0 auto !important;
         width: 100% !important;
-        max-width: min(520px, 98vw) !important;
-        zoom: 0.84 !important;
+        max-width: 100vw !important;
+        zoom: 1 !important;
       }
       body.view-field #duelTopHeader {
         width: 100% !important;
-        margin-bottom: 3px !important;
-        border-radius: 8px 8px 0 0 !important;
-        position: static !important;
+        margin-bottom: 2px !important;
+        border-radius: 0 0 10px 10px !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        padding: 6px 12px !important;
       }
       body.view-field #duelBoardWrapper {
         width: 100% !important;
       }
+
+      /* Tablero en Vertical */
+      .board {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 4px !important;
+        gap: 6px !important;
+      }
+      .boardCenter {
+        width: 100% !important;
+      }
+      .battleLayout, .rightPiles {
+        display: none !important; /* Ocultar pilas complejas para no apretar el campo vertical */
+      }
+
+      /* Zonas de Monstruos y Magias en Vertical */
+      .zone, .zones .zone, .zones.backrow .zone,
+      #playerBack .zone, #enemyBack .zone, #player .zone, #enemy .zone {
+        height: clamp(82px, 11.5vh, 105px) !important;
+        min-height: clamp(82px, 11.5vh, 105px) !important;
+        max-height: clamp(82px, 11.5vh, 105px) !important;
+      }
+      .cardTop .name {
+        font-size: 8.5px !important;
+      }
+      .cardArt {
+        min-height: 42px !important;
+      }
+      .artIcon {
+        font-size: 24px !important;
+      }
+      .stats {
+        font-size: 9.5px !important;
+      }
+
+      /* Mano en Vertical */
+      .hand {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        gap: 6px !important;
+        padding: 4px 6px !important;
+      }
+      .hand .zone {
+        flex: 0 0 clamp(85px, 24vw, 110px) !important;
+        height: clamp(125px, 17vh, 150px) !important;
+        min-height: clamp(125px, 17vh, 150px) !important;
+        max-height: clamp(125px, 17vh, 150px) !important;
+      }
+      .hand .cardTop .name {
+        font-size: 11px !important;
+      }
+      .hand .cardArt {
+        min-height: 65px !important;
+      }
+      .hand .stats {
+        font-size: 11.5px !important;
+      }
+
+      /* Panel de Información en Vertical */
       body.view-field #cardInfoPanel,
       body.view-field .cardInfoPanel,
       body.mobile-portrait #cardInfoPanel,
@@ -487,21 +704,20 @@
       #cardInfoPanel,
       .cardInfoPanel {
         position: fixed !important;
-        top: auto !important;
-        bottom: 4px !important;
+        bottom: 6px !important;
         left: 8px !important;
         right: 8px !important;
         width: auto !important;
         max-width: min(440px, calc(100vw - 16px)) !important;
         min-width: unset !important;
         min-height: unset !important;
-        max-height: 58px !important;
+        max-height: 60px !important;
         height: auto !important;
         padding: 4px 8px !important;
         border-radius: 8px !important;
         border: 1.5px solid #d4af37 !important;
-        background: rgba(14, 11, 7, 0.94) !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.85) !important;
+        background: rgba(14, 11, 7, 0.96) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9) !important;
         z-index: 9999 !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;

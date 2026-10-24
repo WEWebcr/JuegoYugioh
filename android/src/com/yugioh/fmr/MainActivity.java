@@ -110,6 +110,11 @@ public class MainActivity extends Activity {
     }
 
     private void configureWebView() {
+        mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        mWebView.setVerticalScrollBarEnabled(false);
+        mWebView.setHorizontalScrollBarEnabled(false);
+
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
@@ -119,8 +124,12 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
+        settings.setDisplayZoomControls(false);
+        settings.setTextZoom(100);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/3.0.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/3.3.0");
 
         mWebView.setWebChromeClient(new CustomChromeClient(mProgressBar));
         mWebView.setWebViewClient(new CustomWebViewClient(this));
