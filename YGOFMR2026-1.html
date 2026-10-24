@@ -9202,17 +9202,20 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
         if (cd.kind === 'SPELL' || cd.kind === 'TRAP' || cd.kind === 'EQUIP') {
           return { name: cd.name, kind: cd.kind, value: cd.value || cd.name.toUpperCase().replace(/\s+/g, '_'), text: cd.text || cd.desc || '', faceUp: true };
         } else {
-          var cardKind = cd.kind || (cd.frameType === 'synchro' || (cd.type && cd.type.includes('Synchro')) ? 'SYNCHRO' : 'MONSTER');
+          var isXyzCd = cd.kind === 'XYZ' || cd.frameType === 'xyz' || (cd.type && cd.type.toLowerCase().includes('xyz')) || (typeof window.isXyzCard === 'function' && window.isXyzCard(cd.name));
+          var cardKind = isXyzCd ? 'XYZ' : (cd.kind || (cd.frameType === 'synchro' || (cd.type && cd.type.includes('Synchro')) ? 'SYNCHRO' : 'MONSTER'));
           var isTunerCd = cd.isTuner === true || (typeof window.isTunerMonster === 'function' ? window.isTunerMonster(cd) : false);
           return {
             id: cd.id,
             name: cd.name,
-            level: cd.level || 4,
+            level: cd.level || cd.rank || 4,
+            rank: cd.rank || cd.level || 4,
             type: cd.type || 'Warrior',
             attr: cd.attr || 'EARTH',
             atk: cd.atk || 0,
             def: cd.def || 0,
             kind: cardKind,
+            frameType: cd.frameType || (isXyzCd ? 'xyz' : ''),
             isTuner: isTunerCd,
             text: cd.text || cd.desc || '',
             image: cd.image || '',
@@ -29193,22 +29196,24 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     if (!c.kind || c.kind === 'MONSTER') c.kind = isXyz ? 'XYZ' : 'SYNCHRO';
     var sel = (game.selected || []).some(function(x) { return x && x[0] === 'x' && x[1] === i; });
     var eligible = window.extraEligible ? window.extraEligible(c) : false;
-    var cls = 'card monster ' + (sel ? 'selected ' : '') + (eligible ? 'eligible' : 'disabled') + (isXyz ? ' xyz-card' : '');
+    var cls = 'card monster ' + (sel ? 'selected ' : '') + ((eligible || isXyz) ? 'eligible' : 'disabled') + (isXyz ? ' xyz-card' : '');
     
     var rankVal = c.rank || c.level || 0;
     var kindText = isXyz ? ('XYZ · Rango ' + rankVal) : (c.kind === 'LINK' ? 'LINK' : (c.kind + ' · Nv ' + (c.level || 0)));
     var ratingText = c.kind === 'LINK' ? (' · Rating ' + (c.level || 0)) : '';
     var defText = c.kind === 'LINK' ? ' · SIN DEF' : (' / DEF ' + (c.def || 0));
-    var badge = eligible 
-      ? (isXyz ? '<div style="font-size:10px; margin-top:5px; color:#ffd700; font-weight:bold; letter-spacing:0.5px;">⭐ SOBREPOSICIÓN XYZ</div>' : '<div style="font-size:10px; margin-top:5px; color:#7cff7c; font-weight:bold; letter-spacing:0.5px;">⭐ INVOCABLE</div>')
-      : '';
+    var badge = isXyz
+      ? (eligible 
+          ? '<div style="font-size:10px; margin-top:5px; color:#ffd700; font-weight:bold; letter-spacing:0.5px;">⭐ ¡LISTO PARA INVOCAR!</div>'
+          : '<div style="font-size:10px; margin-top:5px; color:#bb86fc; font-weight:bold; letter-spacing:0.5px;">🌌 XYZ (NIV. ' + rankVal + ')</div>')
+      : (eligible ? '<div style="font-size:10px; margin-top:5px; color:#7cff7c; font-weight:bold; letter-spacing:0.5px;">⭐ INVOCABLE</div>' : '');
 
     var glowBorder = isXyz
-      ? (eligible ? 'box-shadow: 0 0 16px #ffd700, inset 0 0 10px rgba(255,215,0,0.4); border: 1.5px solid #ffd700 !important; background: linear-gradient(135deg, #0d0d18 0%, #171728 100%) !important;' : 'background: #0d0d18 !important;')
+      ? (eligible ? 'box-shadow: 0 0 16px #ffd700, inset 0 0 10px rgba(255,215,0,0.4); border: 1.5px solid #ffd700 !important; background: linear-gradient(135deg, #0d0d18 0%, #171728 100%) !important;' : 'box-shadow: 0 0 8px rgba(124, 77, 255, 0.4); border: 1.5px solid #7c4dff !important; background: #0d0d18 !important;')
       : (eligible ? 'box-shadow: 0 0 14px #7cff7c, inset 0 0 8px rgba(124,255,124,0.4); border-color: #7cff7c !important;' : '');
 
     return '<div class="' + cls + '" onclick="extraClick(' + i + ')" style="' + glowBorder + ' cursor: pointer;">' +
-      '<div class="name" style="font-weight:bold; color:' + (eligible ? (isXyz ? '#ffd700' : '#7cff7c') : '#ddd') + ';">' + (c.name || 'Desconocido') + '</div>' +
+      '<div class="name" style="font-weight:bold; color:' + (eligible ? (isXyz ? '#ffd700' : '#7cff7c') : (isXyz ? '#ffd700' : '#ddd')) + ';">' + (c.name || 'Desconocido') + '</div>' +
       '<div style="font-size:10px; opacity:0.85;">' + kindText + ratingText + '</div>' +
       '<div style="font-size:10px; opacity:0.75;">' + (c.type || 'Monster') + ' · ' + (c.attr || 'DARK') + '</div>' +
       '<div class="stats">ATK ' + (c.atk || 0) + defText + '</div>' +
@@ -29533,6 +29538,12 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       });
 
     var selectedSet = new Set((allCombos && allCombos[0]) || []);
+    if (selectedSet.size < 2 && eligibleMonsters.length >= 2) {
+      selectedSet.add(eligibleMonsters[0].idx);
+      selectedSet.add(eligibleMonsters[1].idx);
+    } else if (eligibleMonsters.length === 1) {
+      selectedSet.add(eligibleMonsters[0].idx);
+    }
 
     var overlay = document.createElement('div');
     overlay.id = 'xyz-mat-modal';
@@ -29567,6 +29578,29 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     function renderMonstersGrid() {
       gridDiv.innerHTML = '';
+
+      if (eligibleMonsters.length === 0) {
+        var currentMonsters = (game.field || []).filter(function(x) { return x && !x.faceDown && !x.faceDownSet103; });
+        var currentSummary = currentMonsters.length > 0
+          ? currentMonsters.map(function(m) { return (m.name || 'Monstruo') + ' (★ Nv ' + (m.level || m[1] || '?') + ')'; }).join(', ')
+          : 'Tu campo está vacío actualmente';
+        gridDiv.innerHTML = `
+          <div style="grid-column:1/-1; background:#181228; border:1.5px dashed #ffd700; border-radius:10px; padding:20px; text-align:center;">
+            <div style="color:#ffd700; font-weight:bold; font-size:16px; margin-bottom:8px;">
+              ⚠️ No hay monstruos de Nivel ${targetRank} en tu campo
+            </div>
+            <div style="color:#e0e0e0; font-size:13px; margin-bottom:12px; line-height:1.5;">
+              Para sobreponer e invocar a <b style="color:#ffd700;">${xyzName}</b> necesitas <b>2 monstruos boca arriba de Nivel ${targetRank}</b> en tu campo.
+            </div>
+            <div style="background:#0c0916; border:1px solid #4a3c66; border-radius:6px; padding:10px; color:#b0bec5; font-size:12px; text-align:left;">
+              <b style="color:#fff;">Monstruos actuales en tu campo:</b><br>
+              ${currentSummary}
+            </div>
+          </div>
+        `;
+        return;
+      }
+
       eligibleMonsters.forEach(function(item) {
         var card = item.card;
         var idx = item.idx;
@@ -29615,8 +29649,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           <div style="font-size:11px; color:#aaa; margin-top:2px;">
             ⚔ ${cardAtk} / 🛡 ${cardDef}
           </div>
-          <div style="margin-top:8px; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:bold; ${isSelected ? 'background:#ffd700; color:#000;' : 'background:#241d30; color:#888;'}">
-            ${isSelected ? '✓ MATERIAL ACUMULADO' : 'Clic para seleccionar'}
+          <div style="margin-top:8px; font-size:11px; padding:3px 10px; border-radius:4px; font-weight:bold; ${isSelected ? 'background:#ffd700; color:#000;' : 'background:#241d30; color:#888;'}">
+            ${isSelected ? '✓ MATERIAL SELECCIONADO' : 'Clic para seleccionar'}
           </div>
         `;
         gridDiv.appendChild(cardDiv);
@@ -29632,6 +29666,28 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     function updateStatusCard() {
       var selArr = Array.from(selectedSet);
       var isValid = (selArr.length === 2);
+
+      if (eligibleMonsters.length < 2) {
+        statusCard.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:13px; color:#fff;">
+              <b>Materiales en campo:</b> ${eligibleMonsters.length} / 2 requeridos
+            </div>
+            <div style="font-size:13px; font-weight:bold; color:#ffb74d;">
+              ⚠️ Requiere ${2 - eligibleMonsters.length} monstruo(s) más de Nivel ${targetRank}
+            </div>
+          </div>
+        `;
+        var confirmBtn = document.getElementById('xyz-confirm-btn');
+        if (confirmBtn) {
+          confirmBtn.disabled = true;
+          confirmBtn.style.opacity = '0.4';
+          confirmBtn.style.cursor = 'not-allowed';
+          confirmBtn.style.boxShadow = 'none';
+          confirmBtn.textContent = '⚠️ FALTAN MATERIALES (Se requieren 2 de Nivel ' + targetRank + ')';
+        }
+        return;
+      }
 
       statusCard.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
@@ -29650,6 +29706,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         confirmBtn.style.opacity = isValid ? '1' : '0.4';
         confirmBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
         confirmBtn.style.boxShadow = isValid ? '0 0 18px rgba(255, 215, 0, 0.7)' : 'none';
+        confirmBtn.textContent = '⚡ SOBREPONER E INVOCAR XYZ';
       }
     }
 
@@ -29708,13 +29765,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     if (isXyz) {
       var targetRank = Number(c.rank || c.level || c[1] || 4);
       var xyzCombos = window.findXyzMaterialsFor(c);
-      if (!xyzCombos || xyzCombos.length === 0) {
-        if (typeof log === 'function') log('Esa carta Xyz no puede invocarse: necesitas 2 monstruos de Nivel ' + targetRank + ' en el campo.');
-        if (typeof duelToast === 'function') duelToast('Necesitas 2 monstruos boca arriba de Nivel ' + targetRank + ' para sobreponer');
-        return;
-      }
 
-      window.showXyzMaterialSelectModal(c, i, xyzCombos, function(mats) {
+      window.showXyzMaterialSelectModal(c, i, xyzCombos || [], function(mats) {
         mats.sort(function(a, b) { return b - a; });
         var matCards = [];
         var matNames = [];
@@ -30416,6 +30468,13 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
   var prevOpenPileMaster = window.openPile;
   window.openPile = function(kind) {
+    var isWorld4 = (typeof game !== 'undefined' && game && game._currentWorld === 4) || (window.currentWorld === 4);
+    if (kind === 'extra' && isWorld4) {
+      if (typeof window.openXyzExtraDeckSelector === 'function') {
+        window.openXyzExtraDeckSelector();
+        return;
+      }
+    }
     var isExtraAllowed = (typeof game !== 'undefined' && game && (game._currentWorld === 3 || game._currentWorld === 4)) || (window.currentWorld === 3 || window.currentWorld === 4);
     if (kind === 'extra' || kind === 'enemyExtra') {
       if (!isExtraAllowed) {
@@ -30710,6 +30769,180 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
   };
   try { render = window.render; } catch(_) {}
 
+  // Selector Visual e Interactivo del Extra Deck Xyz (Mundo Zexal)
+  window.openXyzExtraDeckSelector = function() {
+    if (typeof game === 'undefined' || !game) return;
+    var existing = document.getElementById('xyz-extra-selector-modal');
+    if (existing) existing.remove();
+
+    var extraList = (game.extra || []).map(function(c, idx) {
+      return { card: c, index: idx };
+    }).filter(function(item) {
+      var c = item.card;
+      if (!c) return false;
+      var isXyz = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)));
+      if (!c.kind || c.kind === 'MONSTER') {
+        var fCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+        if (fCd && (fCd.kind === 'XYZ' || fCd.rank)) isXyz = true;
+      }
+      return isXyz || game._currentWorld === 4 || window.currentWorld === 4;
+    });
+
+    if (extraList.length === 0) {
+      if (typeof duelToast === 'function') duelToast('No tienes monstruos Xyz en tu Extra Deck.');
+      return;
+    }
+
+    var overlay = document.createElement('div');
+    overlay.id = 'xyz-extra-selector-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(3, 5, 18, 0.94); z-index:99999998; display:flex; justify-content:center; align-items:center; padding:12px; font-family:"Segoe UI", Arial, sans-serif; backdrop-filter:blur(5px);';
+
+    var box = document.createElement('div');
+    box.style.cssText = 'width:min(900px, 96vw); max-height:90vh; background:linear-gradient(180deg, #0e0d1f 0%, #05040a 100%); border:2.5px solid #ffd700; border-radius:14px; box-shadow:0 0 50px rgba(255, 215, 0, 0.4), 0 12px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+    // Header Zexal
+    var header = document.createElement('div');
+    header.style.cssText = 'background:linear-gradient(90deg, #15112f 0%, #291245 50%, #15112f 100%); padding:14px 20px; border-bottom:2px solid #ffd700; display:flex; justify-content:space-between; align-items:center;';
+    header.innerHTML = `
+      <div style="text-align:left;">
+        <div style="font-family:VT323, monospace; font-size:26px; color:#ffd700; text-shadow:0 0 12px #ffd700; letter-spacing:1.5px; line-height:1.1;">
+          🌌 EXTRA DECK · MONSTRUOS XYZ (${extraList.length})
+        </div>
+        <div style="color:#d1c4e9; font-size:12px; margin-top:2px;">
+          Toca cualquier Monstruo Xyz para seleccionarlo y sobreponer sus materiales del campo
+        </div>
+      </div>
+      <button id="xyz-close-selector-btn" style="background:#2b223e; border:1px solid #7c4dff; color:#fff; width:34px; height:34px; border-radius:50%; font-size:18px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center;">✖</button>
+    `;
+    box.appendChild(header);
+
+    // Grid Container
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:16px 20px; overflow-y:auto; flex:1; display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px;';
+
+    extraList.forEach(function(item) {
+      var c = item.card;
+      var i = item.index;
+
+      var targetRank = Number(c.rank || c.level || c[1] || 4);
+      var fCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+      if (fCd) {
+        if (!c.atk && fCd.atk) c.atk = fCd.atk;
+        if (!c.def && fCd.def) c.def = fCd.def;
+        if (!c.type && fCd.type) c.type = fCd.type;
+        if (!c.attr && fCd.attr) c.attr = fCd.attr;
+        if (!c.text && (fCd.text || fCd.desc)) c.text = fCd.text || fCd.desc;
+        if (fCd.rank) targetRank = Number(fCd.rank);
+      }
+
+      var fieldCount = (game.field || []).filter(function(m) {
+        if (!m || m.faceDown || m.faceDownSet103) return false;
+        var lvl = Number(m.level || m[1] || 0);
+        if (!lvl) {
+          var foundM = (window.CARDS_DATA || []).find(function(f) { return f && f.name === m.name; });
+          if (foundM && foundM.level) lvl = Number(foundM.level);
+        }
+        return lvl === targetRank;
+      }).length;
+
+      var isReady = (fieldCount >= 2);
+
+      var cardDiv = document.createElement('div');
+      cardDiv.style.cssText = `
+        background: radial-gradient(circle at top, #1c1533 0%, #0d0c18 100%);
+        border: 2px solid ${isReady ? '#ffd700' : '#5a4675'};
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        cursor: pointer;
+        box-shadow: ${isReady ? '0 0 20px rgba(255, 215, 0, 0.45)' : '0 4px 12px rgba(0,0,0,0.5)'};
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      `;
+      cardDiv.onmouseenter = function() { cardDiv.style.transform = 'translateY(-2px)'; };
+      cardDiv.onmouseleave = function() { cardDiv.style.transform = 'translateY(0)'; };
+
+      cardDiv.onclick = function() {
+        overlay.remove();
+        window.extraClick(i);
+      };
+
+      var starsHTML = '★'.repeat(Math.min(targetRank, 12));
+      var statusBadge = isReady
+        ? `<div style="background:linear-gradient(90deg, #1b5e20, #2e7d32); color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; text-shadow:0 0 4px #000; border:1px solid #7cff7c;">⚡ LISTO (${fieldCount}/2 en campo)</div>`
+        : (fieldCount === 1
+            ? `<div style="background:#ef6c00; color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; border:1px solid #ffb74d;">⚠️ 1/2 en campo</div>`
+            : `<div style="background:#262035; color:#aaa; font-size:11px; padding:3px 8px; border-radius:4px; border:1px solid #4a3c66;">0/2 en campo</div>`);
+
+      var actionBtnStyle = isReady
+        ? 'background:linear-gradient(180deg, #ffd700, #b8860b); color:#000; font-weight:bold; border:1.5px solid #fff; box-shadow:0 0 12px rgba(255,215,0,0.6);'
+        : 'background:#241d33; color:#ffd700; border:1px solid #7c4dff;';
+
+      var actionBtnText = isReady
+        ? '⚡ SOBREPONER MATERIALES'
+        : (fieldCount === 1 ? '📋 VER MATERIALES (1/2)' : '📋 VER REQUISITOS (0/2)');
+
+      cardDiv.innerHTML = `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+            <div style="font-size:14px; font-weight:bold; color:#ffd700; text-shadow:0 0 8px rgba(255,215,0,0.4); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              ${c.name || 'Monstruo Xyz'}
+            </div>
+            ${statusBadge}
+          </div>
+
+          <div style="font-size:11px; color:#ffd700; letter-spacing:1px; margin-bottom:4px;">
+            ${starsHTML} <span style="color:#d1c4e9; font-weight:bold;">(Rango ${targetRank})</span>
+          </div>
+
+          <div style="font-size:11px; color:#bb86fc; margin-bottom:2px;">
+            ${c.type || 'Guerrero'} · ${c.attr || 'LUZ'}
+          </div>
+
+          <div style="font-size:12px; font-weight:bold; color:#fff; margin-bottom:8px;">
+            ⚔ ${c.atk || 0} / 🛡 ${c.def || 0}
+          </div>
+
+          <div style="font-size:11px; color:#cfd8dc; background:#100d1c; border-radius:5px; padding:6px 8px; border:1px solid #33274a; line-height:1.35; max-height:56px; overflow:hidden;">
+            ${c.text || '2 monstruos de Nivel ' + targetRank + '. Puedes desacoplar 1 material Xyz para activar su efecto.'}
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <button style="width:100%; padding:8px 0; border-radius:6px; font-size:11px; cursor:pointer; ${actionBtnStyle}">
+            ${actionBtnText}
+          </button>
+        </div>
+      `;
+
+      body.appendChild(cardDiv);
+    });
+
+    box.appendChild(body);
+
+    // Footer
+    var footer = document.createElement('div');
+    footer.style.cssText = 'background:rgba(10, 8, 20, 0.95); padding:10px 20px; border-top:1px solid rgba(255, 215, 0, 0.3); display:flex; justify-content:space-between; align-items:center;';
+    footer.innerHTML = `
+      <div style="color:#aaa; font-size:11px;">
+        💡 Recuerda: los monstruos sobrepuestos se quedan bajo la carta Xyz como Unidades de Sobreposición.
+      </div>
+      <button id="xyz-footer-close-btn" style="background:#262035; border:1px solid #4a3c66; color:#cfd8dc; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:12px;">
+        Cerrar
+      </button>
+    `;
+    box.appendChild(footer);
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    var closeBtn = document.getElementById('xyz-close-selector-btn');
+    if (closeBtn) closeBtn.onclick = function() { overlay.remove(); };
+    var footerCloseBtn = document.getElementById('xyz-footer-close-btn');
+    if (footerCloseBtn) footerCloseBtn.onclick = function() { overlay.remove(); };
+  };
+
   // Función directa para invocar Xyz desde el botón de combate
   window.openXyzSummonModal = function() {
     if (typeof game === 'undefined' || !game || game.turn !== 'player' || game.duelOver) {
@@ -30720,39 +30953,29 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (typeof duelToast === 'function') duelToast('No tienes cartas en tu Extra Deck.');
       return;
     }
-
-    var xyzIndices = [];
-    game.extra.forEach(function(c, idx) {
-      if (c && (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)))) {
-        xyzIndices.push(idx);
-      }
-    });
-
-    if (xyzIndices.length === 0) {
-      if (typeof duelToast === 'function') duelToast('No tienes monstruos Xyz en tu Extra Deck.');
-      return;
-    }
-
-    var readyIndices = xyzIndices.filter(function(idx) {
-      return !!window.findXyzMaterialsFor(game.extra[idx]);
-    });
-
-    if (readyIndices.length === 0) {
-      var sampleXyz = game.extra[xyzIndices[0]];
-      var reqRank = sampleXyz.rank || sampleXyz.level || 4;
-      if (typeof duelToast === 'function') duelToast('Necesitas 2 monstruos de Nivel ' + reqRank + ' boca arriba en el campo');
-      if (typeof log === 'function') log('Invocación Xyz no disponible: necesitas 2 monstruos boca arriba de Nivel ' + reqRank + ' en el campo.');
-      return;
-    }
-
-    // Ejecutar invocación del primer Xyz elegible
-    window.extraClick(readyIndices[0]);
+    window.openXyzExtraDeckSelector();
   };
 
   // CSS for World 1 Extra Deck hiding, Fusion Button, and Guardian Signs Battle Badges
   var style = document.createElement('style');
   style.id = 'world1ExtraBlockerStyle';
   style.textContent = `
+    /* Monstruos Xyz 100% visibles e interactivos en todo momento */
+    .card.xyz-card, .extraGrid .card.xyz-card {
+      opacity: 1 !important;
+      filter: none !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+    .card.xyz-card.disabled, .extraGrid .card.xyz-card.disabled {
+      opacity: 0.95 !important;
+      filter: none !important;
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      border: 1.5px solid #7c4dff !important;
+      background: #0d0d18 !important;
+    }
+
     /* ════════════════════════════════════════════════════════════════
        ENCABEZADO UNIFICADO DE DUELO Y LP (HORIZONTAL Y VERTICAL)
        ════════════════════════════════════════════════════════════════ */
@@ -30992,6 +31215,31 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     @keyframes synchroPulse {
       0% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 255, 136, 0.6); }
       100% { transform: scale(1.06); box-shadow: 0 0 20px rgba(0, 255, 136, 1); }
+    }
+
+    body.world-4 #extraPile {
+      display: flex !important;
+      cursor: pointer !important;
+      border: 1.5px solid #00e5ff !important;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4) !important;
+      background: linear-gradient(145deg, #071526, #020812) !important;
+      opacity: 0.95 !important;
+      transition: all 0.25s ease;
+    }
+    body.world-4 #extraPile:hover {
+      opacity: 1 !important;
+      border-color: #ffd700 !important;
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.6) !important;
+    }
+    body.world-4 #extraPile.extraReady {
+      opacity: 1 !important;
+      border: 2px solid #ffd700 !important;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.95), inset 0 0 10px rgba(255, 215, 0, 0.4) !important;
+      animation: xyzPulse 1.2s infinite alternate !important;
+    }
+    @keyframes xyzPulse {
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(255, 215, 0, 0.6); }
+      100% { transform: scale(1.06); box-shadow: 0 0 22px rgba(255, 215, 0, 1); }
     }
     .tunerBadge104 {
       background: linear-gradient(135deg, #005a2b, #008f43);
