@@ -3984,7 +3984,7 @@ window.generateZexalStarterDeck = function() {
       "Gagaga Girl", "Gagaga Girl",
       "Gogogo Golem", "Gogogo Golem", "Gogogo Golem",
       "Gogogo Giant", "Gogogo Giant",
-      "Zubaba Knight", "Zubaba Knight", "Zubaba Knight",
+      "Zubaba Knight", "Zubaba Knight",
       "Dododo Buster", "Dododo Buster",
       "Dododo Warrior", "Dododo Warrior",
       "Kagetokage", "Kagetokage", "Kagetokage",
@@ -3995,8 +3995,9 @@ window.generateZexalStarterDeck = function() {
       "Onomatopaira", "Onomatopaira",
       "Gagagarevenge", "Gagagarevenge",
       "Xyz Unit", "Xyz Unit",
-      "Dark Hole", "Mystical Space Typhoon", "Mirror Force", "Bottomless Trap Hole",
-      "Xyz Reborn", "Xyz Block"
+      "Xyz Reborn", "Xyz Reborn",
+      "Xyz Block", "Xyz Block",
+      "Generation Force", "Generation Force"
     ];
 };
 
@@ -4069,7 +4070,10 @@ window.customShowMap = function() {
     // Inicializar Starter Deck y Colección para Mundo 4 si entra por primera vez
     if (isZexal) {
         s.decksMundo4 = s.decksMundo4 || {};
-        if (!s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40) {
+        var isDeckInvalid = !s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40 || 
+                            s.decksMundo4['Principal'].some(c => !window.isCardAllowedInWorld(c, 4)) || 
+                            window.isTaintedTristanDeck(s.decksMundo4['Principal']);
+        if (isDeckInvalid) {
             s.decksMundo4['Principal'] = window.generateZexalStarterDeck();
             s.decksMundo4['Extra'] = window.generateZexalExtraDeck();
             s.activeDeckMundo4 = 'Principal';
@@ -4080,8 +4084,15 @@ window.customShowMap = function() {
             s.decksMundo4['Extra'].forEach(n => {
                 s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Extra'].filter(x => x === n).length);
             });
+            s.deck = [...s.decksMundo4['Principal']];
+            s.extra = [...s.decksMundo4['Extra']];
+            s.collection = s.collectionMundo4;
             if (window.persistUserSave) window.persistUserSave(s);
             else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+        } else {
+            s.deck = [...(s.decksMundo4[s.activeDeckMundo4] || s.decksMundo4['Principal'])];
+            s.extra = [...(s.decksMundo4['Extra'] || [])];
+            s.collection = s.collectionMundo4;
         }
     } else if (is5D) {
         s.decksMundo3 = s.decksMundo3 || {};
@@ -5199,6 +5210,17 @@ window.getCardMetadata = function(name) {
     }
     if ((!imgUrl || imgUrl.includes('imgur.com')) && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) {
         imgUrl = window.CUSTOM_LOCAL_IMAGES[name];
+    }
+    if ((!imgUrl || imgUrl.includes('imgur.com')) && window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+        var cdMeta = window.CARDS_DATA.find(function(x) { return x && x.name === name; });
+        if (cdMeta) {
+            num = cdMeta.id || num;
+            if (cdMeta.image) imgUrl = cdMeta.image;
+            else if (num >= 1100 && num <= 1199) imgUrl = 'imagenescartas/Mundo4/' + num + '.jpg';
+        }
+    }
+    if (num >= 1100 && num <= 1199 && (!imgUrl || imgUrl.includes('imgur.com'))) {
+        imgUrl = 'imagenescartas/Mundo4/' + num + '.jpg';
     }
     
     // Check known special monsters first (Gate Guardian, Sanga, Suijin, Kazejin, and classic field monsters)
@@ -8396,7 +8418,10 @@ window.customShowDeckEditor = function() {
     let currentActiveKey;
 
     if (isZexal) {
-        if (!s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo4['Principal'])) {
+        var isDeckInvalidEditor = !s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40 || 
+                                  s.decksMundo4['Principal'].some(c => !window.isCardAllowedInWorld(c, 4)) || 
+                                  window.isTaintedTristanDeck(s.decksMundo4['Principal']);
+        if (isDeckInvalidEditor) {
             s.decksMundo4['Principal'] = window.generateZexalStarterDeck ? window.generateZexalStarterDeck() : [];
             if (!Array.isArray(s.decksMundo4['Extra'])) {
                 s.decksMundo4['Extra'] = window.generateZexalExtraDeck ? window.generateZexalExtraDeck() : [];
@@ -9224,12 +9249,23 @@ window.customShowDeckEditor = function() {
             if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
                 return window.CUSTOM_LOCAL_IMAGES[num];
             }
+            if (num >= 1100 && num <= 1199) {
+                return 'imagenescartas/Mundo4/' + num + '.jpg';
+            }
+        }
+        if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) return window.CUSTOM_LOCAL_IMAGES[name];
+        if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+            var cd = window.CARDS_DATA.find(function(x) { return x && x.name === name; });
+            if (cd) {
+                if (cd.image) return cd.image;
+                if (cd.id >= 1100 && cd.id <= 1199) return 'imagenescartas/Mundo4/' + cd.id + '.jpg';
+            }
         }
         if (window.BANDAI_ART_FILES && window.BANDAI_ART_FILES[name]) return window.BANDAI_ART_FILES[name];
         if (window.CARD_FILES && window.CARD_FILES[name] && window.CARD_FILES[name].length > 0) {
             return 'https://yugioh.fandom.com/wiki/Special:Redirect/file/' + encodeURIComponent(window.CARD_FILES[name][0]);
         }
-        return 'https://i.imgur.com/vHqR8Kq.png'; 
+        return 'https://images.ygoprodeck.com/images/cards/' + encodeURIComponent(name) + '.jpg'; 
     }
 
     function matchesDeckFilter(name, info) {
@@ -11410,11 +11446,15 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           playerExtraNames = sSave.decksMundo4['Extra'].filter(function(c) { return window.isCardAllowedInWorld(c, 4); });
         }
       }
-      if (!playerCardNames || playerCardNames.length !== 40) {
+      if (!playerCardNames || playerCardNames.length !== 40 || playerCardNames.some(function(c) { return !window.isCardAllowedInWorld(c, 4); })) {
         playerCardNames = typeof window.generateZexalStarterDeck === 'function' ? window.generateZexalStarterDeck() : [];
       }
-      if (!sSave || !sSave.decksMundo4 || !Array.isArray(sSave.decksMundo4['Extra'])) {
+      if (!sSave || !sSave.decksMundo4 || !Array.isArray(sSave.decksMundo4['Extra']) || playerExtraNames.length === 0) {
         playerExtraNames = typeof window.generateZexalExtraDeck === 'function' ? window.generateZexalExtraDeck() : [];
+      }
+      if (sSave) {
+        sSave.deck = playerCardNames.slice();
+        sSave.extra = playerExtraNames.slice();
       }
       var oppDeckObj = (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]));
       if (oppDeckObj && Array.isArray(oppDeckObj.extraDeck)) {
@@ -12705,6 +12745,114 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             game.field[freeSlot] = pm;
             if (typeof log === 'function') log('🌹 [Efecto de Twilight Rose Knight] ¡Invocó de Modo Especial a ' + (pm.name || pm[0]) + ' desde la mano!');
             if (typeof duelToast === 'function') duelToast('¡Twilight Rose Knight invocó a ' + (pm.name || pm[0]) + '!');
+          }
+        }
+      }
+    }
+
+    // Efectos al ser Invocado de Modo Normal en Mundo 4 (ZEXAL)
+    var isZexal = (game._currentWorld === 4) || (window.currentWorld === 4) || (monster && window.isZexalCard && window.isZexalCard(monster));
+    if (isZexal && monster) {
+      var mNameZ = (monster.name || '').trim();
+      var mLvlZ = Number(monster.level || monster[1] || 0);
+
+      // 1. KAGETOKAGE: Si se invoca de Modo Normal un monstruo de Nivel 4, Kagetokage se invoca de Modo Especial desde la mano
+      if (mLvlZ === 4 && Array.isArray(game.hand) && game.hand.length > 0) {
+        var kageIdx = game.hand.findIndex(function(c) {
+          return c && ((c.name || c[0] || '').includes('Kagetokage') || Number(c.id || c.num || 0) === 1107);
+        });
+        var freeSlotK = (game.field || []).findIndex(function(x) { return !x; });
+        if (kageIdx >= 0 && freeSlotK >= 0) {
+          var kageCard = game.hand.splice(kageIdx, 1)[0];
+          var km = window.mk ? (window.mk(kageCard) || window.mk(kageCard.name || kageCard[0])) : Object.assign({}, kageCard);
+          if (!km) km = Object.assign({}, kageCard);
+          km.pos = 'DEF';
+          km.faceUp = true;
+          km.level = 4;
+          km.atk = 1100;
+          km.def = 1500;
+          km.race = 'Reptile';
+          km.summonedTurn = game.turnNo;
+          game.field[freeSlotK] = km;
+          if (window.playSummonSound) window.playSummonSound();
+          if (typeof log === 'function') log('🦎 [Efecto de Kagetokage] ¡Al invocar a ' + mNameZ + ' (Nv 4), Kagetokage es Invocado de Modo Especial desde tu mano en Posición de Defensa!');
+          if (typeof duelToast === 'function') duelToast('¡Efecto Kagetokage! Invocado de Modo Especial');
+        }
+      }
+
+      // 2. GOBLINDBERGH: Al ser Invocado de Modo Normal, Invoca de Modo Especial 1 monstruo de Nivel <= 4 desde la mano y pasa a Defensa
+      if (mNameZ === 'Goblindbergh' || mNameZ.includes('Goblindbergh') || Number(monster.id || monster.num || 0) === 1108) {
+        var freeSlotG = (game.field || []).findIndex(function(x) { return !x; });
+        if (freeSlotG >= 0 && Array.isArray(game.hand) && game.hand.length > 0) {
+          var spIdx = game.hand.findIndex(function(c) {
+            if (!c || (typeof isST === 'function' && isST(c))) return false;
+            var clvl = Number(c.level || c[1] || 0);
+            return clvl > 0 && clvl <= 4;
+          });
+          if (spIdx >= 0) {
+            var spCard = game.hand.splice(spIdx, 1)[0];
+            var spm = window.mk ? (window.mk(spCard) || window.mk(spCard.name || spCard[0])) : Object.assign({}, spCard);
+            if (!spm) spm = Object.assign({}, spCard);
+            spm.pos = 'ATK';
+            spm.faceUp = true;
+            spm.summonedTurn = game.turnNo;
+            game.field[freeSlotG] = spm;
+            monster.pos = 'DEF';
+            if (window.playSummonSound) window.playSummonSound();
+            if (typeof log === 'function') log('🛩️ [Efecto de Goblindbergh] ¡Invocó de Modo Especial a ' + (spm.name || spm[0]) + ' desde la mano y Goblindbergh pasa a Defensa!');
+            if (typeof duelToast === 'function') duelToast('¡Goblindbergh invocó a ' + (spm.name || spm[0]) + '!');
+          }
+        }
+      }
+
+      // 3. TIN GOLDFISH: Al ser Invocado de Modo Normal, Invoca de Modo Especial 1 monstruo de Nivel 4 desde la mano
+      if (mNameZ === 'Tin Goldfish' || mNameZ.includes('Tin Goldfish') || Number(monster.id || monster.num || 0) === 1109) {
+        var freeSlotT = (game.field || []).findIndex(function(x) { return !x; });
+        if (freeSlotT >= 0 && Array.isArray(game.hand) && game.hand.length > 0) {
+          var spIdx4 = game.hand.findIndex(function(c) {
+            if (!c || (typeof isST === 'function' && isST(c))) return false;
+            var clvl = Number(c.level || c[1] || 0);
+            return clvl === 4;
+          });
+          if (spIdx4 >= 0) {
+            var spc4 = game.hand.splice(spIdx4, 1)[0];
+            var spm4 = window.mk ? (window.mk(spc4) || window.mk(spc4.name || spc4[0])) : Object.assign({}, spc4);
+            if (!spm4) spm4 = Object.assign({}, spc4);
+            spm4.pos = 'ATK';
+            spm4.faceUp = true;
+            spm4.summonedTurn = game.turnNo;
+            game.field[freeSlotT] = spm4;
+            if (window.playSummonSound) window.playSummonSound();
+            if (typeof log === 'function') log('🐟 [Efecto de Tin Goldfish] ¡Invocó de Modo Especial a ' + (spm4.name || spm4[0]) + ' (Nv 4) desde la mano!');
+            if (typeof duelToast === 'function') duelToast('¡Tin Goldfish invocó a ' + (spm4.name || spm4[0]) + '!');
+          }
+        }
+      }
+
+      // 4. GOGOGO GIANT: Al ser Invocado de Modo Normal, revive 1 monstruo "Gogogo" del Cementerio en Posición de Defensa
+      if (mNameZ === 'Gogogo Giant' || mNameZ.includes('Gogogo Giant') || Number(monster.id || monster.num || 0) === 1103) {
+        var freeSlotGG = (game.field || []).findIndex(function(x) { return !x; });
+        if (freeSlotGG >= 0 && Array.isArray(game.grave) && game.grave.length > 0) {
+          var gogoIdx = -1;
+          for (var gi = game.grave.length - 1; gi >= 0; gi--) {
+            var gc = game.grave[gi];
+            var gcn = (gc.name || gc[0] || '').toLowerCase();
+            if (gcn.includes('gogogo') && !gcn.includes('giant')) {
+              gogoIdx = gi;
+              break;
+            }
+          }
+          if (gogoIdx >= 0) {
+            var gogoRev = game.grave.splice(gogoIdx, 1)[0];
+            var gogom = window.mk ? (window.mk(gogoRev) || window.mk(gogoRev.name || gogoRev[0])) : Object.assign({}, gogoRev);
+            if (!gogom) gogom = Object.assign({}, gogoRev);
+            gogom.pos = 'DEF';
+            gogom.faceUp = true;
+            gogom.summonedTurn = game.turnNo;
+            game.field[freeSlotGG] = gogom;
+            if (window.playSummonSound) window.playSummonSound();
+            if (typeof log === 'function') log('🗿 [Efecto de Gogogo Giant] ¡Revivió a ' + (gogom.name || gogom[0]) + ' del Cementerio en Posición de Defensa!');
+            if (typeof duelToast === 'function') duelToast('¡Gogogo Giant revivió a ' + (gogom.name || gogom[0]) + '!');
           }
         }
       }
@@ -20324,9 +20472,142 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
   window.aiExtraSummon = function() {
     if (typeof game === 'undefined' || !game) return;
     var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
-    if (!is5D) return;
+    var isZexal = (game._currentWorld === 4) || (window.currentWorld === 4);
+    if (!is5D && !isZexal) return;
 
     var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+
+    // JUGADAS Y EFECTOS DE LA IA EN MUNDO 4 (ZEXAL)
+    if (isZexal) {
+      if (Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
+        // a) Kagetokage de la IA si controla un monstruo Nivel 4
+        var hasLv4Enemy = (game.enemy || []).some(function(m) {
+          return m && Number(m.level || m[1] || 0) === 4;
+        });
+        var kageIdxAI = game.enemyHand.findIndex(function(c) {
+          return c && ((c.name || c[0] || '').includes('Kagetokage') || Number(c.id || c.num || 0) === 1107);
+        });
+        var fSlotKAI = (game.enemy || []).findIndex(function(x) { return !x; });
+        if (hasLv4Enemy && kageIdxAI >= 0 && fSlotKAI >= 0) {
+          var kageCardAI = game.enemyHand.splice(kageIdxAI, 1)[0];
+          var kmAI = window.mk ? (window.mk(kageCardAI) || window.mk(kageCardAI.name || kageCardAI[0])) : Object.assign({}, kageCardAI);
+          if (!kmAI) kmAI = Object.assign({}, kageCardAI);
+          kmAI.pos = 'DEF';
+          kmAI.faceUp = true;
+          kmAI.level = 4;
+          kmAI.atk = 1100;
+          kmAI.def = 1500;
+          kmAI.race = 'Reptile';
+          kmAI.summonedTurn = game.turnNo;
+          game.enemy[fSlotKAI] = kmAI;
+          if (typeof log === 'function') log('🦎 [Efecto Rival] ¡Kagetokage es Invocado de Modo Especial desde la mano enemiga en Posición de Defensa!');
+          if (typeof duelToast === 'function') duelToast('¡Efecto Rival! Kagetokage invocado');
+        }
+
+        // b) Goblindbergh de la IA si está en campo y tiene Nivel <= 4 en mano
+        var gobIdx = (game.enemy || []).findIndex(function(m) {
+          return m && (m.name || m[0] || '').includes('Goblindbergh');
+        });
+        if (gobIdx >= 0) {
+          var spIdxAI = game.enemyHand.findIndex(function(c) {
+            var clvl = Number(c.level || c[1] || 0);
+            return clvl > 0 && clvl <= 4;
+          });
+          var fSlotGAI = (game.enemy || []).findIndex(function(x) { return !x; });
+          if (spIdxAI >= 0 && fSlotGAI >= 0) {
+            var spCardAI = game.enemyHand.splice(spIdxAI, 1)[0];
+            var spmAI = window.mk ? (window.mk(spCardAI) || window.mk(spCardAI.name || spCardAI[0])) : Object.assign({}, spCardAI);
+            if (!spmAI) spmAI = Object.assign({}, spCardAI);
+            spmAI.pos = 'ATK';
+            spmAI.faceUp = true;
+            spmAI.summonedTurn = game.turnNo;
+            game.enemy[fSlotGAI] = spmAI;
+            game.enemy[gobIdx].pos = 'DEF';
+            if (typeof log === 'function') log('🛩️ [Efecto Rival] ¡Goblindbergh invoca de Modo Especial a ' + (spmAI.name || spmAI[0]) + ' desde la mano!');
+          }
+        }
+
+        // c) Tin Goldfish de la IA si está en campo y tiene Nivel 4 en mano
+        var tinIdx = (game.enemy || []).findIndex(function(m) {
+          return m && (m.name || m[0] || '').includes('Tin Goldfish');
+        });
+        if (tinIdx >= 0) {
+          var spIdx4AI = game.enemyHand.findIndex(function(c) {
+            return Number(c.level || c[1] || 0) === 4;
+          });
+          var fSlotTAI = (game.enemy || []).findIndex(function(x) { return !x; });
+          if (spIdx4AI >= 0 && fSlotTAI >= 0) {
+            var spCard4AI = game.enemyHand.splice(spIdx4AI, 1)[0];
+            var spm4AI = window.mk ? (window.mk(spCard4AI) || window.mk(spCard4AI.name || spCard4AI[0])) : Object.assign({}, spCard4AI);
+            if (!spm4AI) spm4AI = Object.assign({}, spCard4AI);
+            spm4AI.pos = 'ATK';
+            spm4AI.faceUp = true;
+            spm4AI.summonedTurn = game.turnNo;
+            game.enemy[fSlotTAI] = spm4AI;
+            if (typeof log === 'function') log('🐟 [Efecto Rival] ¡Tin Goldfish invoca de Modo Especial a ' + (spm4AI.name || spm4AI[0]) + ' desde la mano!');
+          }
+        }
+      }
+
+      // 2. Invocación Xyz de la IA desde el Extra Deck si controla 2 monstruos con el mismo Nivel
+      if (Array.isArray(game.enemyExtra) && game.enemyExtra.length > 0) {
+        var eFieldMons = [];
+        (game.enemy || []).forEach(function(c, idx) {
+          if (c && !c.faceDown && !c.faceDownSet103 && c.kind !== 'XYZ') {
+            var lvl = Number(c.level || c[1] || 0);
+            if (lvl > 0) eFieldMons.push({ idx: idx, card: c, level: lvl });
+          }
+        });
+
+        var matchPair = null;
+        for (var mi = 0; mi < eFieldMons.length; mi++) {
+          for (var mj = mi + 1; mj < eFieldMons.length; mj++) {
+            if (eFieldMons[mi].level === eFieldMons[mj].level) {
+              matchPair = { m1: eFieldMons[mi], m2: eFieldMons[mj], level: eFieldMons[mi].level };
+              break;
+            }
+          }
+          if (matchPair) break;
+        }
+
+        if (matchPair) {
+          var targetRank = matchPair.level;
+          var xyzIdx = game.enemyExtra.findIndex(function(xc) {
+            var r = Number(xc.rank || xc.level || xc[1] || 0);
+            var isX = xc.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(xc.name || xc)) || (xc.id >= 1140 && xc.id <= 1160);
+            return isX && (r === targetRank || (targetRank === 4 && (!r || r === 4)));
+          });
+
+          if (xyzIdx >= 0) {
+            var targetXyz = game.enemyExtra.splice(xyzIdx, 1)[0];
+            var mat1 = matchPair.m1.card;
+            var mat2 = matchPair.m2.card;
+            game.enemy[matchPair.m1.idx] = null;
+            game.enemy[matchPair.m2.idx] = null;
+
+            var fSlotX = game.enemy.findIndex(function(x) { return !x; });
+            if (fSlotX < 0) fSlotX = matchPair.m1.idx;
+
+            var scXyz = JSON.parse(JSON.stringify(targetXyz));
+            scXyz.pos = 'ATK';
+            scXyz.faceUp = true;
+            scXyz.kind = 'XYZ';
+            scXyz.rank = targetRank;
+            scXyz.overlayUnits = 2;
+            scXyz.materials = [mat1, mat2];
+            scXyz.summonedTurn = game.turnNo;
+            game.enemy[fSlotX] = scXyz;
+
+            if (window.playSummonSound) window.playSummonSound();
+            if (typeof log === 'function') log('¡INVOCACIÓN XYZ RIVAL! 🌌 El rival invoca a ' + (scXyz.name || 'Monstruo Xyz') + ' (Rango ' + targetRank + ') sobreponiendo a ' + (mat1.name || mat1[0]) + ' y ' + (mat2.name || mat2[0]) + '!');
+            if (typeof duelToast === 'function') duelToast('¡Invocación Xyz Rival! ' + (scXyz.name || ''));
+            if (typeof render === 'function') render();
+            return;
+          }
+        }
+      }
+      return;
+    }
 
     // 1. Invocaciones Especiales de la IA desde la Mano en Mundo 3
     if (Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
