@@ -9844,7 +9844,8 @@ const portraitMap = {
     'BRONK': 'Bronk.png', 'FLIP': 'Flip.png', 'SHARK': 'Shark.png',
     'RIO': 'Rio.png', 'KITE': 'Kite.png', 'TREY': 'Trey.png',
     'QUATTRO': 'Quattro.png', 'MIZAR': 'Mizar.png', 'VECTOR': 'Vector.png',
-    'YUMA': 'Yuma.png', 'CATHY': 'Cathy.png'
+    'YUMA': 'Yuma.png', 'CATHY': 'Cathy.png',
+    'TORI': 'Tori.png', 'KOTORI': 'Tori.png'
 };
 
 const dialogPortraitMap = {
@@ -9905,7 +9906,9 @@ const dialogPortraitMap = {
     'MIZAR': 'Mizar.png',
     'VECTOR': 'Vector.png',
     'YUMA': 'Yuma.png',
-    'CATHY': 'Cathy.png'
+    'CATHY': 'Cathy.png',
+    'TORI': 'Tori.png',
+    'KOTORI': 'Tori.png'
 };
 
 window.DUELISTS_NAMES = {
@@ -12927,7 +12930,7 @@ window.CUSTOM_NODES_ZEXAL = [
     { id: 'zexal_3', left: '65%', top: '78%', label: 'SHARK', char: 'SHARK', req: ['flip'], itemKey: 'corazon1', itemName: '1ª Pieza de Corazón', itemIcon: '💛' },
     { id: 'zexal_4', left: '35%', top: '71%', label: 'RIO KASTLE', char: 'RIO', req: ['shark'], itemKey: 'corazon2', itemName: '2ª Pieza de Corazón', itemIcon: '💛' },
     { id: 'zexal_5', left: '65%', top: '64%', label: 'KITE TENJO', char: 'KITE', req: ['rio'], itemKey: 'corazon3', itemName: '3ª Pieza de Corazón', itemIcon: '💛' },
-    { id: 'zexal_shop', left: '88%', top: '92%', label: 'TIENDA HEARTLAND', char: 'TORI', req: [] },
+    { id: 'zexal_shop', left: '80%', top: '92%', label: 'TIENDA HEARTLAND', char: 'TORI', req: [] },
     // Fase 2: Batalla de los Números Barian
     { id: 'zexal_6', left: '35%', top: '50%', label: 'TREY (III)', char: 'TREY', req: ['kite'], itemKey: 'corazon4', itemName: '4ª Pieza de Corazón', itemIcon: '💛' },
     { id: 'zexal_7', left: '65%', top: '42%', label: 'QUATTRO (IV)', char: 'QUATTRO', req: ['trey'], itemKey: 'corazon5', itemName: '5ª Pieza (Corazón Completo)', itemIcon: '💖' },
@@ -13675,7 +13678,7 @@ window.customShowMap = function() {
         
         let fChar = (fNode.char || '').toLowerCase();
         if (fChar === 'seto') fChar = 'kaiba';
-        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop' || fNode.id === '5d_shop' || fNode.id === 'zexal_shop') || cleared.includes(fChar);
+        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop' || fNode.id === '5d_shop' || fNode.id === 'zexal_shop' || tNode.id === 'n13' || tNode.id === 'gx_shop' || tNode.id === '5d_shop' || tNode.id === 'zexal_shop') || cleared.includes(fChar);
         
         let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', fNode.left); line.setAttribute('y1', fNode.top);
@@ -13705,7 +13708,7 @@ window.customShowMap = function() {
         if (cid === 'seto') cid = 'kaiba';
         
         let isUnlocked = true;
-        if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop' || cid === 'abuelo' || cid === 'atem' || cid === 'rally' || !n.req || n.req.length === 0) {
+        if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop' || cid === 'abuelo' || cid === 'atem' || cid === 'rally' || cid === 'tori' || cid === 'kotori' || !n.req || n.req.length === 0) {
             isUnlocked = true;
         } else {
             isUnlocked = n.req.every(r => cleared.includes(r.toLowerCase()));
@@ -13717,7 +13720,7 @@ window.customShowMap = function() {
         let itemKeyName = n.itemName || n.insigniaName;
         let itemRecovered = hasItem && isCleared;
         
-        let p = portraitMap[n.char];
+        let p = portraitMap[n.char] || (n.char ? (n.char.charAt(0).toUpperCase() + n.char.slice(1).toLowerCase() + '.png') : null) || 'abueloYugi.jpg';
         if (p) {
             let filterStyle = isCleared ? 'filter: brightness(0.7) contrast(0.95);' : (!isUnlocked ? 'filter: brightness(0.35) grayscale(100%);' : '');
             let borderGlow = n.insigniaKey ? (isZexal ? '#ffd700' : '#e040fb') : '#ffd700';
@@ -13752,7 +13755,9 @@ window.customShowMap = function() {
             
             // 3.2 Etiqueta inferior de estado
             let labelText = isCleared ? `<span style="color:#a3e9a4">✓ ${n.label}</span>` : (!isUnlocked ? '???' : n.label);
-            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop') labelText = '🏪 TIENDA';
+            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop') {
+                labelText = isZexal ? '🏪 TIENDA (TORI)' : (is5D ? '🏪 TIENDA (RALLY)' : (isGX ? '🏪 TIENDA (DOROTHY)' : '🏪 TIENDA'));
+            }
             if (n.id === 'n14') labelText = unlockedCount >= 7 ? '🌌 NUEVO MUNDO' : `🔒 PUERTA (${unlockedCount}/7)`;
             
             btn.innerHTML = `
@@ -14056,6 +14061,15 @@ window.customShowMap = function() {
     });
     
     document.body.appendChild(map);
+    
+    // Auto-scroll inicial en mapas verticales altos (Zexal y 5D's) para posicionar la vista en el primer rival y la tienda
+    if (isZexal || is5D) {
+        setTimeout(() => {
+            if (map && map.scrollHeight > map.clientHeight) {
+                map.scrollTop = map.scrollHeight - map.clientHeight;
+            }
+        }, 60);
+    }
 };
 window.openFreeDuelMenu = function() {
     window.isFreeDuelMode = true;
