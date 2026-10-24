@@ -20992,55 +20992,173 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       if (g.enemyDeck.length > 0) g.enemyHand.push(g.enemyDeck.pop());
     }
 
-    // En duelos con Sincronía (Mundo 3 / 5D's o si hay Extra Deck), garantizar que
-    // tanto el jugador como el oponente comiencen con al menos 1 Monstruo Cantante (Tuner) en su mano inicial de 5 cartas.
-    // El rival NO empieza con su Sincro directamente en el campo; ambos compiten en igualdad para invocarlo.
-    var hasSynchroDuel = is5DDuel || (Array.isArray(g.extra) && g.extra.length > 0) || (Array.isArray(g.enemyExtra) && g.enemyExtra.length > 0);
-    if (hasSynchroDuel) {
-      var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-      var OPP_TUNER_MAP = {
-        trudge: 'Jutte Fighter',
-        leo: 'Formula Synchron',
-        akiza: 'Twilight Rose Knight',
-        crow: 'Blackwing - Gale the Whirlwind',
-        jack: 'Dark Resonator',
-        yusei: 'Junk Synchron'
-      };
+    // ════════════════════════════════════════════════════════════════
+    //  MANO INICIAL: SOPORTE Y ENABLERS SEGÚN MUNDO Y EXTRA DECK
+    // ════════════════════════════════════════════════════════════════
+    var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
-      function ensureTunerInHand(handArr, deckArr, defaultTunerName) {
-        if (!Array.isArray(handArr) || handArr.length === 0) return;
-        var hasTuner = handArr.some(function(c) { return window.isTunerMonster(c); });
-        if (hasTuner) return;
+    // 1. SOPORTE DE INVOCACIÓN XYZ PARA EL JUGADOR:
+    // Solo si el deck tiene monstruos Xyz de Rango 4 en el Extra Deck
+    function isRank4Xyz(cardOrName) {
+      if (!cardOrName) return false;
+      var c = (typeof cardOrName === 'string') ? (typeof cardResolver === 'function' ? cardResolver(cardOrName) : null) : cardOrName;
+      if (!c) return false;
+      var isXyz = (c.frameType === 'xyz' || (c.type && c.type.toLowerCase().includes('xyz')) || (c.kind && c.kind.toLowerCase().includes('xyz')) || (typeof window.isXyzMonster === 'function' && window.isXyzMonster(c)));
+      var r = Number(c.rank || c.level || 0);
+      return isXyz && r === 4;
+    }
 
-        // 1. Buscar un Cantante en el deck restante
-        var dIdx = (deckArr || []).findIndex(function(c) { return window.isTunerMonster(c); });
-        if (dIdx >= 0) {
-          var tunerCard = deckArr.splice(dIdx, 1)[0];
-          var returned = handArr.pop();
-          if (returned) deckArr.push(returned);
-          handArr.unshift(tunerCard);
-        } else if (defaultTunerName) {
-          // 2. Si el mazo no incluía Cantante, resolver el Cantante insignia
-          var newTuner = cardResolver(defaultTunerName);
-          if (newTuner) {
-            handArr.pop();
-            handArr.unshift(newTuner);
+    var playerHasRank4Xyz = Array.isArray(g.extra) && g.extra.some(isRank4Xyz);
+    if (playerHasRank4Xyz) {
+      var XYZ_ENABLERS = ['Goblindbergh', 'Kagetokage', 'Tin Goldfish', 'Gogogo Giant'];
+      
+      // Paso 1: Garantizar un enabler de Invocación Xyz en mano (Goblindbergh, Kagetokage, Tin Goldfish o Gogogo Giant)
+      var hasEnablerInHand = (g.hand || []).some(function(c) {
+        var name = (c.name || (typeof c === 'string' ? c : '')).trim().toLowerCase();
+        return XYZ_ENABLERS.some(function(en) { return en.toLowerCase() === name; });
+      });
+
+      if (!hasEnablerInHand && Array.isArray(g.hand) && g.hand.length > 0) {
+        var dEnablerIdx = (g.deck || []).findIndex(function(c) {
+          var name = (c.name || (typeof c === 'string' ? c : '')).trim().toLowerCase();
+          return XYZ_ENABLERS.some(function(en) { return en.toLowerCase() === name; });
+        });
+
+        var enablerCard = null;
+        if (dEnablerIdx >= 0) {
+          enablerCard = g.deck.splice(dEnablerIdx, 1)[0];
+        } else if (typeof cardResolver === 'function') {
+          enablerCard = cardResolver('Goblindbergh');
+        }
+
+        if (enablerCard) {
+          var resolvedEnabler = (typeof enablerCard === 'string') ? cardResolver(enablerCard) : enablerCard;
+          var returned = g.hand.pop();
+          if (returned && Array.isArray(g.deck)) g.deck.push(returned);
+          g.hand.unshift(resolvedEnabler || enablerCard);
+        }
+      }
+
+      // Paso 2: Asegurar que además haya al menos otro monstruo de Nivel 4 en mano para poder realizar la Invocación Xyz
+      var lvl4InHand = (g.hand || []).filter(function(c) {
+        if (!c) return false;
+        var rc = (typeof c === 'string') ? cardResolver(c) : c;
+        return rc && (rc.kind === 'MONSTER' || rc.type || rc.atk !== undefined) && Number(rc.level || 0) === 4;
+      });
+
+      if (lvl4InHand.length < 2 && Array.isArray(g.hand) && g.hand.length > 0) {
+        var dL4Idx = (g.deck || []).findIndex(function(c) {
+          if (!c) return false;
+          var rc = (typeof c === 'string') ? cardResolver(c) : c;
+          return rc && (rc.kind === 'MONSTER' || rc.type || rc.atk !== undefined) && Number(rc.level || 0) === 4;
+        });
+        if (dL4Idx >= 0) {
+          var l4Card = g.deck.splice(dL4Idx, 1)[0];
+          var resolvedL4 = (typeof l4Card === 'string') ? cardResolver(l4Card) : l4Card;
+          var repIdx = g.hand.findIndex(function(c, i) {
+            if (i === 0) return false;
+            var rc = (typeof c === 'string') ? cardResolver(c) : c;
+            return !rc || rc.kind !== 'MONSTER' || Number(rc.level || 0) !== 4;
+          });
+          if (repIdx > 0) {
+            var ret = g.hand.splice(repIdx, 1, resolvedL4 || l4Card)[0];
+            if (ret && Array.isArray(g.deck)) g.deck.push(ret);
           }
         }
       }
 
-      // Garantizar Tuner en la mano inicial del jugador
-      ensureTunerInHand(g.hand, g.deck, 'Junk Synchron');
-
-      // Garantizar Tuner en la mano inicial del rival
-      var enemyTunerDefault = OPP_TUNER_MAP[normOppKey] || 'Junk Synchron';
-      ensureTunerInHand(g.enemyHand, g.enemyDeck, enemyTunerDefault);
-
       if (typeof log === 'function') {
-        log('🎵 [SINCRONÍA] ¡Ambos duelistas tienen garantizado al menos 1 Monstruo Cantante (Tuner) en su mano inicial!');
+        log('🌌 [INICIADOR XYZ] ¡Tu Extra Deck posee Xyz Rango 4! Se asegura un soporte inicial (Goblindbergh/Nivel 4) para invocar Xyz.');
       }
       if (typeof duelToast === 'function') {
-        duelToast('🎵 ¡Monstruo Cantante garantizado en mano!');
+        duelToast('🌌 ¡Iniciador Xyz de Rango 4 en mano!');
+      }
+    }
+
+    // 2. VENTAJA TÁCTICA PARA OPONENTES:
+    // Pone en manos de los rivales sus cartas insignia y combos principales
+    var RIVAL_BEST_CARDS_MAP = {
+      // ════════ MUNDO 4: ZEXAL (HEARTLAND CITY) ════════
+      bronk: ['Tin Goldfish', 'Gogogo Giant', 'Gogogo Golem', 'Double Summon'],
+      flip: ['Kagetokage', 'Goblindbergh', 'Dark Hole', 'Baby Tiragon'],
+      shark: ['Silent Angler', 'Hammer Shark', 'Big Jaws', 'Abyss Dweller'],
+      rio: ['Blizzard Falcon', 'Aurora Wing', 'Icarus Attack', 'Torrential Tribute'],
+      kite: ['Galaxy-Eyes Photon Dragon', 'Photon Thrasher', 'Photon Crusher', 'Photon Vanisher'],
+      trey: ['Chronomaly Crystal Bones', 'Chronomaly Crystal Skull', 'Chronomaly Golden Jet', 'Chronomaly Nebra Disk'],
+      quattro: ['Gimmick Puppet Dreary Doll', 'Gimmick Puppet Magnet Doll', 'Gimmick Puppet Scissor Arms', 'Junk Puppet'],
+      mizar: ['Galaxy Stealth Dragon', 'Starliege Seyfert', 'Nebula Dragon', 'Galactic Spiral Dragon'],
+      vector: ['Gorgonic Gargoyle', 'Gorgonic Cerberus', 'Gorgonic Ghoul', 'Rank-Up-Magic Barian\'s Force'],
+      yuma: ['Goblindbergh', 'Kagetokage', 'Gagaga Magician', 'Gagaga Girl', 'Monster Reborn'],
+
+      // ════════ MUNDO 3: 5D'S (NEO DOMINO & SATÉLITE) ════════
+      trudge: ['Goyo Guardian', 'Jutte Fighter', 'Torapart', 'Security Orb'],
+      leo: ['Morphtronic Celfon', 'Morphtronic Radion', 'Double Tool C&D'],
+      akiza: ['Twilight Rose Knight', 'Botanical Lion', 'Lord Poison', 'Black Garden'],
+      crow: ['Blackwing - Gale the Whirlwind', 'Blackwing - Bora the Spear', 'Delta Crow - Anti Reverse'],
+      jack: ['Dark Resonator', 'Vice Dragon', 'Fiendish Chain'],
+      yusei: ['Junk Synchron', 'Quillbolt Hedgehog', 'Doppelwarrior', 'Tuning'],
+
+      // ════════ MUNDO 2: GX (ACADEMIA DE DUELOS) ════════
+      chumley: ['Big Koala', 'Des Kangaroo', 'Polymerization'],
+      syrus: ['Submarineroid', 'Drilloid', 'Polymerization'],
+      jaden: ['Elemental HERO Stratos', 'Elemental HERO Neos', 'Miracle Fusion', 'Polymerization'],
+      bastion: ['Hydrogeddon', 'Oxygeddon', 'Bonding - H2O'],
+      alexis: ['Cyber Tutu', 'Cyber Prima', 'Etoile Cyber', 'Polymerization'],
+      chazz: ['Armed Dragon LV7', 'Ojama Delta Hurricane!!', 'Polymerization'],
+      zane: ['Cyber Dragon', 'Power Bond', 'Overload Fusion'],
+      crowler: ['Ancient Gear Golem', 'Ancient Gear Castle', 'Ancient Gear Engineer'],
+      aster: ['Destiny HERO - Plasma', 'Destiny HERO - Dasher', 'Destiny Draw'],
+
+      // ════════ MUNDO 1: DUEL MONSTERS ════════
+      tristan: ['Cyber Commander', 'Super Roboyarou', 'Axe of Despair'],
+      weevil: ['Insect Queen', 'Pinch Hopper', 'Mirror Force'],
+      mai: ['Harpie Lady Sisters', 'Elegant Egotist', 'Harpie\'s Feather Duster'],
+      mako: ['The Legendary Fisherman', 'Umi', 'Torrential Tribute'],
+      joey: ['Red-Eyes Black Dragon', 'Time Wizard', 'Graceful Dice'],
+      pegasus: ['Toon World', 'Toon Summoned Skull', 'Change of Heart'],
+      bakura: ['Dark Necrofear', 'Destiny Board', 'Raigeki'],
+      noah: ['Shinato, King of a Higher Plane', 'Shinato\'s Ark', 'Mirror Force'],
+      kosaburo: ['Exodia Necross', 'Contract with Exodia', 'Graceful Charity'],
+      ishizu: ['Keldo', 'Mudora', 'Swords of Revealing Light'],
+      odion: ['Mystical Beast Serket', 'Temple of the Kings', 'Mirror Force'],
+      kaiba: ['Blue-Eyes White Dragon', 'Lord of D.', 'The Flute of Summoning Dragon'],
+      seto: ['Blue-Eyes White Dragon', 'Lord of D.', 'The Flute of Summoning Dragon'],
+      yugi: ['Dark Magician', 'Magician\'s Valkyria', 'Swords of Revealing Light'],
+      atem: ['Slifer the Sky Dragon', 'Obelisk the Tormentor', 'Monster Reborn']
+    };
+
+    var rivalAces = RIVAL_BEST_CARDS_MAP[normOppKey] || [];
+    if (Array.isArray(rivalAces) && rivalAces.length > 0 && Array.isArray(g.enemyHand) && g.enemyHand.length > 0) {
+      var cardsToEnsure = rivalAces.slice(0, 2);
+      cardsToEnsure.forEach(function(aceName) {
+        var alreadyInHand = (g.enemyHand || []).some(function(c) {
+          var cn = (c.name || (typeof c === 'string' ? c : '')).trim().toLowerCase();
+          return cn === aceName.toLowerCase();
+        });
+        if (alreadyInHand) return;
+
+        var dIdx = (g.enemyDeck || []).findIndex(function(c) {
+          var cn = (c.name || (typeof c === 'string' ? c : '')).trim().toLowerCase();
+          return cn === aceName.toLowerCase();
+        });
+
+        var aceCard = null;
+        if (dIdx >= 0) {
+          aceCard = g.enemyDeck.splice(dIdx, 1)[0];
+        } else if (typeof cardResolver === 'function') {
+          aceCard = cardResolver(aceName);
+        }
+
+        if (aceCard) {
+          var resolvedAce = (typeof aceCard === 'string') ? cardResolver(aceCard) : aceCard;
+          var repCard = g.enemyHand.pop();
+          if (repCard && Array.isArray(g.enemyDeck)) g.enemyDeck.push(repCard);
+          g.enemyHand.unshift(resolvedAce || aceCard);
+        }
+      });
+
+      if (typeof log === 'function') {
+        log('⚔️ [VENTAJA RIVAL] ¡' + (opp || 'El oponente').toUpperCase() + ' comienza con sus mejores cartas estratégicas en mano!');
       }
     }
 
