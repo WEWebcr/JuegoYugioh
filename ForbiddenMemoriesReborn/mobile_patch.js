@@ -1035,8 +1035,13 @@
           buttonsHtml += '<button class="m-act-btn m-act-fuse" id="m-btn-fuse">🔄 FUSIÓN</button>';
         }
       } else if (cKind === 'SPELL' || cKind === 'MAGIC') {
-        buttonsHtml += '<button class="m-act-btn m-act-spell" id="m-btn-spell-act">✨ ACTIVAR</button>';
-        buttonsHtml += '<button class="m-act-btn m-act-set" id="m-btn-spell-set">🛡 SET</button>';
+        const inBP = (typeof window.isBattlePhaseActive === 'function' && window.isBattlePhaseActive());
+        if (inBP) {
+          buttonsHtml += '<button class="m-act-btn m-act-spell" id="m-btn-spell-act" style="opacity:0.4;filter:grayscale(0.8);cursor:not-allowed;" title="No disponible en Battle Phase">🚫 MAGIA EN BP</button>';
+        } else {
+          buttonsHtml += '<button class="m-act-btn m-act-spell" id="m-btn-spell-act">✨ ACTIVAR</button>';
+          buttonsHtml += '<button class="m-act-btn m-act-set" id="m-btn-spell-set">🛡 SET</button>';
+        }
       } else if (cKind === 'TRAP') {
         buttonsHtml += '<button class="m-act-btn m-act-trap" id="m-btn-trap-set">🛡 COLOCAR SET</button>';
       }
@@ -1089,7 +1094,15 @@
 
     const btnSpellAct = document.getElementById('m-btn-spell-act');
     if (btnSpellAct) btnSpellAct.onclick = () => {
+      if (typeof window.isBattlePhaseActive === 'function' && window.isBattlePhaseActive()) {
+        const msg = '⚠️ No puedes activar cartas Mágicas durante la Fase de Batalla (BP). Solo en Main Phase.';
+        if (typeof duelToast === 'function') duelToast(msg);
+        if (typeof log === 'function') log(msg);
+        closeActionBar();
+        return;
+      }
       if (typeof window.activateSpell === 'function') window.activateSpell(idx);
+      else if (typeof window.activateSTFromHand === 'function') window.activateSTFromHand(idx);
       else if (typeof window.normalSummon === 'function') window.normalSummon();
       closeActionBar();
     };

@@ -18066,8 +18066,54 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     return res;
   }
 
+  // REGLA OFICIAL DE DUELO: Restricción de activación de Magias en Fase de Batalla (BP)
+  window.isBattlePhaseActive = function() {
+    try {
+      var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+      if (!g || g.turn !== 'player') return false;
+
+      // 1. Variable nativa de bloqueo de Battle Phase
+      if (typeof bpLocked114 !== 'undefined' && bpLocked114) return true;
+      if (typeof window.bpLocked114 !== 'undefined' && window.bpLocked114) return true;
+
+      // 2. Estado de combate iniciado
+      if (g.battlePhaseStarted) return true;
+
+      // 3. Atributos en DOM (CSS data-phase)
+      if (typeof document !== 'undefined' && document.body) {
+        var p114 = document.body.getAttribute('data-player-phase114');
+        if (p114 === 'BP') return true;
+        var p106 = document.body.getAttribute('data-phase106');
+        if (p106 === 'BP') return true;
+
+        var bpBtn = document.getElementById('bpBtn');
+        if (bpBtn) {
+          if (bpBtn.classList.contains('phaseActive97') || 
+              bpBtn.classList.contains('phaseActive96') || 
+              bpBtn.classList.contains('phaseActive95') || 
+              bpBtn.getAttribute('aria-current') === 'step') {
+            return true;
+          }
+        }
+      }
+
+      // 4. Variables globales de controladores de fase
+      if (typeof phase97 !== 'undefined' && phase97 === 'BP') return true;
+      if (typeof phase96 !== 'undefined' && phase96 === 'BP') return true;
+      if (typeof lastPhasePlayed !== 'undefined' && lastPhasePlayed === 'BP') return true;
+      if (typeof activePhase95 !== 'undefined' && activePhase95 === 'bpBtn') return true;
+    } catch (_) {}
+    return false;
+  };
+
   var prevActivateSTMaster = window.activateSTFromHand;
-  window.activateSTFromHand = function() {
+  window.activateSTFromHand = function(i) {
+    if (window.isBattlePhaseActive()) {
+      var msg = '⚠️ No puedes activar cartas Mágicas durante la Fase de Batalla (Battle Phase). Solo se permiten en Main Phase.';
+      if (typeof duelToast === 'function') duelToast(msg);
+      if (typeof log === 'function') log(msg);
+      return;
+    }
     var args = arguments;
     return safeguardEgyptianGods(function() {
       if (prevActivateSTMaster) return prevActivateSTMaster.apply(window, args);
@@ -18076,13 +18122,36 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
   try { activateSTFromHand = window.activateSTFromHand; } catch(_) {}
 
   var prevActivateSetMaster = window.activateSetCard;
-  window.activateSetCard = function() {
+  window.activateSetCard = function(i) {
+    var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
+    if (g && g.playerBack && g.playerBack[i]) {
+      var c = g.playerBack[i];
+      var isTrap = !!(c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado' || (c.value && String(c.value).includes('TRAP')));
+      if (!isTrap && window.isBattlePhaseActive()) {
+        var msg = '⚠️ Durante la Fase de Batalla (BP) solo se pueden activar cartas de Trampa. Las Mágicas no se pueden activar en esta fase.';
+        if (typeof duelToast === 'function') duelToast(msg);
+        if (typeof log === 'function') log(msg);
+        return;
+      }
+    }
     var args = arguments;
     return safeguardEgyptianGods(function() {
       if (prevActivateSetMaster) return prevActivateSetMaster.apply(window, args);
     });
   };
   try { activateSetCard = window.activateSetCard; } catch(_) {}
+
+  var prevSetSTMaster = window.setST;
+  window.setST = function(i) {
+    if (window.isBattlePhaseActive()) {
+      var msg = '⚠️ No puedes colocar cartas (SET) durante la Fase de Batalla (BP). Hazlo en tu Main Phase o pasa a EP.';
+      if (typeof duelToast === 'function') duelToast(msg);
+      if (typeof log === 'function') log(msg);
+      return;
+    }
+    if (prevSetSTMaster) return prevSetSTMaster.apply(this, arguments);
+  };
+  try { setST = window.setST; } catch(_) {}
 
   // 7. Extra Deck, Invocaciones Especiales & Sincronía en Mundo 3 (5D's)
   window.canSpecialSummonFromHand = function(c) {
