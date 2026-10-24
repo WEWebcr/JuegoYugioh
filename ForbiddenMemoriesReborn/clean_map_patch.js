@@ -694,7 +694,12 @@ const portraitMap = {
     // Dark Signers (Portadores Oscuros)
     'KALIN': 'Kalin.png', 'CARLY': 'Carly.png', 'ROMAN': 'Roman.png',
     'MISTY': 'Misty.png', 'DEVACK': 'Devack.png', 'GREIGER': 'Greiger.png',
-    'GOODWIN': 'Goodwin.png'
+    'GOODWIN': 'Goodwin.png',
+    // ZEXAL characters (Mundo 4)
+    'BRONK': 'Bronk.png', 'FLIP': 'Flip.png', 'SHARK': 'Shark.png',
+    'RIO': 'Rio.png', 'KITE': 'Kite.png', 'TREY': 'Trey.png',
+    'QUATTRO': 'Quattro.png', 'MIZAR': 'Mizar.png', 'VECTOR': 'Vector.png',
+    'YUMA': 'Yuma.png', 'CATHY': 'Cathy.png'
 };
 
 const dialogPortraitMap = {
@@ -743,7 +748,19 @@ const dialogPortraitMap = {
     'MISTY': 'Misty.png',
     'DEVACK': 'Devack.png',
     'GREIGER': 'Greiger.png',
-    'GOODWIN': 'Goodwin.png'
+    'GOODWIN': 'Goodwin.png',
+    // ZEXAL characters (Mundo 4)
+    'BRONK': 'Bronk.png',
+    'FLIP': 'Flip.png',
+    'SHARK': 'Shark.png',
+    'RIO': 'Rio.png',
+    'KITE': 'Kite.png',
+    'TREY': 'Trey.png',
+    'QUATTRO': 'Quattro.png',
+    'MIZAR': 'Mizar.png',
+    'VECTOR': 'Vector.png',
+    'YUMA': 'Yuma.png',
+    'CATHY': 'Cathy.png'
 };
 
 window.DUELISTS_NAMES = {
@@ -789,7 +806,19 @@ window.DUELISTS_NAMES = {
     'misty': 'Misty Tredwell',
     'devack': 'Devack',
     'greiger': 'Greiger',
-    'goodwin': 'Rex Goodwin'
+    'goodwin': 'Rex Goodwin',
+    // ZEXAL characters (Mundo 4)
+    'bronk': 'Bronk Stone (Tetsuo)',
+    'flip': 'Flip Turner',
+    'shark': 'Reginald Kastle (Shark)',
+    'rio': 'Rio Kastle',
+    'kite': 'Kite Tenjo (Kaito)',
+    'cathy': 'Cathy Katherine',
+    'trey': 'Trey (III)',
+    'quattro': 'Quattro (IV)',
+    'mizar': 'Mizar',
+    'vector': 'Vector',
+    'yuma': 'Yuma Tsukumo (& Astral)'
 };
 
 const introDialog = [
@@ -888,12 +917,14 @@ window.playCustomMusic = function(fileName) {
 };
 
 window.getMapBgm = function(world) {
+    if (world === 4) return 'mapa_zexal.mp3';
     if (world === 3) return 'mapa_5d.mp3';
     if (world === 2) return 'mapa_gx.mp3';
     return 'mapa.mp3';
 };
 
 window.getShopBgm = function(world) {
+    if (world === 4) return 'tienda_zexal.mp3';
     if (world === 3) return 'tienda_5d.mp3';
     if (world === 2) return 'tienda_gx.mp3';
     return 'tienda.mp3';
@@ -903,6 +934,15 @@ window.getDuelMusic = function(charId) {
     charId = (charId || '').toLowerCase().trim();
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
     var curWorld = (g && g._currentWorld) || (window.currentWorld) || 1;
+
+    // ── MUNDO 4: HEARTLAND CITY (ZEXAL) ──
+    var isZexalChar = ['bronk', 'flip', 'shark', 'rio', 'kite', 'cathy', 'trey', 'quattro', 'mizar', 'vector', 'yuma'].includes(charId);
+    if (curWorld === 4 || isZexalChar) {
+        if (charId === 'yuma' || charId === 'kite' || charId === 'vector' || charId === 'mizar') {
+            return 'duelo_zexal.mp3';
+        }
+        return 'duelo_zexal.mp3';
+    }
 
     // ── MUNDO 3: NEO DOMINO CITY (5D's) ──
     var is5DChar = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'rally', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'].includes(charId);
@@ -3381,6 +3421,215 @@ window.showNazcaInsigniaCelebration = function(wonInsignia, charId, onDone) {
 };
 
 // ════════════════════════════════════════════════════════════════
+//  SISTEMA CENTRAL DE LAS CARTAS NÚMERO XYZ (YU-GI-OH! ZEXAL)
+// ════════════════════════════════════════════════════════════════
+window.getZexalNumbers = function(s) {
+    s = s || {};
+    const clearedZexal = Array.isArray(s.clearedZexal) ? s.clearedZexal.map(x => String(x).toLowerCase()) : [];
+    return [
+      {
+        id: 'grenosaurus',
+        name: 'Grenosaurus',
+        shortName: 'Grenosaur',
+        bearer: 'Bronk Stone',
+        bearerId: 'bronk',
+        monster: 'Grenosaurus',
+        rank: 3,
+        atk: 2000,
+        def: 1900,
+        icon: '🦖',
+        color: '#ff7043',
+        desc: 'Monstruo Xyz de Rango 3. Al destruir un monstruo por batalla desacopla 1 material e inflige 1000 de daño.',
+        unlocked: clearedZexal.includes('bronk')
+      },
+      {
+        id: 'numero17',
+        name: 'Número 17: Dragón Leviatán',
+        shortName: 'N° 17',
+        bearer: 'Flip Turner',
+        bearerId: 'flip',
+        monster: 'Number 17: Leviathan Dragon',
+        rank: 3,
+        atk: 2000,
+        def: 0,
+        icon: '🐉',
+        color: '#29b6f6',
+        desc: 'Monstruo Xyz de Rango 3. Desacopla 1 material Xyz para ganar +500 ATK permanentemente.',
+        unlocked: clearedZexal.includes('flip')
+      },
+      {
+        id: 'numero32',
+        name: 'Número 32: Draco Tiburón',
+        shortName: 'N° 32',
+        bearer: 'Reginald Kastle (Shark)',
+        bearerId: 'shark',
+        monster: 'Number 32: Shark Drake',
+        rank: 4,
+        atk: 2800,
+        def: 2100,
+        icon: '🦈',
+        color: '#0288d1',
+        desc: 'Monstruo Xyz de Rango 4. Al destruir un monstruo por batalla, lo revive en el campo rival y ataca de nuevo.',
+        unlocked: clearedZexal.includes('shark')
+      },
+      {
+        id: 'zerofyne',
+        name: 'Bestia de Hielo Zerofyne',
+        shortName: 'Zerofyne',
+        bearer: 'Rio Kastle',
+        bearerId: 'rio',
+        monster: 'Ice Beast Zerofyne',
+        rank: 4,
+        atk: 2000,
+        def: 2200,
+        icon: '❄️',
+        color: '#80deea',
+        desc: 'Monstruo Xyz Bestia Alada de Rango 4. Niega los efectos de todas las cartas boca arriba que controle el adversario.',
+        unlocked: clearedZexal.includes('rio')
+      },
+      {
+        id: 'paladynamo',
+        name: 'Paladinamo Starliege',
+        shortName: 'Paladinamo',
+        bearer: 'Kite Tenjo',
+        bearerId: 'kite',
+        monster: 'Starliege Paladynamo',
+        rank: 4,
+        atk: 2000,
+        def: 1000,
+        icon: '💫',
+        color: '#ffd54f',
+        desc: 'Monstruo Xyz de Rango 4. Desacopla 2 materiales: reduce el ATK de un monstruo a 0 y niega sus efectos.',
+        unlocked: clearedZexal.includes('kite')
+      },
+      {
+        id: 'numero33',
+        name: 'Número 33: Machu Mech Cronómalo',
+        shortName: 'N° 33',
+        bearer: 'Trey (III)',
+        bearerId: 'trey',
+        monster: 'Number 33: Chronomaly Machu Mech',
+        rank: 5,
+        atk: 2400,
+        def: 1500,
+        icon: '🗿',
+        color: '#ffb74d',
+        desc: 'Monstruo Xyz de Rango 5. Inflige daño igual a la diferencia del ATK actual y original de un monstruo rival.',
+        unlocked: clearedZexal.includes('trey')
+      },
+      {
+        id: 'numero15',
+        name: 'Número 15: Giant Grinder',
+        shortName: 'N° 15',
+        bearer: 'Quattro (IV)',
+        bearerId: 'quattro',
+        monster: 'Number 15: Gimmick Puppet Giant Grinder',
+        rank: 8,
+        atk: 1500,
+        def: 2500,
+        icon: '🎭',
+        color: '#ab47bc',
+        desc: 'Monstruo Xyz de Rango 8. Destruye monstruos invocados de modo especial del rival e inflige daño por su ATK.',
+        unlocked: clearedZexal.includes('quattro')
+      },
+      {
+        id: 'numero107',
+        name: 'Número 107: Dragón Taquiónico',
+        shortName: 'N° 107',
+        bearer: 'Mizar',
+        bearerId: 'mizar',
+        monster: 'Number 107: Galaxy-Eyes Tachyon Dragon',
+        rank: 8,
+        atk: 3000,
+        def: 2500,
+        icon: '🌌',
+        color: '#ffd700',
+        desc: 'Monstruo Xyz Número Barian de Rango 8. Restablece el campo y puede realizar un segundo ataque devastador.',
+        unlocked: clearedZexal.includes('mizar')
+      },
+      {
+        id: 'numero104',
+        name: 'Número 104: Mascarada',
+        shortName: 'N° 104',
+        bearer: 'Vector',
+        bearerId: 'vector',
+        monster: 'Number 104: Masquerade',
+        rank: 4,
+        atk: 2700,
+        def: 1200,
+        icon: '👁️',
+        color: '#d32f2f',
+        desc: 'Monstruo Xyz de Rango 4. Niega la activación de efectos de monstruos en la Battle Phase y quema al rival.',
+        unlocked: clearedZexal.includes('vector')
+      },
+      {
+        id: 'utopia',
+        name: 'Número 39: Utopía',
+        shortName: 'Utopía',
+        bearer: 'Yuma Tsukumo (& Astral)',
+        bearerId: 'yuma',
+        monster: 'Number 39: Utopia',
+        rank: 4,
+        atk: 2500,
+        def: 2000,
+        icon: '⚔️',
+        color: '#ffd700',
+        desc: 'El Monstruo Xyz legendario de Yuma y Astral. Desacopla 1 material para negar el ataque de cualquier monstruo.',
+        unlocked: clearedZexal.includes('yuma')
+      }
+    ];
+};
+
+window.showZexalNumberCelebration = function(wonNumber, charId, onDone) {
+    if (window.playCustomMusic) window.playCustomMusic('dueloterminado.mp3');
+    if (window.playViolinClick) window.playViolinClick();
+    
+    let modal = document.createElement('div');
+    modal.id = 'zexal-celebration-modal';
+    modal.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background:radial-gradient(circle at center, rgba(10,25,50,0.96) 0%, rgba(2,5,15,0.99) 100%); z-index:9999999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; box-sizing:border-box; font-family:"Segoe UI", sans-serif;';
+    
+    let aura = document.createElement('div');
+    aura.style.cssText = 'position:absolute; width:480px; height:480px; background:radial-gradient(circle, rgba(0,229,255,0.4) 0%, rgba(255,215,0,0.2) 50%, rgba(0,0,0,0) 75%); border-radius:50%; pointer-events:none; animation:relicBadgePulse 2.5s infinite ease-in-out;';
+    modal.appendChild(aura);
+    
+    let iconBox = document.createElement('div');
+    iconBox.style.cssText = 'font-size:72px; margin-bottom:15px; filter:drop-shadow(0 0 25px #ffd700) drop-shadow(0 0 45px rgba(0,229,255,0.8)); z-index:2; line-height:1;';
+    iconBox.textContent = wonNumber.icon;
+    modal.appendChild(iconBox);
+    
+    let subtitle = document.createElement('div');
+    subtitle.style.cssText = 'font-family:VT323, monospace; font-size:24px; color:#ffd700; letter-spacing:3px; text-shadow:0 0 12px #ffd700; z-index:2; margin-bottom:6px;';
+    subtitle.textContent = '🌌 ¡CARTA NÚMERO XYZ PURIFICADA Y CONQUISTADA! 🌌';
+    modal.appendChild(subtitle);
+    
+    let title = document.createElement('div');
+    title.style.cssText = 'font-family:"Cinzel", serif, "Times New Roman"; font-size:28px; font-weight:900; color:#fff; text-shadow:0 0 20px #00e5ff; z-index:2; margin-bottom:12px;';
+    title.textContent = wonNumber.name.toUpperCase();
+    modal.appendChild(title);
+    
+    let descBox = document.createElement('div');
+    descBox.style.cssText = 'background:rgba(0,20,40,0.85); border:1.5px solid #00e5ff; border-radius:10px; padding:14px 20px; max-width:480px; color:#e1f5fe; font-size:14px; line-height:1.5; z-index:2; margin-bottom:16px; box-shadow:0 0 20px rgba(0,229,255,0.3);';
+    descBox.innerHTML = `
+        <div style="font-weight:bold; color:#ffd700; margin-bottom:6px;">Portador: ${wonNumber.bearer} · Rango ${wonNumber.rank} · ${wonNumber.atk} ATK / ${wonNumber.def} DEF</div>
+        <div>"${wonNumber.desc}"</div>
+    `;
+    modal.appendChild(descBox);
+    
+    let btnContinue = document.createElement('button');
+    btnContinue.className = 'campBtn3000 ps1-btn ps1-btn-blue';
+    btnContinue.style.cssText = 'padding:12px 36px; font-size:20px; font-family:VT323, monospace; letter-spacing:2px; cursor:pointer; z-index:2; box-shadow:0 0 20px rgba(0,229,255,0.6);';
+    btnContinue.textContent = '🌌 CONTINUAR AVENTURA ZEXAL';
+    btnContinue.onclick = () => {
+        if (window.playViolinClick) window.playViolinClick();
+        modal.remove();
+        if (typeof onDone === 'function') onDone();
+    };
+    modal.appendChild(btnContinue);
+    
+    document.body.appendChild(modal);
+};
+
+// ════════════════════════════════════════════════════════════════
 //  NODOS Y RUTA DEL MAPA DE CAMPAÑA
 // ════════════════════════════════════════════════════════════════
 window.CUSTOM_NODES = [
@@ -3485,6 +3734,38 @@ const MAP_EDGES_5D = [
     ['5d_11', '5d_12'],
     ['5d_12', '5d_13'],
     ['5d_1', '5d_shop']
+];
+
+// ════════════════════════════════════════════════════════════════
+//  NODOS Y RUTA DEL MAPA MUNDO 4: HEARTLAND CITY (ZEXAL)
+// ════════════════════════════════════════════════════════════════
+window.CUSTOM_NODES_ZEXAL = [
+    // Fase 1: Torneo Heartland City
+    { id: 'zexal_1', left: '50%', top: '92%', label: 'BRONK STONE', char: 'BRONK', req: [] },
+    { id: 'zexal_2', left: '35%', top: '85%', label: 'FLIP TURNER', char: 'FLIP', req: ['bronk'] },
+    { id: 'zexal_3', left: '65%', top: '78%', label: 'SHARK', char: 'SHARK', req: ['flip'] },
+    { id: 'zexal_4', left: '35%', top: '71%', label: 'RIO KASTLE', char: 'RIO', req: ['shark'] },
+    { id: 'zexal_5', left: '65%', top: '64%', label: 'KITE TENJO', char: 'KITE', req: ['rio'] },
+    { id: 'zexal_shop', left: '88%', top: '92%', label: 'TIENDA HEARTLAND', char: 'CATHY', req: [] },
+    // Fase 2: Batalla de los Números Barian
+    { id: 'zexal_6', left: '35%', top: '50%', label: 'TREY (III)', char: 'TREY', req: ['kite'], insigniaKey: 'numero33', insigniaName: 'Número 33: Machu Mech', insigniaIcon: '🏛️' },
+    { id: 'zexal_7', left: '65%', top: '42%', label: 'QUATTRO (IV)', char: 'QUATTRO', req: ['trey'], insigniaKey: 'numero15', insigniaName: 'Número 15: Giant Grinder', insigniaIcon: '🎭' },
+    { id: 'zexal_8', left: '35%', top: '34%', label: 'MIZAR', char: 'MIZAR', req: ['quattro'], insigniaKey: 'numero107', insigniaName: 'Número 107: Tachyon Dragon', insigniaIcon: '🌌' },
+    { id: 'zexal_9', left: '65%', top: '25%', label: 'VECTOR', char: 'VECTOR', req: ['mizar'], insigniaKey: 'numero104', insigniaName: 'Número 104: Masquerade', insigniaIcon: '👁️' },
+    { id: 'zexal_10', left: '50%', top: '10%', label: 'YUMA TSUKUMO (& ASTRAL)', char: 'YUMA', req: ['vector'], insigniaKey: 'utopia', insigniaName: 'Número 39: Utopía', insigniaIcon: '⚔️' }
+];
+
+const MAP_EDGES_ZEXAL = [
+    ['zexal_1', 'zexal_2'],
+    ['zexal_2', 'zexal_3'],
+    ['zexal_3', 'zexal_4'],
+    ['zexal_4', 'zexal_5'],
+    ['zexal_5', 'zexal_6'],
+    ['zexal_6', 'zexal_7'],
+    ['zexal_7', 'zexal_8'],
+    ['zexal_8', 'zexal_9'],
+    ['zexal_9', 'zexal_10'],
+    ['zexal_1', 'zexal_shop']
 ];
 
 window.FIVE_D_CARD_NAMES = new Set([
@@ -3593,19 +3874,143 @@ window.is5DCard = function(cardOrName) {
   return false;
 };
 
+window.ZEXAL_CARD_NAMES = new Set([
+  'Gagaga Magician', 'Gagaga Girl', 'Gogogo Golem', 'Gogogo Giant', 'Zubaba Knight',
+  'Dododo Warrior', 'Dododo Buster', 'Kagetokage', 'Goblindbergh', 'Tin Goldfish',
+  'Tour Guide From the Underworld', 'Crane Crane', 'Photon Thrasher', 'Photon Crusher',
+  'Photon Vanisher', 'Galaxy-Eyes Photon Dragon', 'Big Jaws', 'Skull Kraken', 'Spear Shark',
+  'Doublefin Shark', 'Silent Angler', 'Blizzard Thunderbird', 'Aurora Wing',
+  'Gimmick Puppet Dreary Doll', 'Gimmick Puppet Magnet Doll',
+  'Chronomaly Crystal Skull', 'Chronomaly Golden Jet',
+  'Radius, the Half-Moon Dragon', 'Parsec, the Interstellar Dragon',
+  'Umbral Horror Ghoul', 'Umbral Horror Unform',
+  // Magias & Trampas Zexal
+  "Rank-Up-Magic Barian's Force", 'Gagagarevenge', 'Onomatopaira', 'Double or Nothing!',
+  'Xyz Reborn', 'Xyz Block', 'Overlay Regen', 'Xyz Unit', 'Generation Force',
+  'Tachyon Transmigration',
+  // Monstruos XYZ
+  'Number 39: Utopia', 'Number C39: Utopia Ray', 'Number 17: Leviathan Dragon', 'Grenosaurus',
+  'Gagaga Cowboy', 'Number 50: Blackship of Corn', 'Heroic Champion - Excalibur',
+  'Submersible Carrier Aero Shark', 'Number 32: Shark Drake', 'Black Ray Lancer',
+  'Ice Beast Zerofyne', 'Starliege Paladynamo', 'Number 10: Illumiknight',
+  'Neo Galaxy-Eyes Photon Dragon', 'Number 15: Gimmick Puppet Giant Grinder',
+  'Number 33: Chronomaly Machu Mech', 'Number 104: Masquerade',
+  'Number 107: Galaxy-Eyes Tachyon Dragon', 'Number 66: Master Key Beetle',
+  'Number 30: Acid Golem of Destruction'
+]);
+
+window.XYZ_CARD_NAMES = new Set([
+  'Number 39: Utopia', 'Number C39: Utopia Ray', 'Number 17: Leviathan Dragon', 'Grenosaurus',
+  'Gagaga Cowboy', 'Number 50: Blackship of Corn', 'Heroic Champion - Excalibur',
+  'Submersible Carrier Aero Shark', 'Number 32: Shark Drake', 'Black Ray Lancer',
+  'Ice Beast Zerofyne', 'Starliege Paladynamo', 'Number 10: Illumiknight',
+  'Neo Galaxy-Eyes Photon Dragon', 'Number 15: Gimmick Puppet Giant Grinder',
+  'Number 33: Chronomaly Machu Mech', 'Number 104: Masquerade',
+  'Number 107: Galaxy-Eyes Tachyon Dragon', 'Number 66: Master Key Beetle',
+  'Number 30: Acid Golem of Destruction'
+]);
+
+window.isXyzCard = function(cardOrName) {
+  if (!cardOrName) return false;
+  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || cardOrName[1] || '')).trim();
+  if (name && window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
+  var kind = String((cardOrName && cardOrName.kind) || (cardOrName && cardOrName[6]) || '').toUpperCase();
+  if (kind === 'XYZ') return true;
+  var meta = (typeof cardOrName === 'object' && cardOrName.kind) ? cardOrName : (window.getCardMetadata ? window.getCardMetadata(name) : null);
+  if (meta && meta.kind === 'XYZ') return true;
+  if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+    var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
+    if (cd && cd.kind === 'XYZ') return true;
+  }
+  return false;
+};
+
+window.isZexalCard = function(cardOrName) {
+  if (!cardOrName) return false;
+  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || '')).trim();
+  if (window.ZEXAL_CARD_NAMES && window.ZEXAL_CARD_NAMES.has(name)) return true;
+  var meta = (typeof cardOrName === 'object' && cardOrName.kind) ? cardOrName : (window.getCardMetadata ? window.getCardMetadata(name) : null);
+  if (meta) {
+    if (meta.world === 4 || meta.kind === 'XYZ') return true;
+    var num = Number(meta.num || meta.id || 0);
+    if (num >= 1100 && num <= 1199) return true;
+  }
+  if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+    var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
+    if (cd) {
+      if (cd.world === 4 || cd.kind === 'XYZ') return true;
+      var id = Number(cd.id || 0);
+      if (id >= 1100 && id <= 1199) return true;
+    }
+  }
+  return false;
+};
+
+window.MUNDO4_ALLOWED_STAPLES = new Set([
+  'Dark Hole', 'Raigeki', 'Monster Reborn', 'Pot of Greed', 'Mystical Space Typhoon',
+  'Mirror Force', 'Torrential Tribute', 'Bottomless Trap Hole', 'Trap Hole', 'Waboku',
+  'Sakuretsu Armor', 'Magic Cylinder', 'Negate Attack', 'Swords of Revealing Light',
+  'Compulsory Evacuation Device', 'Fiendish Chain'
+]);
+
 window.isCardAllowedInWorld = function(cardOrName, targetWorld) {
-  var is5DWorld = (Number(targetWorld) === 3);
+  var w = Number(targetWorld);
   var is5DC = window.is5DCard(cardOrName);
+  var isZexalC = window.isZexalCard(cardOrName);
+  var isSynchro = window.isSynchroCard(cardOrName);
   var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || '')).trim();
 
-  if (is5DWorld) {
+  if (w === 4) {
+    // EN MUNDO 4 NO SE PERMITEN MONSTRUOS SINCRONÍA
+    if (isSynchro) return false;
+    if (isZexalC) return true;
+    if (window.MUNDO4_ALLOWED_STAPLES && window.MUNDO4_ALLOWED_STAPLES.has(name)) return true;
+    return false;
+  } else if (w === 3) {
+    if (isZexalC) return false;
     if (is5DC) return true;
     if (window.MUNDO3_ALLOWED_STAPLES && window.MUNDO3_ALLOWED_STAPLES.has(name)) return true;
     return false;
   } else {
-    if (is5DC) return false;
+    // Mundos 1 y 2
+    if (isZexalC || is5DC || isSynchro) return false;
     return true;
   }
+};
+
+window.generateZexalStarterDeck = function() {
+    return [
+      "Gagaga Magician", "Gagaga Magician", "Gagaga Magician",
+      "Gagaga Girl", "Gagaga Girl",
+      "Gogogo Golem", "Gogogo Golem", "Gogogo Golem",
+      "Gogogo Giant", "Gogogo Giant",
+      "Zubaba Knight", "Zubaba Knight", "Zubaba Knight",
+      "Dododo Buster", "Dododo Buster",
+      "Dododo Warrior", "Dododo Warrior",
+      "Kagetokage", "Kagetokage", "Kagetokage",
+      "Goblindbergh", "Goblindbergh", "Goblindbergh",
+      "Tin Goldfish", "Tin Goldfish", "Tin Goldfish",
+      "Tour Guide From the Underworld", "Tour Guide From the Underworld",
+      "Double or Nothing!", "Double or Nothing!",
+      "Onomatopaira", "Onomatopaira",
+      "Gagagarevenge", "Gagagarevenge",
+      "Xyz Unit", "Xyz Unit",
+      "Dark Hole", "Mystical Space Typhoon", "Mirror Force", "Bottomless Trap Hole",
+      "Xyz Reborn", "Xyz Block"
+    ];
+};
+
+window.generateZexalExtraDeck = function() {
+    return [
+      "Number 39: Utopia",
+      "Number 39: Utopia",
+      "Number C39: Utopia Ray",
+      "Number 17: Leviathan Dragon",
+      "Grenosaurus",
+      "Gagaga Cowboy",
+      "Number 50: Blackship of Corn",
+      "Submersible Carrier Aero Shark"
+    ];
 };
 
 window.generate5DStarterDeck = function() {
@@ -3655,13 +4060,30 @@ window.customShowMap = function() {
         else if (window.memorySave) s = window.memorySave;
     } catch(e) {}
     
+    let isZexal = ((s.world || 1) === 4);
     let is5D = ((s.world || 1) === 3);
     let isGX = ((s.world || 1) === 2);
-    let curWorld = is5D ? 3 : (isGX ? 2 : 1);
+    let curWorld = isZexal ? 4 : (is5D ? 3 : (isGX ? 2 : 1));
     window.playCustomMusic(window.getMapBgm(curWorld));
 
-    // Inicializar Starter Deck y Colección para Mundo 3 si entra por primera vez
-    if (is5D) {
+    // Inicializar Starter Deck y Colección para Mundo 4 si entra por primera vez
+    if (isZexal) {
+        s.decksMundo4 = s.decksMundo4 || {};
+        if (!s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40) {
+            s.decksMundo4['Principal'] = window.generateZexalStarterDeck();
+            s.decksMundo4['Extra'] = window.generateZexalExtraDeck();
+            s.activeDeckMundo4 = 'Principal';
+            s.collectionMundo4 = s.collectionMundo4 || {};
+            s.decksMundo4['Principal'].forEach(n => {
+                s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Principal'].filter(x => x === n).length);
+            });
+            s.decksMundo4['Extra'].forEach(n => {
+                s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Extra'].filter(x => x === n).length);
+            });
+            if (window.persistUserSave) window.persistUserSave(s);
+            else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+        }
+    } else if (is5D) {
         s.decksMundo3 = s.decksMundo3 || {};
         if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40) {
             s.decksMundo3['Principal'] = window.generate5DStarterDeck();
@@ -3679,16 +4101,20 @@ window.customShowMap = function() {
         }
     }
 
-    let nodes = is5D ? window.CUSTOM_NODES_5D : (isGX ? window.CUSTOM_NODES_GX : window.CUSTOM_NODES);
-    let edges = is5D ? MAP_EDGES_5D : (isGX ? MAP_EDGES_GX : MAP_EDGES);
-    let cleared = is5D
-        ? (Array.isArray(s.cleared5D) ? s.cleared5D.map(x => String(x).toLowerCase()) : [])
-        : (isGX 
-            ? (Array.isArray(s.clearedGX) ? s.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []))
-            : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : []));
-    let curActiveDeck = is5D
-        ? ((s.decksMundo3 && s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra' && s.decksMundo3[s.activeDeckMundo3]) || (s.decksMundo3 && s.decksMundo3['Principal']) || [])
-        : ((s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || []);
+    let nodes = isZexal ? window.CUSTOM_NODES_ZEXAL : (is5D ? window.CUSTOM_NODES_5D : (isGX ? window.CUSTOM_NODES_GX : window.CUSTOM_NODES));
+    let edges = isZexal ? MAP_EDGES_ZEXAL : (is5D ? MAP_EDGES_5D : (isGX ? MAP_EDGES_GX : MAP_EDGES));
+    let cleared = isZexal
+        ? (Array.isArray(s.clearedZexal) ? s.clearedZexal.map(x => String(x).toLowerCase()) : [])
+        : (is5D
+            ? (Array.isArray(s.cleared5D) ? s.cleared5D.map(x => String(x).toLowerCase()) : [])
+            : (isGX 
+                ? (Array.isArray(s.clearedGX) ? s.clearedGX.map(x => String(x).toLowerCase()) : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()).filter(c => ['chumley','syrus','jaden','bastion','alexis','chazz','zane','crowler','aster'].includes(c)) : []))
+                : (Array.isArray(s.cleared) ? s.cleared.map(x => String(x).toLowerCase()) : [])));
+    let curActiveDeck = isZexal
+        ? ((s.decksMundo4 && s.activeDeckMundo4 && s.activeDeckMundo4 !== 'Extra' && s.decksMundo4[s.activeDeckMundo4]) || (s.decksMundo4 && s.decksMundo4['Principal']) || [])
+        : (is5D
+            ? ((s.decksMundo3 && s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra' && s.decksMundo3[s.activeDeckMundo3]) || (s.decksMundo3 && s.decksMundo3['Principal']) || [])
+            : ((s.decks && s.activeDeck && s.decks[s.activeDeck]) || s.deck || []));
     let activeDeckCount = curActiveDeck ? curActiveDeck.length : 40;
     
     const MILLENNIUM_ITEMS = window.getMillenniumItems(s);
@@ -3697,16 +4123,18 @@ window.customShowMap = function() {
     // Contenedor principal del Mapa con imagen temática según el Mundo
     let map = document.createElement('div');
     map.id = 'map-container-overlay';
-    let mapBg = is5D
-        ? 'linear-gradient(180deg, rgba(3,10,22,0.60) 0%, rgba(5,18,36,0.78) 100%), url("ImagenesPersonajes/map_bg_5d.jpg") center center / cover no-repeat, #020814;'
-        : (isGX 
-            ? 'linear-gradient(180deg, rgba(4,14,32,0.55) 0%, rgba(8,24,56,0.72) 100%), url("ImagenesPersonajes/map_bg_gx.jpg") center center / cover no-repeat, #030a18;'
-            : 'linear-gradient(180deg, rgba(8,5,2,0.55) 0%, rgba(18,12,5,0.72) 100%), url("ImagenesPersonajes/map_bg_m1.jpg") center center / cover no-repeat, #0a0600;');
+    let mapBg = isZexal
+        ? 'linear-gradient(180deg, rgba(2,8,25,0.60) 0%, rgba(5,15,38,0.78) 100%), url("ImagenesPersonajes/map_bg_zexal.jpg") center center / cover no-repeat, #010614;'
+        : (is5D
+            ? 'linear-gradient(180deg, rgba(3,10,22,0.60) 0%, rgba(5,18,36,0.78) 100%), url("ImagenesPersonajes/map_bg_5d.jpg") center center / cover no-repeat, #020814;'
+            : (isGX 
+                ? 'linear-gradient(180deg, rgba(4,14,32,0.55) 0%, rgba(8,24,56,0.72) 100%), url("ImagenesPersonajes/map_bg_gx.jpg") center center / cover no-repeat, #030a18;'
+                : 'linear-gradient(180deg, rgba(8,5,2,0.55) 0%, rgba(18,12,5,0.72) 100%), url("ImagenesPersonajes/map_bg_m1.jpg") center center / cover no-repeat, #0a0600;'));
     map.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:999999; background: ' + mapBg + ' overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; font-family:"Segoe UI", sans-serif;';
     
     let mapStage = document.createElement('div');
     mapStage.id = 'map-stage-track';
-    mapStage.style.cssText = 'position:relative; width:100%; min-height:' + (is5D ? '1800px' : '100vh') + ';';
+    mapStage.style.cssText = 'position:relative; width:100%; min-height:' + (isZexal ? '1600px' : (is5D ? '1800px' : '100vh')) + ';';
     
     // Inyección de estilos de animación para el mapa si no existen
     if (!document.getElementById('custom-map-animations')) {
@@ -3759,28 +4187,55 @@ window.customShowMap = function() {
     // ── 1. BARRA SUPERIOR HUD ESTILO KAME GAME ─────────────────────
     let topBar = document.createElement('div');
     topBar.id = 'map-top-bar';
-    let topBarBorder = is5D ? '#00e5ff' : (isGX ? '#00b0ff' : '#b8860b');
+    let topBarBorder = isZexal ? '#ffd700' : (is5D ? '#00e5ff' : (isGX ? '#00b0ff' : '#b8860b'));
     topBar.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:62px; background:linear-gradient(180deg, rgba(10,6,2,0.96) 0%, rgba(22,14,5,0.92) 80%, rgba(22,14,5,0) 100%); border-bottom:2px solid ' + topBarBorder + '; box-shadow:0 4px 20px rgba(0,0,0,0.85); z-index:100; display:flex; align-items:center; justify-content:space-between; padding:0 16px; box-sizing:border-box;';
     
     // 1.1 Left: Título y Logo
     let brandWrap = document.createElement('div');
     brandWrap.id = 'map-brand-wrap';
     brandWrap.style.cssText = 'display:flex; align-items:center; gap:10px; cursor:pointer;';
-    let brandIcon = is5D ? '🏍️' : (isGX ? '🎓' : '☥');
-    let brandGlow = is5D ? '#00e5ff' : (isGX ? '#00e5ff' : '#ffd700');
-    let brandTitle = is5D ? 'NEO DOMINO CITY · YU-GI-OH! 5D\'S' : (isGX ? 'ACADEMIA DE DUELOS · YU-GI-OH! GX' : 'CAMPAÑA · EL REINO DE LOS DUELOS');
-    let brandSubtitle = is5D ? 'Autopista de Duelo · Invocación por Sincronía' : (isGX ? 'Dormitorios Slifer Red, Ra Yellow y Obelisk Blue' : 'Ruta Sagrada hacia la Puerta del Nuevo Mundo');
+    let brandIcon = isZexal ? '🌌' : (is5D ? '🏍️' : (isGX ? '🎓' : '☥'));
+    let brandGlow = isZexal ? '#ffd700' : (is5D ? '#00e5ff' : (isGX ? '#00e5ff' : '#ffd700'));
+    let brandTitle = isZexal ? 'HEARTLAND CITY · YU-GI-OH! ZEXAL' : (is5D ? 'NEO DOMINO CITY · YU-GI-OH! 5D\'S' : (isGX ? 'ACADEMIA DE DUELOS · YU-GI-OH! GX' : 'CAMPAÑA · EL REINO DE LOS DUELOS'));
+    let brandSubtitle = isZexal ? 'Campaña Número · Invocación Xyz por Sobreposición' : (is5D ? 'Autopista de Duelo · Invocación por Sincronía' : (isGX ? 'Dormitorios Slifer Red, Ra Yellow y Obelisk Blue' : 'Ruta Sagrada hacia la Puerta del Nuevo Mundo'));
     brandWrap.innerHTML = `
         <div style="font-size:26px; filter:drop-shadow(0 0 8px ${brandGlow}); line-height:1;">${brandIcon}</div>
         <div>
             <div class="map-brand-title" style="font-family:'Cinzel', serif, 'Times New Roman'; font-size:15px; font-weight:900; color:${brandGlow}; letter-spacing:1.5px; text-shadow:0 2px 6px rgba(0,0,0,0.8);">${brandTitle}</div>
-            <div class="map-brand-subtitle" style="font-size:10px; color:${is5D ? '#80d8ff' : (isGX ? '#80d8ff' : '#d4af37')}; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">${brandSubtitle}</div>
+            <div class="map-brand-subtitle" style="font-size:10px; color:${isZexal ? '#ffe082' : (is5D ? '#80d8ff' : (isGX ? '#80d8ff' : '#d4af37'))}; letter-spacing:1px; font-family:'Segoe UI', sans-serif;">${brandSubtitle}</div>
         </div>
     `;
     topBar.appendChild(brandWrap);
     
     // 1.2 Center: Estado de Campaña
-    if (is5D) {
+    if (isZexal) {
+        let zexalBar = document.createElement('div');
+        zexalBar.id = 'map-relics-bar';
+        zexalBar.style.cssText = 'display:flex; align-items:center; gap:5px; background:rgba(2,10,30,0.85); padding:3px 10px; border-radius:20px; border:1.5px solid #ffd700; box-shadow:0 0 12px rgba(255,215,0,0.4);';
+        
+        const ZEXAL_NUMBERS = window.getZexalNumbers(s);
+        const unlockedNumbersCount = ZEXAL_NUMBERS.filter(it => it.unlocked).length;
+        
+        let leadChip = document.createElement('div');
+        leadChip.style.cssText = 'font-size:11px; font-weight:bold; color:#ffd700; font-family:VT323, monospace; letter-spacing:1px; margin-right:4px;';
+        leadChip.innerHTML = `🌌 NÚMEROS: ${unlockedNumbersCount}/10`;
+        zexalBar.appendChild(leadChip);
+        
+        ZEXAL_NUMBERS.forEach(it => {
+            let chip = document.createElement('div');
+            chip.style.cssText = `display:flex; align-items:center; gap:3px; padding:2px 7px; border-radius:12px; cursor:pointer; transition:transform 0.18s ease; ${it.unlocked ? 'background:linear-gradient(135deg, rgba(255,215,0,0.4), rgba(5,20,40,0.9)); border:1.5px solid #ffd700; box-shadow:0 0 8px rgba(255,215,0,0.6);' : 'background:rgba(5,15,30,0.7); border:1px solid #1a3a60; opacity:0.5;'}`;
+            chip.title = it.unlocked ? `${it.name}: ¡CONQUISTADO de ${it.bearer}! (${it.atk}/${it.def})` : `${it.name}: En poder de ${it.bearer}. ¡Derrótalo para obtener su Número Xyz!`;
+            chip.innerHTML = `<span style="font-size:13px;">${it.unlocked ? it.icon : '🔒'}</span><span style="font-size:10px; font-weight:bold; color:${it.unlocked ? '#ffd700' : '#80deea'}; font-family:'Segoe UI', sans-serif;">${it.shortName}</span>`;
+            chip.onmouseover = () => { chip.style.transform = 'scale(1.15)'; };
+            chip.onmouseout = () => { chip.style.transform = 'scale(1)'; };
+            chip.onclick = () => {
+                if (window.playViolinClick) window.playViolinClick();
+                alert(`${it.icon} ${it.name.toUpperCase()}\n\nPortador: ${it.bearer}\nMonstruo Xyz: Rango ${it.rank} (${it.atk} ATK / ${it.def} DEF)\n\n"${it.desc}"\n\nEstado: ${it.unlocked ? '✅ PURIFICADO (' + unlockedNumbersCount + '/10 Números)' : '🔒 BLOQUEADO (Derrótalo en la Campaña)'}`);
+            };
+            zexalBar.appendChild(chip);
+        });
+        topBar.appendChild(zexalBar);
+    } else if (is5D) {
         let fiveDBar = document.createElement('div');
         fiveDBar.id = 'map-relics-bar';
         fiveDBar.style.cssText = 'display:flex; align-items:center; gap:5px; background:rgba(0,10,25,0.85); padding:3px 10px; border-radius:20px; border:1.5px solid #ab47bc; box-shadow:0 0 12px rgba(171,71,188,0.4);';
@@ -3840,18 +4295,31 @@ window.customShowMap = function() {
     actionsWrap.id = 'map-actions-wrap';
     actionsWrap.style.cssText = 'display:flex; align-items:center; gap:10px;';
 
-    // Botón Viaje Interdimensional entre Mundos (Ciclo de 3 Mundos: DM -> GX -> 5D's -> DM)
+    // Botón Viaje Interdimensional entre Mundos (Ciclo de 4 Mundos: DM -> GX -> 5D's -> ZEXAL -> DM)
     let btnSwitchWorld = document.createElement('button');
     btnSwitchWorld.className = 'map-top-action-btn';
-    if (is5D) {
-        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #102030 0%, #050d18 100%); border: 1.5px solid #00e5ff; color: #80d8ff; font-weight:bold; box-shadow:0 0 10px rgba(0,229,255,0.4);';
-        btnSwitchWorld.innerHTML = '<span>🏍️</span><span>MUNDO 3: 5D\'s</span>';
+    if (isZexal) {
+        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #1a2a40 0%, #081220 100%); border: 1.5px solid #ffd700; color: #ffe082; font-weight:bold; box-shadow:0 0 10px rgba(255,215,0,0.5);';
+        btnSwitchWorld.innerHTML = '<span>🌌</span><span>MUNDO 4: ZEXAL</span>';
         btnSwitchWorld.onclick = () => {
             if (window.playViolinClick) window.playViolinClick();
             s.world = 1;
             let m1Act = (s.activeDeck && s.decks && s.decks[s.activeDeck]) ? s.activeDeck : (Object.keys(s.decks || {}).filter(k => k !== 'Extra')[0] || 'Deck 1');
             s.activeDeck = m1Act;
             if (s.decks && s.decks[m1Act]) s.deck = [...s.decks[m1Act]];
+            if (window.persistUserSave) window.persistUserSave(s);
+            else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
+            window.customShowMap();
+        };
+    } else if (is5D) {
+        btnSwitchWorld.style.cssText = 'background: linear-gradient(180deg, #102030 0%, #050d18 100%); border: 1.5px solid #00e5ff; color: #80d8ff; font-weight:bold; box-shadow:0 0 10px rgba(0,229,255,0.4);';
+        btnSwitchWorld.innerHTML = '<span>🏍️</span><span>MUNDO 3: 5D\'s</span>';
+        btnSwitchWorld.onclick = () => {
+            if (window.playViolinClick) window.playViolinClick();
+            s.world = 4;
+            let m4Act = (s.activeDeckMundo4 && s.decksMundo4 && s.decksMundo4[s.activeDeckMundo4]) ? s.activeDeckMundo4 : 'Principal';
+            s.activeDeckMundo4 = m4Act;
+            if (s.decksMundo4 && s.decksMundo4[m4Act]) s.deck = [...s.decksMundo4[m4Act]];
             if (window.persistUserSave) window.persistUserSave(s);
             else origSet('FMR_SAVE_' + window.activeAccount, JSON.stringify(s));
             window.customShowMap();
@@ -3895,7 +4363,7 @@ window.customShowMap = function() {
     let deckBadge = document.createElement('div');
     deckBadge.style.cssText = 'background:#142036; border:1px solid #3d6499; border-radius:6px; padding:4px 10px; color:#90caf9; font-family:VT323, monospace; font-size:15px; cursor:pointer;';
     deckBadge.title = 'Haz clic para ir al Editor de Decks';
-    let curActiveDeckName = is5D ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1');
+    let curActiveDeckName = isZexal ? (s.activeDeckMundo4 || 'Principal') : (is5D ? (s.activeDeckMundo3 || 'Principal') : (s.activeDeck || 'Deck 1'));
     deckBadge.textContent = `🎴 DECK: ${curActiveDeckName} (${activeDeckCount}/40)`;
     deckBadge.onclick = () => {
         if (window.playViolinClick) window.playViolinClick();
@@ -4015,18 +4483,18 @@ window.customShowMap = function() {
         
         let fChar = (fNode.char || '').toLowerCase();
         if (fChar === 'seto') fChar = 'kaiba';
-        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop' || fNode.id === '5d_shop') || cleared.includes(fChar);
+        let isPathConquered = (fNode.id === 'n13' || fNode.id === 'gx_shop' || fNode.id === '5d_shop' || fNode.id === 'zexal_shop') || cleared.includes(fChar);
         
         let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', fNode.left); line.setAttribute('y1', fNode.top);
         line.setAttribute('x2', tNode.left); line.setAttribute('y2', tNode.top);
         
         if (isPathConquered) {
-            line.setAttribute('stroke', isGX ? '#00e5ff' : '#ffd700');
+            line.setAttribute('stroke', isZexal ? '#ffd700' : (isGX ? '#00e5ff' : '#ffd700'));
             line.setAttribute('stroke-width', '4.5');
-            line.style.cssText = `filter: drop-shadow(0 0 6px ${isGX ? 'rgba(0,229,255,0.85)' : 'rgba(255,215,0,0.85)'}); animation: mapPathGlow 2.5s infinite ease-in-out;`;
+            line.style.cssText = `filter: drop-shadow(0 0 6px ${isZexal ? 'rgba(255,215,0,0.85)' : (isGX ? 'rgba(0,229,255,0.85)' : 'rgba(255,215,0,0.85)')}); animation: mapPathGlow 2.5s infinite ease-in-out;`;
         } else {
-            line.setAttribute('stroke', isGX ? '#0d324d' : '#664a18');
+            line.setAttribute('stroke', isZexal ? '#3a2e0a' : (isGX ? '#0d324d' : '#664a18'));
             line.setAttribute('stroke-width', '3');
             line.setAttribute('stroke-dasharray', '7,7');
             line.setAttribute('opacity', '0.65');
@@ -4045,7 +4513,7 @@ window.customShowMap = function() {
         if (cid === 'seto') cid = 'kaiba';
         
         let isUnlocked = true;
-        if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || cid === 'abuelo' || cid === 'atem' || cid === 'rally' || !n.req || n.req.length === 0) {
+        if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop' || cid === 'abuelo' || cid === 'atem' || cid === 'rally' || !n.req || n.req.length === 0) {
             isUnlocked = true;
         } else {
             isUnlocked = n.req.every(r => cleared.includes(r.toLowerCase()));
@@ -4060,7 +4528,7 @@ window.customShowMap = function() {
         let p = portraitMap[n.char];
         if (p) {
             let filterStyle = isCleared ? 'filter: brightness(0.7) contrast(0.95);' : (!isUnlocked ? 'filter: brightness(0.35) grayscale(100%);' : '');
-            let borderGlow = n.insigniaKey ? '#e040fb' : '#ffd700';
+            let borderGlow = n.insigniaKey ? (isZexal ? '#ffd700' : '#e040fb') : '#ffd700';
             let borderStyle = isCleared ? 'border: 3px solid #4caf50;' : (isUnlocked ? (hasItem ? 'border: 3px solid ' + borderGlow + '; animation: relicNodeGlow 2s infinite ease-in-out;' : 'border: 3px solid #e4c06b;') : 'border: 3px solid #443315;');
             
             // 3.1 Insignia de Reliquia o Nazca Flotante
@@ -4073,9 +4541,9 @@ window.customShowMap = function() {
                         </div>
                     `;
                 } else if (isUnlocked) {
-                    let badgeBg = n.insigniaKey ? 'linear-gradient(135deg, #6a1b9a, #ab47bc)' : 'linear-gradient(135deg, #b8860b, #ffd700)';
+                    let badgeBg = n.insigniaKey ? (isZexal ? 'linear-gradient(135deg, #0d47a1, #ffd700)' : 'linear-gradient(135deg, #6a1b9a, #ab47bc)') : 'linear-gradient(135deg, #b8860b, #ffd700)';
                     let badgeColor = n.insigniaKey ? '#fff' : '#000';
-                    let badgeShadow = n.insigniaKey ? 'rgba(224,64,251,0.9)' : 'rgba(255,215,0,0.9)';
+                    let badgeShadow = n.insigniaKey ? (isZexal ? 'rgba(255,215,0,0.9)' : 'rgba(224,64,251,0.9)') : 'rgba(255,215,0,0.9)';
                     relicBadgeHtml = `
                         <div class="map-node-badge" style="position:absolute; top:-18px; background:${badgeBg}; color:${badgeColor}; border:1.5px solid #fff; border-radius:12px; padding:2px 8px; font-size:10px; font-weight:900; box-shadow:0 0 12px ${badgeShadow}; white-space:nowrap; display:flex; align-items:center; gap:3px; z-index:25; animation:relicBadgePulse 1.8s infinite ease-in-out;">
                             <span>${itemKeyIcon}</span> <span>${itemKeyName.toUpperCase()}</span>
@@ -4092,7 +4560,7 @@ window.customShowMap = function() {
             
             // 3.2 Etiqueta inferior de estado
             let labelText = isCleared ? `<span style="color:#a3e9a4">✓ ${n.label}</span>` : (!isUnlocked ? '???' : n.label);
-            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop') labelText = '🏪 TIENDA';
+            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop') labelText = '🏪 TIENDA';
             if (n.id === 'n14') labelText = unlockedCount >= 7 ? '🌌 NUEVO MUNDO' : `🔒 PUERTA (${unlockedCount}/7)`;
             
             btn.innerHTML = `
@@ -4114,7 +4582,7 @@ window.customShowMap = function() {
             if (window.playViolinClick) window.playViolinClick();
             
             // Caso Tienda
-            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop') {
+            if (n.id === 'n13' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop') {
                 if (window.openCustomShopMenu) window.openCustomShopMenu();
                 return;
             }
@@ -4142,17 +4610,20 @@ window.customShowMap = function() {
                         try {
                             let sCheck = JSON.parse(sCheckStr);
                             if (sCheck) {
+                                let isZexalCheck = (sCheck.world === 4);
                                 let is5DCheck = (sCheck.world === 3);
-                                let curCheckDeck = is5DCheck 
-                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
-                                    : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                                let curDeckName = is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal');
+                                let curCheckDeck = isZexalCheck
+                                    ? ((sCheck.decksMundo4 && sCheck.activeDeckMundo4 && sCheck.activeDeckMundo4 !== 'Extra' && sCheck.decksMundo4[sCheck.activeDeckMundo4]) || (sCheck.decksMundo4 && sCheck.decksMundo4['Principal']) || [])
+                                    : (is5DCheck 
+                                        ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                        : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []));
+                                let curDeckName = isZexalCheck ? ((sCheck.activeDeckMundo4 && sCheck.activeDeckMundo4 !== 'Extra') ? sCheck.activeDeckMundo4 : 'Principal') : (is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal'));
                                 if (curCheckDeck && curCheckDeck.length !== 40) {
                                     alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                                     if (window.customShowDeckEditor) window.customShowDeckEditor();
                                     return;
                                 }
-                                let targetW = is5DCheck ? 3 : 1;
+                                let targetW = isZexalCheck ? 4 : (is5DCheck ? 3 : 1);
                                 let invalidCards = (curCheckDeck || []).filter(c => !window.isCardAllowedInWorld(c, targetW));
                                 if (invalidCards.length > 0) {
                                     alert(`⚠️ DECK ACTIVO NO VÁLIDO ⚠️\n\nTu Deck Activo ("${curDeckName}") contiene cartas no compatibles con este mundo (${invalidCards.slice(0, 3).join(', ')}).\nPor favor ve al Dashboard del Deck para ajustarlo.`);
@@ -4193,17 +4664,20 @@ window.customShowMap = function() {
                 try {
                     let sCheck = JSON.parse(sCheckStr);
                     if (sCheck) {
+                        let isZexalCheck = (sCheck.world === 4);
                         let is5DCheck = (sCheck.world === 3);
-                        let curCheckDeck = is5DCheck 
-                            ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
-                            : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                        let curDeckName = is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal');
+                        let curCheckDeck = isZexalCheck
+                            ? ((sCheck.decksMundo4 && sCheck.activeDeckMundo4 && sCheck.activeDeckMundo4 !== 'Extra' && sCheck.decksMundo4[sCheck.activeDeckMundo4]) || (sCheck.decksMundo4 && sCheck.decksMundo4['Principal']) || [])
+                            : (is5DCheck 
+                                ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []));
+                        let curDeckName = isZexalCheck ? ((sCheck.activeDeckMundo4 && sCheck.activeDeckMundo4 !== 'Extra') ? sCheck.activeDeckMundo4 : 'Principal') : (is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal'));
                         if (curCheckDeck && curCheckDeck.length !== 40) {
                             alert(`⚠️ DECK ACTIVO NO VÁLIDO (${curCheckDeck.length}/40) ⚠️\n\nTu Deck Activo ("${curDeckName}") debe tener EXACTAMENTE 40 cartas para poder combatir.\nPor favor ve al Dashboard del Deck para ajustarlo.`);
                             if (window.customShowDeckEditor) window.customShowDeckEditor();
                             return;
                         }
-                        let targetW2 = is5DCheck ? 3 : 1;
+                        let targetW2 = isZexalCheck ? 4 : (is5DCheck ? 3 : 1);
                         let invalidCards2 = (curCheckDeck || []).filter(c => !window.isCardAllowedInWorld(c, targetW2));
                         if (invalidCards2.length > 0) {
                             alert(`⚠️ DECK ACTIVO NO VÁLIDO ⚠️\n\nTu Deck Activo ("${curDeckName}") contiene cartas no compatibles con este mundo (${invalidCards2.slice(0, 3).join(', ')}).\nPor favor ve al Dashboard del Deck para ajustarlo.`);
@@ -4328,6 +4802,29 @@ window.customShowMap = function() {
                             { role: 'system', speaker: 'GOODWIN', text: 'Poseo tanto la luz del Salvador como las tinieblas de los Portadores Oscuros. ¡Voy a purificar y reiniciar este mundo en ruinas!' },
                             { role: 'system', speaker: 'GOODWIN', text: '¡Desciende desde los cielos oscuros, el Inmortal supremo de Nazca: Inmortal Terrestre Wiraqocha Rasca!' }
                         ];
+                    } else if (charKey === 'bronk') {
+                        introLines = [{ role: 'system', speaker: 'BRONK', text: '¡Ey! ¡Soy Bronk Stone, el mejor amigo de Yuma! ¡Te enseñaré la fuerza de mi Grenosaurus y mis ruedas pesadas!' }];
+                    } else if (charKey === 'flip') {
+                        introLines = [{ role: 'system', speaker: 'FLIP', text: '¡Jejeje! Caíste en mi trampa. El Número 17: Dragón Leviatán devorará todos tus puntos de vida antes de que pestañees.' }];
+                    } else if (charKey === 'shark') {
+                        introLines = [{ role: 'system', speaker: 'SHARK', text: '¿Crees que puedes nadar en mis aguas? Los colmillos de mis tiburones y el temible Número 32: Draco Tiburón te arrastrarán al abismo.' }];
+                    } else if (charKey === 'rio') {
+                        introLines = [{ role: 'system', speaker: 'RIO', text: 'No tolero la insolencia. Mi Bestia de Hielo Zerofyne congelará tu campo y anulará cada uno de tus efectos.' }];
+                    } else if (charKey === 'kite') {
+                        introLines = [{ role: 'system', speaker: 'KITE', text: '¡Cazador de Números Kite Tenjo al ataque! ¡Desciende de la tormenta de fotones, Dragón Fotónico de Ojos Galácticos!' }];
+                    } else if (charKey === 'trey') {
+                        introLines = [{ role: 'system', speaker: 'TREY', text: 'Por el honor de mi familia y el poder de las reliquias antiguas... ¡Despierta, Número 33: Machu Mech Cronómalo!' }];
+                    } else if (charKey === 'quattro') {
+                        introLines = [{ role: 'system', speaker: 'QUATTRO', text: '¡Bienvenido a mi servicio para fans! ¡Jajaja! ¡Te desgarraré con mi Número 15: Titiritero Trucado Gigante Afilador!' }];
+                    } else if (charKey === 'mizar') {
+                        introLines = [{ role: 'system', speaker: 'MIZAR', text: '¡Solo existe un verdadero maestro de los Dragones Galácticos! ¡Despliega tus alas doradas, Número 107: Dragón Taquiónico de Ojos Galácticos!' }];
+                    } else if (charKey === 'vector') {
+                        introLines = [{ role: 'system', speaker: 'VECTOR', text: '¡Jajajajaja! ¡Idiota, caíste en mis garras Barian! ¡Destruye su cordura, Número 104: Mascarada!' }];
+                    } else if (charKey === 'yuma') {
+                        introLines = [
+                            { role: 'system', speaker: 'YUMA', text: '¡Es hora de sentir el flujo! ¡Kattobingu da, ore! ¡Astral y yo lucharemos con el corazón!' },
+                            { role: 'system', speaker: 'ASTRAL', text: 'Observo un duelista extraordinario ante nosotros, Yuma. Despleguemos nuestra mejor estrategia. ¡Aparece, Número 39: Utopía!' }
+                        ];
                     }
                     
                     window.playCustomMusic('dialogos.mp3');
@@ -4410,7 +4907,8 @@ window.openFreeDuelMenu = function() {
     let worlds = [
         { id: 1, label: '🌍 MUNDO 1: DUEL MONSTERS', nodes: window.CUSTOM_NODES || [] },
         { id: 2, label: '⚔️ MUNDO 2: GX / ACADEMIA', nodes: window.CUSTOM_NODES_GX || [] },
-        { id: 3, label: '⚡ MUNDO 3: 5D\'S / NEO DOMINO', nodes: window.CUSTOM_NODES_5D || [] }
+        { id: 3, label: '⚡ MUNDO 3: 5D\'S / NEO DOMINO', nodes: window.CUSTOM_NODES_5D || [] },
+        { id: 4, label: '🌌 MUNDO 4: ZEXAL / HEARTLAND', nodes: window.CUSTOM_NODES_ZEXAL || [] }
     ];
 
     let tabBar = document.createElement('div');
@@ -4450,7 +4948,7 @@ window.openFreeDuelMenu = function() {
         let renderedCount = 0;
 
         nodes.forEach(n => {
-            if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop' || n.id === '5d_shop') return;
+            if (!n.char || n.id === 'n13' || n.id === 'n14' || n.id === 'gx_shop' || n.id === '5d_shop' || n.id === 'zexal_shop') return;
             let cid = n.char.toLowerCase() === 'seto' ? 'kaiba' : n.char.toLowerCase();
             if (seenChars.has(cid)) return;
             seenChars.add(cid);
@@ -4464,6 +4962,9 @@ window.openFreeDuelMenu = function() {
             } else if (activeWorldTab === 3) {
                 let d5List = (saved && Array.isArray(saved.cleared5D)) ? saved.cleared5D.map(x => String(x).toLowerCase()) : [];
                 isDefeated = d5List.includes(cid);
+            } else if (activeWorldTab === 4) {
+                let zList = (saved && Array.isArray(saved.clearedZexal)) ? saved.clearedZexal.map(x => String(x).toLowerCase()) : [];
+                isDefeated = zList.includes(cid);
             }
 
             if (isDefeated) {
@@ -4486,12 +4987,15 @@ window.openFreeDuelMenu = function() {
                         try {
                             let sCheck = JSON.parse(sCheckStr);
                             if (sCheck) {
+                                let isZexalCheck = (sCheck.world === 4);
                                 let is5DCheck = (sCheck.world === 3);
-                                let curDeck = is5DCheck 
-                                    ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
-                                    : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []);
-                                let curName = is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal');
-                                if (!is5DCheck && sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
+                                let curDeck = isZexalCheck
+                                    ? ((sCheck.decksMundo4 && sCheck.activeDeckMundo4 && sCheck.activeDeckMundo4 !== 'Extra' && sCheck.decksMundo4[sCheck.activeDeckMundo4]) || (sCheck.decksMundo4 && sCheck.decksMundo4['Principal']) || [])
+                                    : (is5DCheck 
+                                        ? ((sCheck.decksMundo3 && sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra' && sCheck.decksMundo3[sCheck.activeDeckMundo3]) || (sCheck.decksMundo3 && sCheck.decksMundo3['Principal']) || [])
+                                        : ((sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) || sCheck.deck || []));
+                                let curName = isZexalCheck ? ((sCheck.activeDeckMundo4 && sCheck.activeDeckMundo4 !== 'Extra') ? sCheck.activeDeckMundo4 : 'Principal') : (is5DCheck ? ((sCheck.activeDeckMundo3 && sCheck.activeDeckMundo3 !== 'Extra') ? sCheck.activeDeckMundo3 : 'Principal') : (sCheck.activeDeck || 'Principal'));
+                                if (!is5DCheck && !isZexalCheck && sCheck.decks && sCheck.activeDeck && sCheck.decks[sCheck.activeDeck]) {
                                     sCheck.deck = [...sCheck.decks[sCheck.activeDeck]];
                                     if (window.persistUserSave) window.persistUserSave(sCheck);
                                 }
@@ -5245,13 +5749,23 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     }
 
     let normalizedOpp = String(oppId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const ZEXAL_OPPONENTS_SET = new Set(['bronk', 'flip', 'shark', 'rio', 'kite', 'trey', 'quattro', 'mizar', 'vector', 'yuma']);
     const GX_OPPONENTS_SET = new Set(['chumley', 'syrus', 'jaden', 'bastion', 'alexis', 'chazz', 'zane', 'crowler', 'aster']);
     const FIVE_D_OPPONENTS_SET = new Set(['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin']);
-    let is5DOpponent = FIVE_D_OPPONENTS_SET.has(normalizedOpp) || (s && s.world === 3);
-    let isGXOpponent = !is5DOpponent && GX_OPPONENTS_SET.has(normalizedOpp);
+    let isZexalOpponent = ZEXAL_OPPONENTS_SET.has(normalizedOpp) || (s && s.world === 4);
+    let is5DOpponent = !isZexalOpponent && (FIVE_D_OPPONENTS_SET.has(normalizedOpp) || (s && s.world === 3));
+    let isGXOpponent = !isZexalOpponent && !is5DOpponent && GX_OPPONENTS_SET.has(normalizedOpp);
 
-    // En Mundo 3 (5D's), recompensas provienen 100% de cartas temáticas de 5D's, Cantantes, Sincronías y soporte sin relleno de DM
-    if (is5DOpponent) {
+    // En Mundo 4 (ZEXAL), recompensas provienen 100% de cartas temáticas de Zexal, XYZ y soporte
+    if (isZexalOpponent) {
+        let rawDeckPool = [...new Set([...(oppDeck && oppDeck.cards ? oppDeck.cards : []), ...(oppDeck && oppDeck.extraDeck ? oppDeck.extraDeck : [])])];
+        cardPool = rawDeckPool.filter(c => window.isCardAllowedInWorld(c, 4));
+        if (window.ZEXAL_CARD_NAMES) {
+            window.ZEXAL_CARD_NAMES.forEach(c => {
+                if (!cardPool.includes(c)) cardPool.push(c);
+            });
+        }
+    } else if (is5DOpponent) {
         const DM_FILLER_FILTER = new Set([
             'Red Medicine', 'Dian Keto the Cure Master', 'Fissure', 'Trap Hole', 'Waboku',
             'Dark Hole', 'Swords of Revealing Light', 'Eatgaboon', 'Bear Trap', 'Acid Trap Hole',
@@ -5354,7 +5868,7 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     cardPool = cardPool.filter(c => !ULTRA_RARE_BOSS_CARDS.includes(c) && !VERY_RARE_CARDS.includes(c) && !EARTHBOUND_IMMORTALS_SET.has(c));
 
     // Shuffle pool and select 3 cards
-    let curCollection = is5DOpponent ? (s.collectionMundo3 || {}) : (s.collection || {});
+    let curCollection = isZexalOpponent ? (s.collectionMundo4 || {}) : (is5DOpponent ? (s.collectionMundo3 || {}) : (s.collection || {}));
     let shuffled = [...cardPool].sort(() => 0.5 - Math.random());
     let candidates = shuffled.filter(c => (curCollection[c] || 0) < 3);
     if (candidates.length < 3) candidates = shuffled;
@@ -5373,8 +5887,24 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     s.wins = s.wins || {};
     let oppWins = (s.wins[normalizedOpp] || 0);
 
-    // RECOMPENSAS 5D'S EXCLUSIVAS (CARTAS INSIGNIA, CANTANTES Y SYNCHROS SUPREMOS):
-    if (is5DOpponent) {
+    // RECOMPENSAS ZEXAL EXCLUSIVAS (CARTAS INSIGNIA Y MONSTRUOS XYZ):
+    if (isZexalOpponent) {
+        let bossZexalMap = {
+            bronk: ['Grenosaurus', 'Tin Goldfish', 'Zubaba Knight'],
+            flip: ['Number 17: Leviathan Dragon', 'Kagetokage', 'Crane Crane'],
+            shark: ['Number 32: Shark Drake', 'Submersible Carrier Aero Shark', 'Black Ray Lancer', 'Doublefin Shark'],
+            rio: ['Ice Beast Zerofyne', 'Blizzard Thunderbird', 'Aurora Wing'],
+            kite: ['Neo Galaxy-Eyes Photon Dragon', 'Galaxy-Eyes Photon Dragon', 'Starliege Paladynamo', 'Photon Thrasher'],
+            trey: ['Number 33: Chronomaly Machu Mech', 'Chronomaly Crystal Skull', 'Chronomaly Golden Jet'],
+            quattro: ['Number 15: Gimmick Puppet Giant Grinder', 'Gimmick Puppet Dreary Doll', 'Gimmick Puppet Magnet Doll'],
+            mizar: ['Number 107: Galaxy-Eyes Tachyon Dragon', 'Tachyon Transmigration', 'Parsec, the Interstellar Dragon'],
+            vector: ['Number 104: Masquerade', 'Number 66: Master Key Beetle', "Rank-Up-Magic Barian's Force"],
+            yuma: ['Number 39: Utopia', 'Number C39: Utopia Ray', 'Gagaga Cowboy', 'Onomatopaira', 'Gagagarevenge']
+        };
+        let rivalCards = bossZexalMap[normalizedOpp] || ['Number 39: Utopia', 'Gagaga Magician', 'Gogogo Golem'];
+        let chosenBoss = rivalCards[Math.floor(Math.random() * rivalCards.length)];
+        selected3[0] = chosenBoss;
+    } else if (is5DOpponent) {
         let boss5DMap = {
             trudge: ['Goyo Guardian', 'Junk Warrior'],
             leo: ['Power Tool Dragon', 'Junk Warrior', 'Formula Synchron'],
@@ -5678,11 +6208,11 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
     selected3.forEach(cardName => {
         let info = window.getCardMetadata(cardName);
         let cardColor = info.isMonster ? '#d4af37' : (info.isTrap ? '#ff80ab' : '#4caf50');
-        let ownCount = is5DOpponent ? ((s.collectionMundo3 && s.collectionMundo3[cardName]) || 0) : ((s.collection && s.collection[cardName]) || 0);
+        let ownCount = isZexalOpponent ? ((s.collectionMundo4 && s.collectionMundo4[cardName]) || 0) : (is5DOpponent ? ((s.collectionMundo3 && s.collectionMundo3[cardName]) || 0) : ((s.collection && s.collection[cardName]) || 0));
         
         let isEarthbound = (typeof EARTHBOUND_IMMORTALS_SET !== 'undefined' && EARTHBOUND_IMMORTALS_SET.has(cardName));
         let cardBox = document.createElement('div');
-        let boxBorder = isEarthbound ? '#e040fb' : '#a67c00';
+        let boxBorder = isEarthbound ? '#e040fb' : (isZexalOpponent ? '#ffd700' : '#a67c00');
         let boxShadow = isEarthbound ? '0 0 25px rgba(224,64,251,0.6), 0 8px 25px rgba(0,0,0,0.9)' : '0 8px 25px rgba(0,0,0,0.8)';
         cardBox.style.cssText = 'position:relative; background: rgba(22, 22, 32, 0.95); border: 2px solid ' + boxBorder + '; border-radius: 10px; padding: 16px; width: 240px; display:flex; flex-direction:column; align-items:center; box-shadow: ' + boxShadow + '; transition: transform 0.2s, box-shadow 0.2s; box-sizing:border-box;';
         if (isEarthbound) {
@@ -5741,7 +6271,10 @@ window.showCustomDuelRewardChoice = function(oppId, rank, gain, onComplete) {
             let curSaveKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
             let curStr = origGet(curSaveKey) || origGet('FMR_REBORN_STORY_V3000');
             let freshSave = curStr ? JSON.parse(curStr) : s;
-            if (is5DOpponent || freshSave.world === 3) {
+            if (isZexalOpponent || freshSave.world === 4) {
+                freshSave.collectionMundo4 = freshSave.collectionMundo4 || {};
+                freshSave.collectionMundo4[cardName] = (freshSave.collectionMundo4[cardName] || 0) + 1;
+            } else if (is5DOpponent || freshSave.world === 3) {
                 freshSave.collectionMundo3 = freshSave.collectionMundo3 || {};
                 freshSave.collectionMundo3[cardName] = (freshSave.collectionMundo3[cardName] || 0) + 1;
             } else {
@@ -5780,15 +6313,38 @@ window.customShowShop = function() {
     let s = sStr ? JSON.parse(sStr) : (window.nativeAPI && window.nativeAPI.loadGame ? window.nativeAPI.loadGame() : null);
     if (!s) return;
 
+    let isZexal = ((s.world || 1) === 4);
     let is5D = ((s.world || 1) === 3);
     if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
 
     s.decks = s.decks || {};
     s.decksMundo3 = s.decksMundo3 || {};
+    s.decksMundo4 = s.decksMundo4 || {};
     s.collection = s.collection || {};
     s.collectionMundo3 = s.collectionMundo3 || {};
+    s.collectionMundo4 = s.collectionMundo4 || {};
 
-    if (is5D) {
+    if (isZexal) {
+        if (!s.activeDeckMundo4 || s.activeDeckMundo4 === 'Extra' || !s.decksMundo4[s.activeDeckMundo4]) {
+            s.activeDeckMundo4 = 'Principal';
+        }
+        if (!s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo4['Principal'])) {
+            s.decksMundo4['Principal'] = window.generateZexalStarterDeck ? window.generateZexalStarterDeck() : [];
+            if (!Array.isArray(s.decksMundo4['Extra'])) {
+                s.decksMundo4['Extra'] = window.generateZexalExtraDeck ? window.generateZexalExtraDeck() : [];
+            }
+            s.activeDeckMundo4 = 'Principal';
+            s.decksMundo4['Principal'].forEach(n => {
+                s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Principal'].filter(x => x === n).length);
+            });
+            s.decksMundo4['Extra'].forEach(n => {
+                s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Extra'].filter(x => x === n).length);
+            });
+        }
+        s.extra = Array.isArray(s.decksMundo4['Extra']) ? s.decksMundo4['Extra'] : [];
+        s.deck = [...(s.decksMundo4[s.activeDeckMundo4] || s.decksMundo4['Principal'] || [])];
+        s.collection = s.collectionMundo4;
+    } else if (is5D) {
         if (!s.activeDeckMundo3 || s.activeDeckMundo3 === 'Extra' || !s.decksMundo3[s.activeDeckMundo3]) {
             s.activeDeckMundo3 = 'Principal';
         }
@@ -5853,16 +6409,16 @@ window.customShowShop = function() {
     let rightSide = document.createElement('div');
     rightSide.style.cssText = 'flex: 1; display:flex; flex-direction:column; overflow:hidden;';
     
-    let shopHeaderTheme = is5D ? '#00e5ff' : '#ffd700';
+    let shopHeaderTheme = isZexal ? '#ffd700' : (is5D ? '#00e5ff' : '#ffd700');
     let header = document.createElement('div');
     header.style.cssText = `display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid ${shopHeaderTheme}; padding-bottom: 12px; margin-bottom: 12px; flex-wrap:wrap; gap:10px;`;
     header.innerHTML = `
         <div>
             <div style="font-family:VT323, monospace; color:${shopHeaderTheme}; font-size: 26px; text-shadow: 2px 2px 0 #000; letter-spacing:1px;">
-                ${is5D ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY (5D\'S)' : 'TIENDA DE MEMORIAS · CARTAS PODEROSAS'}
+                ${isZexal ? 'CENTRO COMERCIAL DE HEARTLAND · TIENDA ZEXAL' : (is5D ? 'REFUGIO DE SATELLITE · TIENDA DE RALLY (5D\'S)' : 'TIENDA DE MEMORIAS · CARTAS PODEROSAS')}
             </div>
-            <div style="color:${is5D ? '#80deea' : '#aaa'}; font-size:12px;">
-                ${is5D ? 'Cartas, piezas y Monstruos de Sincronía recolectados en Satélite' : 'Cartas de élite para ayudarte a vencer a los rivales más desafiantes'}
+            <div style="color:${isZexal ? '#ffe082' : (is5D ? '#80deea' : '#aaa')}; font-size:12px;">
+                ${isZexal ? 'Monstruos Gagaga, Gogogo, Shark, Fotónicos y Soporte Xyz' : (is5D ? 'Cartas, piezas y Monstruos de Sincronía recolectados en Satélite' : 'Cartas de élite para ayudarte a vencer a los rivales más desafiantes')}
             </div>
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
@@ -5937,7 +6493,13 @@ window.customShowShop = function() {
     let typeSelect = document.getElementById('shop-filter-type');
     
     function persistShopSave() {
-        if (is5D) {
+        if (isZexal) {
+            let aKey = (s.activeDeckMundo4 && s.activeDeckMundo4 !== 'Extra') ? s.activeDeckMundo4 : 'Principal';
+            s.decksMundo4 = s.decksMundo4 || {};
+            s.decksMundo4[aKey] = [...s.deck];
+            s.decksMundo4['Extra'] = [...(s.extra || [])];
+            s.collectionMundo4 = s.collection;
+        } else if (is5D) {
             let aKey = (s.activeDeckMundo3 && s.activeDeckMundo3 !== 'Extra') ? s.activeDeckMundo3 : 'Principal';
             s.decksMundo3 = s.decksMundo3 || {};
             s.decksMundo3[aKey] = [...s.deck];
@@ -5962,7 +6524,7 @@ window.customShowShop = function() {
         let pmEl = document.getElementById('shop-pm-balance');
         if (pmEl) pmEl.innerHTML = `💰 ${s.pm || 0} PM`;
         let deckEl = document.getElementById('shop-deck-count');
-        if (deckEl) deckEl.innerHTML = `DECK: <span style="color:${s.deck.length === 40 ? '#4caf50' : '#f44336'}">${s.deck.length}</span>/40${is5D ? ` <span style="color:#00e5ff; margin-left:6px;">EXTRA: ${(s.extra || []).length}/15</span>` : ''}`;
+        if (deckEl) deckEl.innerHTML = `DECK: <span style="color:${s.deck.length === 40 ? '#4caf50' : '#f44336'}">${s.deck.length}</span>/40${(isZexal || is5D) ? ` <span style="color:${isZexal ? '#ffd700' : '#00e5ff'}; margin-left:6px;">EXTRA: ${(s.extra || []).length}/15</span>` : ''}`;
         
         tbody.innerHTML = '';
         let query = (searchInput.value || '').toLowerCase();
@@ -6002,7 +6564,44 @@ window.customShowShop = function() {
         }
 
         let activeShopCards = [];
-        if (is5D) {
+        if (isZexal) {
+            // Mundo 4: Catálogo exclusivo de ZEXAL (Monstruos Gagaga, Gogogo, Dododo, Shark, Photon y XYZ)
+            const REWARD_ONLY_ZEXAL = new Set([
+                'Number 39: Utopia', 'Number C39: Utopia Ray', 'Number 17: Leviathan Dragon',
+                'Number 32: Shark Drake', 'Number 33: Chronomaly Machu Mech',
+                'Number 15: Gimmick Puppet Giant Grinder', 'Number 107: Galaxy-Eyes Tachyon Dragon',
+                'Number 104: Masquerade', 'Neo Galaxy-Eyes Photon Dragon'
+            ]);
+            if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+                window.CARDS_DATA.filter(c => c && (c.world === 4 || (c.id >= 1100 && c.id <= 1160))).forEach(c => {
+                    if (REWARD_ONLY_ZEXAL.has(c.name)) return;
+                    let isXyz = (c.kind === 'XYZ');
+                    let isST = (c.kind === 'SPELL' || c.kind === 'TRAP');
+                    let price = isXyz ? 15000 : (isST ? 8000 : 5000);
+                    let tier = isXyz ? 'MONSTRUO XYZ' : (isST ? 'MAGIA/TRAMPA ZEXAL' : 'MONSTRUO ZEXAL');
+                    activeShopCards.push({
+                        name: c.name,
+                        price: price,
+                        tier: tier,
+                        kind: c.kind,
+                        desc: c.text || c.desc || ''
+                    });
+                });
+            }
+            const ZEXAL_STAPLES = [
+                { name: 'Dark Hole', price: 8000, tier: 'MAGIA NORMAL', desc: 'Destruye todos los monstruos en el campo.' },
+                { name: 'Mystical Space Typhoon', price: 4000, tier: 'MAGIA RÁPIDA', desc: 'Destruye 1 carta Mágica o Trampa en el campo.' },
+                { name: 'Mirror Force', price: 10000, tier: 'TRAMPA NORMAL', desc: 'Cuando un monstruo adversario declara un ataque, destruye todos los monstruos en Posición de Ataque que controle.' },
+                { name: 'Bottomless Trap Hole', price: 6000, tier: 'TRAMPA NORMAL', desc: 'Cuando el adversario invoca con 1500+ ATK, destruye y destierra ese monstruo.' }
+            ];
+            let curNames = new Set(activeShopCards.map(c => c.name.toLowerCase().trim()));
+            ZEXAL_STAPLES.forEach(st => {
+                if (!curNames.has(st.name.toLowerCase().trim())) {
+                    activeShopCards.push(st);
+                    curNames.add(st.name.toLowerCase().trim());
+                }
+            });
+        } else if (is5D) {
             // Mundo 3: Catálogo exclusivo de 5D's y soporte para Satellite
             const NEW_5D_SPELL_TRAPS = new Set([
                 'Soul Charge', 'Black Whirlwind', 'Allure of Darkness', 'De-Synchro',
@@ -7401,6 +8000,11 @@ window.customFinishStoryDuel = function(win) {
         if (fiveDDuelists.includes(id) && !s.cleared5D.includes(id)) {
             s.cleared5D.push(id);
         }
+        if (!s.clearedZexal) s.clearedZexal = [];
+        var zexalDuelists = ['bronk', 'flip', 'shark', 'rio', 'kite', 'trey', 'quattro', 'mizar', 'vector', 'yuma'];
+        if (zexalDuelists.includes(id) && !s.clearedZexal.includes(id)) {
+            s.clearedZexal.push(id);
+        }
         if (!s.unlocked) s.unlocked = [];
         if (!s.unlocked.includes(id)) s.unlocked.push(id);
         const storyNextMap = { 
@@ -7409,7 +8013,8 @@ window.customFinishStoryDuel = function(win) {
             ishizu: 'odion', odion: 'marik', marik: 'kaiba', kaiba: 'yugi', yugi: 'atem',
             chumley: 'syrus', syrus: 'jaden', jaden: 'bastion', bastion: 'alexis',
             alexis: 'chazz', chazz: 'zane', zane: 'crowler', crowler: 'aster',
-            trudge: 'leo', leo: 'akiza', akiza: 'crow', crow: 'jack', jack: 'yusei', yusei: 'kalin', kalin: 'carly', carly: 'roman', roman: 'misty', misty: 'devack', devack: 'greiger', greiger: 'goodwin'
+            trudge: 'leo', leo: 'akiza', akiza: 'crow', crow: 'jack', jack: 'yusei', yusei: 'kalin', kalin: 'carly', carly: 'roman', roman: 'misty', misty: 'devack', devack: 'greiger', greiger: 'goodwin',
+            bronk: 'flip', flip: 'shark', shark: 'rio', rio: 'kite', kite: 'trey', trey: 'quattro', quattro: 'mizar', mizar: 'vector', vector: 'yuma'
         };
         const nextOpp = storyNextMap[id] || (typeof STORY_UNLOCK_NEXT !== 'undefined' && STORY_UNLOCK_NEXT[id]);
         if (nextOpp && !s.unlocked.includes(nextOpp)) s.unlocked.push(nextOpp);
@@ -7549,6 +8154,29 @@ window.customFinishStoryDuel = function(win) {
                 { role: 'system', speaker: 'GOODWIN', text: '¡Wiraqocha Rasca... derrotado! La luz y la oscuridad finalmente se han armonizado en este duelo definitivo.' },
                 { role: 'system', speaker: 'GOODWIN', text: 'Has reunido las 7 Insignias de Nazca. El gran sello ancestral ha caído... ¡Un Nuevo Mundo ha abierto sus puertas para ti!' }
             ];
+        } else if (id === 'bronk') {
+            winLines = [{ role: 'system', speaker: 'BRONK', text: '¡Vaya, amigo! ¡Ruedas a gran velocidad! ¡Toma mi Grenosaurus! ¡Te servirá mucho en tu aventura Xyz!' }];
+        } else if (id === 'flip') {
+            winLines = [{ role: 'system', speaker: 'FLIP', text: '¡Increíble! Mis trucos no funcionaron... Te entrego el temible Número 17: Dragón Leviatán. ¡Ten cuidado con su poder!' }];
+        } else if (id === 'shark') {
+            winLines = [{ role: 'system', speaker: 'SHARK', text: 'No lo hiciste mal... Me recuerdas a los duelos apasionados. Quédate con el Número 32: Draco Tiburón. ¡Hazlo rugir en el campo!' }];
+        } else if (id === 'rio') {
+            winLines = [{ role: 'system', speaker: 'RIO', text: 'Has demostrado una elegancia impecable en combate. Te otorgo la Bestia de Hielo Zerofyne. ¡Úsala con sabiduría!' }];
+        } else if (id === 'kite') {
+            winLines = [{ role: 'system', speaker: 'KITE', text: 'Tienes un potencial lumínico formidable. Mi Paladinamo Starliege ahora viajará en tu Extra Deck. ¡Protege el futuro de Heartland!' }];
+        } else if (id === 'trey') {
+            winLines = [{ role: 'system', speaker: 'TREY', text: 'Gracias por este duelo tan sincero. El Número 33: Machu Mech Cronómalo resonará con tu espíritu.' }];
+        } else if (id === 'quattro') {
+            winLines = [{ role: 'system', speaker: 'QUATTRO', text: '¡Maldición...! Mis títeres no pudieron con tus jugadas. Toma el Número 15: Giant Grinder. ¡Es tu gran premio de fans!' }];
+        } else if (id === 'mizar') {
+            winLines = [{ role: 'system', speaker: 'MIZAR', text: 'Reconozco tu maestría en el campo. El dragón de la galaxia taquiónica, Número 107, luchará a tu lado. ¡Que tu luz brille en el cosmos!' }];
+        } else if (id === 'vector') {
+            winLines = [{ role: 'system', speaker: 'VECTOR', text: '¡Grrr...! ¿Cómo pudiste desbaratar mis planes? ¡Maldito seas! Toma la Máscara del Número 104... ¡Pero los Barian no descansaremos!' }];
+        } else if (id === 'yuma') {
+            winLines = [
+                { role: 'system', speaker: 'YUMA', text: '¡Ese fue el duelo más emocionante de mi vida! ¡Kattobingu total!' },
+                { role: 'system', speaker: 'ASTRAL', text: 'Has purificado y reunido los Números. Número 39: Utopía y nosotros seremos tus aliados eternos en el camino de los duelistas.' }
+            ];
         }
         
         // Show 3-card reward choice screen for the defeated character
@@ -7596,7 +8224,22 @@ window.customFinishStoryDuel = function(win) {
                             nextStep();
                         }
                     } else {
-                        nextStep();
+                        // Check if this defeated opponent carries a Zexal Number Card
+                        const allNumbers = window.getZexalNumbers ? window.getZexalNumbers(s) : [];
+                        const wonNumber = allNumbers.find(it => (it.bearerId || '').toLowerCase() === id.toLowerCase());
+                        const numberClaimKey = 'FMR_NUMBER_CLAIMED_' + id.toLowerCase();
+                        const numberAlreadyClaimed = origGet(numberClaimKey);
+
+                        if (wonNumber && !numberAlreadyClaimed) {
+                            origSet(numberClaimKey, '1');
+                            if (window.showZexalNumberCelebration) {
+                                window.showZexalNumberCelebration(wonNumber, id, nextStep);
+                            } else {
+                                nextStep();
+                            }
+                        } else {
+                            nextStep();
+                        }
                     }
                 }
             });
@@ -7731,13 +8374,17 @@ window.customShowDeckEditor = function() {
     
     if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
 
+    let isZexal = ((s.world || 1) === 4);
     let is5D = ((s.world || 1) === 3);
-    let targetWorld = is5D ? 3 : 1;
+    let targetWorld = isZexal ? 4 : (is5D ? 3 : 1);
+    let hasExtraDeckWorld = is5D || isZexal;
 
     s.decks = s.decks || {};
     s.decksMundo3 = s.decksMundo3 || {};
+    s.decksMundo4 = s.decksMundo4 || {};
     s.collection = s.collection || {};
     s.collectionMundo3 = s.collectionMundo3 || {};
+    s.collectionMundo4 = s.collectionMundo4 || {};
 
     const generatedDeck = (typeof window.generateForbiddenMemoriesStarterDeck === 'function') ? window.generateForbiddenMemoriesStarterDeck() : null;
     const DEF = (generatedDeck && generatedDeck.length === 40 && !window.isTaintedTristanDeck(generatedDeck)) 
@@ -7748,7 +8395,32 @@ window.customShowDeckEditor = function() {
     let workingCollection;
     let currentActiveKey;
 
-    if (is5D) {
+    if (isZexal) {
+        if (!s.decksMundo4['Principal'] || s.decksMundo4['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo4['Principal'])) {
+            s.decksMundo4['Principal'] = window.generateZexalStarterDeck ? window.generateZexalStarterDeck() : [];
+            if (!Array.isArray(s.decksMundo4['Extra'])) {
+                s.decksMundo4['Extra'] = window.generateZexalExtraDeck ? window.generateZexalExtraDeck() : [];
+            }
+            s.activeDeckMundo4 = 'Principal';
+            s.decksMundo4['Principal'].forEach(n => {
+                s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Principal'].filter(x => x === n).length);
+            });
+            s.decksMundo4['Extra'].forEach(n => {
+                s.collectionMundo4[n] = Math.max(s.collectionMundo4[n] || 0, s.decksMundo4['Extra'].filter(x => x === n).length);
+            });
+        }
+        if (!Array.isArray(s.decksMundo4['Extra'])) {
+            s.decksMundo4['Extra'] = window.generateZexalExtraDeck ? window.generateZexalExtraDeck() : [];
+        }
+        if (!s.activeDeckMundo4 || s.activeDeckMundo4 === 'Extra' || !s.decksMundo4[s.activeDeckMundo4]) {
+            s.activeDeckMundo4 = 'Principal';
+        }
+        workingDecks = s.decksMundo4;
+        workingCollection = s.collectionMundo4;
+        currentActiveKey = s.activeDeckMundo4 || 'Principal';
+        s.extra = s.decksMundo4['Extra'];
+        s.deck = [...(workingDecks[currentActiveKey] || workingDecks['Principal'] || [])];
+    } else if (is5D) {
         if (!s.decksMundo3['Principal'] || s.decksMundo3['Principal'].length !== 40 || window.isTaintedTristanDeck(s.decksMundo3['Principal'])) {
             s.decksMundo3['Principal'] = window.generate5DStarterDeck ? window.generate5DStarterDeck() : [];
             if (!Array.isArray(s.decksMundo3['Extra'])) {
@@ -7793,10 +8465,17 @@ window.customShowDeckEditor = function() {
     }
     
     let currentDeckKey = currentActiveKey;
-    if (currentDeckKey === 'Extra') currentDeckKey = is5D ? 'Principal' : 'Deck 1';
+    if (currentDeckKey === 'Extra') currentDeckKey = hasExtraDeckWorld ? 'Principal' : 'Deck 1';
 
     function persistSave() {
-        if (is5D) {
+        if (isZexal) {
+            if (s.activeDeckMundo4 === 'Extra') s.activeDeckMundo4 = 'Principal';
+            s.decksMundo4 = workingDecks;
+            s.activeDeckMundo4 = currentActiveKey;
+            s.decksMundo4['Extra'] = s.extra || [];
+            s.collectionMundo4 = workingCollection;
+            s.deck = [...(workingDecks[currentActiveKey] || [])];
+        } else if (is5D) {
             if (s.activeDeckMundo3 === 'Extra') s.activeDeckMundo3 = 'Principal';
             s.decksMundo3 = workingDecks;
             s.activeDeckMundo3 = currentActiveKey;
@@ -8005,6 +8684,10 @@ window.customShowDeckEditor = function() {
     
     function isAdvanced(c) {
         let kind = String(c.kind || (c[6] && typeof c[6] === 'string' ? c[6] : '')).toUpperCase();
+        if (isZexal) {
+            if (kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c))) return false;
+            return kind === 'LINK' || kind === 'SYNCHRO' || kind === 'PENDULUM';
+        }
         if (is5D && (kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(c.name || c)))) return false;
         return kind === 'LINK' || kind === 'XYZ' || kind === 'SYNCHRO' || kind === 'PENDULUM';
     }
@@ -8012,9 +8695,10 @@ window.customShowDeckEditor = function() {
     function isExtraDeck(c) {
         if (!c) return false;
         let name = typeof c === 'string' ? c : (c.name || c[1] || '');
+        if (window.isXyzCard && (window.isXyzCard(name) || window.isXyzCard(c))) return true;
         if (window.isSynchroCard && (window.isSynchroCard(name) || window.isSynchroCard(c))) return true;
         let kind = String((c && c.kind) || (c && c[6]) || '').toUpperCase();
-        if (kind === 'SYNCHRO' || kind === 'FUSION') return true;
+        if (kind === 'XYZ' || kind === 'SYNCHRO' || kind === 'FUSION') return true;
         if (c && c.isExtra) return true;
         return false;
     }
@@ -8087,9 +8771,9 @@ window.customShowDeckEditor = function() {
             }
         });
     });
-    if (is5D && Array.isArray(s.extra)) {
+    if (hasExtraDeckWorld && Array.isArray(s.extra)) {
         s.extra.forEach(n => {
-            if (window.isCardAllowedInWorld(n, 3)) {
+            if (window.isCardAllowedInWorld(n, targetWorld)) {
                 if ((workingCollection[n] || 0) < 1) workingCollection[n] = 1;
             }
         });
@@ -8101,9 +8785,9 @@ window.customShowDeckEditor = function() {
             if (window.isCardAllowedInWorld(n, targetWorld)) ownedSet.add(n);
         });
     });
-    if (is5D && Array.isArray(s.extra)) {
+    if (hasExtraDeckWorld && Array.isArray(s.extra)) {
         s.extra.forEach(n => {
-            if (window.isCardAllowedInWorld(n, 3)) ownedSet.add(n);
+            if (window.isCardAllowedInWorld(n, targetWorld)) ownedSet.add(n);
         });
     }
     ownedSet.forEach(name => {
@@ -8660,7 +9344,7 @@ window.customShowDeckEditor = function() {
     function renderDeckBar() {
         let deckKeys = Object.keys(workingDecks).filter(k => k !== 'Extra');
         if (deckKeys.length === 0) {
-            let defKey = is5D ? 'Principal' : 'Deck 1';
+            let defKey = hasExtraDeckWorld ? 'Principal' : 'Deck 1';
             workingDecks[defKey] = [...(s.deck || [])];
             deckKeys = [defKey];
         }
@@ -8734,11 +9418,13 @@ window.customShowDeckEditor = function() {
                 }
                 let synchroInMain = curArr.filter(c => window.isSynchroCard && window.isSynchroCard(c));
                 if (synchroInMain.length > 0) {
-                    alert(`⚠️ Este deck contiene monstruos Synchro en el Deck Principal (${synchroInMain.slice(0, 3).join(', ')}).\nLos monstruos Synchro solo pueden ir en el Extra Deck.`);
+                    alert(`⚠️ Este deck contiene monstruos Synchro en el Deck Principal (${synchroInMain.slice(0, 3).join(', ')}).\nLos monstruos Synchro no pueden ir en el Deck Principal.`);
                     return;
                 }
                 currentActiveKey = currentDeckKey;
-                if (is5D) {
+                if (isZexal) {
+                    s.activeDeckMundo4 = currentDeckKey;
+                } else if (is5D) {
                     s.activeDeckMundo3 = currentDeckKey;
                 } else {
                     s.activeDeck = currentDeckKey;
@@ -8755,7 +9441,7 @@ window.customShowDeckEditor = function() {
         let newBtn = deckBar.querySelector('#btn-new-deck');
         newBtn.onclick = () => {
             let nextNum = Object.keys(workingDecks).filter(k => k !== 'Extra').length + 1;
-            let name = prompt('Nombre para el nuevo Deck:', (is5D ? 'Deck 5D ' : 'Deck ') + nextNum);
+            let name = prompt('Nombre para el nuevo Deck:', (isZexal ? 'Deck Zexal ' : (is5D ? 'Deck 5D ' : 'Deck ')) + nextNum);
             if (!name) return;
             name = name.trim();
             if (!name) return;
@@ -8795,7 +9481,8 @@ window.customShowDeckEditor = function() {
             delete workingDecks[currentDeckKey];
             if (currentActiveKey === currentDeckKey) {
                 currentActiveKey = newName;
-                if (is5D) s.activeDeckMundo3 = newName;
+                if (isZexal) s.activeDeckMundo4 = newName;
+                else if (is5D) s.activeDeckMundo3 = newName;
                 else s.activeDeck = newName;
             }
             currentDeckKey = newName;
@@ -8816,8 +9503,9 @@ window.customShowDeckEditor = function() {
             delete workingDecks[currentDeckKey];
             let remainingKeys = Object.keys(workingDecks).filter(k => k !== 'Extra');
             if (currentActiveKey === currentDeckKey) {
-                currentActiveKey = remainingKeys[0] || (is5D ? 'Principal' : 'Deck 1');
-                if (is5D) s.activeDeckMundo3 = currentActiveKey;
+                currentActiveKey = remainingKeys[0] || (hasExtraDeckWorld ? 'Principal' : 'Deck 1');
+                if (isZexal) s.activeDeckMundo4 = currentActiveKey;
+                else if (is5D) s.activeDeckMundo3 = currentActiveKey;
                 else s.activeDeck = currentActiveKey;
                 s.deck = [...(workingDecks[currentActiveKey] || [])];
                 alert(`⚠️ Se ha asignado "${currentActiveKey}" como tu nuevo Deck Activo.`);
@@ -8831,7 +9519,7 @@ window.customShowDeckEditor = function() {
     }
 
     function renderRows() {
-        if (currentDeckKey === 'Extra') currentDeckKey = is5D ? 'Principal' : 'Deck 1';
+        if (currentDeckKey === 'Extra') currentDeckKey = hasExtraDeckWorld ? 'Principal' : 'Deck 1';
         let currentDeck = workingDecks[currentDeckKey] = workingDecks[currentDeckKey] || [];
         let illegalCards = currentDeck.filter(c => !window.isCardAllowedInWorld(c, targetWorld));
         if (illegalCards.length > 0) {
@@ -8850,7 +9538,17 @@ window.customShowDeckEditor = function() {
             if (currentDeckKey === currentActiveKey) s.deck = [...currentDeck];
             persistSave();
         }
-        if (is5D && Array.isArray(s.extra)) {
+        if (isZexal && Array.isArray(s.extra)) {
+            let illegalExtra = s.extra.filter(c => !window.isCardAllowedInWorld(c, 4) || (window.isSynchroCard && window.isSynchroCard(c)));
+            if (illegalExtra.length > 0) {
+                s.extra = s.extra.filter(c => window.isCardAllowedInWorld(c, 4) && !(window.isSynchroCard && window.isSynchroCard(c)));
+                persistSave();
+            }
+            if (s.extra.length > 15) {
+                s.extra = s.extra.slice(0, 15);
+                persistSave();
+            }
+        } else if (is5D && Array.isArray(s.extra)) {
             let illegalExtra = s.extra.filter(c => !window.is5DCard(c) || !(window.isSynchroCard && window.isSynchroCard(c)));
             if (illegalExtra.length > 0) {
                 s.extra = s.extra.filter(c => window.is5DCard(c) && (window.isSynchroCard ? window.isSynchroCard(c) : true));
@@ -8878,9 +9576,9 @@ window.customShowDeckEditor = function() {
         let tabMainEl = document.getElementById('deck-tab-main');
         if (tabMainEl) tabMainEl.textContent = `🃏 Principal (${dLen}/40)`;
         let tabExtraEl = document.getElementById('deck-tab-extra');
-        if (tabExtraEl) tabExtraEl.textContent = is5D ? `⚡ Extra Deck (${exLen}/15)` : `⚡ Extra Deck`;
+        if (tabExtraEl) tabExtraEl.textContent = hasExtraDeckWorld ? `⚡ Extra Deck (${exLen}/15)` : `⚡ Extra Deck`;
 
-        document.getElementById('deck-count').innerHTML = is5D 
+        document.getElementById('deck-count').innerHTML = hasExtraDeckWorld 
             ? `${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 cartas · <span style="color:#00e5ff">Extra: ${exLen}/15 (Sin mínimo)</span>`
             : `${currentDeckKey.toUpperCase()}: <span style="color:${isDeckValid ? '#4caf50' : '#f44336'}">${dLen}</span>/40 cartas`;
 
@@ -8905,7 +9603,7 @@ window.customShowDeckEditor = function() {
         }
 
         // Migrar cualquier carta residual en s.extra a la colección (solo en Mundos clásicos)
-        if (!is5D && s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
+        if (!hasExtraDeckWorld && s.extra && Array.isArray(s.extra) && s.extra.length > 0) {
             workingCollection = workingCollection || {};
             s.extra.forEach(n => { if (n) workingCollection[n] = (workingCollection[n] || 0) + 1; });
             s.extra = [];
@@ -8914,7 +9612,7 @@ window.customShowDeckEditor = function() {
 
         // Render 1: TOP TABLE (Cartas actualmente en el DECK SELECCIONADO)
         deckTbody.innerHTML = '';
-        let deckUnique = Array.from(new Set([...currentDeck, ...(is5D ? (s.extra || []) : [])])).filter(n => cardDict[n]);
+        let deckUnique = Array.from(new Set([...currentDeck, ...(hasExtraDeckWorld ? (s.extra || []) : [])])).filter(n => cardDict[n]);
         deckUnique = sortCardList(deckUnique, deckFilter.sort);
 
         let deckRowsRendered = 0;
@@ -9043,9 +9741,15 @@ window.customShowDeckEditor = function() {
             deckBtn.onclick = (e) => {
                 e.stopPropagation();
                 if (!window.isCardAllowedInWorld(name, targetWorld)) {
-                    alert(is5D 
-                        ? `⚠️ "${name}" no pertenece al Mundo de 5D's. Las cartas de otros mundos no se pueden añadir a este deck.`
-                        : `⚠️ "${name}" pertenece al Mundo de 5D's. No es compatible con este mundo y no se puede añadir.`);
+                    alert(isZexal
+                        ? `⚠️ "${name}" no está permitida en el Mundo 4 (ZEXAL). Recuerda que los Monstruos de Sincronía están prohibidos en este mundo.`
+                        : (is5D 
+                            ? `⚠️ "${name}" no pertenece al Mundo de 5D's. Las cartas de otros mundos no se pueden añadir a este deck.`
+                            : `⚠️ "${name}" no es compatible con este mundo y no se puede añadir.`));
+                    return;
+                }
+                if (isZexal && window.isSynchroCard && window.isSynchroCard(name)) {
+                    alert('⚠️ Los Monstruos de Sincronía están completamente prohibidos en el Mundo 4 (ZEXAL).');
                     return;
                 }
                 if (!canAddMore) {
@@ -9053,7 +9757,7 @@ window.customShowDeckEditor = function() {
                     return;
                 }
 
-                if (info.isExtra || (window.isSynchroCard && window.isSynchroCard(name))) {
+                if (info.isExtra || (window.isSynchroCard && window.isSynchroCard(name)) || (window.isXyzCard && window.isXyzCard(name))) {
                     s.extra = s.extra || [];
                     if (s.extra.length >= 15) {
                         alert('⚠️ El Extra Deck está lleno (máximo 15 cartas).');
@@ -9073,6 +9777,10 @@ window.customShowDeckEditor = function() {
 
                 if (window.isSynchroCard && window.isSynchroCard(name)) {
                     alert('⚠️ Los monstruos Synchro solo pueden pertenecer al Extra Deck.');
+                    return;
+                }
+                if (window.isXyzCard && window.isXyzCard(name)) {
+                    alert('⚠️ Los monstruos Xyz solo pueden pertenecer al Extra Deck.');
                     return;
                 }
 
@@ -9112,7 +9820,7 @@ window.customShowDeckEditor = function() {
 
         // Actualizar contadores móviles de pestañas
         let mTabDeckNum = document.getElementById('m-tab-deck-num');
-        if (mTabDeckNum) mTabDeckNum.textContent = dLen + '/40' + (is5D ? ' +' + exLen : '');
+        if (mTabDeckNum) mTabDeckNum.textContent = dLen + '/40' + (hasExtraDeckWorld ? ' +' + exLen : '');
         let mTabBancaNum = document.getElementById('m-tab-banca-num');
         if (mTabBancaNum) mTabBancaNum.textContent = String(totalBenchCards);
 
@@ -10023,7 +10731,8 @@ window.customShowCollection = function() {
     let worlds = [
         { id: 1, label: '🌍 MUNDO 1: DUEL MONSTERS' },
         { id: 2, label: '⚔️ MUNDO 2: GX / ACADEMIA' },
-        { id: 3, label: '⚡ MUNDO 3: 5D\'S / NEO DOMINO' }
+        { id: 3, label: '⚡ MUNDO 3: 5D\'S / NEO DOMINO' },
+        { id: 4, label: '🌌 MUNDO 4: ZEXAL / HEARTLAND' }
     ];
 
     let worldTabBar = document.createElement('div');
@@ -10060,7 +10769,8 @@ window.customShowCollection = function() {
             <option value="">Todas las cartas</option>
             <option value="MONSTER">Monstruos (Todos)</option>
             <option value="MAIN_MONSTER">Monstruos (Deck Principal)</option>
-            <option value="EXTRA">⚡ Extra Deck (Sincronía / Fusión)</option>
+            <option value="EXTRA">⚡ Extra Deck (Sincronía / Fusión / Xyz)</option>
+            <option value="XYZ">⬛ Monstruos Xyz</option>
             <option value="SPELL">📖 Todas las Magias</option>
             <option value="SPELL_NORMAL">Magias Normales</option>
             <option value="SPELL_EQUIP">⚔️ Magias de Equipo</option>
@@ -10166,7 +10876,8 @@ window.customShowCollection = function() {
         let fAtk = parseInt(overlay.querySelector('#f-atk').value) || -1;
         let fDef = parseInt(overlay.querySelector('#f-def').value) || -1;
         let fOwn = overlay.querySelector('#f-owned').value;
-        let colSource = (activeWorldTab === 3) ? (s.collectionMundo3 || {}) : (s.collection || {});
+        let colSource = (activeWorldTab === 4) ? (s.collectionMundo4 || {}) :
+                        (activeWorldTab === 3) ? (s.collectionMundo3 || {}) : (s.collection || {});
         
         tbody.innerHTML = '';
         
@@ -10176,15 +10887,21 @@ window.customShowCollection = function() {
 
             // Filtro estricto de catálogo por Mundo
             let num = Number(c.num || c.id || 0);
-            let is5D = (window.is5DCard && window.is5DCard(c)) || (num >= 950 && num <= 1100);
-            if (activeWorldTab === 3) {
+            let isZexal = (window.isZexalCard && window.isZexalCard(c)) || (num >= 1100 && num <= 1160);
+            let is5D = !isZexal && ((window.is5DCard && window.is5DCard(c)) || (num >= 950 && num <= 1099));
+
+            if (activeWorldTab === 4) {
+                let isAllowed = window.isCardAllowedInWorld ? window.isCardAllowedInWorld(name, 4) : isZexal;
+                if (!isAllowed) return;
+            } else if (activeWorldTab === 3) {
+                if (isZexal) return;
                 let isAllowedStaple = window.MUNDO3_ALLOWED_STAPLES && window.MUNDO3_ALLOWED_STAPLES.has(name);
                 if (!is5D && !isAllowedStaple) return;
             } else if (activeWorldTab === 2) {
-                if (is5D) return;
+                if (isZexal || is5D) return;
                 if (num < 723 || num > 949) return;
             } else if (activeWorldTab === 1) {
-                if (is5D) return;
+                if (isZexal || is5D) return;
                 if (num < 1 || num > 722) return;
             }
 
@@ -10196,8 +10913,9 @@ window.customShowCollection = function() {
             let isEquip = typeof window.isEquipSpell === 'function' ? window.isEquipSpell(c) : false;
             let isSpell = !c.isMonster && (c.type === 'SPELL' || c.kind === 'SPELL' || isField || isEquip) && c.type !== 'TRAP' && c.kind !== 'TRAP';
 
+            let isXyz = (c.kind === 'XYZ' || c.type === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)));
             let isExtra = Boolean(
-                c.isExtra ||
+                c.isExtra || isXyz ||
                 c.kind === 'SYNCHRO' || c.kind === 'FUSION' ||
                 c.type === 'Synchro' || c.type === 'Fusion' ||
                 (window.isSynchroCard && window.isSynchroCard(c.name || c)) ||
@@ -10205,6 +10923,8 @@ window.customShowCollection = function() {
                 (window.FUSION_MONSTER_NAMES && window.FUSION_MONSTER_NAMES.has(c.name))
             );
             let isMainMonster = (c.isMonster || c.kind === 'MONSTER') && !isExtra;
+
+            if (fCard === 'XYZ' && !isXyz) return;
 
             if (fCard === 'MONSTER' && (!c.isMonster && !isExtra)) return;
             if (fCard === 'MAIN_MONSTER' && !isMainMonster) return;
@@ -10669,12 +11389,57 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     
     var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
-    var is5DDuel = fiveDDuelists.includes(opp) || (sSave && sSave.world === 3);
+    var zexalDuelists = ['yuma', 'astral', 'bronk', 'flip', 'shark', 'kite', 'rio', 'trey', 'quattro', 'mizar', 'vector'];
+    var isZexalDuel = zexalDuelists.includes(opp) || (sSave && sSave.world === 4);
+    var is5DDuel = !isZexalDuel && (fiveDDuelists.includes(opp) || (sSave && sSave.world === 3));
     var playerCardNames = null;
     var playerExtraNames = [];
     var enemyExtraNames = [];
 
-    if (is5DDuel) {
+    if (isZexalDuel) {
+      if (sSave && sSave.decksMundo4) {
+        var aKey = (sSave.activeDeckMundo4 && sSave.activeDeckMundo4 !== 'Extra') ? sSave.activeDeckMundo4 : 'Principal';
+        var candDeck = Array.isArray(sSave.decksMundo4[aKey]) ? sSave.decksMundo4[aKey] : sSave.decksMundo4['Principal'];
+        if (Array.isArray(candDeck) && candDeck.length === 40 && !window.isTaintedTristanDeck(candDeck)) {
+          var hasInvalidZexal = candDeck.some(function(c) { return !window.isCardAllowedInWorld(c, 4); });
+          if (!hasInvalidZexal) {
+            playerCardNames = candDeck;
+          }
+        }
+        if (Array.isArray(sSave.decksMundo4['Extra'])) {
+          playerExtraNames = sSave.decksMundo4['Extra'].filter(function(c) { return window.isCardAllowedInWorld(c, 4); });
+        }
+      }
+      if (!playerCardNames || playerCardNames.length !== 40) {
+        playerCardNames = typeof window.generateZexalStarterDeck === 'function' ? window.generateZexalStarterDeck() : [];
+      }
+      if (!sSave || !sSave.decksMundo4 || !Array.isArray(sSave.decksMundo4['Extra'])) {
+        playerExtraNames = typeof window.generateZexalExtraDeck === 'function' ? window.generateZexalExtraDeck() : [];
+      }
+      var oppDeckObj = (window.CHARACTER_DECKS && (window.CHARACTER_DECKS[opp] || window.CHARACTER_DECKS[rawOpp]));
+      if (oppDeckObj && Array.isArray(oppDeckObj.extraDeck)) {
+        enemyExtraNames = oppDeckObj.extraDeck.slice();
+      }
+      if (!enemyExtraNames || enemyExtraNames.length === 0) {
+        var ZEXAL_ACE_MAP = {
+          yuma: ['Number 39: Utopia', 'Gagaga Cowboy', 'Number 17: Leviathan Dragon'],
+          astral: ['Number 39: Utopia', 'Gagaga Cowboy'],
+          bronk: ['Number 39: Utopia', 'Gagaga Cowboy'],
+          flip: ['Number 39: Utopia', 'Gagaga Cowboy'],
+          shark: ['Number 17: Leviathan Dragon', 'Submersible Carrier Aero Shark', 'Black Ray Lancer'],
+          kite: ['Galaxy-Eyes Photon Dragon', 'Number 10: Illumiknight', 'Number 20: Giga-Brilliant'],
+          rio: ['Number 17: Leviathan Dragon', 'Submersible Carrier Aero Shark'],
+          trey: ['Number 33: Chronomaly Machu Mech', 'Number 39: Utopia'],
+          quattro: ['Number 15: Gimmick Puppet Giant Killer', 'Number 39: Utopia'],
+          mizar: ['Number 107: Galaxy-Eyes Tachyon Dragon', 'Galaxy-Eyes Photon Dragon'],
+          vector: ['Number 66: Master Key Beetle', 'Number 39: Utopia']
+        };
+        var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (ZEXAL_ACE_MAP[normOppKey]) {
+          enemyExtraNames = ZEXAL_ACE_MAP[normOppKey].slice();
+        }
+      }
+    } else if (is5DDuel) {
       if (sSave && sSave.decksMundo3) {
         var aKey = (sSave.activeDeckMundo3 && sSave.activeDeckMundo3 !== 'Extra') ? sSave.activeDeckMundo3 : 'Principal';
         var candDeck = Array.isArray(sSave.decksMundo3[aKey]) ? sSave.decksMundo3[aKey] : sSave.decksMundo3['Principal'];
@@ -10800,7 +11565,13 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     g.grave = [];
     g.enemyGrave = [];
     g.selected = [];
-    if (is5DDuel) {
+    if (isZexalDuel) {
+      g.extra = (playerExtraNames || []).map(cardResolver).filter(Boolean);
+      g.enemyExtra = (enemyExtraNames || []).map(cardResolver).filter(Boolean);
+      g.extraUsed = [];
+      g._currentWorld = 4;
+      window.currentWorld = 4;
+    } else if (is5DDuel) {
       g.extra = (playerExtraNames || []).map(cardResolver).filter(Boolean);
       g.enemyExtra = (enemyExtraNames || []).map(cardResolver).filter(Boolean);
       g.extraUsed = [];
@@ -11483,10 +12254,23 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             if (isFieldZone && (c._handEquipAtk || c._handEquipDef)) {
               rendered = rendered.replace(/<div class="fieldStats">[\s\S]*?<\/div>/, c.kind === 'LINK' ? '<div class="fieldStats"><span class="atk">⚔ ' + effAtk + '</span><span class="def">LINK</span></div>' : '<div class="fieldStats"><span class="atk">⚔ ' + effAtk + '</span><span class="def">🛡 ' + effDef + '</span></div>');
             }
+            if (isFieldZone && (c.kind === 'XYZ' || c.overlayUnits != null || (window.isXyzCard && window.isXyzCard(c.name || c)))) {
+              var uCount = (c.overlayUnits != null) ? c.overlayUnits : 2;
+              var orbs = '🟡 ' + uCount;
+              var xyzBadge = '<div class="xyzOverlayBadge" style="position:absolute; bottom:2px; right:2px; font-size:10px; font-weight:900; background:rgba(10,10,20,0.85); border:1px solid #ffd700; border-radius:4px; padding:1px 4px; color:#ffd700; z-index:4; box-shadow:0 0 4px #000;">' + orbs + '</div>';
+              rendered = rendered.replace(/<\/div>\s*$/, xyzBadge + '</div>');
+            }
             return rendered;
           }
         }
-        return origCardHTML.apply(this, arguments);
+        var baseRendered = origCardHTML.apply(this, arguments);
+        if (c && (zone === 'f' || zone === 'e') && (c.kind === 'XYZ' || c.overlayUnits != null || (window.isXyzCard && window.isXyzCard(c.name || c)))) {
+          var uCount = (c.overlayUnits != null) ? c.overlayUnits : 2;
+          var orbs = '🟡 ' + uCount;
+          var xyzBadge = '<div class="xyzOverlayBadge" style="position:absolute; bottom:2px; right:2px; font-size:10px; font-weight:900; background:rgba(10,10,20,0.85); border:1px solid #ffd700; border-radius:4px; padding:1px 4px; color:#ffd700; z-index:4; box-shadow:0 0 4px #000;">' + orbs + '</div>';
+          baseRendered = baseRendered.replace(/<\/div>\s*$/, xyzBadge + '</div>');
+        }
+        return baseRendered;
       };
       try { cardHTML = window.cardHTML; } catch(_) {}
     }
@@ -18693,39 +19477,102 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     });
   };
 
-  // El botón Extra Deck SOLO se enciende cuando existe una Sincronía válida disponible
+  // Lógica de Materiales para Invocación Xyz
+  window.findXyzMaterialsFor = function(xyzCard) {
+    if (typeof game === 'undefined' || !game || !xyzCard) return null;
+    var rank = Number(xyzCard.rank || xyzCard.level || xyzCard[1] || 0);
+    if (!rank) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === xyzCard.name; });
+      if (foundCd && (foundCd.rank || foundCd.level)) rank = Number(foundCd.rank || foundCd.level);
+    }
+    if (!rank) return null;
+
+    // Buscar monstruos boca arriba en game.field cuyo nivel coincida con el rango del Xyz
+    var matchingIndices = [];
+    (game.field || []).forEach(function(c, idx) {
+      if (c && !c.faceDown && !c.faceDownSet103) {
+        var lvl = Number(c.level || c[1] || 0);
+        if (!lvl) {
+          var fCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
+          if (fCd && fCd.level) lvl = Number(fCd.level);
+        }
+        if (lvl === rank) {
+          matchingIndices.push(idx);
+        }
+      }
+    });
+
+    if (matchingIndices.length < 2) return null;
+
+    // Combinaciones de 2 materiales
+    var combos = [];
+    for (var i = 0; i < matchingIndices.length; i++) {
+      for (var j = i + 1; j < matchingIndices.length; j++) {
+        combos.push([matchingIndices[i], matchingIndices[j]]);
+      }
+    }
+    return combos.length > 0 ? combos : null;
+  };
+
+  // Comprueba si el jugador puede realizar alguna Invocación Xyz en este momento
+  window.canPlayerXyzSummonAny = function() {
+    if (typeof game === 'undefined' || !game || game.turn !== 'player' || game.duelOver) return false;
+    if (!Array.isArray(game.extra) || game.extra.length === 0) return false;
+
+    return game.extra.some(function(c) {
+      if (!c) return false;
+      var isXyz = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)));
+      if (!isXyz) return false;
+      return !!window.findXyzMaterialsFor(c);
+    });
+  };
+
+  // El botón Extra Deck SOLO se enciende cuando existe una Sincronía o Xyz válida disponible
   window.updateExtraReady = function() {
     var p = document.getElementById('extraPile');
     var e = document.getElementById('enemyExtraPile');
     if (e) e.classList.remove('extraReady');
     if (!p) return;
 
-    var ready = window.canPlayerSynchroSummonAny();
+    var ready = (typeof window.canPlayerSynchroSummonAny === 'function' && window.canPlayerSynchroSummonAny()) ||
+                (typeof window.canPlayerXyzSummonAny === 'function' && window.canPlayerXyzSummonAny());
     p.classList.toggle('extraReady', !!ready);
   };
   try { updateExtraReady = window.updateExtraReady; } catch(_) {}
 
-  // Validación de invocación por Sincronía
+  // Validación de invocación por Extra Deck (Sincronía o Xyz)
   window.extraEligible = function(c) {
     if (typeof game === 'undefined' || !game || !c || game.turn !== 'player' || game.duelOver) return false;
 
-    // Reconocer si la carta es de tipo SYNCHRO
+    // Reconocer si la carta es de tipo XYZ o SYNCHRO
     var kind = (c.kind || '').toUpperCase();
+    var isXyz = (kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)));
     if (!kind || kind === 'MONSTER') {
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
       if (foundCd && foundCd.kind) {
         kind = foundCd.kind.toUpperCase();
         c.kind = kind;
         if (!c.level && foundCd.level) c.level = foundCd.level;
+        if (!c.rank && foundCd.rank) c.rank = foundCd.rank;
         if (!c.text && (foundCd.text || foundCd.desc)) c.text = foundCd.text || foundCd.desc;
+        if (kind === 'XYZ') isXyz = true;
+      } else if (window.isXyzCard && window.isXyzCard(c.name || c)) {
+        kind = 'XYZ';
+        c.kind = 'XYZ';
+        isXyz = true;
       } else {
         kind = 'SYNCHRO';
         c.kind = 'SYNCHRO';
       }
     }
-    if (kind !== 'SYNCHRO') return false;
 
-    return !!window.findSynchroMaterialsFor(c);
+    if (isXyz) {
+      return !!window.findXyzMaterialsFor(c);
+    }
+    if (kind === 'SYNCHRO' || (window.isSynchroCard && window.isSynchroCard(c.name || c))) {
+      return !!window.findSynchroMaterialsFor(c);
+    }
+    return false;
   };
   try { extraEligible = window.extraEligible; } catch(_) {}
 
@@ -18736,23 +19583,33 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     if (found) {
       if (found.kind && (!c.kind || c.kind === 'MONSTER')) c.kind = found.kind;
       if (!c.level && found.level) c.level = found.level;
+      if (!c.rank && found.rank) c.rank = found.rank;
       if (!c.type && found.type) c.type = found.type;
       if (!c.attr && found.attr) c.attr = found.attr;
       if (!c.atk && found.atk) c.atk = found.atk;
       if (!c.def && found.def) c.def = found.def;
       if (!c.text && (found.text || found.desc)) c.text = found.text || found.desc;
     }
-    if (!c.kind || c.kind === 'MONSTER') c.kind = 'SYNCHRO';
+    var isXyz = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)));
+    if (!c.kind || c.kind === 'MONSTER') c.kind = isXyz ? 'XYZ' : 'SYNCHRO';
     var sel = (game.selected || []).some(function(x) { return x && x[0] === 'x' && x[1] === i; });
     var eligible = window.extraEligible ? window.extraEligible(c) : false;
-    var cls = 'card monster ' + (sel ? 'selected ' : '') + (eligible ? 'eligible' : 'disabled');
-    var kindText = c.kind === 'LINK' ? 'LINK' : (c.kind + ' · Nv/Rank ' + (c.level || 0));
+    var cls = 'card monster ' + (sel ? 'selected ' : '') + (eligible ? 'eligible' : 'disabled') + (isXyz ? ' xyz-card' : '');
+    
+    var rankVal = c.rank || c.level || 0;
+    var kindText = isXyz ? ('XYZ · Rango ' + rankVal) : (c.kind === 'LINK' ? 'LINK' : (c.kind + ' · Nv ' + (c.level || 0)));
     var ratingText = c.kind === 'LINK' ? (' · Rating ' + (c.level || 0)) : '';
     var defText = c.kind === 'LINK' ? ' · SIN DEF' : (' / DEF ' + (c.def || 0));
-    var badge = eligible ? '<div style="font-size:10px; margin-top:5px; color:#7cff7c; font-weight:bold; letter-spacing:0.5px;">⭐ INVOCABLE</div>' : '';
+    var badge = eligible 
+      ? (isXyz ? '<div style="font-size:10px; margin-top:5px; color:#ffd700; font-weight:bold; letter-spacing:0.5px;">⭐ SOBREPOSICIÓN XYZ</div>' : '<div style="font-size:10px; margin-top:5px; color:#7cff7c; font-weight:bold; letter-spacing:0.5px;">⭐ INVOCABLE</div>')
+      : '';
 
-    return '<div class="' + cls + '" onclick="extraClick(' + i + ')" style="' + (eligible ? 'box-shadow: 0 0 14px #7cff7c, inset 0 0 8px rgba(124,255,124,0.4); border-color: #7cff7c !important; cursor: pointer;' : '') + '">' +
-      '<div class="name" style="font-weight:bold; color:' + (eligible ? '#ffd700' : '#ddd') + ';">' + (c.name || 'Desconocido') + '</div>' +
+    var glowBorder = isXyz
+      ? (eligible ? 'box-shadow: 0 0 16px #ffd700, inset 0 0 10px rgba(255,215,0,0.4); border: 1.5px solid #ffd700 !important; background: linear-gradient(135deg, #0d0d18 0%, #171728 100%) !important;' : 'background: #0d0d18 !important;')
+      : (eligible ? 'box-shadow: 0 0 14px #7cff7c, inset 0 0 8px rgba(124,255,124,0.4); border-color: #7cff7c !important;' : '');
+
+    return '<div class="' + cls + '" onclick="extraClick(' + i + ')" style="' + glowBorder + ' cursor: pointer;">' +
+      '<div class="name" style="font-weight:bold; color:' + (eligible ? (isXyz ? '#ffd700' : '#7cff7c') : '#ddd') + ';">' + (c.name || 'Desconocido') + '</div>' +
       '<div style="font-size:10px; opacity:0.85;">' + kindText + ratingText + '</div>' +
       '<div style="font-size:10px; opacity:0.75;">' + (c.type || 'Monster') + ' · ' + (c.attr || 'DARK') + '</div>' +
       '<div class="stats">ATK ' + (c.atk || 0) + defText + '</div>' +
@@ -19049,17 +19906,258 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     updateUI();
   };
 
-  // Invocación por Sincronía del Jugador
+  // Modal interactivo de Selección de Materiales para Invocación Xyz
+  window.showXyzMaterialSelectModal = function(xyzCard, extraIndex, allCombos, onConfirm, onCancel) {
+    var existing = document.getElementById('xyz-mat-modal');
+    if (existing) existing.remove();
+
+    var targetRank = Number(xyzCard.rank || xyzCard.level || xyzCard[1] || 0);
+    if (!targetRank) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === xyzCard.name; });
+      if (foundCd && (foundCd.rank || foundCd.level)) targetRank = Number(foundCd.rank || foundCd.level);
+    }
+    var xyzName = xyzCard.name || 'Monstruo Xyz';
+    var xyzAtk = xyzCard.atk !== undefined ? xyzCard.atk : (xyzCard[4] !== undefined ? xyzCard[4] : '-');
+    var xyzDef = xyzCard.def !== undefined ? xyzCard.def : (xyzCard[5] !== undefined ? xyzCard[5] : '-');
+
+    // Monstruos boca arriba en el campo cuyo nivel coincida con el rango
+    var eligibleMonsters = (game.field || [])
+      .map(function(c, idx) { return { idx: idx, card: c }; })
+      .filter(function(x) {
+        if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
+        var lvl = Number(x.card.level || x.card[1] || 0);
+        if (!lvl) {
+          var fCd = (window.CARDS_DATA || []).find(function(f) { return f && f.name === x.card.name; });
+          if (fCd && fCd.level) lvl = Number(fCd.level);
+        }
+        return lvl === targetRank;
+      });
+
+    var selectedSet = new Set((allCombos && allCombos[0]) || []);
+
+    var overlay = document.createElement('div');
+    overlay.id = 'xyz-mat-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(2,4,16,0.92); z-index:99999999; display:flex; justify-content:center; align-items:center; padding:15px; font-family:"Segoe UI", Arial, sans-serif; backdrop-filter:blur(4px);';
+
+    var box = document.createElement('div');
+    box.style.cssText = 'width:min(820px, 96vw); max-height:88vh; background:linear-gradient(180deg, #0b0d1b 0%, #030408 100%); border:2.5px solid #ffd700; border-radius:14px; box-shadow:0 0 40px rgba(255, 215, 0, 0.4), 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+    // Header Zexal
+    var header = document.createElement('div');
+    header.style.cssText = 'background:linear-gradient(90deg, #121028 0%, #201335 50%, #121028 100%); padding:14px 20px; border-bottom:2px solid #ffd700; text-align:center; position:relative;';
+    header.innerHTML = `
+      <div style="font-family:VT323, monospace; font-size:26px; color:#ffd700; text-shadow:0 0 12px #ffd700; letter-spacing:1.5px;">
+        🌌 INVOCACIÓN XYZ · SOBREPOSICIÓN DE MATERIALES
+      </div>
+      <div style="color:#fff; font-size:14px; margin-top:4px;">
+        Invocando a <b style="color:#ffd700;">${xyzName}</b> (★ Rango <b>${targetRank}</b> · ⚔${xyzAtk} / 🛡${xyzDef})
+      </div>
+      <div style="color:#d1c4e9; font-size:12px; margin-top:2px;">
+        Requisito: <b>2 Monstruos de Nivel ${targetRank}</b> sobrepuestos en el campo
+      </div>
+    `;
+    box.appendChild(header);
+
+    // Body
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:16px 20px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:14px;';
+
+    // Grid de monstruos
+    var gridDiv = document.createElement('div');
+    gridDiv.style.cssText = 'display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:10px;';
+
+    function renderMonstersGrid() {
+      gridDiv.innerHTML = '';
+      eligibleMonsters.forEach(function(item) {
+        var card = item.card;
+        var idx = item.idx;
+        var isSelected = selectedSet.has(idx);
+
+        var cardLvl = Number(card.level || card[1] || targetRank);
+        var cardAtk = card.atk !== undefined ? card.atk : (card[4] !== undefined ? card[4] : '-');
+        var cardDef = card.def !== undefined ? card.def : (card[5] !== undefined ? card[5] : '-');
+
+        var cardDiv = document.createElement('div');
+        cardDiv.style.cssText = `
+          background: ${isSelected ? 'linear-gradient(135deg, #24143a 0%, #3e1b60 100%)' : '#141424'};
+          border: 2px solid ${isSelected ? '#ffd700' : '#453859'};
+          border-radius: 8px;
+          padding: 10px;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          box-shadow: ${isSelected ? '0 0 16px rgba(255, 215, 0, 0.6)' : 'none'};
+          transition: all 0.15s ease;
+        `;
+
+        cardDiv.onclick = function() {
+          if (selectedSet.has(idx)) {
+            selectedSet.delete(idx);
+          } else {
+            if (selectedSet.size >= 2) {
+              var first = selectedSet.values().next().value;
+              selectedSet.delete(first);
+            }
+            selectedSet.add(idx);
+          }
+          if (window.playViolinClick) window.playViolinClick();
+          updateUI();
+        };
+
+        cardDiv.innerHTML = `
+          <div style="font-size:12px; font-weight:bold; color:${isSelected ? '#ffd700' : '#fff'}; margin-bottom:4px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            ${card.name || 'Monstruo'}
+          </div>
+          <div style="font-size:11px; color:#bb86fc; font-weight:bold;">
+            ★ Nivel ${cardLvl}
+          </div>
+          <div style="font-size:11px; color:#aaa; margin-top:2px;">
+            ⚔ ${cardAtk} / 🛡 ${cardDef}
+          </div>
+          <div style="margin-top:8px; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:bold; ${isSelected ? 'background:#ffd700; color:#000;' : 'background:#241d30; color:#888;'}">
+            ${isSelected ? '✓ MATERIAL ACUMULADO' : 'Clic para seleccionar'}
+          </div>
+        `;
+        gridDiv.appendChild(cardDiv);
+      });
+    }
+
+    body.appendChild(gridDiv);
+
+    // Status Card
+    var statusCard = document.createElement('div');
+    statusCard.style.cssText = 'background:rgba(20, 16, 36, 0.9); border:1px solid #7c4dff; border-radius:8px; padding:12px 16px; display:flex; flex-direction:column; gap:4px;';
+
+    function updateStatusCard() {
+      var selArr = Array.from(selectedSet);
+      var isValid = (selArr.length === 2);
+
+      statusCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="font-size:13px; color:#fff;">
+            <b>Materiales seleccionados:</b> ${selArr.length} / 2
+          </div>
+          <div style="font-size:13px; font-weight:bold; color:${isValid ? '#7cff7c' : '#ffd700'};">
+            ${isValid ? '✓ ¡Condición de Sobreposición cumplida!' : 'Selecciona exactamente 2 monstruos de Nivel ' + targetRank}
+          </div>
+        </div>
+      `;
+
+      var confirmBtn = document.getElementById('xyz-confirm-btn');
+      if (confirmBtn) {
+        confirmBtn.disabled = !isValid;
+        confirmBtn.style.opacity = isValid ? '1' : '0.4';
+        confirmBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
+        confirmBtn.style.boxShadow = isValid ? '0 0 18px rgba(255, 215, 0, 0.7)' : 'none';
+      }
+    }
+
+    body.appendChild(statusCard);
+    box.appendChild(body);
+
+    // Footer
+    var footer = document.createElement('div');
+    footer.style.cssText = 'background:rgba(12, 10, 24, 0.95); padding:12px 20px; border-top:1px solid rgba(255, 215, 0, 0.3); display:flex; justify-content:space-between; align-items:center;';
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.textContent = '❌ Cancelar';
+    cancelBtn.style.cssText = 'background:#262035; border:1px solid #4a3c66; color:#cfd8dc; padding:8px 18px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold;';
+    cancelBtn.onclick = function() {
+      overlay.remove();
+      if (typeof onCancel === 'function') onCancel();
+    };
+    footer.appendChild(cancelBtn);
+
+    var confirmBtn = document.createElement('button');
+    confirmBtn.id = 'xyz-confirm-btn';
+    confirmBtn.innerHTML = '⚡ SOBREPONER E INVOCAR XYZ';
+    confirmBtn.style.cssText = 'background:linear-gradient(180deg, #ffd700, #b8860b); border:1.5px solid #fff; color:#000; padding:9px 24px; border-radius:6px; font-size:13px; font-weight:bold;';
+    confirmBtn.onclick = function() {
+      var selArr = Array.from(selectedSet);
+      if (selArr.length !== 2) return;
+      overlay.remove();
+      if (typeof onConfirm === 'function') onConfirm(selArr);
+    };
+    footer.appendChild(confirmBtn);
+
+    box.appendChild(footer);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    function updateUI() {
+      renderMonstersGrid();
+      updateStatusCard();
+    }
+    updateUI();
+  };
+
+  // Invocación por Extra Deck del Jugador (Sincronía o Xyz)
   window.extraClick = function(i) {
     if (typeof game === 'undefined' || !game) return;
     var c = game.extra && game.extra[i];
     if (!c) return;
 
+    var isXyz = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)));
     if (!c.kind) {
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
-      c.kind = (foundCd && foundCd.kind) ? foundCd.kind : 'SYNCHRO';
+      c.kind = (foundCd && foundCd.kind) ? foundCd.kind : (isXyz ? 'XYZ' : 'SYNCHRO');
+      if (c.kind === 'XYZ') isXyz = true;
     }
 
+    if (isXyz) {
+      var targetRank = Number(c.rank || c.level || c[1] || 4);
+      var xyzCombos = window.findXyzMaterialsFor(c);
+      if (!xyzCombos || xyzCombos.length === 0) {
+        if (typeof log === 'function') log('Esa carta Xyz no puede invocarse: necesitas 2 monstruos de Nivel ' + targetRank + ' en el campo.');
+        if (typeof duelToast === 'function') duelToast('Necesitas 2 monstruos boca arriba de Nivel ' + targetRank + ' para sobreponer');
+        return;
+      }
+
+      window.showXyzMaterialSelectModal(c, i, xyzCombos, function(mats) {
+        mats.sort(function(a, b) { return b - a; });
+        var matCards = [];
+        var matNames = [];
+        mats.forEach(function(idx) {
+          var mat = game.field[idx];
+          if (mat) {
+            matNames.push(mat.name || 'Monstruo');
+            matCards.push(mat);
+            game.field[idx] = null;
+          }
+        });
+
+        var slot = game.field.findIndex(function(x) { return !x; });
+        if (slot < 0) slot = mats[0];
+
+        var sc = JSON.parse(JSON.stringify(c));
+        sc.pos = 'ATK';
+        sc.faceUp = true;
+        sc.kind = 'XYZ';
+        sc.rank = targetRank;
+        sc.overlayUnits = 2;
+        sc.materials = matCards;
+        sc.summonedTurn = game.turnNo;
+        game.field[slot] = sc;
+
+        game.extraUsed = game.extraUsed || [];
+        game.extraUsed.push(c.name);
+        game.selected = [];
+
+        game.extra.splice(i, 1);
+
+        if (typeof closePile === 'function') closePile();
+        if (typeof render === 'function') render();
+        if (typeof log === 'function') log('¡INVOCACIÓN XYZ! 🌌 ' + sc.name + ' (Rango ' + sc.rank + ') aparece en el campo sobreponiendo ' + matNames.join(' + ') + '!');
+        if (typeof duelToast === 'function') duelToast('¡Invocación Xyz! ' + sc.name);
+        if (window.playViolinClick) window.playViolinClick();
+        if (window.playSummonSound) window.playSummonSound();
+      });
+      return;
+    }
+
+    // Flujo normal de Sincronía
     var allCombos = window.findAllSynchroMaterialCombinations(c);
     if (!allCombos || allCombos.length === 0) {
       if (typeof log === 'function') log('Esa carta no puede sincronizarse con los materiales disponibles en el campo.');
@@ -19586,9 +20684,9 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
   var prevOpenPileMaster = window.openPile;
   window.openPile = function(kind) {
-    var is5D = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
+    var isExtraAllowed = (typeof game !== 'undefined' && game && (game._currentWorld === 3 || game._currentWorld === 4)) || (window.currentWorld === 3 || window.currentWorld === 4);
     if (kind === 'extra' || kind === 'enemyExtra') {
-      if (!is5D) {
+      if (!isExtraAllowed) {
         if (typeof duelToast === 'function') duelToast('En este mundo solo se permiten Fusiones al estilo FMR.');
         return;
       }
@@ -19775,9 +20873,12 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     }
     var g = (typeof game !== 'undefined' && game) ? game : (typeof window !== 'undefined' ? window.game : null);
     var hasExtra = (g && Array.isArray(g.extra) && g.extra.length > 0);
-    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3) || hasExtra;
+    var is5D = (g && g._currentWorld === 3) || (window.currentWorld === 3);
+    var isZexal = (g && g._currentWorld === 4) || (window.currentWorld === 4);
+    var isExtraWorld = is5D || isZexal || hasExtra;
     if (document.body) {
       document.body.classList.toggle('world-3', !!is5D);
+      document.body.classList.toggle('world-4', !!isZexal);
     }
     if (g) {
       g.linkZones = [null, null];
@@ -19795,8 +20896,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     var fb = document.getElementById('fusionBtn');
 
-    if (is5D || hasExtra) {
-      if (fb && is5D) {
+    if (isExtraWorld) {
+      if (fb && (is5D || isZexal)) {
         fb.style.display = 'none';
         fb.disabled = true;
         fb.classList.remove('fusionReady');
@@ -19841,6 +20942,30 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         actionBtns.insertBefore(spBtn, actionBtns.children[1] || null);
       }
     }
+
+    // Botón de Invocación Xyz en la barra de acciones
+    var hasXyzCards = (isZexal || (g && Array.isArray(g.extra) && g.extra.some(function(x) { return x && (x.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.name || x))); })));
+    var xyzBtn = document.getElementById('xyzSummonBtn');
+    if (!xyzBtn && hasXyzCards) {
+      var actionBtns = document.querySelector('.btns.actionBtns');
+      if (actionBtns) {
+        xyzBtn = document.createElement('button');
+        xyzBtn.id = 'xyzSummonBtn';
+        xyzBtn.className = 'btn';
+        xyzBtn.textContent = '⚡ Inv. Xyz';
+        xyzBtn.style.cssText = 'background:linear-gradient(180deg, #ffd700, #b8860b) !important; color:#000 !important; font-weight:900 !important; border:1px solid #fff !important;';
+        xyzBtn.onclick = function() {
+          if (typeof window.openXyzSummonModal === 'function') window.openXyzSummonModal();
+        };
+        actionBtns.insertBefore(xyzBtn, actionBtns.children[2] || null);
+      }
+    }
+    if (xyzBtn) {
+      var canXyz = typeof window.canPlayerXyzSummonAny === 'function' && window.canPlayerXyzSummonAny();
+      xyzBtn.style.boxShadow = canXyz ? '0 0 14px #ffd700' : 'none';
+      xyzBtn.style.opacity = canXyz ? '1' : '0.6';
+    }
+
     if (typeof updateSpecialSummonAssist === 'function') {
       try { updateSpecialSummonAssist(); } catch(_) {}
     }
@@ -19852,6 +20977,45 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     if (typeof updateGuardianBattleHints === 'function') try { updateGuardianBattleHints(); } catch(_) {}
   };
   try { render = window.render; } catch(_) {}
+
+  // Función directa para invocar Xyz desde el botón de combate
+  window.openXyzSummonModal = function() {
+    if (typeof game === 'undefined' || !game || game.turn !== 'player' || game.duelOver) {
+      if (typeof duelToast === 'function') duelToast('Solo puedes invocar durante tu turno.');
+      return;
+    }
+    if (!Array.isArray(game.extra) || game.extra.length === 0) {
+      if (typeof duelToast === 'function') duelToast('No tienes cartas en tu Extra Deck.');
+      return;
+    }
+
+    var xyzIndices = [];
+    game.extra.forEach(function(c, idx) {
+      if (c && (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c.name || c)))) {
+        xyzIndices.push(idx);
+      }
+    });
+
+    if (xyzIndices.length === 0) {
+      if (typeof duelToast === 'function') duelToast('No tienes monstruos Xyz en tu Extra Deck.');
+      return;
+    }
+
+    var readyIndices = xyzIndices.filter(function(idx) {
+      return !!window.findXyzMaterialsFor(game.extra[idx]);
+    });
+
+    if (readyIndices.length === 0) {
+      var sampleXyz = game.extra[xyzIndices[0]];
+      var reqRank = sampleXyz.rank || sampleXyz.level || 4;
+      if (typeof duelToast === 'function') duelToast('Necesitas 2 monstruos de Nivel ' + reqRank + ' boca arriba en el campo');
+      if (typeof log === 'function') log('Invocación Xyz no disponible: necesitas 2 monstruos boca arriba de Nivel ' + reqRank + ' en el campo.');
+      return;
+    }
+
+    // Ejecutar invocación del primer Xyz elegible
+    window.extraClick(readyIndices[0]);
+  };
 
   // CSS for World 1 Extra Deck hiding, Fusion Button, and Guardian Signs Battle Badges
   var style = document.createElement('style');
@@ -19971,9 +21135,9 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       }
     }
 
-    body:not(.world-3) #enemyExtraPile,
-    body:not(.world-3) .extraPile,
-    body:not(.world-3) #extraPile,
+    body:not(.world-3):not(.world-4) #enemyExtraPile,
+    body:not(.world-3):not(.world-4) .extraPile,
+    body:not(.world-3):not(.world-4) #extraPile,
     #sharedLink,
     .linkZone { display: none !important; }
 
@@ -19981,7 +21145,12 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     body.world-3 .btn.fusionReady#fusionBtn,
     body.world-3 #fusionBtn.fusionReady,
     body.world-3.view-hand #fusionBtn,
-    body.world-3.view-field #fusionBtn {
+    body.world-3.view-field #fusionBtn,
+    body.world-4 #fusionBtn,
+    body.world-4 .btn.fusionReady#fusionBtn,
+    body.world-4 #fusionBtn.fusionReady,
+    body.world-4.view-hand #fusionBtn,
+    body.world-4.view-field #fusionBtn {
       display: none !important;
       opacity: 0 !important;
       animation: none !important;
@@ -19995,6 +21164,16 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     }
 
     body:not(.world-3) #specialSummonBtn {
+      display: none !important;
+    }
+
+    body.world-4 #xyzSummonBtn,
+    body.world-4.view-hand #xyzSummonBtn,
+    body.world-4.view-field #xyzSummonBtn {
+      display: inline-flex !important;
+    }
+
+    body:not(.world-4) #xyzSummonBtn {
       display: none !important;
     }
 

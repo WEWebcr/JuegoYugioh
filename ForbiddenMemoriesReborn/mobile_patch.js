@@ -1028,10 +1028,14 @@
         buttonsHtml += '<button class="m-act-btn m-act-atk" id="m-btn-summon-atk">⚔ INVOCAR</button>';
         buttonsHtml += '<button class="m-act-btn m-act-set" id="m-btn-summon-set">🛡 SET</button>';
         const is5DWorld = (typeof game !== 'undefined' && game && game._currentWorld === 3) || (window.currentWorld === 3);
+        const isZexalWorld = (typeof game !== 'undefined' && game && game._currentWorld === 4) || (window.currentWorld === 4);
         if (is5DWorld && typeof window.canSpecialSummonFromHand === 'function' && window.canSpecialSummonFromHand(card)) {
           buttonsHtml += '<button class="m-act-btn m-act-special" id="m-btn-summon-special" style="background:linear-gradient(135deg,#00b4d8,#0077b6);border:1px solid #00e5ff;color:#fff;font-weight:bold;box-shadow:0 0 8px #00e5ff;">⚡ INV. ESPECIAL</button>';
         }
-        if (!is5DWorld && typeof window.fuse === 'function') {
+        if (isZexalWorld && typeof window.canPlayerXyzSummonAny === 'function' && window.canPlayerXyzSummonAny()) {
+          buttonsHtml += '<button class="m-act-btn m-act-xyz" id="m-btn-summon-xyz" style="background:linear-gradient(135deg,#ffd700,#b8860b);border:1px solid #fff;color:#000;font-weight:900;box-shadow:0 0 8px #ffd700;">⚡ INV. XYZ</button>';
+        }
+        if (!is5DWorld && !isZexalWorld && typeof window.fuse === 'function') {
           buttonsHtml += '<button class="m-act-btn m-act-fuse" id="m-btn-fuse">🔄 FUSIÓN</button>';
         }
       } else if (cKind === 'SPELL' || cKind === 'MAGIC') {
@@ -1089,6 +1093,12 @@
     const btnSpecial = document.getElementById('m-btn-summon-special');
     if (btnSpecial) btnSpecial.onclick = () => {
       if (typeof window.specialSummonFromHand === 'function') window.specialSummonFromHand(idx);
+      closeActionBar();
+    };
+
+    const btnXyz = document.getElementById('m-btn-summon-xyz');
+    if (btnXyz) btnXyz.onclick = () => {
+      if (typeof window.openXyzSummonModal === 'function') window.openXyzSummonModal();
       closeActionBar();
     };
 
