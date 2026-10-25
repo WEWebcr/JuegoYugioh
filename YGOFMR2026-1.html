@@ -1,5 +1,40 @@
 <!doctype html>
-<html lang="es"><head><meta charset="UTF-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"><meta http-equiv="Expires" content="0"><meta http-equiv="Pragma" content="no-cache"><title>Forbidden Memories Reborn - Web Test V2.9.28 REFRESH</title>
+<html lang="es"><head>
+<script>
+// TOP-LEVEL NETWORK & API ROUTER FOR OFFLINE-FIRST APK
+(function() {
+  var SERVER_ORIGIN = 'https://yugiohreborn.onrender.com';
+  function rewriteApiUrl(u) {
+    if (typeof u !== 'string') return u;
+    if (u.indexOf('/api/') === 0) return SERVER_ORIGIN + u;
+    if (u.indexOf('https://fmr.local/api/') === 0) return u.replace('https://fmr.local', SERVER_ORIGIN);
+    if (u.indexOf('http://fmr.local/api/') === 0) return u.replace('http://fmr.local', SERVER_ORIGIN);
+    return u;
+  }
+  var origFetch = window.fetch;
+  if (typeof origFetch === 'function') {
+    window.fetch = function(input, init) {
+      if (typeof input === 'string') {
+        input = rewriteApiUrl(input);
+      } else if (input && typeof input.url === 'string') {
+        var rewritten = rewriteApiUrl(input.url);
+        if (rewritten !== input.url) {
+          try { input = new Request(rewritten, input); } catch(_) { input.url = rewritten; }
+        }
+      }
+      return origFetch.call(this, input, init);
+    };
+  }
+  if (typeof XMLHttpRequest !== 'undefined' && XMLHttpRequest.prototype) {
+    var origOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      arguments[1] = rewriteApiUrl(url);
+      return origOpen.apply(this, arguments);
+    };
+  }
+})();
+</script>
+<meta charset="UTF-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"><meta http-equiv="Expires" content="0"><meta http-equiv="Pragma" content="no-cache"><title>Forbidden Memories Reborn - Web Test V2.9.28 REFRESH</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#15110d;color:#eee;font-family:system-ui,Arial,sans-serif;touch-action:manipulation}.wrap{max-width:1100px;margin:auto;padding:10px}.top{display:flex;justify-content:space-between;gap:8px;align-items:center}.lp{font-weight:800;font-size:18px}.board{background:linear-gradient(#30251a,#20170f);border:2px solid #80643c;border-radius:12px;padding:10px;box-shadow:0 8px 30px #0008;display:grid;grid-template-columns:92px minmax(0,1fr) 92px;gap:10px;align-items:stretch}.boardCenter{min-width:0}.zones{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.zone{height:68px;border:1px dashed #8c7048;border-radius:8px;background:#0003;display:flex;align-items:center;justify-content:center;position:relative}.zone small{opacity:.35}.rowTitle{font-size:9px;letter-spacing:.08em;opacity:.55;margin:5px 0 3px;text-align:center}.backrow .zone{height:68px}.backrow .card{font-size:9px;min-height:0}.deckPile .pileLabel{font-size:9px}.pileCount{display:block;font-size:8px;opacity:.75;margin-top:2px}.card{width:100%;height:100%;border-radius:7px;border:2px solid #bda66e;background:linear-gradient(145deg,#443a2b,#201b15);padding:5px;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;cursor:pointer;user-select:none}.card.monster{background:linear-gradient(145deg,#493a25,#1d1710)}.card.selected{outline:3px solid #f4d35e;transform:translateY(-3px)}.name{font-weight:800;font-size:12px}.stats{font-weight:700}.mid{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:8px 0}.log{height:70px;overflow:auto;background:#090807aa;border:1px solid #57452d;border-radius:8px;padding:6px;font-size:12px}.btns{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0}.btn{border:1px solid #a48750;background:#302719;color:#fff;border-radius:8px;padding:10px 12px;font-weight:700}.btn:active{transform:scale(.97)}.hand{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}.hand .card{min-height:135px}.section{margin-top:7px;font-size:12px;opacity:.75}.mode{font-size:13px;text-align:center}.disabled{opacity:.45;pointer-events:none}@media(max-width:650px){.zone{height:58px}.backrow .zone{height:58px}.hand .card{min-height:120px}.name{font-size:10px}.card{font-size:9px}.mid{grid-template-columns:1fr}.log{height:55px}.lp{font-size:15px}.btn{padding:9px 10px;font-size:12px}}
 .extraPanel{margin-top:6px;padding:8px;background:#1b1510;border:1px solid #6b5238;border-radius:8px}.extraHelp{font-size:11px;opacity:.75;margin-bottom:7px}.extraGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.extraGrid .card{min-height:88px}.extraGrid .card.selected{outline:3px solid #f4d35e}.extraGrid .card.eligible{outline:3px solid #7cff7c;box-shadow:0 0 12px rgba(124,255,124,.75);cursor:pointer}.extraGrid .card.disabled{opacity:.42;filter:grayscale(.65)}@media(max-width:650px){.extraGrid{grid-template-columns:repeat(2,1fr)}.extraGrid .card{min-height:82px}}
@@ -8301,6 +8336,8 @@ window.hideDuelBoard = function() {
 
 // LOCAL SFX - musica/ folder
 function _sfx(file, vol) {
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === "function") { window.NativeAudio.playSfx(file); return; }
+
     try { let a = new Audio('musica/' + file); a.volume = vol || 0.7; a.play().catch(()=>{}); } catch(_) {}
 }
 // Duelo
@@ -9152,16 +9189,41 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
 <script>
 // Native Storage & Remote API Interceptor for Offline-First Autonomous APK
 (function() {
-  // 1. Auto-ruta para peticiones /api/ cuando el juego corre localmente en Android (file://)
+  var SERVER_ORIGIN = 'https://yugiohreborn.onrender.com';
+  function rewriteApiUrl(u) {
+    if (typeof u !== 'string') return u;
+    if (u.indexOf('/api/') === 0) return SERVER_ORIGIN + u;
+    if (u.indexOf('https://fmr.local/api/') === 0) return u.replace('https://fmr.local', SERVER_ORIGIN);
+    if (u.indexOf('http://fmr.local/api/') === 0) return u.replace('http://fmr.local', SERVER_ORIGIN);
+    return u;
+  }
+
+  // 1. Auto-ruta para peticiones fetch()
   var origFetch = window.fetch;
   if (typeof origFetch === 'function') {
-    window.fetch = function(url, options) {
-      if (typeof url === 'string' && url.indexOf('/api/') === 0 && typeof location !== 'undefined') {
-        if (location.protocol === 'file:' || location.hostname === 'fmr.local' || location.hostname === 'appassets.androidplatform.net') {
-          url = 'https://yugiohreborn.onrender.com' + url;
+    window.fetch = function(input, init) {
+      if (typeof input === 'string') {
+        input = rewriteApiUrl(input);
+      } else if (input && typeof input.url === 'string') {
+        var rewritten = rewriteApiUrl(input.url);
+        if (rewritten !== input.url) {
+          try {
+            input = new Request(rewritten, input);
+          } catch (_) {
+            input.url = rewritten;
+          }
         }
       }
-      return origFetch.call(this, url, options);
+      return origFetch.call(this, input, init);
+    };
+  }
+
+  // 2. Auto-ruta para peticiones XMLHttpRequest
+  if (typeof XMLHttpRequest !== 'undefined' && XMLHttpRequest.prototype) {
+    var origXhrOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      arguments[1] = rewriteApiUrl(url);
+      return origXhrOpen.apply(this, arguments);
     };
   }
 
@@ -10141,6 +10203,12 @@ try { installAudioUnlocker(); } catch(e){}
 
 window.playCustomMusic = function(fileName) {
     if (!fileName) return;
+
+    if (window.NativeAudio && typeof window.NativeAudio.playBgm === 'function') {
+        window.currentBgm = fileName;
+        window.NativeAudio.playBgm(fileName);
+        return;
+    }
     
     // Stop and silence any other stray audio elements on page
     try {
@@ -10268,8 +10336,13 @@ document.addEventListener('click', function(e) {
 }, true);
 
 window.playViolinClick = function() {
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('escogenciamenu.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('escogenciamenu.mp3', 0.65); return; }
     try {
-        let audio = new Audio('musica/violin.mp3'); audio.volume = 0.6;
+        let audio = new Audio('musica/escogenciamenu.mp3'); audio.volume = 0.65;
         let p = audio.play();
         if (p !== undefined) p.catch(e => playFallbackClick());
     } catch(e){ playFallbackClick(); }
@@ -21106,29 +21179,49 @@ window.surrenderDuel = function() { if(window.playCancelSound) window.playCancel
     }
 };
 
-// Mejorar efectos de sonido
+// Efectos de sonido locales y optimizados para offline y Android nativo
 window.playViolinClick = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-menu-select.mp3');
-    a.volume = 0.5; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('escogenciamenu.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('escogenciamenu.mp3', 0.65); return; }
+    try { let a = new Audio('musica/escogenciamenu.mp3'); a.volume = 0.65; a.play().catch(()=>{}); } catch(_) {}
 };
 window.playHoverSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-menu-move.mp3');
-    a.volume = 0.3; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('movercarta.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('movercarta.mp3', 0.4); return; }
+    try { let a = new Audio('musica/movercarta.mp3'); a.volume = 0.4; a.play().catch(()=>{}); } catch(_) {}
 };
 window.playChic = window.playViolinClick;
 
-// Reemplazar sonidos nativos de duelo
+// Reemplazar sonidos nativos de duelo con audio local
 window.nativeAtkSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-attack.mp3');
-    a.volume = 0.6; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('summon.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('summon.mp3', 0.7); return; }
+    try { let a = new Audio('musica/summon.mp3'); a.volume = 0.7; a.play().catch(()=>{}); } catch(_) {}
 };
 window.nativeDefSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-defense.mp3');
-    a.volume = 0.6; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('set.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('set.mp3', 0.6); return; }
+    try { let a = new Audio('musica/set.mp3'); a.volume = 0.6; a.play().catch(()=>{}); } catch(_) {}
 };
 window.nativeLpSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-lp-drain.mp3');
-    a.volume = 0.6; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('bajarLP.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('bajarLP.mp3', 0.85); return; }
+    try { let a = new Audio('musica/bajarLP.mp3'); a.volume = 0.85; a.play().catch(()=>{}); } catch(_) {}
 };
 
 

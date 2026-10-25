@@ -1,15 +1,40 @@
 // Native Storage & Remote API Interceptor for Offline-First Autonomous APK
 (function() {
-  // 1. Auto-ruta para peticiones /api/ cuando el juego corre localmente en Android (file://)
+  var SERVER_ORIGIN = 'https://yugiohreborn.onrender.com';
+  function rewriteApiUrl(u) {
+    if (typeof u !== 'string') return u;
+    if (u.indexOf('/api/') === 0) return SERVER_ORIGIN + u;
+    if (u.indexOf('https://fmr.local/api/') === 0) return u.replace('https://fmr.local', SERVER_ORIGIN);
+    if (u.indexOf('http://fmr.local/api/') === 0) return u.replace('http://fmr.local', SERVER_ORIGIN);
+    return u;
+  }
+
+  // 1. Auto-ruta para peticiones fetch()
   var origFetch = window.fetch;
   if (typeof origFetch === 'function') {
-    window.fetch = function(url, options) {
-      if (typeof url === 'string' && url.indexOf('/api/') === 0 && typeof location !== 'undefined') {
-        if (location.protocol === 'file:' || location.hostname === 'fmr.local' || location.hostname === 'appassets.androidplatform.net') {
-          url = 'https://yugiohreborn.onrender.com' + url;
+    window.fetch = function(input, init) {
+      if (typeof input === 'string') {
+        input = rewriteApiUrl(input);
+      } else if (input && typeof input.url === 'string') {
+        var rewritten = rewriteApiUrl(input.url);
+        if (rewritten !== input.url) {
+          try {
+            input = new Request(rewritten, input);
+          } catch (_) {
+            input.url = rewritten;
+          }
         }
       }
-      return origFetch.call(this, url, options);
+      return origFetch.call(this, input, init);
+    };
+  }
+
+  // 2. Auto-ruta para peticiones XMLHttpRequest
+  if (typeof XMLHttpRequest !== 'undefined' && XMLHttpRequest.prototype) {
+    var origXhrOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      arguments[1] = rewriteApiUrl(url);
+      return origXhrOpen.apply(this, arguments);
     };
   }
 
@@ -989,6 +1014,12 @@ try { installAudioUnlocker(); } catch(e){}
 
 window.playCustomMusic = function(fileName) {
     if (!fileName) return;
+
+    if (window.NativeAudio && typeof window.NativeAudio.playBgm === 'function') {
+        window.currentBgm = fileName;
+        window.NativeAudio.playBgm(fileName);
+        return;
+    }
     
     // Stop and silence any other stray audio elements on page
     try {
@@ -1116,8 +1147,13 @@ document.addEventListener('click', function(e) {
 }, true);
 
 window.playViolinClick = function() {
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('escogenciamenu.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('escogenciamenu.mp3', 0.65); return; }
     try {
-        let audio = new Audio('musica/violin.mp3'); audio.volume = 0.6;
+        let audio = new Audio('musica/escogenciamenu.mp3'); audio.volume = 0.65;
         let p = audio.play();
         if (p !== undefined) p.catch(e => playFallbackClick());
     } catch(e){ playFallbackClick(); }
@@ -11954,29 +11990,49 @@ window.surrenderDuel = function() { if(window.playCancelSound) window.playCancel
     }
 };
 
-// Mejorar efectos de sonido
+// Efectos de sonido locales y optimizados para offline y Android nativo
 window.playViolinClick = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-menu-select.mp3');
-    a.volume = 0.5; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('escogenciamenu.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('escogenciamenu.mp3', 0.65); return; }
+    try { let a = new Audio('musica/escogenciamenu.mp3'); a.volume = 0.65; a.play().catch(()=>{}); } catch(_) {}
 };
 window.playHoverSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-menu-move.mp3');
-    a.volume = 0.3; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('movercarta.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('movercarta.mp3', 0.4); return; }
+    try { let a = new Audio('musica/movercarta.mp3'); a.volume = 0.4; a.play().catch(()=>{}); } catch(_) {}
 };
 window.playChic = window.playViolinClick;
 
-// Reemplazar sonidos nativos de duelo
+// Reemplazar sonidos nativos de duelo con audio local
 window.nativeAtkSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-attack.mp3');
-    a.volume = 0.6; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('summon.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('summon.mp3', 0.7); return; }
+    try { let a = new Audio('musica/summon.mp3'); a.volume = 0.7; a.play().catch(()=>{}); } catch(_) {}
 };
 window.nativeDefSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-defense.mp3');
-    a.volume = 0.6; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('set.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('set.mp3', 0.6); return; }
+    try { let a = new Audio('musica/set.mp3'); a.volume = 0.6; a.play().catch(()=>{}); } catch(_) {}
 };
 window.nativeLpSound = function() {
-    let a = new Audio('https://www.myinstants.com/media/sounds/yugioh-lp-drain.mp3');
-    a.volume = 0.6; a.play().catch(()=>{});
+    if (window.NativeAudio && typeof window.NativeAudio.playSfx === 'function') {
+        window.NativeAudio.playSfx('bajarLP.mp3');
+        return;
+    }
+    if (typeof _sfx === 'function') { _sfx('bajarLP.mp3', 0.85); return; }
+    try { let a = new Audio('musica/bajarLP.mp3'); a.volume = 0.85; a.play().catch(()=>{}); } catch(_) {}
 };
 
 

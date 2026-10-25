@@ -5,14 +5,20 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,16 +26,15 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import android.net.Uri;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebResourceResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +48,7 @@ public class MainActivity extends Activity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private SharedPreferences mPrefs;
+    private NativeAudioBridge mNativeAudio;
 
     public static class NativeStorageBridge {
         private final Context context;
@@ -116,6 +122,168 @@ public class MainActivity extends Activity {
         }
     }
 
+    public static class NativeAudioBridge implements MediaPlayer.OnCompletionListener {
+        private final Context context;
+        private MediaPlayer bgmPlayer;
+        private String currentBgm = null;
+        private float bgmVolume = 0.55f;
+        private boolean isMuted = false;
+        private boolean isPaused = false;
+
+        public NativeAudioBridge(Context ctx) {
+            this.context = ctx;
+        }
+
+        @JavascriptInterface
+        public synchronized void playBgm(String fileName) {
+            if (fileName == null || fileName.isEmpty()) return;
+            try {
+                String cleanName = fileName.replace("musica/", "").trim();
+                if (cleanName.equals(currentBgm) && bgmPlayer != null && bgmPlayer.isPlaying()) {
+                    return;
+                }
+                stopBgmInternal();
+                currentBgm = cleanName;
+
+                AssetFileDescriptor afd = null;
+                try {
+                    afd = context.getAssets().openFd("musica/" + cleanName);
+                } catch (Exception e1) {
+                    try {
+                        afd = context.getAssets().openFd(cleanName);
+                    } catch (Exception ignored) {}
+                }
+
+                if (afd != null) {
+                    bgmPlayer = new MediaPlayer();
+                    bgmPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                    afd.close();
+                    bgmPlayer.setLooping(true);
+                    bgmPlayer.setVolume(isMuted ? 0f : bgmVolume, isMuted ? 0f : bgmVolume);
+                    bgmPlayer.prepare();
+                    bgmPlayer.start();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @JavascriptInterface
+        public synchronized void stopBgm() {
+            stopBgmInternal();
+        }
+
+        public synchronized void stopBgmInternal() {
+            try {
+                if (bgmPlayer != null) {
+                    if (bgmPlayer.isPlaying()) bgmPlayer.stop();
+                    bgmPlayer.release();
+                    bgmPlayer = null;
+                }
+                currentBgm = null;
+            } catch (Exception ignored) {}
+        }
+
+        public synchronized void pauseBgm() {
+            try {
+                if (bgmPlayer != null && bgmPlayer.isPlaying()) {
+                    bgmPlayer.pause();
+                    isPaused = true;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        public synchronized void resumeBgm() {
+            try {
+                if (bgmPlayer != null && isPaused) {
+                    bgmPlayer.start();
+                    isPaused = false;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        @JavascriptInterface
+        public synchronized void setVolume(float vol) {
+            this.bgmVolume = vol;
+            if (bgmPlayer != null) {
+                bgmPlayer.setVolume(isMuted ? 0f : bgmVolume, isMuted ? 0f : bgmVolume);
+            }
+        }
+
+        @JavascriptInterface
+        public synchronized void setMuted(boolean muted) {
+            this.isMuted = muted;
+            if (bgmPlayer != null) {
+                bgmPlayer.setVolume(isMuted ? 0f : bgmVolume, isMuted ? 0f : bgmVolume);
+            }
+        }
+
+        @JavascriptInterface
+        public void playSfx(String fileName) {
+            if (fileName == null || isMuted) return;
+            try {
+                String cleanName = fileName.replace("musica/", "").trim();
+                AssetFileDescriptor afd = null;
+                try {
+                    afd = context.getAssets().openFd("musica/" + cleanName);
+                } catch (Exception e1) {
+                    try {
+                        afd = context.getAssets().openFd(cleanName);
+                    } catch (Exception e2) {
+                        try {
+                            afd = context.getAssets().openFd("assets/" + cleanName);
+                        } catch (Exception ignored) {}
+                    }
+                }
+                if (afd != null) {
+                    MediaPlayer sfx = new MediaPlayer();
+                    sfx.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                    afd.close();
+                    sfx.setLooping(false);
+                    sfx.setVolume(1.0f, 1.0f);
+                    sfx.setOnCompletionListener(this);
+                    sfx.prepare();
+                    sfx.start();
+                }
+            } catch (Exception ignored) {}
+        }
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            try {
+                if (mp != null) {
+                    mp.release();
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
+    static class LimitedInputStream extends FilterInputStream {
+        private long remaining;
+
+        public LimitedInputStream(InputStream in, long limit) {
+            super(in);
+            this.remaining = limit;
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (remaining <= 0) return -1;
+            int r = super.read();
+            if (r != -1) remaining--;
+            return r;
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (remaining <= 0) return -1;
+            if (len > remaining) len = (int) remaining;
+            int r = super.read(b, off, len);
+            if (r > 0) remaining -= r;
+            return r;
+        }
+    }
+
     static class CustomChromeClient extends WebChromeClient {
         private final ProgressBar bar;
         public CustomChromeClient(ProgressBar b) {
@@ -136,6 +304,9 @@ public class MainActivity extends Activity {
 
     static class CustomWebViewClient extends WebViewClient {
         private final MainActivity activity;
+        private static final Map<String, String> sAssetPathMap = new HashMap<String, String>();
+        private static boolean sAssetMapInitialized = false;
+
         public CustomWebViewClient(MainActivity act) {
             this.activity = act;
         }
@@ -159,12 +330,12 @@ public class MainActivity extends Activity {
                     path = "YGOFMR2026-1.html";
                 }
 
-                // Las llamadas API (/api/...) deben salir a internet hacia Render
+                // Las llamadas API (/api/...) NO son assets locales; deben ser manejadas por la red
                 if (path.startsWith("api/")) {
                     return null;
                 }
 
-                return serveAsset(path);
+                return serveAsset(path, request);
             }
 
             // 2. Interceptar también si se accede por file:///android_asset/
@@ -176,28 +347,128 @@ public class MainActivity extends Activity {
                     } else if (path.startsWith("/")) {
                         path = path.substring(1);
                     }
-                    return serveAsset(path);
+                    return serveAsset(path, request);
                 }
             }
 
             return super.shouldInterceptRequest(view, request);
         }
 
-        private WebResourceResponse serveAsset(String path) {
-            if (path == null || activity == null) return null;
+        private synchronized String resolveAssetCasing(String path) {
+            if (path == null) return null;
+            if (!sAssetMapInitialized && activity != null) {
+                buildAssetMap("", activity.getAssets());
+                sAssetMapInitialized = true;
+            }
+            return sAssetPathMap.get(path.toLowerCase());
+        }
+
+        private void buildAssetMap(String prefix, AssetManager am) {
+            try {
+                String[] list = am.list(prefix);
+                if (list == null) return;
+                for (int i = 0; i < list.length; i++) {
+                    String item = list[i];
+                    String full = prefix.isEmpty() ? item : (prefix + "/" + item);
+                    sAssetPathMap.put(full.toLowerCase(), full);
+                    buildAssetMap(full, am);
+                }
+            } catch (Exception ignored) {}
+        }
+
+        private WebResourceResponse serveAsset(String rawPath, WebResourceRequest request) {
+            if (rawPath == null || activity == null) return null;
+            String path = rawPath;
+            try {
+                path = URLDecoder.decode(path, "UTF-8");
+            } catch (Exception ignored) {}
             int q = path.indexOf('?');
             if (q != -1) path = path.substring(0, q);
             int h = path.indexOf('#');
             if (h != -1) path = path.substring(0, h);
 
             try {
-                InputStream is = activity.getAssets().open(path);
+                InputStream is = null;
+                try {
+                    is = activity.getAssets().open(path);
+                } catch (IOException e1) {
+                    String resolved = resolveAssetCasing(path);
+                    if (resolved != null) {
+                        path = resolved;
+                        is = activity.getAssets().open(path);
+                    } else {
+                        return null;
+                    }
+                }
+
                 String mime = getMimeType(path);
-                Map<String, String> headers = new HashMap<>();
+                boolean isText = mime.startsWith("text/") || mime.equals("application/javascript") || mime.equals("application/json");
+                // CRÍTICO: Para recursos binarios (imágenes, audio), encoding DEBE ser null
+                String encoding = isText ? "UTF-8" : null;
+
+                Map<String, String> headers = new HashMap<String, String>();
                 headers.put("Access-Control-Allow-Origin", "*");
-                headers.put("Access-Control-Allow-Methods", "GET, OPTIONS");
+                headers.put("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
                 headers.put("Accept-Ranges", "bytes");
-                return new WebResourceResponse(mime, "UTF-8", 200, "OK", headers, is);
+
+                long fileLength = -1;
+                try {
+                    AssetFileDescriptor afd = activity.getAssets().openFd(path);
+                    if (afd != null) {
+                        fileLength = afd.getLength();
+                        afd.close();
+                    }
+                } catch (Exception ignored) {
+                    try {
+                        fileLength = is.available();
+                    } catch (Exception ignored2) {}
+                }
+
+                String rangeHeader = null;
+                if (request != null && request.getRequestHeaders() != null) {
+                    rangeHeader = request.getRequestHeaders().get("Range");
+                    if (rangeHeader == null) rangeHeader = request.getRequestHeaders().get("range");
+                }
+
+                if (rangeHeader != null && rangeHeader.startsWith("bytes=") && fileLength > 0) {
+                    String rangeVal = rangeHeader.substring(6).trim();
+                    long start = 0;
+                    long end = fileLength - 1;
+                    int dash = rangeVal.indexOf('-');
+                    if (dash != -1) {
+                        String sStr = rangeVal.substring(0, dash).trim();
+                        String eStr = rangeVal.substring(dash + 1).trim();
+                        if (!sStr.isEmpty()) {
+                            try { start = Long.parseLong(sStr); } catch (Exception ignored) {}
+                        }
+                        if (!eStr.isEmpty()) {
+                            try { end = Long.parseLong(eStr); } catch (Exception ignored) {}
+                        }
+                    }
+                    if (end >= fileLength) end = fileLength - 1;
+                    if (start > end) start = 0;
+
+                    long contentLength = (end - start) + 1;
+                    headers.put("Content-Range", "bytes " + start + "-" + end + "/" + fileLength);
+                    headers.put("Content-Length", String.valueOf(contentLength));
+
+                    if (start > 0) {
+                        long skipped = 0;
+                        while (skipped < start) {
+                            long s = is.skip(start - skipped);
+                            if (s <= 0) break;
+                            skipped += s;
+                        }
+                    }
+
+                    return new WebResourceResponse(mime, encoding, 206, "Partial Content", headers, new LimitedInputStream(is, contentLength));
+                }
+
+                if (fileLength > 0) {
+                    headers.put("Content-Length", String.valueOf(fileLength));
+                }
+
+                return new WebResourceResponse(mime, encoding, 200, "OK", headers, is);
             } catch (IOException e) {
                 return null;
             }
@@ -274,6 +545,34 @@ public class MainActivity extends Activity {
         loadGameUrl();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mNativeAudio != null) {
+            mNativeAudio.pauseBgm();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hideSystemUI();
+        if (mNativeAudio != null) {
+            mNativeAudio.resumeBgm();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mNativeAudio != null) {
+            mNativeAudio.stopBgmInternal();
+        }
+        if (mWebView != null) {
+            mWebView.destroy();
+        }
+        super.onDestroy();
+    }
+
     private void configureWebView() {
         mWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -299,6 +598,8 @@ public class MainActivity extends Activity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/" + getAppVersionName());
 
+        mNativeAudio = new NativeAudioBridge(this);
+        mWebView.addJavascriptInterface(mNativeAudio, "NativeAudio");
         mWebView.addJavascriptInterface(new NativeStorageBridge(this), "NativeStorage");
         mWebView.setWebChromeClient(new CustomChromeClient(mProgressBar));
         mWebView.setWebViewClient(new CustomWebViewClient(this));

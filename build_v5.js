@@ -3,6 +3,51 @@ const path = require('path');
 const ROOT = __dirname;
 let html = fs.readFileSync(path.join(ROOT, 'ForbiddenMemoriesReborn', 'FMR_V3_0_7_BANDAI1998_MENU.html'), 'utf8');
 
+// 0. Inject early network & API router in <head>
+const earlyNetworkRouter = `
+<script>
+// TOP-LEVEL NETWORK & API ROUTER FOR OFFLINE-FIRST APK
+(function() {
+  var SERVER_ORIGIN = 'https://yugiohreborn.onrender.com';
+  function rewriteApiUrl(u) {
+    if (typeof u !== 'string') return u;
+    if (u.indexOf('/api/') === 0) return SERVER_ORIGIN + u;
+    if (u.indexOf('https://fmr.local/api/') === 0) return u.replace('https://fmr.local', SERVER_ORIGIN);
+    if (u.indexOf('http://fmr.local/api/') === 0) return u.replace('http://fmr.local', SERVER_ORIGIN);
+    return u;
+  }
+  var origFetch = window.fetch;
+  if (typeof origFetch === 'function') {
+    window.fetch = function(input, init) {
+      if (typeof input === 'string') {
+        input = rewriteApiUrl(input);
+      } else if (input && typeof input.url === 'string') {
+        var rewritten = rewriteApiUrl(input.url);
+        if (rewritten !== input.url) {
+          try { input = new Request(rewritten, input); } catch(_) { input.url = rewritten; }
+        }
+      }
+      return origFetch.call(this, input, init);
+    };
+  }
+  if (typeof XMLHttpRequest !== 'undefined' && XMLHttpRequest.prototype) {
+    var origOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url) {
+      arguments[1] = rewriteApiUrl(url);
+      return origOpen.apply(this, arguments);
+    };
+  }
+})();
+</script>
+`;
+html = html.replace('<head>', '<head>' + earlyNetworkRouter);
+
+// Hook NativeAudio into base _sfx engine function
+html = html.replace(
+  'function _sfx(file, vol) {',
+  'function _sfx(file, vol) {\n    if (window.NativeAudio && typeof window.NativeAudio.playSfx === "function") { window.NativeAudio.playSfx(file); return; }\n'
+);
+
 // 1. Fix native missing <script> tag before V3.0.5
 html = html.replace(/(<\/script>\s*\r?\n)(\s*\/\*\s*V3\.0\.5)/i, (m, p1, p2) => m.includes('<script>') ? m : p1 + '<script>\n' + p2);
 

@@ -49,6 +49,17 @@ function maskEmail(email) {
 
 app.use(express.json({ limit: '25mb' }));
 
+// ── CORS Headers para permitir peticiones desde la APK Android (https://fmr.local / file://) ──
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // ── Utilidades ──────────────────────────────────────────────────
 function hashPassword(pw) {
   return crypto.createHash('sha256').update(String(pw) + 'FMR_SALT_2026').digest('hex');
