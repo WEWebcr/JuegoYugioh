@@ -12677,9 +12677,9 @@
   {
     "id": 1134,
     "name": "Double or Nothing!",
-    "kind": "SPELL",
-    "type": "Spell",
-    "text": "¡Doble o Nada! Cuando el ataque de un monstruo es negado (por ejemplo por Utopia): selecciona ese monstruo; puede atacar una segunda vez este turno y su ATK se duplica durante el cálculo de daño.",
+    "kind": "EQUIP",
+    "type": "Equip",
+    "text": "Carta de Magia de Equipo. Solo puede equiparse a 'Number 39: Utopia'. Duplica el ATK del monstruo equipado (x2) hasta el final del turno. El monstruo equipado con esta carta no puede atacar directamente al rival.",
     "image": "imagenescartas/Mundo4/1134.jpg",
     "world": 4
   },

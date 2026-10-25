@@ -14851,10 +14851,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       'Insect Armor with Laser Cannon', 'Horn of Light', 'Elegant Egotist',
       'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin', 'Violet Crystal',
       'Lightning Blade', 'Bright Castle', 'Castillo Brillante', 'Winged Trumpeter',
-      'Xyz Unit', 'Gagagarevenge', 'Gagaga Revenge'
+      'Xyz Unit', 'Gagagarevenge', 'Gagaga Revenge', 'Double or Nothing!', 'Double or Nothing'
     ];
     if (equipNames.includes(name)) return true;
-    if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER', 'XYZ_UNIT', 'GAGAGAREVENGE', 'BRIGHT_CASTLE', 'SALAMANDRA', 'WINGED_TRUMPETER', 'LIGHTNING_BLADE'].includes(val)) return true;
+    if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER', 'XYZ_UNIT', 'GAGAGAREVENGE', 'BRIGHT_CASTLE', 'SALAMANDRA', 'WINGED_TRUMPETER', 'LIGHTNING_BLADE', 'DOUBLE_OR_NOTHING'].includes(val)) return true;
     var desc = (c.text || c.desc || '').toLowerCase();
     if ((desc.includes('equipa a') || desc.includes('monstruo equipado') || desc.includes('equipped with this card') || desc.includes('equip to')) && kind !== 'TRAP') return true;
     return false;
@@ -14866,7 +14866,14 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var val = (eqCard && eqCard.value) || '';
     var atk = 500;
     var def = 0;
-    if (name === 'Xyz Unit' || val === 'XYZ_UNIT') {
+    if (name === 'Double or Nothing!' || name === 'Double or Nothing' || val === 'DOUBLE_OR_NOTHING' || name.includes('Double or Nothing') || name.includes('Doble o Nada')) {
+      var baseEff = 2500;
+      if (target) {
+        baseEff = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(target) : Number(target.atk || 2500));
+      }
+      atk = baseEff; // Duplica su ataque actual (al sumar su propio valor de ATK)
+      def = 0;
+    } else if (name === 'Xyz Unit' || val === 'XYZ_UNIT') {
       var rk = 4;
       if (target) {
         rk = Number(target.rank || target.level || target[1] || 4);
@@ -15004,6 +15011,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (eqVal === 'EQUIP_WINGED_BEAST' || eqName === 'Follow Wind') {
       return monType.includes('winged beast') || monType.includes('bestia alada');
     }
+    if (eqVal === 'DOUBLE_OR_NOTHING' || eqName === 'Double or Nothing!' || eqName === 'Double or Nothing' || eqName.includes('Double or Nothing') || eqName.includes('Doble o Nada')) {
+      var tNameU = ((target.name || target[0] || '') + '').toLowerCase();
+      return tNameU.includes('number 39: utopia') || tNameU.includes('numero 39: utopia') || tNameU.includes('número 39: utopía') || (tNameU.includes('utopia') && !tNameU.includes('buster'));
+    }
     if (eqVal === 'XYZ_UNIT' || eqName === 'Xyz Unit') {
       return (typeof window.isFieldMonsterXyz === 'function' ? window.isFieldMonsterXyz(target) : (target.kind === 'XYZ' || (target.name && window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(target.name))));
     }
@@ -15064,7 +15075,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var eqVal = eqCard.value || '';
 
     if (!allTargets.length) {
-      if (eqVal === 'DRAGON_TREASURE' || eqName === 'Dragon Treasure' || eqVal === 'EQUIP_DRAGON' || eqName === 'Garra del Dragón') {
+      if (eqVal === 'DOUBLE_OR_NOTHING' || eqName === 'Double or Nothing!' || eqName === 'Double or Nothing' || eqName.includes('Double or Nothing') || eqName.includes('Doble o Nada')) {
+        duelToast('Double or Nothing! solo puede equiparse a Number 39: Utopia.');
+        if (typeof log === 'function') log('Double or Nothing! solo puede equiparse a Number 39: Utopia.');
+      } else if (eqVal === 'DRAGON_TREASURE' || eqName === 'Dragon Treasure' || eqVal === 'EQUIP_DRAGON' || eqName === 'Garra del Dragón') {
         duelToast('Dragon Treasure requiere al menos un monstruo Tipo Dragón boca arriba en el campo.');
       } else if (eqVal === 'FUSION_WEAPON' || eqName === 'Fusion Weapon') {
         duelToast('Fusion Weapon requiere un monstruo de Fusión Nivel 6 o menor boca arriba en el campo.');
@@ -15087,9 +15101,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var sampleCard = (allTargets.length > 0 && allTargets[0]) ? allTargets[0].card : null;
     var eqStats = getEquipStats(eqCard, sampleCard);
     var isMega = (eqName === 'Megamorph' || eqVal === 'MEGAMORPH' || eqName === 'Megamorfo');
+    var isDoN = (eqName === 'Double or Nothing!' || eqName === 'Double or Nothing' || eqVal === 'DOUBLE_OR_NOTHING' || eqName.includes('Double or Nothing') || eqName.includes('Doble o Nada'));
     var boostStr = isMega
       ? 'Duplica ATK (si LP < rival) / Mitad ATK (si LP > rival)'
-      : ((eqStats.atk >= 0 ? '+' : '') + eqStats.atk + ' ATK' + (eqStats.def ? ' / +' + eqStats.def + ' DEF' : ''));
+      : (isDoN
+        ? 'Duplica ATK (x2 hasta el final del turno, no puede atacar directo)'
+        : ((eqStats.atk >= 0 ? '+' : '') + eqStats.atk + ' ATK' + (eqStats.def ? ' / +' + eqStats.def + ' DEF' : '')));
 
     var headerHTML = '<h3 style="color:#ffd700;font-size:24px;margin:0 0 6px;text-align:center;letter-spacing:1px;text-shadow:0 0 8px #ffb300;">' +
       'EQUIPAR: ' + eqName + '</h3>' +
@@ -15175,8 +15192,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       tCard._handEquipDef = (tCard._handEquipDef || 0) + def;
       tCard._appliedDef109 = (tCard._appliedDef109 || 0) + def;
     }
-    if (!tCard.equippedCards) tCard.equippedCards = [];
-    tCard.equippedCards.push(eqCard.name);
+    var isDoN = (eqCard && (eqCard.name === 'Double or Nothing!' || eqCard.name === 'Double or Nothing' || eqCard.value === 'DOUBLE_OR_NOTHING' || (eqCard.name && eqCard.name.includes('Double or Nothing'))));
+    if (isDoN) {
+      tCard._doubleOrNothingBoost = atk;
+      tCard._cannotAttackDirect = true;
+      tCard._doubleOrNothingTurn = (g && g.turnNo) || 1;
+    }
 
     // Equipping monster on Field
     var token = tCard._equipToken109 || ('EQM109-' + Date.now() + '-' + Math.random());
@@ -15194,7 +15215,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           equipToken109: token,
           _targetMonster: tCard,
           _appliedAtk109: atk,
-          _appliedDef109: def
+          _appliedDef109: def,
+          _isDoubleOrNothing: isDoN,
+          _turnActivated: (g && g.turnNo) || 1
         });
       } else {
         g.grave.push(Object.assign({}, splicedCard, { set: false, faceUp: true }));
@@ -15209,14 +15232,22 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         g.playerBack[source.index]._targetMonster = tCard;
         g.playerBack[source.index]._appliedAtk109 = atk;
         g.playerBack[source.index]._appliedDef109 = def;
+        g.playerBack[source.index]._isDoubleOrNothing = isDoN;
+        g.playerBack[source.index]._turnActivated = (g && g.turnNo) || 1;
       }
     }
 
     g.selected = [];
     if (typeof render === 'function') render();
     var tName = tCard.name || tCard[0] || 'monstruo';
-    duelToast('¡' + (eqCard.name) + ' equipado a ' + tName + ' en el campo!');
-    if (typeof log === 'function') log('Equipaste ' + eqCard.name + ' a ' + tName + ' en el campo. +' + atk + ' ATK' + (def ? ' / +' + def + ' DEF' : '') + '.');
+    if (isDoN) {
+      var totalAtk = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(tCard) : (tCard.atk || 0));
+      duelToast('💥 ¡Double or Nothing! equipado a ' + tName + ': ¡ATK duplicado a ' + totalAtk + ' hasta el final del turno! (No puede atacar directo)');
+      if (typeof log === 'function') log('¡Double or Nothing! duplica el ATK de ' + tName + ' a ' + totalAtk + ' este turno. No puede atacar directamente.');
+    } else {
+      duelToast('¡' + (eqCard.name) + ' equipado a ' + tName + ' en el campo!');
+      if (typeof log === 'function') log('Equipaste ' + eqCard.name + ' a ' + tName + ' en el campo. +' + atk + ' ATK' + (def ? ' / +' + def + ' DEF' : '') + '.');
+    }
   }
 
   // Override equipSpell and activateEquipPlayer109
@@ -16986,28 +17017,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     // DOUBLE OR NOTHING!
     if (val === 'DOUBLE_OR_NOTHING' || cName === 'Double or Nothing!' || nUpperHand.includes('DOUBLE OR NOTHING') || nUpperHand.includes('DOBLE O NADA')) {
-      var myMonsters = (g.field || []).concat(g.linkZones || []).filter(function(m) {
-        return m && !m.faceDown;
-      });
-      if (!myMonsters.length) {
-        duelToast('Doble o Nada requiere al menos 1 monstruo boca arriba en tu campo.');
-        if (typeof log === 'function') log('Doble o Nada: No tienes monstruos boca arriba en el campo.');
-        return;
-      }
-      g.hand.splice(i, 1);
-      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
-      myMonsters.sort(function(a, b) {
-        var atkA = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(a) : Number(a.atk || 0));
-        var atkB = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(b) : Number(b.atk || 0));
-        return atkB - atkA;
-      });
-      var targetMon = myMonsters[0];
-      var baseEff = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(targetMon) : Number(targetMon.atk || 0));
-      targetMon.tempBoost = (targetMon.tempBoost || 0) + baseEff;
-      var tMName = targetMon.name || targetMon[0] || 'Monstruo';
-      duelToast('💥 ¡Doble o Nada! ' + tMName + ' duplica su ATK (+' + baseEff + ' ATK).');
-      if (typeof log === 'function') log('¡Doble o Nada! ' + tMName + ' duplica su ataque este turno. +' + baseEff + ' ATK.');
-      if (typeof render === 'function') render();
+      window.promptEquipTarget(c, { type: 'hand', index: i });
       return;
     }
 
@@ -18407,20 +18417,34 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     for (var h = game.enemyHand.length - 1; h >= 0; h--) {
       var eq = game.enemyHand[h];
       if (eq && (eq.kind === 'EQUIP' || eq.type === 'EQUIP' || eq.value === 'EQUIP' || isEquipSpell(eq) || (eq.name && (eq.name.includes('Pendant') || eq.name.includes('Treasure') || eq.name.includes('Unicorn'))))) {
+        var isDoN = (eq.name === 'Double or Nothing!' || eq.name === 'Double or Nothing' || eq.value === 'DOUBLE_OR_NOTHING' || (eq.name && eq.name.includes('Double or Nothing')));
         var strongestTarget = null, sAtk = -1;
-        (game.enemy || []).forEach(function(mon) {
-          if (mon && (mon.atk || 0) > sAtk) {
-            sAtk = mon.atk || 0;
-            strongestTarget = mon;
-          }
-        });
+        if (isDoN) {
+          strongestTarget = (game.enemy || []).find(function(mon) {
+            if (!mon) return false;
+            var mn = (mon.name || mon[0] || '').toLowerCase();
+            return mn.includes('number 39: utopia') || mn.includes('numero 39: utopia') || mn.includes('número 39: utopía') || (mn.includes('utopia') && !mn.includes('buster'));
+          });
+          if (!strongestTarget) continue; // Si la IA no tiene a Utopia, no puede equipar Double or Nothing
+        } else {
+          (game.enemy || []).forEach(function(mon) {
+            if (mon && (mon.atk || 0) > sAtk) {
+              sAtk = mon.atk || 0;
+              strongestTarget = mon;
+            }
+          });
+        }
         if (strongestTarget) {
           game.enemyHand.splice(h, 1);
           var token = strongestTarget._equipToken109 || ('EQM109-' + Date.now() + '-' + Math.random());
           strongestTarget._equipToken109 = token;
           var eqSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
           var boost = 500;
-          if (eq.name === 'Axe of Despair' || eq.value === 'AXE_DESPAIR') boost = 1000;
+          if (isDoN) {
+            boost = (strongestTarget.atk || 2500); // Duplica su ATK
+            strongestTarget._cannotAttackDirect = true;
+            strongestTarget._doubleOrNothingBoost = boost;
+          } else if (eq.name === 'Axe of Despair' || eq.value === 'AXE_DESPAIR') boost = 1000;
           else if (eq.name === 'Horn of the Unicorn' || eq.value === 'HORN_UNICORN') boost = 700;
           else if (eq.name === 'United We Stand' || eq.value === 'UNITED_WE_STAND') boost = 800;
 
@@ -18433,7 +18457,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
               equipToken109: token,
               _targetMonster: strongestTarget,
               _appliedAtk109: boost,
-              _appliedDef109: 0
+              _appliedDef109: 0,
+              _isDoubleOrNothing: isDoN
             });
           } else {
             game.enemyGrave.push(eq);
@@ -18844,6 +18869,10 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
       // CASO 1: ATAQUE DIRECTO (El jugador NO tiene monstruos en el campo)
       if (remainingPlayerMonsters.length === 0) {
+        if (e._cannotAttackDirect || (e.equippedCards && e.equippedCards.some(function(n) { return n && n.includes('Double or Nothing'); }))) {
+          if (typeof log === 'function') log(e.name + ' no puede atacar directamente debido al efecto de Double or Nothing!.');
+          continue;
+        }
         // En ataque directo el rival es agresivo al 100%
         if (!playerHasConcealing && e.pos !== 'ATK' && e.kind !== 'LINK') {
           e.pos = 'ATK';
@@ -19544,6 +19573,21 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       var e = (ei != null && game.enemy) ? game.enemy[ei[1]] : null;
       if (!e && (game.selected || []).some(function(x) { return x && x[0] === 'el'; })) {
         e = game.enemyLinkField;
+      }
+
+      // Restricción Double or Nothing!: el monstruo equipado NO puede atacar directamente
+      var enemyMonsterCount = (game.enemy || []).filter(Boolean).length + (game.enemyLinkField ? 1 : 0);
+      var isDirectAttack = (enemyMonsterCount === 0 || (!e && enemyMonsterCount === 0));
+      var hasDoN = p && (p._cannotAttackDirect || (p.equippedCards && p.equippedCards.some(function(n) { return n && n.includes('Double or Nothing'); })));
+      if (!hasDoN && p && Array.isArray(game.playerBack)) {
+        hasDoN = game.playerBack.some(function(b) {
+          return b && (b._isDoubleOrNothing || (b.name && b.name.includes('Double or Nothing'))) && b._targetMonster === p;
+        });
+      }
+      if (hasDoN && isDirectAttack) {
+        duelToast('⚠️ ' + (p.name || 'Number 39: Utopia') + ' está equipado con Double or Nothing! y NO puede atacar directamente.');
+        if (typeof log === 'function') log('⚠️ ' + (p.name || 'Number 39: Utopia') + ' no puede atacar directamente al rival debido al efecto de Double or Nothing!.');
+        return;
       }
 
       // AI Battle Traps in response to Player Attack
@@ -24279,6 +24323,32 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (typeof render === 'function') render();
     }
 
+    // 3. Reversión de Double or Nothing! (el incremento al doble dura solo hasta el final del turno)
+    var allPlayerMons = (g.field || []).concat(g.linkZones || []).concat([g.linkField]).filter(Boolean);
+    allPlayerMons.forEach(function(m) {
+      if (m && m._doubleOrNothingBoost) {
+        var b = m._doubleOrNothingBoost;
+        m.equip = Math.max(0, (m.equip || 0) - b);
+        m._handEquipAtk = Math.max(0, (m._handEquipAtk || 0) - b);
+        m._appliedAtk109 = Math.max(0, (m._appliedAtk109 || 0) - b);
+        delete m._doubleOrNothingBoost;
+        delete m._cannotAttackDirect;
+        delete m._doubleOrNothingTurn;
+        if (typeof log === 'function') log('El efecto de Double or Nothing! en ' + (m.name || 'Number 39: Utopia') + ' finaliza (pierde el ATK duplicado).');
+      }
+    });
+
+    if (Array.isArray(g.playerBack)) {
+      for (var bi = 0; bi < g.playerBack.length; bi++) {
+        var pb = g.playerBack[bi];
+        if (pb && (pb._isDoubleOrNothing || (pb.name && pb.name.includes('Double or Nothing')))) {
+          g.playerBack[bi] = null;
+          g.grave.push(Object.assign({}, pb, { set: false, faceUp: true }));
+          if (typeof log === 'function') log('Double or Nothing! se envía al Cementerio al terminar el turno.');
+        }
+      }
+    }
+
     if (typeof origEndTurn === 'function') {
       return origEndTurn.apply(this, arguments);
     }
@@ -24291,6 +24361,31 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
   window.startTurnDraw67 = function(side) {
     var g = (typeof game !== 'undefined' && game) ? game : window.game;
     if (!g || g.duelOver) return false;
+
+    // Reversión de Double or Nothing! para la IA o el jugador al comenzar el turno del contrario
+    if (side === 'player') {
+      var allEnemyMons = (g.enemy || []).concat(g.enemyLinkZones || []).concat([g.enemyLinkField]).filter(Boolean);
+      allEnemyMons.forEach(function(em) {
+        if (em && em._doubleOrNothingBoost) {
+          var eb = em._doubleOrNothingBoost;
+          em.equip = Math.max(0, (em.equip || 0) - eb);
+          em.atk = Math.max(0, (em.atk || 0) - eb);
+          delete em._doubleOrNothingBoost;
+          delete em._cannotAttackDirect;
+          delete em._doubleOrNothingTurn;
+        }
+      });
+      if (Array.isArray(g.enemyBack)) {
+        for (var ebi = 0; ebi < g.enemyBack.length; ebi++) {
+          var epb = g.enemyBack[ebi];
+          if (epb && (epb._isDoubleOrNothing || (epb.name && epb.name.includes('Double or Nothing')))) {
+            g.enemyBack[ebi] = null;
+            g.enemyGrave.push(Object.assign({}, epb, { set: false, faceUp: true }));
+          }
+        }
+      }
+    }
+
     var hand = side === 'enemy' ? g.enemyHand : g.hand;
     var deck = side === 'enemy' ? g.enemyDeck : g.deck;
     var label = side === 'enemy' ? 'El rival' : 'Tú';
