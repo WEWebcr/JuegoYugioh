@@ -32157,6 +32157,9 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     // Botón de Invocación Xyz en la barra de acciones
     var hasXyzCards = (isZexal || (g && Array.isArray(g.extra) && g.extra.some(function(x) { return x && (x.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.name || x))); })));
+    if (document.body) {
+      document.body.classList.toggle('has-xyz', !!hasXyzCards);
+    }
     var xyzBtn = document.getElementById('xyzSummonBtn');
     if (!xyzBtn && hasXyzCards) {
       var actionBtns = document.querySelector('.btns.actionBtns');
@@ -32165,7 +32168,6 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         xyzBtn.id = 'xyzSummonBtn';
         xyzBtn.className = 'btn';
         xyzBtn.textContent = '⚡ Inv. Xyz';
-        xyzBtn.style.cssText = 'background:linear-gradient(180deg, #ffd700, #b8860b) !important; color:#000 !important; font-weight:900 !important; border:1px solid #fff !important;';
         xyzBtn.onclick = function() {
           if (typeof window.openXyzSummonModal === 'function') window.openXyzSummonModal();
         };
@@ -32174,8 +32176,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     }
     if (xyzBtn) {
       var canXyz = typeof window.canPlayerXyzSummonAny === 'function' && window.canPlayerXyzSummonAny();
-      xyzBtn.style.boxShadow = canXyz ? '0 0 14px #ffd700' : 'none';
-      xyzBtn.style.opacity = canXyz ? '1' : '0.6';
+      xyzBtn.classList.toggle('xyzReady', !!canXyz);
     }
 
     if (typeof updateSpecialSummonAssist === 'function') {
@@ -32613,14 +32614,317 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       display: none !important;
     }
 
+    /* BOTÓN INVOCACIÓN XYZ Y CONTROLADORES DE ACCIÓN */
     body.world-4 #xyzSummonBtn,
+    body.has-xyz #xyzSummonBtn,
     body.world-4.view-hand #xyzSummonBtn,
-    body.world-4.view-field #xyzSummonBtn {
+    body.world-4.view-field #xyzSummonBtn,
+    body.has-xyz.view-hand #xyzSummonBtn,
+    body.has-xyz.view-field #xyzSummonBtn {
       display: inline-flex !important;
     }
 
-    body:not(.world-4) #xyzSummonBtn {
+    body:not(.world-4):not(.has-xyz) #xyzSummonBtn {
       display: none !important;
+    }
+
+    /* ESTILO PREMIUM PARA EL BOTÓN INVOCACIÓN XYZ */
+    #xyzSummonBtn {
+      background: linear-gradient(135deg, #181926 0%, #0d0e15 60%, #1e1f2e 100%) !important;
+      border: 1.5px solid #d4af37 !important;
+      color: #ffd700 !important;
+      font-weight: 900 !important;
+      border-radius: 9px !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      transition: all 0.18s ease !important;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.75), inset 0 0 8px rgba(212, 175, 55, 0.2) !important;
+      cursor: pointer !important;
+    }
+
+    #xyzSummonBtn:hover:not(:disabled) {
+      border-color: #ffe600 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.8), inset 0 0 12px rgba(255, 215, 0, 0.35) !important;
+      transform: translateY(-2px) !important;
+    }
+
+    #xyzSummonBtn.xyzReady {
+      border: 2px solid #ffe600 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 20px rgba(255, 230, 0, 0.95), inset 0 0 10px rgba(255, 215, 0, 0.5) !important;
+      animation: xyzPulseGlow 1.3s infinite alternate !important;
+    }
+
+    @keyframes xyzPulseGlow {
+      0% {
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        transform: scale(1);
+      }
+      100% {
+        box-shadow: 0 0 22px rgba(255, 230, 0, 1), 0 0 32px rgba(255, 200, 0, 0.65);
+        transform: scale(1.04);
+      }
+    }
+
+    #xyzSummonBtn.disabled,
+    #xyzSummonBtn:disabled {
+      opacity: 0.4 !important;
+      filter: grayscale(0.8) !important;
+      pointer-events: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      border-color: #555555 !important;
+      color: #888888 !important;
+    }
+
+    /* ============================================================== */
+    /* ESTILIZACIÓN DE LA BARRA DE BOTONES DE DUELO ("MUY CHIVA")     */
+    /* ============================================================== */
+
+    /* Contenedor de Botones de Acción */
+    .btns.actionBtns {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 8px 12px !important;
+      max-width: min(96vw, 1150px) !important;
+      margin: 10px auto 14px !important;
+      padding: 8px 14px !important;
+      background: linear-gradient(180deg, rgba(24, 18, 12, 0.9) 0%, rgba(12, 9, 6, 0.94) 100%) !important;
+      border: 1.5px solid rgba(200, 165, 95, 0.45) !important;
+      border-radius: 14px !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+      backdrop-filter: blur(8px) !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Estilo base de cada botón de acción */
+    .actionBtns .btn {
+      height: 38px !important;
+      min-height: 38px !important;
+      padding: 0 14px !important;
+      border-radius: 9px !important;
+      font-size: 11.5px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.04em !important;
+      text-transform: uppercase !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      cursor: pointer !important;
+      box-sizing: border-box !important;
+      transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.16s ease, filter 0.16s ease !important;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85) !important;
+    }
+
+    .actionBtns .btn:hover:not(:disabled):not(.disabled) {
+      transform: translateY(-2px) !important;
+      filter: brightness(1.15) !important;
+    }
+
+    .actionBtns .btn:active:not(:disabled):not(.disabled) {
+      transform: translateY(1px) !important;
+    }
+
+    /* 1. Botón INVOCAR (Normal Summon) */
+    #summonBtn103,
+    .actionBtns button[onclick*="normalSummon"] {
+      background: linear-gradient(135deg, #c0392b 0%, #8e1b10 100%) !important;
+      border: 1.5px solid #ff7979 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    }
+    #summonBtn103:hover,
+    .actionBtns button[onclick*="normalSummon"]:hover {
+      box-shadow: 0 0 16px rgba(255, 121, 121, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* 2. Botón SET (Colocar Monstruo en Defensa) */
+    #setMonsterBtn103 {
+      background: linear-gradient(135deg, #1b638a 0%, #0e3b54 100%) !important;
+      border: 1.5px solid #48dbfb !important;
+      color: #e0f7fa !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    }
+    #setMonsterBtn103.setReady103 {
+      border: 2px solid #00f2fe !important;
+      box-shadow: 0 0 18px rgba(0, 242, 254, 0.9), inset 0 0 8px rgba(0, 242, 254, 0.45) !important;
+      color: #ffffff !important;
+      animation: setPulse 1.3s infinite alternate !important;
+    }
+    @keyframes setPulse {
+      0% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.5); }
+      100% { box-shadow: 0 0 22px rgba(0, 242, 254, 1); }
+    }
+
+    /* 3. Botón FUSIÓN */
+    #fusionBtn {
+      background: linear-gradient(135deg, #6c5ce7 0%, #4834d4 100%) !important;
+      border: 1.5px solid #a29bfe !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    }
+    #fusionBtn.fusionReady {
+      border: 2px solid #e0d4ff !important;
+      box-shadow: 0 0 20px rgba(162, 155, 254, 0.95), inset 0 0 10px rgba(162, 155, 254, 0.5) !important;
+      animation: fusionGlow 1.2s infinite alternate !important;
+    }
+    @keyframes fusionGlow {
+      0% { box-shadow: 0 0 8px rgba(162, 155, 254, 0.5); }
+      100% { box-shadow: 0 0 24px rgba(162, 155, 254, 1), 0 0 35px rgba(108, 92, 231, 0.75); }
+    }
+
+    /* 4. Botón CAMBIAR POSICIÓN */
+    .actionBtns button[onclick*="changePosition"] {
+      background: linear-gradient(135deg, #27ae60 0%, #1e824c 100%) !important;
+      border: 1.5px solid #2ecc71 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    }
+    .actionBtns button[onclick*="changePosition"]:hover {
+      box-shadow: 0 0 16px rgba(46, 204, 113, 0.75) !important;
+    }
+
+    /* 5. Botón ACTIVAR (Magias / Trampas Colocadas) */
+    #activateSetBtn {
+      background: linear-gradient(135deg, #e84393 0%, #c0392b 100%) !important;
+      border: 1.5px solid #fd79a8 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 14px rgba(253, 121, 168, 0.7) !important;
+      animation: activateSetPulse 1.2s infinite alternate !important;
+    }
+    @keyframes activateSetPulse {
+      0% { box-shadow: 0 0 8px rgba(253, 121, 168, 0.4); }
+      100% { box-shadow: 0 0 22px rgba(253, 121, 168, 0.95); }
+    }
+
+    /* 6. Botón NUEVO DUELO */
+    .actionBtns button[onclick*="newGame"] {
+      background: linear-gradient(135deg, #3d3d3d 0%, #222222 100%) !important;
+      border: 1.5px solid #7f8c8d !important;
+      color: #dfe4ea !important;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.5) !important;
+    }
+    .actionBtns button[onclick*="newGame"]:hover {
+      border-color: #bdc3c7 !important;
+      color: #ffffff !important;
+    }
+
+    /* 7. Botón RENDIRSE */
+    .actionBtns button[onclick*="surrenderDuel"] {
+      background: linear-gradient(135deg, #5c1818 0%, #330b0b 100%) !important;
+      border: 1.5px solid #e74c3c !important;
+      color: #ffcccc !important;
+      margin-left: 4px !important;
+      opacity: 0.88 !important;
+    }
+    .actionBtns button[onclick*="surrenderDuel"]:hover {
+      opacity: 1 !important;
+      box-shadow: 0 0 14px rgba(231, 76, 60, 0.8) !important;
+    }
+
+    /* 8. Botones Deshabilitados */
+    .actionBtns .btn:disabled,
+    .actionBtns .btn.disabled {
+      opacity: 0.32 !important;
+      filter: grayscale(0.85) !important;
+      pointer-events: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      border-color: #555555 !important;
+      cursor: not-allowed !important;
+    }
+
+    /* 9. Barra de Fases (Phase Bar: DP, BP, EP) */
+    .phaseBar {
+      background: rgba(16, 12, 8, 0.92) !important;
+      border: 1.5px solid #9e814a !important;
+      border-radius: 22px !important;
+      padding: 4px 8px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      margin: 8px auto !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75), inset 0 0 8px rgba(0, 0, 0, 0.8) !important;
+    }
+    .phaseBtn {
+      min-width: 52px !important;
+      height: 32px !important;
+      padding: 0 10px !important;
+      border-radius: 16px !important;
+      border: 1px solid #7a6136 !important;
+      background: linear-gradient(180deg, #2d2316, #1a140c) !important;
+      color: #e5c986 !important;
+      font-weight: 800 !important;
+      font-size: 11.5px !important;
+      cursor: pointer !important;
+      transition: all 0.16s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
+    }
+    .phaseBtn:hover {
+      border-color: #ffd700 !important;
+      color: #ffffff !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.45) !important;
+    }
+    .phaseBtn#epBtn {
+      background: linear-gradient(180deg, #8a4e10, #4d2b09) !important;
+      border-color: #f39c12 !important;
+      color: #ffffff !important;
+    }
+    .phaseBtn#epBtn:hover {
+      box-shadow: 0 0 16px rgba(243, 156, 18, 0.8) !important;
+    }
+
+    /* 10. Navegación CAMPO / MANO (viewNav) */
+    .viewNav {
+      background: rgba(14, 11, 8, 0.94) !important;
+      border: 1.5px solid #9e814a !important;
+      border-radius: 22px !important;
+      padding: 4px !important;
+      gap: 6px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.7) !important;
+    }
+    .viewBtn {
+      min-width: 90px !important;
+      height: 32px !important;
+      padding: 0 14px !important;
+      border-radius: 16px !important;
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      color: #cbb482 !important;
+      font-weight: 800 !important;
+      font-size: 12px !important;
+      letter-spacing: 0.04em !important;
+      cursor: pointer !important;
+      transition: all 0.16s ease !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+    }
+    .viewBtn:hover {
+      color: #ffffff !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+    .viewBtn.active {
+      background: linear-gradient(180deg, #c99c3a, #8c661c) !important;
+      border: 1px solid #ffd700 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 14px rgba(255, 215, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
     }
 
     #specialSummonBtn {
@@ -32825,52 +33129,63 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     /* --- 1. VISTA MANO (HAND VIEW) --- */
     body.view-hand #hand {
-      display: grid !important;
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-      gap: 12px !important;
-      max-width: 980px !important;
-      margin: 15px auto 30px !important;
-      padding: 0 10px !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: clamp(14px, 1.8vw, 26px) !important;
+      max-width: min(96vw, 1380px) !important;
+      margin: 16px auto 32px !important;
+      padding: 8px 14px !important;
+      box-sizing: border-box !important;
     }
 
     body.view-hand #hand .zone {
-      height: 270px !important;
-      min-height: 270px !important;
-      max-height: 270px !important;
+      flex: 0 1 clamp(160px, 15vw, 215px) !important;
+      width: clamp(160px, 15vw, 215px) !important;
+      height: clamp(285px, 25vw, 325px) !important;
+      min-height: unset !important;
+      max-height: unset !important;
       border: 0 !important;
       background: transparent !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
     }
 
     body.view-hand #hand .card,
     .hand .card {
-      height: 270px !important;
-      min-height: 270px !important;
-      max-height: 270px !important;
+      width: 100% !important;
+      height: 100% !important;
+      min-height: unset !important;
+      max-height: unset !important;
       display: flex !important;
       flex-direction: column !important;
       justify-content: space-between !important;
-      padding: 6px !important;
-      border-radius: 9px !important;
-      border: 2px solid #9e814a !important;
-      background: linear-gradient(160deg, #2a2015, #140e0a) !important;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+      padding: 7px !important;
+      border-radius: 12px !important;
+      border: 2px solid #b89758 !important;
+      background: linear-gradient(165deg, #2b2015 0%, #16100c 55%, #0a0806 100%) !important;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.82), inset 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
       box-sizing: border-box !important;
       position: relative !important;
-      transition: transform 0.16s ease, box-shadow 0.16s ease !important;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease !important;
     }
 
     body.view-hand #hand .card:hover,
     .hand .card:hover {
-      transform: translateY(-8px) scale(1.03) !important;
-      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.9), 0 0 14px rgba(229, 200, 120, 0.45) !important;
+      transform: translateY(-10px) scale(1.04) !important;
+      border-color: #ffd700 !important;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.95), 0 0 18px rgba(255, 215, 0, 0.5) !important;
       z-index: 30 !important;
     }
 
     body.view-hand #hand .card.selected,
     .hand .card.selected {
-      transform: translateY(-10px) scale(1.045) !important;
+      transform: translateY(-12px) scale(1.05) !important;
       outline: 3px solid #f4d35e !important;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.95), 0 0 22px rgba(244, 211, 94, 0.7) !important;
+      border-color: #ffffff !important;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.95), 0 0 24px rgba(244, 211, 94, 0.8) !important;
       z-index: 35 !important;
     }
 
@@ -32928,20 +33243,19 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     body.view-hand #hand .card.spell .cardArt,
     body.view-hand #hand .card.trap .cardArt {
       width: 100% !important;
-      height: 155px !important;
-      min-height: 155px !important;
-      max-height: 155px !important;
-      flex: 0 0 155px !important;
+      height: clamp(140px, 14vw, 175px) !important;
+      min-height: 120px !important;
+      max-height: 180px !important;
+      flex: 1 1 auto !important;
       margin: 2px 0 !important;
-      border-radius: 6px !important;
+      border-radius: 7px !important;
       overflow: hidden !important;
       border: 1.5px solid #8e7343 !important;
-      background: #000 !important;
+      background: #000000 !important;
       box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9) !important;
       position: relative !important;
       display: flex !important;
       align-items: center !important;
-      justify-content: center !important;
     }
 
     body.view-hand #hand .card.spell .cardArt {
@@ -33332,30 +33646,35 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     /* Responsive adjustments for mobile and portrait */
     @media (max-width: 768px), (orientation: portrait) {
       body.view-hand #hand {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
         gap: 8px !important;
-        padding: 0 4px !important;
+        padding: 4px 6px !important;
+        max-width: 100vw !important;
       }
       body.view-hand #hand .zone {
-        height: 215px !important;
-        min-height: 215px !important;
-        max-height: 215px !important;
+        flex: 0 1 calc(33.333% - 6px) !important;
+        width: calc(33.333% - 6px) !important;
+        height: 220px !important;
+        min-height: 220px !important;
+        max-height: 220px !important;
       }
       body.view-hand #hand .card,
       .hand .card {
-        height: 215px !important;
-        min-height: 215px !important;
-        max-height: 215px !important;
+        height: 220px !important;
+        min-height: 220px !important;
+        max-height: 220px !important;
         padding: 4px !important;
       }
       body.view-hand #hand .card .cardArt,
       .hand .card .cardArt,
       body.view-hand #hand .card.spell .cardArt,
       body.view-hand #hand .card.trap .cardArt {
-        height: 115px !important;
-        min-height: 115px !important;
-        max-height: 115px !important;
-        flex: 0 0 115px !important;
+        height: 118px !important;
+        min-height: 118px !important;
+        max-height: 118px !important;
+        flex: 0 0 118px !important;
       }
       body.view-hand #hand .card .cardTop .name,
       .hand .card .cardTop .name {
@@ -33366,6 +33685,16 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         font-size: 8.5px !important;
         height: 20px !important;
         min-height: 20px !important;
+      }
+      .actionBtns {
+        gap: 6px 8px !important;
+        padding: 6px 8px !important;
+      }
+      .actionBtns .btn {
+        height: 33px !important;
+        min-height: 33px !important;
+        padding: 0 9px !important;
+        font-size: 10.5px !important;
       }
       body.view-field #player .fieldStats,
       body.view-field #enemy .fieldStats,
