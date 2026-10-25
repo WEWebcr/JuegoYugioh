@@ -5599,6 +5599,7 @@ window.isCardProgrammed = function(cardOrName) {
   var name = '';
   if (typeof cardOrName === 'string') {
     name = cardOrName.trim().toLowerCase();
+    if (name === 'mammoth graveyard' || name === 'zanki' || name === 'dragon zombie' || name === 'curse of dragon' || name === 'gaia the fierce knight') return true;
     var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : null;
     if (dict && (dict[cardOrName] || dict[name])) {
       c = dict[cardOrName] || dict[name];
@@ -5611,13 +5612,16 @@ window.isCardProgrammed = function(cardOrName) {
     c = cardOrName;
     name = (c.name || c[0] || '').trim().toLowerCase();
   }
-  // Cartas de 5D's oficiales están siempre programadas
+  // Cartas de 5D's y ZEXAL oficiales están siempre programadas
   if (typeof window.is5DCard === 'function' && window.is5DCard(c || name)) return true;
+  if (typeof window.isZexalCard === 'function' && window.isZexalCard(c || name)) return true;
+  if (window.CARD_MAPPINGS && (window.CARD_MAPPINGS[cardOrName] || window.CARD_MAPPINGS[name] || (window.CARD_MAPPINGS_LOWER && window.CARD_MAPPINGS_LOWER[name]))) return true;
+  if (window.FMR_CANONICAL_STARTER_DECK && window.FMR_CANONICAL_STARTER_DECK.some(function(x) { return x && x.toLowerCase().trim() === name; })) return true;
   if (!c) {
     return window.PROGRAMMED_ST_NAMES.has(name);
   }
   var kind = String(c.kind || c.type || '').toUpperCase();
-  if (kind === 'MONSTER' || kind === 'FUSION' || kind === 'LINK' || c.isMonster || (c.atk !== undefined && c.atk !== '-' && kind !== 'SPELL' && kind !== 'TRAP' && kind !== 'EQUIP')) {
+  if (kind === 'MONSTER' || kind === 'FUSION' || kind === 'LINK' || kind === 'XYZ' || kind === 'SYNCHRO' || c.isMonster || (c.atk !== undefined && c.atk !== '-' && kind !== 'SPELL' && kind !== 'TRAP' && kind !== 'EQUIP')) {
     return true;
   }
   if (window.PROGRAMMED_ST_NAMES.has(name)) return true;
@@ -5703,8 +5707,10 @@ window.cleanSaveCollection = function(s) {
       delete s.collection[k];
       modified = true;
     } else if (typeof window.isCardProgrammed === 'function' && !window.isCardProgrammed(k)) {
-      delete s.collection[k];
-      modified = true;
+      if (typeof window.isCardAllowedInWorld === 'function' && !window.isCardAllowedInWorld(k, 1)) {
+        delete s.collection[k];
+        modified = true;
+      }
     }
   });
 
@@ -5734,13 +5740,15 @@ window.cleanSaveCollection = function(s) {
   }
 
   // 3. Limpiar decks clásicos (s.decks y s.deck) de cualquier carta 5D's
-  var defaultFillers = ['Celtic Guardian', 'Silver Fang', 'Mammoth Graveyard', 'Feral Imp', 'Winged Dragon, Guardian of the Fortress #1'];
+  var defaultFillers = ['Celtic Guardian', 'Silver Fang', 'Mammoth Graveyard', 'Feral Imp', 'Winged Dragon, Guardian of the Fortress #1', 'Baby Dragon', 'Battle Ox'];
   function sanitizeClassicDeck(deckArr) {
     if (!Array.isArray(deckArr)) return deckArr;
     var filtered = deckArr.filter(function(cardName) {
       if (!window.isCardProgrammed(cardName)) {
-        modified = true;
-        return false;
+        if (typeof window.isCardAllowedInWorld === 'function' && !window.isCardAllowedInWorld(cardName, 1)) {
+          modified = true;
+          return false;
+        }
       }
       if (typeof window.is5DCard === 'function' && window.is5DCard(cardName)) {
         modified = true;
@@ -5750,7 +5758,9 @@ window.cleanSaveCollection = function(s) {
     });
     var fIdx = 0;
     while (filtered.length < 40 && filtered.length > 0) {
-      filtered.push(defaultFillers[fIdx % defaultFillers.length]);
+      var filler = defaultFillers[fIdx % defaultFillers.length];
+      filtered.push(filler);
+      s.collection[filler] = Math.max(s.collection[filler] || 0, filtered.filter(function(x) { return x === filler; }).length);
       fIdx++;
       modified = true;
     }
@@ -5759,6 +5769,9 @@ window.cleanSaveCollection = function(s) {
 
   if (Array.isArray(s.deck)) {
     s.deck = sanitizeClassicDeck(s.deck);
+    s.deck.forEach(function(c) {
+      s.collection[c] = Math.max(s.collection[c] || 0, s.deck.filter(function(x) { return x === c; }).length);
+    });
   }
   if (s.decks && typeof s.decks === 'object') {
     for (var dName in s.decks) {
@@ -9682,7 +9695,7 @@ window.customShowDeckEditor = function() {
         return true;
     }
 
-    function showMobileCardDetail(name, info, cardColor) {
+    function showMobileCardDetail(name, info, cardColor, extraDesc) {
         let existingModal = document.getElementById('deck-mobile-card-modal');
         if (existingModal) existingModal.remove();
 
@@ -9690,21 +9703,23 @@ window.customShowDeckEditor = function() {
         modal.id = 'deck-mobile-card-modal';
         modal.style.cssText = 'position:fixed; inset:0; z-index:10000000; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; padding:12px; box-sizing:border-box; animation:fadeIn 0.2s ease;';
 
-        let descText = extraText[name] || '';
+        let descText = extraDesc || (typeof extraText !== 'undefined' && extraText[name]) || (info && (info.text || info.desc)) || '';
         let atkDefHtml = info.isMonster ? `<div style="font-size:14px; font-weight:bold; margin-top:4px;"><span style="color:#ff5252">ATK ${info.atk}</span> / <span style="color:#2196f3">DEF ${info.def}</span></div>` : '';
+        let cardNumStr = info.num ? String(info.num).replace(/[^\d]/g, '').padStart(3, '0') : '';
+        let cardImgUrl = (info && info.image) ? info.image : (typeof getCardImageUrl === 'function' ? getCardImageUrl(name) : (window.getCardMetadata ? window.getCardMetadata(name).imgUrl : 'https://i.imgur.com/vHqR8Kq.png'));
 
         modal.innerHTML = `
             <div style="background:linear-gradient(180deg, #1e2630 0%, #10161d 100%); border:2px solid ${cardColor}; border-radius:12px; max-width:340px; width:100%; max-height:85vh; overflow-y:auto; display:flex; flex-direction:column; align-items:center; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,0.9); color:#fff; font-family:'Segoe UI', sans-serif;">
                 <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span style="font-size:12px; color:#888;">#${String(info.num).replace(/[^\\d]/g, '').padStart(3, '0')}</span>
-                    <span style="font-size:16px; font-weight:bold; color:${cardColor}; text-align:center; flex:1; padding:0 8px;">${info.name}</span>
+                    <span style="font-size:12px; color:#888;">${cardNumStr ? '#' + cardNumStr : ''}</span>
+                    <span style="font-size:16px; font-weight:bold; color:${cardColor}; text-align:center; flex:1; padding:0 8px;">${info.name || name}</span>
                     <button id="m-modal-close" style="background:#8b0000; color:#fff; border:none; width:28px; height:28px; border-radius:50%; font-weight:bold; cursor:pointer; font-size:14px;">✕</button>
                 </div>
                 <div style="width:180px; height:260px; border:2px solid #a67c00; border-radius:8px; overflow:hidden; background:#000; display:flex; align-items:center; justify-content:center; margin-bottom:10px; box-shadow:0 4px 12px rgba(0,0,0,0.6);">
-                    <img src="${getCardImageUrl(name)}" style="width:100%; height:100%; object-fit:contain;">
+                    <img src="${cardImgUrl}" style="width:100%; height:100%; object-fit:contain;">
                 </div>
                 <div style="font-size:12px; color:#aaa; margin-bottom:4px;">
-                    [${info.type}] ${info.attr !== '-' ? ' · ' + info.attr : ''} ${info.isMonster && info.sign !== '-' ? ' · ' + info.sign : ''}
+                    [${info.type || 'Carta'}] ${info.attr && info.attr !== '-' ? ' · ' + info.attr : ''} ${info.isMonster && info.sign && info.sign !== '-' ? ' · ' + info.sign : ''}
                 </div>
                 ${atkDefHtml}
                 ${descText ? `<div style="background:#151b22; border:1px solid #334; border-radius:6px; padding:8px 10px; margin-top:10px; font-size:12px; line-height:1.4; color:#ffeb3b; width:100%; box-sizing:border-box;">${descText}</div>` : ''}
@@ -9719,6 +9734,7 @@ window.customShowDeckEditor = function() {
             }
         };
     }
+    window.showMobileCardDetail = showMobileCardDetail;
 
     function wireHover(tr, name, info, cardColor) {
         tr.onmouseover = () => {
@@ -10076,6 +10092,11 @@ window.customShowDeckEditor = function() {
                 let idx = arr.indexOf(name);
                 if (idx >= 0) {
                     arr.splice(idx, 1);
+                    workingCollection[name] = Math.max(workingCollection[name] || 0, 1);
+                    if (!ownedSet.has(name)) {
+                        ownedSet.add(name);
+                        owned.push(name);
+                    }
                     if (currentDeckKey === currentActiveKey) {
                         s.deck = [...currentDeck];
                     }
@@ -11457,10 +11478,77 @@ window.customShowCollection = function() {
     if (!s.collection) return;
     if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
     
+    if (!document.getElementById('fmr-coll-fus-responsive-styles')) {
+        let st = document.createElement('style');
+        st.id = 'fmr-coll-fus-responsive-styles';
+        st.textContent = `
+            @media (max-width: 850px), (orientation: portrait) {
+                #custom-collection-overlay, #custom-fusions-overlay {
+                    flex-direction: column !important;
+                    padding: 8px 6px !important;
+                }
+                #collection-left-preview, #fusions-left-preview {
+                    display: none !important;
+                }
+                #collection-right-main, #fusions-right-main {
+                    width: 100% !important;
+                    height: 100% !important;
+                    flex: 1 !important;
+                }
+                #collection-header, #fusions-header {
+                    flex-wrap: wrap !important;
+                    gap: 6px !important;
+                    padding-bottom: 6px !important;
+                    margin-bottom: 6px !important;
+                }
+                #coll-search, #fus-search {
+                    font-size: 12px !important;
+                    padding: 6px 10px !important;
+                    max-width: 140px !important;
+                }
+                #btn-exit-coll, #btn-exit-fus {
+                    padding: 6px 14px !important;
+                    font-size: 13px !important;
+                }
+                #coll-filter-bar {
+                    gap: 6px !important;
+                    margin-bottom: 8px !important;
+                }
+                #coll-filter-bar select, #coll-filter-bar input {
+                    font-size: 11px !important;
+                    padding: 4px 6px !important;
+                }
+                #coll-world-tab-bar {
+                    gap: 4px !important;
+                    margin-bottom: 8px !important;
+                }
+                #coll-world-tab-bar button {
+                    font-size: 12px !important;
+                    padding: 5px 8px !important;
+                }
+                .coll-table-wrap, .fus-table-wrap {
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .coll-table-wrap table, .fus-table-wrap table {
+                    min-width: 520px;
+                    font-size: 12px !important;
+                }
+                .coll-table-wrap th, .coll-table-wrap td,
+                .fus-table-wrap th, .fus-table-wrap td {
+                    padding: 6px 8px !important;
+                }
+            }
+        `;
+        document.head.appendChild(st);
+    }
+
     let overlay = document.createElement('div');
+    overlay.id = 'custom-collection-overlay';
     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: #1a1a1a; z-index:9999999; display:flex; flex-direction:row; padding: 20px; box-sizing:border-box; color: #fff; font-family: "Segoe UI", Arial, sans-serif;';
     
     let leftSide = document.createElement('div');
+    leftSide.id = 'collection-left-preview';
     leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px;';
     
     let previewImgWrap = document.createElement('div');
@@ -11476,10 +11564,12 @@ window.customShowCollection = function() {
     overlay.appendChild(leftSide);
     
     let rightSide = document.createElement('div');
+    rightSide.id = 'collection-right-main';
     rightSide.style.cssText = 'flex:1; display:flex; flex-direction:column; overflow:hidden;';
     overlay.appendChild(rightSide);
     
     let header = document.createElement('div');
+    header.id = 'collection-header';
     header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #e4c06b; padding-bottom: 10px; margin-bottom: 10px;';
     header.innerHTML = `
         <div style="font-family:VT323, monospace; color:#ffcc00; font-size: 24px; text-shadow: 2px 2px 0 #000;">BIBLIOTECA DE CARTAS</div>
@@ -11497,6 +11587,7 @@ window.customShowCollection = function() {
     ];
 
     let worldTabBar = document.createElement('div');
+    worldTabBar.id = 'coll-world-tab-bar';
     worldTabBar.style.cssText = 'display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;';
     rightSide.appendChild(worldTabBar);
 
@@ -11523,7 +11614,7 @@ window.customShowCollection = function() {
     }
     renderWorldTabs();
 
-    let filterBar = document.createElement('div');
+    filterBar.id = 'coll-filter-bar';
     filterBar.style.cssText = 'display:flex; gap:10px; margin-bottom: 15px; align-items:center; flex-wrap:wrap; font-size: 14px;';
     filterBar.innerHTML = `
         <select id="f-cardtype" style="padding: 8px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px;">
@@ -11581,6 +11672,7 @@ window.customShowCollection = function() {
     rightSide.appendChild(filterBar);
     
     let tableWrap = document.createElement('div');
+    tableWrap.className = 'coll-table-wrap';
     tableWrap.style.cssText = 'flex: 1; overflow-y: auto; background: #222; border: 1px solid #444; border-radius: 8px; box-shadow: inset 0 0 10px #000;';
     
     let table = document.createElement('table');
@@ -11717,6 +11809,13 @@ window.customShowCollection = function() {
                 siblings.forEach(sib => { if(sib!==tr) sib.onmouseout = () => sib.style.background = 'transparent'; });
                 
                 updatePreview(previewImg, infoBox, name);
+
+                if (window.innerWidth <= 850 || window.innerHeight > window.innerWidth) {
+                    let cardColor = c.isMonster ? '#d4af37' : (c.type==='SPELL' ? '#4da6ff' : '#ff4d4d');
+                    if (typeof window.showMobileCardDetail === 'function') {
+                        window.showMobileCardDetail(name, c, cardColor);
+                    }
+                }
             };
             
             let colorType = c.isMonster ? '#fff' : (c.type==='SPELL' ? '#4da6ff' : '#ff4d4d');
@@ -11821,9 +11920,11 @@ window.customShowFusions = function() {
     let discovered = new Set(fusionsList);
 
     let overlay = document.createElement('div');
+    overlay.id = 'custom-fusions-overlay';
     overlay.style.cssText = 'position:fixed; top:0; left:0; width:100vw; height:100vh; background: #1a1a1a; z-index:9999999; display:flex; flex-direction:row; padding: 20px; box-sizing:border-box; color: #fff; font-family: "Segoe UI", Arial, sans-serif;';
     
     let leftSide = document.createElement('div');
+    leftSide.id = 'fusions-left-preview';
     leftSide.style.cssText = 'width: 320px; display:flex; flex-direction:column; margin-right: 20px; border-right: 2px solid #333; padding-right: 20px; flex-shrink: 0;';
     
     let previewImgWrap = document.createElement('div');
@@ -11839,10 +11940,12 @@ window.customShowFusions = function() {
     overlay.appendChild(leftSide);
     
     let rightSide = document.createElement('div');
+    rightSide.id = 'fusions-right-main';
     rightSide.style.cssText = 'flex:1; display:flex; flex-direction:column; overflow:hidden;';
     overlay.appendChild(rightSide);
     
     let header = document.createElement('div');
+    header.id = 'fusions-header';
     header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #e4c06b; padding-bottom: 10px; margin-bottom: 10px;';
     header.innerHTML = `
         <div style="display:flex; align-items:center; gap:15px;">
@@ -11854,6 +11957,7 @@ window.customShowFusions = function() {
     rightSide.appendChild(header);
     
     let tableWrap = document.createElement('div');
+    tableWrap.className = 'fus-table-wrap';
     tableWrap.style.cssText = 'flex: 1; overflow-y: auto; background: #222; border: 1px solid #444; border-radius: 8px; box-shadow: inset 0 0 10px #000;';
     
     let table = document.createElement('table');
@@ -11924,6 +12028,20 @@ window.customShowFusions = function() {
             if (isKnown) {
                 let recipeDesc = r.customDiscovered ? '<strong>Fusión Descubierta en Combate</strong>' : `<strong>Receta Exacta:</strong><br/>${r.exact[0]}<br/>+<br/>${r.exact[1]}`;
                 updatePreview(previewImg, infoBox, name, recipeDesc);
+
+                if (window.innerWidth <= 850 || window.innerHeight > window.innerWidth) {
+                    let meta = (window.getCardMetadata ? window.getCardMetadata(name) : null) || {};
+                    if (typeof window.showMobileCardDetail === 'function') {
+                        window.showMobileCardDetail(name, Object.assign({}, meta, {
+                            name: name,
+                            type: meta.type || 'Fusión',
+                            isMonster: true,
+                            atk: meta.atk || '-',
+                            def: meta.def || '-',
+                            attr: meta.attr || '-'
+                        }), '#00ffcc', recipeDesc);
+                    }
+                }
             } else {
                 previewImg.src = '';
                 previewImg.style.display = 'none';

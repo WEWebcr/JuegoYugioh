@@ -30,6 +30,34 @@
     "tier": "DRAGÓN CLÁSICO"
   },
   {
+    "id": 3,
+    "name": "Gaia the Fierce Knight",
+    "level": 7,
+    "type": "Warrior",
+    "attr": "EARTH",
+    "atk": 2300,
+    "def": 2100,
+    "kind": "MONSTER",
+    "text": "Caballero que cabalga veloz como el viento para embestir a sus enemigos.",
+    "image": "imagenescartas/Mundo1/003.jpeg",
+    "sign1": "SATURNO",
+    "sign2": "MARTE"
+  },
+  {
+    "id": 4,
+    "name": "Curse of Dragon",
+    "level": 5,
+    "type": "Dragon",
+    "attr": "DARK",
+    "atk": 2000,
+    "def": 1500,
+    "kind": "MONSTER",
+    "text": "Dragón negro de cuatro alas con poderosos ataques de fuego maldito.",
+    "image": "imagenescartas/Mundo1/004.jpeg",
+    "sign1": "LUNA",
+    "sign2": "MARTE"
+  },
+  {
     "id": 6,
     "name": "Dark Magician",
     "kind": "MONSTER",
@@ -240,6 +268,20 @@
     "tier": "DRAGÓN BÁSICO"
   },
   {
+    "id": 42,
+    "name": "Thunder Dragon",
+    "level": 5,
+    "type": "Thunder",
+    "attr": "LIGHT",
+    "atk": 1600,
+    "def": 1500,
+    "kind": "MONSTER",
+    "text": "Dragón que manipula el trueno. Fusiónalo para crear el Dragón Trueno Bicéfalo.",
+    "image": "imagenescartas/Mundo1/042.jpeg",
+    "sign1": "PLUTON",
+    "sign2": "SOL"
+  },
+  {
     "id": 43,
     "name": "Koumori Dragon",
     "kind": "MONSTER",
@@ -316,6 +358,20 @@
     "image": "imagenescartas/Mundo1/049.jpg"
   },
   {
+    "id": 51,
+    "name": "Dragon Zombie",
+    "level": 3,
+    "type": "Zombie",
+    "attr": "DARK",
+    "atk": 1600,
+    "def": 0,
+    "kind": "MONSTER",
+    "text": "Dragón reanimado por magia oscura. Gran fuerza de ataque.",
+    "image": "imagenescartas/Mundo1/051.jpg",
+    "sign1": "LUNA",
+    "sign2": "PLUTON"
+  },
+  {
     "id": 53,
     "name": "Twin-Headed Thunder Dragon",
     "level": 7,
@@ -366,6 +422,20 @@
     "value": "GRAVE_CALL",
     "text": "Estando SET, invoca 1 monstruo de cualquiera de los dos Cementerios.",
     "image": "imagenescartas/Mundo1/058.jpeg"
+  },
+  {
+    "id": 59,
+    "name": "Mammoth Graveyard",
+    "level": 3,
+    "type": "Dinosaur",
+    "attr": "EARTH",
+    "atk": 1200,
+    "def": 800,
+    "kind": "MONSTER",
+    "text": "Un mamut no muerto que vaga en las sombras con 1200 ATK y 800 DEF.",
+    "image": "imagenescartas/Mundo1/059.jpg",
+    "sign1": "SATURNO",
+    "sign2": "PLUTON"
   },
   {
     "id": 68,
@@ -522,15 +592,17 @@
   },
   {
     "id": 93,
-    "name": "Mataza the Zapper",
+    "name": "Zanki",
     "kind": "MONSTER",
     "type": "Warrior",
-    "attr": "DARK",
-    "level": 3,
-    "atk": 1300,
-    "def": 800,
-    "text": "Puede atacar dos veces durante cada Battle Phase.",
-    "image": "imagenescartas/Mundo1/093.jpg"
+    "attr": "EARTH",
+    "level": 5,
+    "atk": 1500,
+    "def": 1700,
+    "text": "Guerrero legendario que blande una espada pesada con gran maestría.",
+    "image": "imagenescartas/Mundo1/093.jpg",
+    "sign1": "SATURNO",
+    "sign2": "MARTE"
   },
   {
     "id": 94,
