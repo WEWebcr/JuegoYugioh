@@ -43,5 +43,7 @@ Thumbs.db
 
 # Android build outputs
 android/build/
+android/assets/
 android/*.keystore
 *.idsig
+*.apk

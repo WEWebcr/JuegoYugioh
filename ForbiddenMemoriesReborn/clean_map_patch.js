@@ -1,3 +1,32 @@
+// Native Storage & Remote API Interceptor for Offline-First Autonomous APK
+(function() {
+  // 1. Auto-ruta para peticiones /api/ cuando el juego corre localmente en Android (file://)
+  var origFetch = window.fetch;
+  if (typeof origFetch === 'function') {
+    window.fetch = function(url, options) {
+      if (typeof url === 'string' && url.indexOf('/api/') === 0 && typeof location !== 'undefined' && location.protocol === 'file:') {
+        url = 'https://yugiohreborn.onrender.com' + url;
+      }
+      return origFetch.call(this, url, options);
+    };
+  }
+
+  // 2. Restauración automática al inicio si localStorage está vacío pero hay partida guardada en el teléfono
+  try {
+    if (window.NativeStorage && typeof window.NativeStorage.loadData === 'function') {
+      var storySave = window.NativeStorage.loadData('FMR_REBORN_STORY_V3000');
+      if (storySave && !localStorage.getItem('FMR_REBORN_STORY_V3000')) {
+        localStorage.setItem('FMR_REBORN_STORY_V3000', storySave);
+        console.log('[NativeStorage] Restaurada partida FMR_REBORN_STORY_V3000 desde almacenamiento nativo del teléfono.');
+      }
+      var accsStr = window.NativeStorage.loadData('FMR_ACCOUNTS');
+      if (accsStr && !localStorage.getItem('FMR_ACCOUNTS')) {
+        localStorage.setItem('FMR_ACCOUNTS', accsStr);
+      }
+    }
+  } catch(_) {}
+})();
+
 // Inyectar CARDS_DATA en FMR_CARD_META y DB
 (function() {
   function syncCardsData() {
@@ -1585,13 +1614,26 @@ localStorage.setItem = function(k, v) {
         }
     }
     origSet(k, v);
+    if (window.NativeStorage && typeof window.NativeStorage.saveData === 'function' && typeof v === 'string') {
+        try { window.NativeStorage.saveData(k, v); } catch(_) {}
+    }
 };
 localStorage.getItem = function(k) {
     if(k === 'FMR_REBORN_STORY_V3000' && window.activeAccount) {
         let s = origGet('FMR_SAVE_' + window.activeAccount);
         if(s) return s;
     }
-    return origGet(k);
+    let val = origGet(k);
+    if (!val && window.NativeStorage && typeof window.NativeStorage.loadData === 'function') {
+        try {
+            let nVal = window.NativeStorage.loadData(k);
+            if (nVal) {
+                origSet(k, nVal);
+                return nVal;
+            }
+        } catch(_) {}
+    }
+    return val;
 };
 
 // CSS
@@ -13159,13 +13201,29 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         pass = pass || sess.password;
       } catch(_) {}
     }
-    if (!name || !pass || !saveObj) return;
+    if (!saveObj) return;
+
+    // 1. Guardado garantizado e inmediato en el almacenamiento nativo del teléfono
+    if (window.NativeStorage && typeof window.NativeStorage.saveData === 'function') {
+      try {
+        var jsonSave = JSON.stringify(saveObj);
+        window.NativeStorage.saveData('FMR_REBORN_STORY_V3000', jsonSave);
+        if (name) window.NativeStorage.saveData('FMR_SAVE_' + name, jsonSave);
+      } catch(_) {}
+    }
+
+    if (!name || !pass) return;
+
+    var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = controller ? setTimeout(function() { controller.abort(); }, 3500) : null;
 
     fetch('/api/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.assign({}, saveObj, { name: name, password: pass }))
+      body: JSON.stringify(Object.assign({}, saveObj, { name: name, password: pass })),
+      signal: controller ? controller.signal : undefined
     }).then(function(r) {
+      if (timer) clearTimeout(timer);
       if (r.ok) return r.json();
     }).then(function(data) {
       if (data && data.ok) {
@@ -13231,7 +13289,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         }
       }
     }).catch(function(e) {
-      console.warn('[Server Save] Error al guardar en servidor:', e);
+      if (timer) clearTimeout(timer);
+      console.log('[Offline Mode] Servidor Render offline o timeout. Partida resguardada localmente en el teléfono.');
     });
   }
   window.sendServerSave = sendServerSave;

@@ -34,10 +34,36 @@ const appBuild = vCodeMatch ? vCodeMatch[1] : '6';
 
 console.log(`=== COMPILADOR DE APK NATIVO YU-GI-OH! FMR v${appVersion} (Build ${appBuild}) ===`);
 
+const ASSETS_DIR = path.join(ANDROID_DIR, 'assets');
+
 // Prepare clean build dirs
 [BUILD_DIR, DEX_DIR, GEN_DIR, CLASSES_DIR].forEach(dir => {
     if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true, force: true });
     fs.mkdirSync(dir, { recursive: true });
+});
+
+// Prepare assets directory for offline-first autonomous bundle
+if (!fs.existsSync(ASSETS_DIR)) fs.mkdirSync(ASSETS_DIR, { recursive: true });
+
+// 1. Copy fresh YGOFMR2026-1.html
+const htmlSrc = path.join(ROOT, 'YGOFMR2026-1.html');
+const htmlDest = path.join(ASSETS_DIR, 'YGOFMR2026-1.html');
+if (fs.existsSync(htmlSrc)) {
+    fs.copyFileSync(htmlSrc, htmlDest);
+}
+
+// 2. Ensure junctions for local game media (cards, characters, audio, configs)
+const assetFolders = ['imagenescartas', 'ImagenesPersonajes', 'musica', 'assets', 'data'];
+assetFolders.forEach(folder => {
+    const src = path.join(ROOT, folder);
+    const dest = path.join(ASSETS_DIR, folder);
+    if (!fs.existsSync(dest) && fs.existsSync(src)) {
+        try {
+            execSync(`cmd /c "mklink /J "${dest}" "${src}""`, { stdio: 'ignore' });
+        } catch (_) {
+            try { fs.cpSync(src, dest, { recursive: true }); } catch (__) {}
+        }
+    }
 });
 
 try {
@@ -46,11 +72,11 @@ try {
     const compiledResZip = path.join(BUILD_DIR, 'compiled_res.zip');
     execSync(`"${AAPT2}" compile --dir "${path.join(ANDROID_DIR, 'res')}" -o "${compiledResZip}"`, { stdio: 'inherit' });
 
-    // 2. AAPT2 LINK
-    console.log('[2/7] Enlazando manifiesto y generando R.java...');
+    // 2. AAPT2 LINK CON ASSETS COMPLETOS (-A)
+    console.log('[2/7] Enlazando manifiesto, assets locales y generando R.java...');
     const unalignedResApk = path.join(BUILD_DIR, 'unaligned_resources.apk');
     const manifestPath = path.join(ANDROID_DIR, 'AndroidManifest.xml');
-    execSync(`"${AAPT2}" link -I "${ANDROID_JAR}" --manifest "${manifestPath}" --min-sdk-version 24 --target-sdk-version 34 "${compiledResZip}" --java "${GEN_DIR}" -o "${unalignedResApk}" --auto-add-overlay`, { stdio: 'inherit' });
+    execSync(`"${AAPT2}" link -I "${ANDROID_JAR}" --manifest "${manifestPath}" --min-sdk-version 24 --target-sdk-version 34 "${compiledResZip}" -A "${ASSETS_DIR}" --java "${GEN_DIR}" -o "${unalignedResApk}" --auto-add-overlay`, { stdio: 'inherit' });
 
     // 3. JAVAC
     console.log('[3/7] Compilando código Java con OpenJDK 21...');

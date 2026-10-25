@@ -20,6 +20,15 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import android.webkit.JavascriptInterface;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
 public class MainActivity extends Activity {
 
     public static final String PREFS_NAME = "FMR_PREFS";
@@ -29,6 +38,78 @@ public class MainActivity extends Activity {
     private WebView mWebView;
     private ProgressBar mProgressBar;
     private SharedPreferences mPrefs;
+
+    public static class NativeStorageBridge {
+        private final Context context;
+
+        public NativeStorageBridge(Context ctx) {
+            this.context = ctx;
+        }
+
+        @JavascriptInterface
+        public boolean isNative() {
+            return true;
+        }
+
+        @JavascriptInterface
+        public boolean saveData(String key, String data) {
+            if (key == null || data == null) return false;
+            try {
+                String safeKey = key.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+                FileOutputStream fos = context.openFileOutput("fmr_save_" + safeKey + ".json", Context.MODE_PRIVATE);
+                fos.write(data.getBytes(StandardCharsets.UTF_8));
+                fos.flush();
+                fos.close();
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        @JavascriptInterface
+        public String loadData(String key) {
+            if (key == null) return null;
+            try {
+                String safeKey = key.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+                FileInputStream fis = context.openFileInput("fmr_save_" + safeKey + ".json");
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+                reader.close();
+                return sb.toString();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        @JavascriptInterface
+        public boolean hasData(String key) {
+            if (key == null) return false;
+            try {
+                String safeKey = key.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+                File f = new File(context.getFilesDir(), "fmr_save_" + safeKey + ".json");
+                return f.exists() && f.length() > 0;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        @JavascriptInterface
+        public boolean deleteData(String key) {
+            if (key == null) return false;
+            try {
+                String safeKey = key.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+                File f = new File(context.getFilesDir(), "fmr_save_" + safeKey + ".json");
+                return f.delete();
+            } catch (Exception e) {
+                return false;
+            }
+        }
+    }
 
     static class CustomChromeClient extends WebChromeClient {
         private final ProgressBar bar;
@@ -120,6 +201,9 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setUseWideViewPort(true);
@@ -131,11 +215,26 @@ public class MainActivity extends Activity {
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/" + getAppVersionName());
 
+        mWebView.addJavascriptInterface(new NativeStorageBridge(this), "NativeStorage");
         mWebView.setWebChromeClient(new CustomChromeClient(mProgressBar));
         mWebView.setWebViewClient(new CustomWebViewClient(this));
     }
 
     public void loadGameUrl() {
+        boolean hasLocalAsset = false;
+        try {
+            InputStream is = getAssets().open("YGOFMR2026-1.html");
+            if (is != null) {
+                is.close();
+                hasLocalAsset = true;
+            }
+        } catch (Exception ignored) {}
+
+        if (hasLocalAsset) {
+            mWebView.loadUrl("file:///android_asset/YGOFMR2026-1.html");
+            return;
+        }
+
         String url = mPrefs.getString(KEY_SERVER_URL, DEFAULT_URL);
         if (url == null || url.isEmpty() || url.contains("juegoyugioh") || !url.contains("yugiohreborn")) {
             url = DEFAULT_URL;
