@@ -9191,11 +9191,27 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
   document.addEventListener('DOMContentLoaded', syncCardsData);
 
   // Global robust card resolver
-  window.resolveGameCard = function(name) {
+  window.resolveGameCard = function(nameOrCard) {
+    if (!nameOrCard) return null;
+    if (typeof nameOrCard === 'object') {
+      if (nameOrCard.name && (nameOrCard.atk !== undefined || nameOrCard.kind)) {
+        var obj = Object.assign({}, nameOrCard, { faceUp: true });
+        if (typeof window.isXyzCard === 'function' && window.isXyzCard(nameOrCard)) {
+          obj.kind = 'XYZ';
+          obj.frameType = 'xyz';
+          obj.rank = Number(obj.rank || obj.level || 4);
+        }
+        return obj;
+      }
+      nameOrCard = nameOrCard.name || nameOrCard[0] || '';
+    }
+    var name = String(nameOrCard || '').trim();
     if (!name) return null;
+
     var pool = window.FMR_ST_POOL_V1 || [];
     var st = pool.find(function(c) { return c && (c.name === name || (c.name && c.name.toLowerCase() === name.toLowerCase())); });
     if (st) return Object.assign({}, st, { faceUp: true });
+
     if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
       var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase() === name.toLowerCase())); });
       if (cd) {
@@ -9226,6 +9242,51 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
         }
       }
     }
+
+    // Buscar en el array EXTRA nativo de FMR
+    if (typeof EXTRA !== 'undefined' && Array.isArray(EXTRA)) {
+      var ex = EXTRA.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
+      if (ex) {
+        var isXyzEx = ex[6] === 'XYZ' || (typeof window.isXyzCard === 'function' && window.isXyzCard(ex[0]));
+        return {
+          name: ex[0],
+          level: ex[1],
+          rank: isXyzEx ? ex[1] : undefined,
+          type: ex[2],
+          attr: ex[3],
+          atk: ex[4],
+          def: ex[6] === 'LINK' ? null : ex[5],
+          kind: isXyzEx ? 'XYZ' : (ex[6] || 'SYNCHRO'),
+          frameType: isXyzEx ? 'xyz' : (ex[6] === 'SYNCHRO' ? 'synchro' : ''),
+          pos: 'ATK',
+          materials: [],
+          faceUp: true
+        };
+      }
+    }
+
+    if (window.getCardMetadata) {
+      var meta = window.getCardMetadata(name);
+      if (meta) {
+        var isXyzMeta = meta.kind === 'XYZ' || (typeof window.isXyzCard === 'function' && window.isXyzCard(name));
+        return {
+          name: meta.name || name,
+          level: meta.level || meta.rank || 4,
+          rank: isXyzMeta ? (meta.rank || meta.level || 4) : undefined,
+          type: meta.type || 'Warrior',
+          attr: meta.attr || 'LIGHT',
+          atk: meta.atk || 0,
+          def: meta.def || 0,
+          kind: isXyzMeta ? 'XYZ' : (meta.kind || 'MONSTER'),
+          frameType: isXyzMeta ? 'xyz' : '',
+          pos: 'ATK',
+          materials: [],
+          text: meta.desc || meta.text || '',
+          faceUp: true
+        };
+      }
+    }
+
     if (typeof DB !== 'undefined' && Array.isArray(DB)) {
       var d = DB.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
       if (d) {
@@ -9241,6 +9302,26 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
       var m2 = mk(name);
       if (m2) return m2;
     }
+
+    // Fallback garantizado para cualquier carta Xyz
+    if (typeof window.isXyzCard === 'function' && window.isXyzCard(name)) {
+      return {
+        name: name,
+        level: 4,
+        rank: 4,
+        type: 'Warrior',
+        attr: 'LIGHT',
+        atk: 2500,
+        def: 2000,
+        kind: 'XYZ',
+        frameType: 'xyz',
+        pos: 'ATK',
+        materials: [],
+        text: '2 monstruos de Nivel 4.',
+        faceUp: true
+      };
+    }
+
     return null;
   };
 
@@ -13094,13 +13175,15 @@ window.XYZ_CARD_NAMES = new Set([
   'Neo Galaxy-Eyes Photon Dragon', 'Number 15: Gimmick Puppet Giant Grinder',
   'Number 33: Chronomaly Machu Mech', 'Number 104: Masquerade',
   'Number 107: Galaxy-Eyes Tachyon Dragon', 'Number 66: Master Key Beetle',
-  'Number 30: Acid Golem of Destruction'
+  'Number 30: Acid Golem of Destruction',
+  'Dark Rebellion Xyz Dragon', 'Gaia Dragon, the Thunder Charger', 'Big Eye'
 ]);
 
 window.isXyzCard = function(cardOrName) {
   if (!cardOrName) return false;
   var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || cardOrName[1] || '')).trim();
   if (name && window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
+  if (/^number\s+\w+/i.test(name) || /cxyz/i.test(name) || /xyz\s+dragon/i.test(name)) return true;
   var kind = String((cardOrName && cardOrName.kind) || (cardOrName && cardOrName[6]) || '').toUpperCase();
   if (kind === 'XYZ') return true;
   var meta = (typeof cardOrName === 'object' && cardOrName.kind) ? cardOrName : (window.getCardMetadata ? window.getCardMetadata(name) : null);
@@ -13109,13 +13192,19 @@ window.isXyzCard = function(cardOrName) {
     var cd = window.CARDS_DATA.find(function(c) { return c && c.name === name; });
     if (cd && cd.kind === 'XYZ') return true;
   }
+  if (typeof EXTRA !== 'undefined' && Array.isArray(EXTRA)) {
+    var ex = EXTRA.find(function(x) { return x && x[0] === name; });
+    if (ex && ex[6] === 'XYZ') return true;
+  }
   return false;
 };
 
 window.isZexalCard = function(cardOrName) {
   if (!cardOrName) return false;
+  if (typeof window.isXyzCard === 'function' && window.isXyzCard(cardOrName)) return true;
   var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || '')).trim();
   if (window.ZEXAL_CARD_NAMES && window.ZEXAL_CARD_NAMES.has(name)) return true;
+  if (window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
   var meta = (typeof cardOrName === 'object' && cardOrName.kind) ? cardOrName : (window.getCardMetadata ? window.getCardMetadata(name) : null);
   if (meta) {
     if (meta.world === 4 || meta.kind === 'XYZ') return true;
@@ -13143,6 +13232,7 @@ window.MUNDO4_ALLOWED_STAPLES = new Set([
 window.isCardAllowedInWorld = function(cardOrName, targetWorld) {
   var w = Number(targetWorld);
   var is5DC = window.is5DCard(cardOrName);
+  var isXyzC = typeof window.isXyzCard === 'function' ? window.isXyzCard(cardOrName) : false;
   var isZexalC = window.isZexalCard(cardOrName);
   var isSynchro = window.isSynchroCard(cardOrName);
   var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || '')).trim();
@@ -13150,17 +13240,18 @@ window.isCardAllowedInWorld = function(cardOrName, targetWorld) {
   if (w === 4) {
     // EN MUNDO 4 NO SE PERMITEN MONSTRUOS SINCRONÍA
     if (isSynchro) return false;
+    if (isXyzC) return true;
     if (isZexalC) return true;
     if (window.MUNDO4_ALLOWED_STAPLES && window.MUNDO4_ALLOWED_STAPLES.has(name)) return true;
     return false;
   } else if (w === 3) {
-    if (isZexalC) return false;
+    if (isXyzC || isZexalC) return false;
     if (is5DC) return true;
     if (window.MUNDO3_ALLOWED_STAPLES && window.MUNDO3_ALLOWED_STAPLES.has(name)) return true;
     return false;
   } else {
     // Mundos 1 y 2
-    if (isZexalC || is5DC || isSynchro) return false;
+    if (isXyzC || isZexalC || is5DC || isSynchro) return false;
     return true;
   }
 };
@@ -20761,31 +20852,37 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     
     var fiveDDuelists = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
-    var zexalDuelists = ['yuma', 'astral', 'bronk', 'flip', 'shark', 'kite', 'rio', 'trey', 'quattro', 'mizar', 'vector'];
-    var isZexalDuel = zexalDuelists.includes(opp) || (sSave && sSave.world === 4);
-    var is5DDuel = !isZexalDuel && (fiveDDuelists.includes(opp) || (sSave && sSave.world === 3));
+    var zexalDuelists = ['yuma', 'astral', 'bronk', 'flip', 'shark', 'kite', 'rio', 'trey', 'quattro', 'mizar', 'vector', 'tori', 'alito', 'girag', 'durbe', 'dumble', 'nasch', 'vetrix', 'drfaker', 'heartland'];
+    var activeWorldNum = Number((sSave && sSave.world) || window.currentWorld || window.activeWorld || 1);
+    var isZexalDuel = zexalDuelists.includes(opp) || activeWorldNum === 4;
+    var is5DDuel = !isZexalDuel && (fiveDDuelists.includes(opp) || activeWorldNum === 3);
     var playerCardNames = null;
     var playerExtraNames = [];
     var enemyExtraNames = [];
 
     if (isZexalDuel) {
-      if (sSave && sSave.decksMundo4) {
-        var aKey = (sSave.activeDeckMundo4 && sSave.activeDeckMundo4 !== 'Extra') ? sSave.activeDeckMundo4 : 'Principal';
-        var candDeck = Array.isArray(sSave.decksMundo4[aKey]) ? sSave.decksMundo4[aKey] : sSave.decksMundo4['Principal'];
-        if (Array.isArray(candDeck) && candDeck.length === 40 && !window.isTaintedTristanDeck(candDeck)) {
-          var hasInvalidZexal = candDeck.some(function(c) { return !window.isCardAllowedInWorld(c, 4); });
-          if (!hasInvalidZexal) {
-            playerCardNames = candDeck;
+      if (sSave) {
+        if (sSave.decksMundo4) {
+          var aKey = (sSave.activeDeckMundo4 && sSave.activeDeckMundo4 !== 'Extra') ? sSave.activeDeckMundo4 : 'Principal';
+          var candDeck = Array.isArray(sSave.decksMundo4[aKey]) ? sSave.decksMundo4[aKey] : sSave.decksMundo4['Principal'];
+          if (Array.isArray(candDeck) && candDeck.length === 40 && !window.isTaintedTristanDeck(candDeck)) {
+            var hasInvalidZexal = candDeck.some(function(c) { return !window.isCardAllowedInWorld(c, 4); });
+            if (!hasInvalidZexal) {
+              playerCardNames = candDeck;
+            }
+          }
+          if (Array.isArray(sSave.decksMundo4['Extra']) && sSave.decksMundo4['Extra'].length > 0) {
+            playerExtraNames = sSave.decksMundo4['Extra'].slice();
           }
         }
-        if (Array.isArray(sSave.decksMundo4['Extra'])) {
-          playerExtraNames = sSave.decksMundo4['Extra'].filter(function(c) { return window.isCardAllowedInWorld(c, 4); });
+        if (playerExtraNames.length === 0 && Array.isArray(sSave.extra) && sSave.extra.length > 0) {
+          playerExtraNames = sSave.extra.slice();
         }
       }
       if (!playerCardNames || playerCardNames.length !== 40 || playerCardNames.some(function(c) { return !window.isCardAllowedInWorld(c, 4); })) {
         playerCardNames = typeof window.generateZexalStarterDeck === 'function' ? window.generateZexalStarterDeck() : [];
       }
-      if (!sSave || !sSave.decksMundo4 || !Array.isArray(sSave.decksMundo4['Extra']) || playerExtraNames.length === 0) {
+      if (!playerExtraNames || playerExtraNames.length === 0) {
         playerExtraNames = typeof window.generateZexalExtraDeck === 'function' ? window.generateZexalExtraDeck() : [];
       }
       if (sSave) {
@@ -20943,6 +21040,9 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     g.selected = [];
     if (isZexalDuel) {
       g.extra = (playerExtraNames || []).map(cardResolver).filter(Boolean);
+      if (g.extra.length === 0 && typeof window.generateZexalExtraDeck === 'function') {
+        g.extra = window.generateZexalExtraDeck().map(cardResolver).filter(Boolean);
+      }
       g.enemyExtra = (enemyExtraNames || []).map(cardResolver).filter(Boolean);
       g.extraUsed = [];
       g._currentWorld = 4;
@@ -30775,6 +30875,24 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     var existing = document.getElementById('xyz-extra-selector-modal');
     if (existing) existing.remove();
 
+    // Auto-recuperación en caliente: si game.extra está vacío, sincronizar con el Extra Deck guardado del jugador
+    if (!Array.isArray(game.extra) || game.extra.length === 0) {
+      var sUser = null;
+      try {
+        var curKey = window.activeAccount ? ('FMR_SAVE_' + window.activeAccount) : 'FMR_REBORN_STORY_V3000';
+        var rawSave = (typeof localStorage !== 'undefined') ? (localStorage.getItem(curKey) || localStorage.getItem('FMR_REBORN_STORY_V3000')) : null;
+        if (rawSave) sUser = JSON.parse(rawSave);
+      } catch(_) {}
+      var savedEx = (sUser && sUser.decksMundo4 && Array.isArray(sUser.decksMundo4['Extra']) && sUser.decksMundo4['Extra'].length > 0)
+        ? sUser.decksMundo4['Extra']
+        : (sUser && Array.isArray(sUser.extra) && sUser.extra.length > 0 ? sUser.extra : null);
+      if (!savedEx || savedEx.length === 0) {
+        savedEx = typeof window.generateZexalExtraDeck === 'function' ? window.generateZexalExtraDeck() : [];
+      }
+      game.extra = (savedEx || []).map(window.resolveGameCard).filter(Boolean);
+      if (typeof updateExtraReady === 'function') updateExtraReady();
+    }
+
     var extraList = (game.extra || []).map(function(c, idx) {
       return { card: c, index: idx };
     }).filter(function(item) {
@@ -30789,8 +30907,9 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     });
 
     if (extraList.length === 0) {
-      if (typeof duelToast === 'function') duelToast('No tienes monstruos Xyz en tu Extra Deck.');
-      return;
+      var fallbackNames = typeof window.generateZexalExtraDeck === 'function' ? window.generateZexalExtraDeck() : [];
+      game.extra = fallbackNames.map(window.resolveGameCard).filter(Boolean);
+      extraList = (game.extra || []).map(function(c, idx) { return { card: c, index: idx }; });
     }
 
     var overlay = document.createElement('div');
