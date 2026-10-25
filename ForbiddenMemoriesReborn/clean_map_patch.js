@@ -11099,15 +11099,13 @@ window.cardHTML = function(c, z, i) {
         '</div>' +
         '<div class="cardArt" style="padding:0;overflow:hidden;flex:1;min-height:68px;max-height:94px;width:100%;border-radius:4px;margin:2px 0;background:#000;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">' +
           imgTag +
-          '<div style="position:absolute;bottom:2px;right:2px;background:rgba(2,10,30,0.85);color:#00e5ff;font-size:8px;font-weight:bold;padding:1px 4px;border-radius:3px;border:1px solid #00e5ff;">ℹ️ INFO</div>' +
         '</div>' +
         '<div class="cardMeta" style="font-size:8.5px;line-height:1.2;color:#dcdcdc;text-align:left;background:rgba(0,0,0,0.5);border-radius:3px;padding:2px 4px;margin:1px 0;max-height:26px;overflow:hidden;flex-shrink:0;" title="' + descText + '">' +
           '<span style="color:' + badgeColor + ';font-weight:bold;">▶ </span>' + descText +
         '</div>' +
-        '<div class="stActions" style="display:flex;gap:3px;margin-top:2px;flex-shrink:0;">' +
-          '<button type="button" style="flex:1.2;padding:4px 1px;font-size:9.5px;font-weight:bold;cursor:pointer;background:#0d233a;color:#64b5f6;border:1px solid #1976d2;border-radius:4px;" onclick="event.stopPropagation(); if (window.showCardDetailModal) window.showCardDetailModal(game.hand ? game.hand[' + i + '] : null, \'' + zone + '\', ' + i + ');" title="Ver descripción y efecto de la carta">ℹ️ DETALLES</button>' +
-          '<button type="button" style="flex:1;padding:4px 1px;font-size:9.5px;font-weight:bold;cursor:pointer;background:#392d20;color:#fff;border:1px solid #a48750;border-radius:4px;" onclick="event.stopPropagation();setST(' + i + ')">SET</button>' +
-          '<button type="button" style="flex:1;padding:4px 1px;font-size:9.5px;font-weight:bold;cursor:pointer;background:#1b5e20;color:#fff;border:1px solid #4caf50;border-radius:4px;" onclick="event.stopPropagation();activateSTFromHand(' + i + ')" ' + (c.kind === 'TRAP' ? 'disabled' : '') + '>ACTIVAR</button>' +
+        '<div class="stActions" style="display:flex;gap:5px;margin-top:3px;flex-shrink:0;">' +
+          '<button type="button" style="flex:1;padding:5px 2px;font-size:10.5px;font-weight:bold;cursor:pointer;background:#392d20;color:#fff;border:1px solid #a48750;border-radius:4px;" onclick="event.stopPropagation();setST(' + i + ')">SET</button>' +
+          '<button type="button" style="flex:1;padding:5px 2px;font-size:10.5px;font-weight:bold;cursor:pointer;background:#1b5e20;color:#fff;border:1px solid #4caf50;border-radius:4px;" onclick="event.stopPropagation();activateSTFromHand(' + i + ')" ' + (c.kind === 'TRAP' ? 'disabled' : '') + '>ACTIVAR</button>' +
         '</div>' +
       '</div>';
     }
