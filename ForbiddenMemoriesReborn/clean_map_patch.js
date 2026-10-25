@@ -11627,6 +11627,7 @@ window.customShowCollection = function() {
     }
     renderWorldTabs();
 
+    let filterBar = document.createElement('div');
     filterBar.id = 'coll-filter-bar';
     filterBar.style.cssText = 'display:flex; gap:10px; margin-bottom: 15px; align-items:center; flex-wrap:wrap; font-size: 14px;';
     filterBar.innerHTML = `
