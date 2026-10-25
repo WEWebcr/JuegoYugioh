@@ -29179,7 +29179,47 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     });
   };
 
-  // Lógica de Materiales para Invocación Xyz
+  // Detección de Monstruos Chaos Xyz / Number C y su monstruo Xyz base
+  window.getChaosChangeRequirements = function(c) {
+    if (!c) return null;
+    var name = (typeof c === 'string' ? c : (c.name || '')).trim();
+    var rank = Number((c && (c.rank || c.level)) || 0);
+    if (!rank) {
+      var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === name; });
+      if (foundCd && (foundCd.rank || foundCd.level)) rank = Number(foundCd.rank || foundCd.level);
+    }
+
+    var isChaos = /^number\s+c/i.test(name) || /c39/i.test(name) || /chaos\s+xyz/i.test(name) || /c\d+/i.test(name) || name.includes('Utopia Ray');
+    if (!isChaos) return null;
+
+    var baseName = 'Number 39: Utopia';
+    if (/c39/i.test(name) || /utopia\s+ray/i.test(name)) {
+      baseName = 'Number 39: Utopia';
+    } else if (/c32/i.test(name) || /shark\s+drake\s+veiss/i.test(name)) {
+      baseName = 'Number 32: Shark Drake';
+    } else if (/c15/i.test(name) || /giant\s+hunter/i.test(name)) {
+      baseName = 'Number 15: Gimmick Puppet Giant Grinder';
+    } else if (/c107/i.test(name) || /tachyon/i.test(name)) {
+      baseName = 'Number 107: Galaxy-Eyes Tachyon Dragon';
+    } else if (/c104/i.test(name) || /masquerade/i.test(name)) {
+      baseName = 'Number 104: Masquerade';
+    } else {
+      var m = name.match(/Number\s+C(\d+)/i);
+      if (m) {
+        baseName = 'Number ' + m[1];
+      } else {
+        baseName = 'Monstruo Xyz Rango 4';
+      }
+    }
+
+    return {
+      isChaos: true,
+      baseName: baseName,
+      targetRank: rank || 5
+    };
+  };
+
+  // Lógica de Materiales para Invocación Xyz (Estándar y Chaos Xyz Change)
   window.findXyzMaterialsFor = function(xyzCard) {
     if (typeof game === 'undefined' || !game || !xyzCard) return null;
     var rank = Number(xyzCard.rank || xyzCard.level || xyzCard[1] || 0);
@@ -29187,9 +29227,32 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === xyzCard.name; });
       if (foundCd && (foundCd.rank || foundCd.level)) rank = Number(foundCd.rank || foundCd.level);
     }
-    if (!rank) return null;
+    if (!rank) rank = 4;
 
-    // Buscar monstruos boca arriba en game.field cuyo nivel coincida con el rango del Xyz
+    // 1. VENTAJA ESPECIAL: Invocación Chaos Xyz Change sobre monstruo Xyz base (sin necesidad de Rank-Up)
+    var chaosReq = window.getChaosChangeRequirements ? window.getChaosChangeRequirements(xyzCard) : null;
+    if (chaosReq && chaosReq.isChaos) {
+      var chaosIndices = [];
+      (game.field || []).forEach(function(c, idx) {
+        if (c && !c.faceDown && !c.faceDownSet103) {
+          var cName = (c.name || '').toLowerCase();
+          var isBaseMatch = cName.includes(chaosReq.baseName.toLowerCase()) || 
+                            (chaosReq.baseName.toLowerCase().includes('utopia') && cName.includes('utopia'));
+          var cRank = Number(c.rank || c.level || 0);
+          var isXyzKind = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c)));
+          var isRankMatch = isXyzKind && (cRank === 4 || cRank === (chaosReq.targetRank - 1));
+          if (isBaseMatch || isRankMatch) {
+            chaosIndices.push(idx);
+          }
+        }
+      });
+
+      if (chaosIndices.length > 0) {
+        return chaosIndices.map(function(idx) { return [idx]; });
+      }
+    }
+
+    // 2. Invocación Xyz regular: 2 monstruos boca arriba de Nivel coincidente con el Rango
     var matchingIndices = [];
     (game.field || []).forEach(function(c, idx) {
       if (c && !c.faceDown && !c.faceDownSet103) {
@@ -29610,7 +29673,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     updateUI();
   };
 
-  // Modal interactivo de Selección de Materiales para Invocación Xyz
+  // Modal interactivo de Selección de Materiales para Invocación Xyz (Estándar y Chaos Xyz Change)
   window.showXyzMaterialSelectModal = function(xyzCard, extraIndex, allCombos, onConfirm, onCancel) {
     var existing = document.getElementById('xyz-mat-modal');
     if (existing) existing.remove();
@@ -29620,29 +29683,59 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       var foundCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === xyzCard.name; });
       if (foundCd && (foundCd.rank || foundCd.level)) targetRank = Number(foundCd.rank || foundCd.level);
     }
+    if (!targetRank) targetRank = 4;
     var xyzName = xyzCard.name || 'Monstruo Xyz';
     var xyzAtk = xyzCard.atk !== undefined ? xyzCard.atk : (xyzCard[4] !== undefined ? xyzCard[4] : '-');
     var xyzDef = xyzCard.def !== undefined ? xyzCard.def : (xyzCard[5] !== undefined ? xyzCard[5] : '-');
 
-    // Monstruos boca arriba en el campo cuyo nivel coincida con el rango
-    var eligibleMonsters = (game.field || [])
-      .map(function(c, idx) { return { idx: idx, card: c }; })
-      .filter(function(x) {
-        if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
-        var lvl = Number(x.card.level || x.card[1] || 0);
-        if (!lvl) {
-          var fCd = (window.CARDS_DATA || []).find(function(f) { return f && f.name === x.card.name; });
-          if (fCd && fCd.level) lvl = Number(fCd.level);
-        }
-        return lvl === targetRank;
-      });
+    // Detección de Chaos Xyz / Number C (ej. Number C39: Utopia Ray)
+    var chaosReq = window.getChaosChangeRequirements ? window.getChaosChangeRequirements(xyzCard) : null;
+    var isChaos = !!(chaosReq && chaosReq.isChaos);
+    var requiredCount = isChaos ? 1 : 2;
+
+    // Monstruos elegibles en el campo:
+    var eligibleMonsters = [];
+    if (isChaos) {
+      // Para Chaos Xyz: Monstruos boca arriba que sean el monstruo base o Xyz Rango 4 (o targetRank - 1)
+      eligibleMonsters = (game.field || [])
+        .map(function(c, idx) { return { idx: idx, card: c }; })
+        .filter(function(x) {
+          if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
+          var cName = (x.card.name || '').toLowerCase();
+          var isBaseMatch = cName.includes(chaosReq.baseName.toLowerCase()) || 
+                            (chaosReq.baseName.toLowerCase().includes('utopia') && cName.includes('utopia'));
+          var cRank = Number(x.card.rank || x.card.level || 0);
+          var isXyzKind = (x.card.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.card)));
+          var isRankMatch = isXyzKind && (cRank === 4 || cRank === (chaosReq.targetRank - 1));
+          return isBaseMatch || isRankMatch;
+        });
+    } else {
+      // Para Xyz regular: Monstruos boca arriba cuyo nivel coincida con el rango
+      eligibleMonsters = (game.field || [])
+        .map(function(c, idx) { return { idx: idx, card: c }; })
+        .filter(function(x) {
+          if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
+          var lvl = Number(x.card.level || x.card[1] || 0);
+          if (!lvl) {
+            var fCd = (window.CARDS_DATA || []).find(function(f) { return f && f.name === x.card.name; });
+            if (fCd && fCd.level) lvl = Number(fCd.level);
+          }
+          return lvl === targetRank;
+        });
+    }
 
     var selectedSet = new Set((allCombos && allCombos[0]) || []);
-    if (selectedSet.size < 2 && eligibleMonsters.length >= 2) {
-      selectedSet.add(eligibleMonsters[0].idx);
-      selectedSet.add(eligibleMonsters[1].idx);
-    } else if (eligibleMonsters.length === 1) {
-      selectedSet.add(eligibleMonsters[0].idx);
+    if (isChaos) {
+      if (selectedSet.size === 0 && eligibleMonsters.length >= 1) {
+        selectedSet.add(eligibleMonsters[0].idx);
+      }
+    } else {
+      if (selectedSet.size < 2 && eligibleMonsters.length >= 2) {
+        selectedSet.add(eligibleMonsters[0].idx);
+        selectedSet.add(eligibleMonsters[1].idx);
+      } else if (eligibleMonsters.length === 1) {
+        selectedSet.add(eligibleMonsters[0].idx);
+      }
     }
 
     var overlay = document.createElement('div');
@@ -29650,20 +29743,26 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     overlay.style.cssText = 'position:fixed; inset:0; background:rgba(2,4,16,0.92); z-index:99999999; display:flex; justify-content:center; align-items:center; padding:15px; font-family:"Segoe UI", Arial, sans-serif; backdrop-filter:blur(4px);';
 
     var box = document.createElement('div');
-    box.style.cssText = 'width:min(820px, 96vw); max-height:88vh; background:linear-gradient(180deg, #0b0d1b 0%, #030408 100%); border:2.5px solid #ffd700; border-radius:14px; box-shadow:0 0 40px rgba(255, 215, 0, 0.4), 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
+    box.style.cssText = 'width:min(820px, 96vw); max-height:88vh; background:linear-gradient(180deg, #0b0d1b 0%, #030408 100%); border:2.5px solid ' + (isChaos ? '#ff0055' : '#ffd700') + '; border-radius:14px; box-shadow:0 0 45px ' + (isChaos ? 'rgba(255, 0, 85, 0.45)' : 'rgba(255, 215, 0, 0.4)') + ', 0 10px 40px #000; display:flex; flex-direction:column; overflow:hidden;';
 
     // Header Zexal
     var header = document.createElement('div');
-    header.style.cssText = 'background:linear-gradient(90deg, #121028 0%, #201335 50%, #121028 100%); padding:14px 20px; border-bottom:2px solid #ffd700; text-align:center; position:relative;';
+    header.style.cssText = 'background:linear-gradient(90deg, ' + (isChaos ? '#250818 0%, #420d29 50%, #250818 100%' : '#121028 0%, #201335 50%, #121028 100%') + '); padding:14px 20px; border-bottom:2px solid ' + (isChaos ? '#ff0055' : '#ffd700') + '; text-align:center; position:relative;';
+    
+    var titleText = isChaos ? '🌌 CAMBIO XYZ DEL CAOS · SOBREPOSICIÓN DIRECTA' : '🌌 INVOCACIÓN XYZ · SOBREPOSICIÓN DE MATERIALES';
+    var reqDescText = isChaos 
+      ? `Requisito Especial: Sobreponer sobre <b>1 "${chaosReq.baseName}"</b> (o Xyz Rango 4) en tu campo. <span style="color:#7cff7c; font-weight:bold;">¡No requiere Rank-Up!</span>`
+      : `Requisito: <b>2 Monstruos de Nivel ${targetRank}</b> sobrepuestos en el campo`;
+
     header.innerHTML = `
-      <div style="font-family:VT323, monospace; font-size:26px; color:#ffd700; text-shadow:0 0 12px #ffd700; letter-spacing:1.5px;">
-        🌌 INVOCACIÓN XYZ · SOBREPOSICIÓN DE MATERIALES
+      <div style="font-family:VT323, monospace; font-size:26px; color:${isChaos ? '#ff4081' : '#ffd700'}; text-shadow:0 0 12px ${isChaos ? '#ff0055' : '#ffd700'}; letter-spacing:1.5px;">
+        ${titleText}
       </div>
       <div style="color:#fff; font-size:14px; margin-top:4px;">
-        Invocando a <b style="color:#ffd700;">${xyzName}</b> (★ Rango <b>${targetRank}</b> · ⚔${xyzAtk} / 🛡${xyzDef})
+        Invocando a <b style="color:${isChaos ? '#ff4081' : '#ffd700'};">${xyzName}</b> (★ Rango <b>${targetRank}</b> · ⚔${xyzAtk} / 🛡${xyzDef})
       </div>
       <div style="color:#d1c4e9; font-size:12px; margin-top:2px;">
-        Requisito: <b>2 Monstruos de Nivel ${targetRank}</b> sobrepuestos en el campo
+        ${reqDescText}
       </div>
     `;
     box.appendChild(header);
@@ -29682,15 +29781,20 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (eligibleMonsters.length === 0) {
         var currentMonsters = (game.field || []).filter(function(x) { return x && !x.faceDown && !x.faceDownSet103; });
         var currentSummary = currentMonsters.length > 0
-          ? currentMonsters.map(function(m) { return (m.name || 'Monstruo') + ' (★ Nv ' + (m.level || m[1] || '?') + ')'; }).join(', ')
+          ? currentMonsters.map(function(m) { return (m.name || 'Monstruo') + ' (' + (m.kind === 'XYZ' ? ('★ Rango ' + (m.rank || m.level || 4)) : ('★ Nv ' + (m.level || m[1] || '?'))) + ')'; }).join(', ')
           : 'Tu campo está vacío actualmente';
+
+        var noMatchMsg = isChaos
+          ? `Para sobreponer e invocar a <b style="color:#ff4081;">${xyzName}</b> necesitas tener a <b>${chaosReq.baseName}</b> (o cualquier Monstruo Xyz de Rango 4) en tu campo.<br><span style="color:#7cff7c; font-weight:bold;">¡Ventaja activa: No necesitas Magia de Subida de Rango!</span>`
+          : `Para sobreponer e invocar a <b style="color:#ffd700;">${xyzName}</b> necesitas <b>2 monstruos boca arriba de Nivel ${targetRank}</b> en tu campo.`;
+
         gridDiv.innerHTML = `
-          <div style="grid-column:1/-1; background:#181228; border:1.5px dashed #ffd700; border-radius:10px; padding:20px; text-align:center;">
-            <div style="color:#ffd700; font-weight:bold; font-size:16px; margin-bottom:8px;">
-              ⚠️ No hay monstruos de Nivel ${targetRank} en tu campo
+          <div style="grid-column:1/-1; background:#181228; border:1.5px dashed ${isChaos ? '#ff0055' : '#ffd700'}; border-radius:10px; padding:20px; text-align:center;">
+            <div style="color:${isChaos ? '#ff4081' : '#ffd700'}; font-weight:bold; font-size:16px; margin-bottom:8px;">
+              ⚠️ ${isChaos ? 'No tienes al monstruo Xyz base en tu campo' : ('No hay monstruos de Nivel ' + targetRank + ' en tu campo')}
             </div>
             <div style="color:#e0e0e0; font-size:13px; margin-bottom:12px; line-height:1.5;">
-              Para sobreponer e invocar a <b style="color:#ffd700;">${xyzName}</b> necesitas <b>2 monstruos boca arriba de Nivel ${targetRank}</b> en tu campo.
+              ${noMatchMsg}
             </div>
             <div style="background:#0c0916; border:1px solid #4a3c66; border-radius:6px; padding:10px; color:#b0bec5; font-size:12px; text-align:left;">
               <b style="color:#fff;">Monstruos actuales en tu campo:</b><br>
@@ -29706,14 +29810,15 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         var idx = item.idx;
         var isSelected = selectedSet.has(idx);
 
-        var cardLvl = Number(card.level || card[1] || targetRank);
+        var isXyzMat = (card.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(card)));
+        var cardRankOrLvl = isXyzMat ? ('★ Rango ' + (card.rank || card.level || 4)) : ('★ Nivel ' + Number(card.level || card[1] || targetRank));
         var cardAtk = card.atk !== undefined ? card.atk : (card[4] !== undefined ? card[4] : '-');
         var cardDef = card.def !== undefined ? card.def : (card[5] !== undefined ? card[5] : '-');
 
         var cardDiv = document.createElement('div');
         cardDiv.style.cssText = `
-          background: ${isSelected ? 'linear-gradient(135deg, #24143a 0%, #3e1b60 100%)' : '#141424'};
-          border: 2px solid ${isSelected ? '#ffd700' : '#453859'};
+          background: ${isSelected ? (isChaos ? 'linear-gradient(135deg, #380e22 0%, #601438 100%)' : 'linear-gradient(135deg, #24143a 0%, #3e1b60 100%)') : '#141424'};
+          border: 2px solid ${isSelected ? (isChaos ? '#ff0055' : '#ffd700') : '#453859'};
           border-radius: 8px;
           padding: 10px;
           cursor: pointer;
@@ -29721,7 +29826,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           flex-direction: column;
           align-items: center;
           text-align: center;
-          box-shadow: ${isSelected ? '0 0 16px rgba(255, 215, 0, 0.6)' : 'none'};
+          box-shadow: ${isSelected ? (isChaos ? '0 0 18px rgba(255, 0, 85, 0.7)' : '0 0 16px rgba(255, 215, 0, 0.6)') : 'none'};
           transition: all 0.15s ease;
         `;
 
@@ -29729,9 +29834,13 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           if (selectedSet.has(idx)) {
             selectedSet.delete(idx);
           } else {
-            if (selectedSet.size >= 2) {
-              var first = selectedSet.values().next().value;
-              selectedSet.delete(first);
+            if (isChaos) {
+              selectedSet.clear();
+            } else {
+              if (selectedSet.size >= 2) {
+                var first = selectedSet.values().next().value;
+                selectedSet.delete(first);
+              }
             }
             selectedSet.add(idx);
           }
@@ -29739,18 +29848,24 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           updateUI();
         };
 
+        var selectedBadge = isSelected
+          ? (isChaos ? '✓ SOBREPONER CAOS' : '✓ MATERIAL SELECCIONADO')
+          : 'Clic para seleccionar';
+
+        var badgeBg = isSelected ? (isChaos ? 'background:#ff0055; color:#fff;' : 'background:#ffd700; color:#000;') : 'background:#241d30; color:#888;';
+
         cardDiv.innerHTML = `
-          <div style="font-size:12px; font-weight:bold; color:${isSelected ? '#ffd700' : '#fff'}; margin-bottom:4px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          <div style="font-size:12px; font-weight:bold; color:${isSelected ? (isChaos ? '#ff4081' : '#ffd700') : '#fff'}; margin-bottom:4px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
             ${card.name || 'Monstruo'}
           </div>
           <div style="font-size:11px; color:#bb86fc; font-weight:bold;">
-            ★ Nivel ${cardLvl}
+            ${cardRankOrLvl}
           </div>
           <div style="font-size:11px; color:#aaa; margin-top:2px;">
             ⚔ ${cardAtk} / 🛡 ${cardDef}
           </div>
-          <div style="margin-top:8px; font-size:11px; padding:3px 10px; border-radius:4px; font-weight:bold; ${isSelected ? 'background:#ffd700; color:#000;' : 'background:#241d30; color:#888;'}">
-            ${isSelected ? '✓ MATERIAL SELECCIONADO' : 'Clic para seleccionar'}
+          <div style="margin-top:8px; font-size:11px; padding:3px 10px; border-radius:4px; font-weight:bold; ${badgeBg}">
+            ${selectedBadge}
           </div>
         `;
         gridDiv.appendChild(cardDiv);
@@ -29761,20 +29876,20 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     // Status Card
     var statusCard = document.createElement('div');
-    statusCard.style.cssText = 'background:rgba(20, 16, 36, 0.9); border:1px solid #7c4dff; border-radius:8px; padding:12px 16px; display:flex; flex-direction:column; gap:4px;';
+    statusCard.style.cssText = 'background:rgba(20, 16, 36, 0.9); border:1px solid ' + (isChaos ? '#ff0055' : '#7c4dff') + '; border-radius:8px; padding:12px 16px; display:flex; flex-direction:column; gap:4px;';
 
     function updateStatusCard() {
       var selArr = Array.from(selectedSet);
-      var isValid = (selArr.length === 2);
+      var isValid = (selArr.length === requiredCount);
 
-      if (eligibleMonsters.length < 2) {
+      if (eligibleMonsters.length < requiredCount) {
         statusCard.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
             <div style="font-size:13px; color:#fff;">
-              <b>Materiales en campo:</b> ${eligibleMonsters.length} / 2 requeridos
+              <b>Monstruos en campo:</b> ${eligibleMonsters.length} / ${requiredCount} requerido
             </div>
             <div style="font-size:13px; font-weight:bold; color:#ffb74d;">
-              ⚠️ Requiere ${2 - eligibleMonsters.length} monstruo(s) más de Nivel ${targetRank}
+              ⚠️ ${isChaos ? ('Invoca primero a ' + chaosReq.baseName + ' o un Xyz Rango 4') : ('Requiere ' + (2 - eligibleMonsters.length) + ' monstruo(s) más de Nivel ' + targetRank)}
             </div>
           </div>
         `;
@@ -29784,7 +29899,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           confirmBtn.style.opacity = '0.4';
           confirmBtn.style.cursor = 'not-allowed';
           confirmBtn.style.boxShadow = 'none';
-          confirmBtn.textContent = '⚠️ FALTAN MATERIALES (Se requieren 2 de Nivel ' + targetRank + ')';
+          confirmBtn.textContent = isChaos ? ('⚠️ FALTA MONSTRUO BASE (' + chaosReq.baseName + ')') : ('⚠️ FALTAN MATERIALES (Se requieren 2 de Nivel ' + targetRank + ')');
         }
         return;
       }
@@ -29792,10 +29907,10 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       statusCard.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div style="font-size:13px; color:#fff;">
-            <b>Materiales seleccionados:</b> ${selArr.length} / 2
+            <b>${isChaos ? 'Monstruo base seleccionado:' : 'Materiales seleccionados:'}</b> ${selArr.length} / ${requiredCount}
           </div>
           <div style="font-size:13px; font-weight:bold; color:${isValid ? '#7cff7c' : '#ffd700'};">
-            ${isValid ? '✓ ¡Condición de Sobreposición cumplida!' : 'Selecciona exactamente 2 monstruos de Nivel ' + targetRank}
+            ${isValid ? (isChaos ? '✓ ¡Condición de Cambio Xyz del Caos cumplida!' : '✓ ¡Condición de Sobreposición cumplida!') : (isChaos ? 'Selecciona 1 monstruo Xyz para sobreponer' : ('Selecciona exactamente 2 monstruos de Nivel ' + targetRank))}
           </div>
         </div>
       `;
@@ -29805,8 +29920,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         confirmBtn.disabled = !isValid;
         confirmBtn.style.opacity = isValid ? '1' : '0.4';
         confirmBtn.style.cursor = isValid ? 'pointer' : 'not-allowed';
-        confirmBtn.style.boxShadow = isValid ? '0 0 18px rgba(255, 215, 0, 0.7)' : 'none';
-        confirmBtn.textContent = '⚡ SOBREPONER E INVOCAR XYZ';
+        confirmBtn.style.boxShadow = isValid ? (isChaos ? '0 0 20px rgba(255, 0, 85, 0.8)' : '0 0 18px rgba(255, 215, 0, 0.7)') : 'none';
+        confirmBtn.textContent = isChaos ? '⚡ CAMBIO XYZ DEL CAOS (SOBREPONER)' : '⚡ SOBREPONER E INVOCAR XYZ';
       }
     }
 
@@ -29828,11 +29943,13 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     var confirmBtn = document.createElement('button');
     confirmBtn.id = 'xyz-confirm-btn';
-    confirmBtn.innerHTML = '⚡ SOBREPONER E INVOCAR XYZ';
-    confirmBtn.style.cssText = 'background:linear-gradient(180deg, #ffd700, #b8860b); border:1.5px solid #fff; color:#000; padding:9px 24px; border-radius:6px; font-size:13px; font-weight:bold;';
+    confirmBtn.innerHTML = isChaos ? '⚡ CAMBIO XYZ DEL CAOS (SOBREPONER)' : '⚡ SOBREPONER E INVOCAR XYZ';
+    confirmBtn.style.cssText = isChaos 
+      ? 'background:linear-gradient(180deg, #ff0055, #c2185b); border:1.5px solid #fff; color:#fff; padding:9px 24px; border-radius:6px; font-size:13px; font-weight:bold;'
+      : 'background:linear-gradient(180deg, #ffd700, #b8860b); border:1.5px solid #fff; color:#000; padding:9px 24px; border-radius:6px; font-size:13px; font-weight:bold;';
     confirmBtn.onclick = function() {
       var selArr = Array.from(selectedSet);
-      if (selArr.length !== 2) return;
+      if (selArr.length !== requiredCount) return;
       overlay.remove();
       if (typeof onConfirm === 'function') onConfirm(selArr);
     };
@@ -29849,7 +29966,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     updateUI();
   };
 
-  // Invocación por Extra Deck del Jugador (Sincronía o Xyz)
+  // Invocación por Extra Deck del Jugador (Sincronía o Xyz / Chaos Change)
   window.extraClick = function(i) {
     if (typeof game === 'undefined' || !game) return;
     var c = game.extra && game.extra[i];
@@ -29874,6 +29991,12 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           var mat = game.field[idx];
           if (mat) {
             matNames.push(mat.name || 'Monstruo');
+            // Transferir materiales acumulados si el monstruo sobrepuesto ya tenía unidades de sobreposición
+            if (Array.isArray(mat.materials) && mat.materials.length > 0) {
+              mat.materials.forEach(function(innerMat) {
+                matCards.push(innerMat);
+              });
+            }
             matCards.push(mat);
             game.field[idx] = null;
           }
@@ -29887,8 +30010,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         sc.faceUp = true;
         sc.kind = 'XYZ';
         sc.rank = targetRank;
-        sc.overlayUnits = 2;
         sc.materials = matCards;
+        sc.overlayUnits = matCards.length;
         sc.summonedTurn = game.turnNo;
         game.field[slot] = sc;
 
@@ -29900,8 +30023,15 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
         if (typeof closePile === 'function') closePile();
         if (typeof render === 'function') render();
-        if (typeof log === 'function') log('¡INVOCACIÓN XYZ! 🌌 ' + sc.name + ' (Rango ' + sc.rank + ') aparece en el campo sobreponiendo ' + matNames.join(' + ') + '!');
-        if (typeof duelToast === 'function') duelToast('¡Invocación Xyz! ' + sc.name);
+
+        var chaosReq = window.getChaosChangeRequirements ? window.getChaosChangeRequirements(sc) : null;
+        if (chaosReq && chaosReq.isChaos) {
+          if (typeof log === 'function') log('¡CAMBIO XYZ DEL CAOS! 🌌 ' + sc.name + ' (Rango ' + sc.rank + ') aparece sobreponiéndose sobre ' + matNames.join(', ') + ' con ' + sc.overlayUnits + ' Unidades de Sobreposición!');
+          if (typeof duelToast === 'function') duelToast('¡Cambio Xyz del Caos! ' + sc.name);
+        } else {
+          if (typeof log === 'function') log('¡INVOCACIÓN XYZ! 🌌 ' + sc.name + ' (Rango ' + sc.rank + ') aparece en el campo sobreponiendo ' + matNames.join(' + ') + '!');
+          if (typeof duelToast === 'function') duelToast('¡Invocación Xyz! ' + sc.name);
+        }
         if (window.playViolinClick) window.playViolinClick();
         if (window.playSummonSound) window.playSummonSound();
       });
@@ -30954,29 +31084,54 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         if (fCd.rank) targetRank = Number(fCd.rank);
       }
 
-      var fieldCount = (game.field || []).filter(function(m) {
-        if (!m || m.faceDown || m.faceDownSet103) return false;
-        var lvl = Number(m.level || m[1] || 0);
-        if (!lvl) {
-          var foundM = (window.CARDS_DATA || []).find(function(f) { return f && f.name === m.name; });
-          if (foundM && foundM.level) lvl = Number(foundM.level);
-        }
-        return lvl === targetRank;
-      }).length;
+      var chaosReq = window.getChaosChangeRequirements ? window.getChaosChangeRequirements(c) : null;
+      var isChaos = !!(chaosReq && chaosReq.isChaos);
 
-      var isReady = (fieldCount >= 2);
+      var fieldCount = 0;
+      var isReady = false;
+
+      if (isChaos) {
+        fieldCount = (game.field || []).filter(function(m) {
+          if (!m || m.faceDown || m.faceDownSet103) return false;
+          var mName = (m.name || '').toLowerCase();
+          var isBaseMatch = mName.includes(chaosReq.baseName.toLowerCase()) || 
+                            (chaosReq.baseName.toLowerCase().includes('utopia') && mName.includes('utopia'));
+          var mRank = Number(m.rank || m.level || 0);
+          var isXyzKind = (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m)));
+          return isBaseMatch || (isXyzKind && (mRank === 4 || mRank === (chaosReq.targetRank - 1)));
+        }).length;
+        isReady = (fieldCount >= 1);
+      } else {
+        fieldCount = (game.field || []).filter(function(m) {
+          if (!m || m.faceDown || m.faceDownSet103) return false;
+          var lvl = Number(m.level || m[1] || 0);
+          if (!lvl) {
+            var foundM = (window.CARDS_DATA || []).find(function(f) { return f && f.name === m.name; });
+            if (foundM && foundM.level) lvl = Number(foundM.level);
+          }
+          return lvl === targetRank;
+        }).length;
+        isReady = (fieldCount >= 2);
+      }
+
+      var cardBorderColor = isReady
+        ? (isChaos ? '#ff0055' : '#ffd700')
+        : (isChaos ? '#7a2245' : '#5a4675');
+      var cardShadow = isReady
+        ? (isChaos ? '0 0 22px rgba(255, 0, 85, 0.55)' : '0 0 20px rgba(255, 215, 0, 0.45)')
+        : '0 4px 12px rgba(0,0,0,0.5)';
 
       var cardDiv = document.createElement('div');
       cardDiv.style.cssText = `
-        background: radial-gradient(circle at top, #1c1533 0%, #0d0c18 100%);
-        border: 2px solid ${isReady ? '#ffd700' : '#5a4675'};
+        background: radial-gradient(circle at top, ${isChaos ? '#290d1f' : '#1c1533'} 0%, #0d0c18 100%);
+        border: 2px solid ${cardBorderColor};
         border-radius: 10px;
         padding: 12px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         cursor: pointer;
-        box-shadow: ${isReady ? '0 0 20px rgba(255, 215, 0, 0.45)' : '0 4px 12px rgba(0,0,0,0.5)'};
+        box-shadow: ${cardShadow};
         transition: transform 0.15s ease, box-shadow 0.15s ease;
       `;
       cardDiv.onmouseenter = function() { cardDiv.style.transform = 'translateY(-2px)'; };
@@ -30988,24 +31143,37 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       };
 
       var starsHTML = '★'.repeat(Math.min(targetRank, 12));
-      var statusBadge = isReady
-        ? `<div style="background:linear-gradient(90deg, #1b5e20, #2e7d32); color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; text-shadow:0 0 4px #000; border:1px solid #7cff7c;">⚡ LISTO (${fieldCount}/2 en campo)</div>`
-        : (fieldCount === 1
-            ? `<div style="background:#ef6c00; color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; border:1px solid #ffb74d;">⚠️ 1/2 en campo</div>`
-            : `<div style="background:#262035; color:#aaa; font-size:11px; padding:3px 8px; border-radius:4px; border:1px solid #4a3c66;">0/2 en campo</div>`);
+      var statusBadge = '';
+      if (isChaos) {
+        statusBadge = isReady
+          ? `<div style="background:linear-gradient(90deg, #c2185b, #ff0055); color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; text-shadow:0 0 4px #000; border:1px solid #ff4081;">⚡ CAMBIO CAOS (${chaosReq.baseName})</div>`
+          : `<div style="background:#262035; color:#ff80ab; font-size:11px; padding:3px 8px; border-radius:4px; border:1px solid #ff4081;">Requiere ${chaosReq.baseName}</div>`;
+      } else {
+        statusBadge = isReady
+          ? `<div style="background:linear-gradient(90deg, #1b5e20, #2e7d32); color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; text-shadow:0 0 4px #000; border:1px solid #7cff7c;">⚡ LISTO (${fieldCount}/2 en campo)</div>`
+          : (fieldCount === 1
+              ? `<div style="background:#ef6c00; color:#fff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:4px; border:1px solid #ffb74d;">⚠️ 1/2 en campo</div>`
+              : `<div style="background:#262035; color:#aaa; font-size:11px; padding:3px 8px; border-radius:4px; border:1px solid #4a3c66;">0/2 en campo</div>`);
+      }
 
       var actionBtnStyle = isReady
-        ? 'background:linear-gradient(180deg, #ffd700, #b8860b); color:#000; font-weight:bold; border:1.5px solid #fff; box-shadow:0 0 12px rgba(255,215,0,0.6);'
+        ? (isChaos
+            ? 'background:linear-gradient(180deg, #ff0055, #c2185b); color:#fff; font-weight:bold; border:1.5px solid #fff; box-shadow:0 0 14px rgba(255,0,85,0.7);'
+            : 'background:linear-gradient(180deg, #ffd700, #b8860b); color:#000; font-weight:bold; border:1.5px solid #fff; box-shadow:0 0 12px rgba(255,215,0,0.6);')
         : 'background:#241d33; color:#ffd700; border:1px solid #7c4dff;';
 
       var actionBtnText = isReady
-        ? '⚡ SOBREPONER MATERIALES'
-        : (fieldCount === 1 ? '📋 VER MATERIALES (1/2)' : '📋 VER REQUISITOS (0/2)');
+        ? (isChaos ? '⚡ CAMBIO XYZ DEL CAOS' : '⚡ SOBREPONER MATERIALES')
+        : (isChaos ? '📋 VER REQUISITOS CAOS' : (fieldCount === 1 ? '📋 VER MATERIALES (1/2)' : '📋 VER REQUISITOS (0/2)'));
+
+      var descText = isChaos
+        ? `Invoca sobreponiendo sobre 1 ${chaosReq.baseName} (o Xyz Rango 4). Hereda todos sus materiales acoplados.`
+        : (c.text || '2 monstruos de Nivel ' + targetRank + '. Puedes desacoplar 1 material Xyz para activar su efecto.');
 
       cardDiv.innerHTML = `
         <div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-            <div style="font-size:14px; font-weight:bold; color:#ffd700; text-shadow:0 0 8px rgba(255,215,0,0.4); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <div style="font-size:14px; font-weight:bold; color:${isChaos ? '#ff4081' : '#ffd700'}; text-shadow:0 0 8px rgba(255,215,0,0.4); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
               ${c.name || 'Monstruo Xyz'}
             </div>
             ${statusBadge}
@@ -31024,7 +31192,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           </div>
 
           <div style="font-size:11px; color:#cfd8dc; background:#100d1c; border-radius:5px; padding:6px 8px; border:1px solid #33274a; line-height:1.35; max-height:56px; overflow:hidden;">
-            ${c.text || '2 monstruos de Nivel ' + targetRank + '. Puedes desacoplar 1 material Xyz para activar su efecto.'}
+            ${descText}
           </div>
         </div>
 
