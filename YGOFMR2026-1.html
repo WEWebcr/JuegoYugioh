@@ -19889,72 +19889,390 @@ window.cardHTML = function(c, z, i) {
   }
 })();
 
-window.stHTML = function(c, zone, i) {
-  if (!c) return '<small>Zona libre</small>';
-  var sel = (typeof game !== 'undefined' && game && game.selected && game.selected.some(function(x) { return x[0] === zone && x[1] === i; }));
-  var cls = 'card ' + (c.kind === 'TRAP' ? 'trap' : 'spell') + (sel ? ' selected' : '');
-  var name = c.name || '';
-  var num = (window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]) || 0;
-  var imgSrc = (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) || '';
-  if (!imgSrc && window.CUSTOM_LOCAL_IMAGES) {
-    if (window.CUSTOM_LOCAL_IMAGES[name]) {
-      imgSrc = window.CUSTOM_LOCAL_IMAGES[name];
-    } else if (c.image) {
-      imgSrc = c.image;
-    } else if (c.id && window.CUSTOM_LOCAL_IMAGES[c.id]) {
-      imgSrc = window.CUSTOM_LOCAL_IMAGES[c.id];
-    } else {
-      var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : (window.CARD_MAPPINGS || {});
-      var dNum = dict[name] && dict[name].num ? dict[name].num : dict[name];
-      if (dNum && window.CUSTOM_LOCAL_IMAGES[dNum]) {
-        imgSrc = window.CUSTOM_LOCAL_IMAGES[dNum];
+  // Base de datos de efectos y descripciones para Cartas Mágicas, Trampas y Monstruos
+  window.getCardEffectText = function(c) {
+    if (!c) return '';
+    var name = (typeof c === 'string' ? c : (c.name || c[0] || '')).trim();
+    if (typeof c === 'object' && (c.text || c.desc)) {
+      return c.text || c.desc;
+    }
+    // 1. CARDS_DATA
+    if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+      var cd = window.CARDS_DATA.find(function(x) { return x && x.name === name; });
+      if (cd && (cd.text || cd.desc)) return cd.text || cd.desc;
+    }
+    // 2. CARDS109
+    if (typeof CARDS109 !== 'undefined' && Array.isArray(CARDS109)) {
+      var c109 = CARDS109.find(function(x) { return x && x.name === name; });
+      if (c109 && (c109.text || c109.desc)) return c109.text || c109.desc;
+    }
+    // 3. STDB / FMR_ST_POOL_V1
+    if (typeof STDB !== 'undefined' && Array.isArray(STDB)) {
+      var st = STDB.find(function(x) { return x && x.name === name; });
+      if (st && (st.text || st.desc)) return st.text || st.desc;
+    }
+    if (window.FMR_ST_POOL_V1 && Array.isArray(window.FMR_ST_POOL_V1)) {
+      var pool = window.FMR_ST_POOL_V1.find(function(x) { return x && x.name === name; });
+      if (pool && (pool.text || pool.desc)) return pool.text || pool.desc;
+    }
+
+    var KNOWN_EFFECTS = {
+      'Renace al Monstruo': 'Carta Mágica Normal: Selecciona e Invoca de Modo Especial 1 monstruo de cualquier Cementerio en tu Campo.',
+      'Monster Reborn': 'Carta Mágica Normal: Selecciona e Invoca de Modo Especial 1 monstruo de cualquier Cementerio en tu Campo.',
+      'Llamado de la Tumba': 'Carta de Trampa: Estando colocada (SET), selecciona e Invoca de Modo Especial 1 monstruo de cualquier Cementerio en tu Campo.',
+      'Call of the Haunted': 'Carta de Trampa Continua: Invoca de Modo Especial 1 monstruo de tu Cementerio en Posición de Ataque.',
+      'Raigeki': 'Carta Mágica Normal: Destruye todos los monstruos que controla tu adversario.',
+      'Dark Hole': 'Carta Mágica Normal: Destruye todos los monstruos en el Campo (tuyos y del rival).',
+      "Harpie's Feather Duster": 'Carta Mágica Normal: Destruye todas las cartas de Magia, Trampa y Equipos que controle tu adversario.',
+      'Plumero de Arpía': 'Carta Mágica Normal: Destruye todas las cartas de Magia, Trampa y Equipos que controle tu adversario.',
+      'Tormenta Pesada': 'Carta Mágica Normal: Destruye todas las cartas de Magia, Trampa y Equipos en el Campo.',
+      'Heavy Storm': 'Carta Mágica Normal: Destruye todas las cartas de Magia, Trampa y Equipos en el Campo.',
+      'Swords of Revealing Light': 'Carta Mágica Continua: Revela todos los monstruos boca abajo de tu adversario. Tu adversario no puede declarar ataques durante 3 turnos.',
+      'Espadas de la Luz Reveladora': 'Carta Mágica Continua: Revela todos los monstruos boca abajo de tu adversario. Tu adversario no puede declarar ataques durante 3 turnos.',
+      'Axe of Despair': 'Carta Mágica de Equipo: El monstruo equipado gana 1000 ATK.',
+      'Hacha de la Desesperación': 'Carta Mágica de Equipo: El monstruo equipado gana 1000 ATK.',
+      'Black Pendant': 'Carta Mágica de Equipo: El monstruo equipado gana 500 ATK. Si esta carta es enviada del Campo al Cementerio, inflige 500 puntos de daño al rival.',
+      'Colgante Negro': 'Carta Mágica de Equipo: El monstruo equipado gana 500 ATK. Si esta carta es enviada del Campo al Cementerio, inflige 500 puntos de daño al rival.',
+      'Horn of the Unicorn': 'Carta Mágica de Equipo: El monstruo equipado gana 700 ATK y 700 DEF.',
+      'Cuerno del Unicornio': 'Carta Mágica de Equipo: El monstruo equipado gana 700 ATK y 700 DEF.',
+      'Dragon Treasure': 'Carta Mágica de Equipo: Equipa solo a un monstruo Dragón. Gana 300 ATK y 300 DEF.',
+      'Tesoro de Dragón': 'Carta Mágica de Equipo: Equipa solo a un monstruo Dragón. Gana 300 ATK y 300 DEF.',
+      'Garra del Dragón': 'Carta Mágica de Equipo: El monstruo Dragón equipado gana 300 ATK y 300 DEF.',
+      'United We Stand': 'Carta Mágica de Equipo: El monstruo equipado gana 500 ATK y 500 DEF por cada monstruo boca arriba que controles (máx. 2000).',
+      'Unidos Resistiremos': 'Carta Mágica de Equipo: El monstruo equipado gana 500 ATK y 500 DEF por cada monstruo boca arriba que controles (máx. 2000).',
+      'Mirror Force': 'Carta de Trampa Normal: Cuando un monstruo del adversario declara un ataque: destruye todos los monstruos en Posición de Ataque de tu adversario.',
+      'Fuerza de Espejo': 'Carta de Trampa Normal: Cuando un monstruo del adversario declara un ataque: destruye todos los monstruos en Posición de Ataque de tu adversario.',
+      'Trap Hole': 'Carta de Trampa Normal: Cuando tu adversario Invoca un monstruo con 1000 ATK o más: destruye ese monstruo.',
+      'Agujero Trampa': 'Carta de Trampa Normal: Cuando tu adversario Invoca un monstruo con 1000 ATK o más: destruye ese monstruo.',
+      'Magic Cylinder': 'Carta de Trampa Normal: Cuando un monstruo del adversario declara un ataque: niega el ataque y causa daño a sus LP igual al ATK del atacante.',
+      'Cilindro Mágico': 'Carta de Trampa Normal: Cuando un monstruo del adversario declara un ataque: niega el ataque y causa daño a sus LP igual al ATK del atacante.',
+      'Waboku': 'Carta de Trampa Normal: No recibes daño de batalla este turno y tus monstruos no pueden ser destruidos en batalla este turno.',
+      'Negate Attack': 'Carta de Trampa de Contraataque: Cuando un monstruo del adversario ataca: niega el ataque y termina la Battle Phase del adversario.',
+      'Ataque Negado': 'Carta de Trampa de Contraataque: Cuando un monstruo del adversario ataca: niega el ataque y termina la Battle Phase del adversario.',
+      'Sakuretsu Armor': 'Carta de Trampa Normal: Cuando un monstruo del adversario declara un ataque: destruye al monstruo atacante.',
+      'Armadura Sakuretsu': 'Carta de Trampa Normal: Cuando un monstruo del adversario declara un ataque: destruye al monstruo atacante.',
+      'Torrential Tribute': 'Carta de Trampa Normal: Cuando un monstruo es Invocado: destruye todos los monstruos en el Campo.',
+      'Tributo Torrencial': 'Carta de Trampa Normal: Cuando un monstruo es Invocado: destruye todos los monstruos en el Campo.',
+      'Dust Tornado': 'Carta de Trampa Normal: Selecciona 1 Carta Mágica o de Trampa que controle tu adversario y destrúyela.',
+      'Tornado de Polvo': 'Carta de Trampa Normal: Selecciona 1 Carta Mágica o de Trampa que controle tu adversario y destrúyela.',
+      'Javalina Encantada': 'Carta de Trampa: Cuando el rival declara un ataque directo, aumentas tus LP en una cantidad igual al ATK de ese monstruo.',
+      'Pot of Greed': 'Carta Mágica Normal: Roba 2 cartas de tu Deck.',
+      'Olla de la Codicia': 'Carta Mágica Normal: Roba 2 cartas de tu Deck.',
+      'Graceful Charity': 'Carta Mágica Normal: Roba 3 cartas de tu Deck, luego descarta 2 cartas de tu mano.',
+      'Caridad Grácil': 'Carta Mágica Normal: Roba 3 cartas de tu Deck, luego descarta 2 cartas de tu mano.',
+      'Limiter Removal': 'Carta Mágica de Juego Rápido: Duplica el ATK actual de todos los monstruos Máquina que controles hasta el final del turno. Se destruyen al terminar el turno.',
+      'Scapegoat': 'Carta Mágica de Juego Rápido: Invoca de Modo Especial 4 Fichas de Oveja (Bestia/TIERRA/Nivel 1/ATK 0/DEF 0) en Posición de Defensa.',
+      'Threatening Roar': 'Carta de Trampa Normal: Tu adversario no puede declarar ataques este turno.',
+      'Rugido Amenazante': 'Carta de Trampa Normal: Tu adversario no puede declarar ataques este turno.',
+      'Cybernetic Fusion Support': 'Carta Mágica: Puedes pagar la mitad de tus LP; este turno puedes usar materiales de tu Cementerio o Campo para invocar por Fusión.',
+      'Cybernetic Zone': 'Carta Mágica: Selecciona 1 monstruo Máquina que controles; destiérralo hasta la End Phase y luego regresa con el doble de ATK.',
+      'Fusion Weapon': 'Carta Mágica de Equipo: Equipa solo a un monstruo de Fusión de Nivel 6 o menor. Gana 1500 ATK y 1500 DEF.',
+      'Montaña': 'Carta Mágica de Campo: Aumenta el ATK y DEF de todos los monstruos Dragón, Bestia Alada y Trueno en 200 puntos.',
+      'Refuerzo': 'Carta Mágica: Aumenta el ATK de un monstruo en tu campo.',
+      'Goblindbergh': 'Efecto de Monstruo: Cuando esta carta es Invocada de Modo Normal: puedes Invocar de Modo Especial, desde tu mano, 1 monstruo de Nivel 4 o menor.',
+      'Junk Synchron': 'Cantante: Cuando esta carta es Invocada de Modo Normal: puedes seleccionar 1 monstruo de Nivel 2 o menor en tu Cementerio; Invócalo de Modo Especial en Posición de Defensa.',
+      'Debris Dragon': 'Cantante: Cuando esta carta es Invocada de Modo Normal: puedes seleccionar 1 monstruo con 500 ATK o menos en tu Cementerio; Invócalo de Modo Especial en Posición de Ataque.'
+    };
+
+    if (KNOWN_EFFECTS[name]) return KNOWN_EFFECTS[name];
+    for (var k in KNOWN_EFFECTS) {
+      if (name.toLowerCase() === k.toLowerCase()) return KNOWN_EFFECTS[k];
+    }
+    return '';
+  };
+
+  // Modal interactivo para ver en grande los detalles y efecto de cualquier carta
+  window.showCardDetailModal = function(c, zone, i) {
+    if (!c) {
+      if (zone === 'h' && typeof game !== 'undefined' && game && game.hand) c = game.hand[i];
+      else if (zone === 'b' && typeof game !== 'undefined' && game && game.playerBack) c = game.playerBack[i];
+      else if (zone === 'f' && typeof game !== 'undefined' && game && game.field) c = game.field[i];
+    }
+    if (!c) return;
+
+    var existing = document.getElementById('fmr-card-detail-modal');
+    if (existing) existing.remove();
+
+    var name = c.name || c[0] || 'Carta';
+    var isMonster = (c.kind === 'MONSTER' || c.atk !== undefined || (typeof isST === 'function' && !isST(c)));
+    var isTrap = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || name === 'Dust Tornado');
+    var isEquip = (c.kind === 'EQUIP' || c.value === 'EQUIP');
+    var isSpell = !isMonster && !isTrap;
+
+    var typeTitle = 'CARTA MÁGICA';
+    var themeColor = '#00e5ff';
+    var themeBorder = '#00e5ff';
+    var themeBgHeader = 'linear-gradient(90deg, #092c28 0%, #0c3e38 50%, #092c28 100%)';
+    var borderGlow = 'rgba(0, 229, 255, 0.45)';
+
+    if (isTrap) {
+      typeTitle = 'CARTA DE TRAMPA';
+      themeColor = '#ff4081';
+      themeBorder = '#ff4081';
+      themeBgHeader = 'linear-gradient(90deg, #380d22 0%, #541132 50%, #380d22 100%)';
+      borderGlow = 'rgba(255, 64, 129, 0.45)';
+    } else if (isEquip) {
+      typeTitle = 'MÁGICA DE EQUIPO';
+      themeColor = '#ffd700';
+      themeBorder = '#ffd700';
+      themeBgHeader = 'linear-gradient(90deg, #332b0a 0%, #4a3e0f 50%, #332b0a 100%)';
+      borderGlow = 'rgba(255, 215, 0, 0.45)';
+    } else if (isMonster) {
+      var isXyz = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c)));
+      var isSynchro = (c.kind === 'SYNCHRO');
+      var isFusion = (c.kind === 'FUSION');
+      if (isXyz) {
+        typeTitle = 'MONSTRUO XYZ';
+        themeColor = '#ffd700';
+        themeBorder = '#ffd700';
+        themeBgHeader = 'linear-gradient(90deg, #1b162f 0%, #312154 50%, #1b162f 100%)';
+        borderGlow = 'rgba(255, 215, 0, 0.5)';
+      } else if (isSynchro) {
+        typeTitle = 'MONSTRUO SINCRONÍA';
+        themeColor = '#ffffff';
+        themeBorder = '#ffffff';
+        themeBgHeader = 'linear-gradient(90deg, #15222e 0%, #22374a 50%, #15222e 100%)';
+        borderGlow = 'rgba(255, 255, 255, 0.5)';
+      } else if (isFusion) {
+        typeTitle = 'MONSTRUO FUSIÓN';
+        themeColor = '#bb86fc';
+        themeBorder = '#bb86fc';
+        themeBgHeader = 'linear-gradient(90deg, #251336 0%, #3f1e5c 50%, #251336 100%)';
+        borderGlow = 'rgba(187, 134, 252, 0.45)';
+      } else {
+        typeTitle = 'MONSTRUO';
+        themeColor = '#ffb74d';
+        themeBorder = '#ffb74d';
+        themeBgHeader = 'linear-gradient(90deg, #2a1f14 0%, #45321f 50%, #2a1f14 100%)';
+        borderGlow = 'rgba(255, 183, 77, 0.45)';
       }
     }
-  }
-  var isEquip = (c.kind === 'EQUIP' || c.value === 'EQUIP');
-  var kindBadge = isEquip ? '⚡ EQUIPO' : (c.kind === 'TRAP' ? '🛡️ TRAMPA' : '🔮 MAGIA');
-  var badgeColor = isEquip ? '#ffd700' : (c.kind === 'TRAP' ? '#ff80ab' : '#80deea');
 
-  var imgTag = imgSrc ?
-    '<img src="' + imgSrc + '" style="max-width:100%;max-height:100%;object-fit:contain;background:#000;display:block;margin:auto;" />' :
-    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:11px;">' + name + '</div>';
+    var num = (typeof window.getCardNumber === 'function' ? window.getCardNumber(name) : null) || (window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]);
+    var imgSrc = '';
+    if (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
+      imgSrc = window.CUSTOM_LOCAL_IMAGES[num];
+    } else if (c.image) {
+      imgSrc = c.image;
+    } else if (name && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) {
+      imgSrc = window.CUSTOM_LOCAL_IMAGES[name];
+    } else if (c.id && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[c.id]) {
+      imgSrc = window.CUSTOM_LOCAL_IMAGES[c.id];
+    }
 
-  if (zone === 'h') {
-    var descText = isEquip ? (c.desc || c.text || 'Mágica de Equipo') : (c.kind === 'TRAP' ? (c.desc || c.text || 'Carta de Trampa') : (c.desc || c.text || 'Carta Mágica'));
-    return '<div data-zone="' + zone + '" data-index="' + i + '" class="' + cls + '" onclick="select(\'' + zone + '\',' + i + ')" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:5px;box-sizing:border-box;height:100%;">' +
-      '<div class="cardTop" style="display:flex;justify-content:space-between;align-items:center;gap:4px;margin-bottom:2px;flex-shrink:0;">' +
-        '<div class="name" style="font-size:11px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:1px 1px 2px #000;flex:1;" title="' + name + '">' + name + '</div>' +
-        '<span style="font-size:8px;font-weight:bold;color:' + badgeColor + ';background:rgba(0,0,0,0.7);padding:1px 4px;border-radius:3px;border:1px solid ' + badgeColor + ';flex-shrink:0;">' + kindBadge + '</span>' +
-      '</div>' +
-      '<div class="cardArt" style="padding:0;overflow:hidden;flex:1;min-height:70px;max-height:98px;width:100%;border-radius:4px;margin:2px 0;background:#000;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;">' +
+    var effectText = window.getCardEffectText ? window.getCardEffectText(c) : (c.text || c.desc || '');
+    if (!effectText) {
+      effectText = isSpell ? 'Activa esta carta mágica para aplicar su efecto especial en el campo.' :
+                   isTrap ? 'Coloca esta carta boca abajo (SET). Puede activarse durante el turno del adversario o cuando ocurra su condición de activación.' :
+                   'Monstruo listo para ser invocado en Modo de Ataque o colocado en Modo de Defensa boca abajo.';
+    }
+
+    var modal = document.createElement('div');
+    modal.id = 'fmr-card-detail-modal';
+    modal.style.cssText = 'position:fixed; inset:0; background:rgba(2,4,14,0.92); z-index:999999999; display:flex; justify-content:center; align-items:center; padding:14px; font-family:"Segoe UI", Arial, sans-serif; backdrop-filter:blur(5px);';
+
+    function closeModal() {
+      if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
+    }
+    modal.onclick = function(e) {
+      if (e.target === modal) closeModal();
+    };
+
+    var box = document.createElement('div');
+    box.style.cssText = 'width:min(500px, 94vw); max-height:90vh; background:linear-gradient(180deg, #0f101d 0%, #06070c 100%); border:2.5px solid ' + themeBorder + '; border-radius:14px; box-shadow:0 0 40px ' + borderGlow + ', 0 12px 35px #000; display:flex; flex-direction:column; overflow:hidden;';
+
+    // Header
+    var header = document.createElement('div');
+    header.style.cssText = 'background:' + themeBgHeader + '; padding:14px 18px; border-bottom:2px solid ' + themeBorder + '; display:flex; justify-content:space-between; align-items:center;';
+    header.innerHTML = `
+      <div style="text-align:left;">
+        <div style="font-family:VT323, monospace; font-size:24px; color:${themeColor}; text-shadow:0 0 10px ${borderGlow}; letter-spacing:1px; line-height:1.1;">
+          ${name}
+        </div>
+        <div style="font-size:11px; font-weight:bold; color:#fff; opacity:0.9; margin-top:2px;">
+          ${typeTitle}
+        </div>
+      </div>
+      <button id="fmr-close-detail-x" style="background:#201736; border:1px solid #7c4dff; color:#fff; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center;">✖</button>
+    `;
+    box.appendChild(header);
+
+    // Body
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:16px 18px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:12px;';
+
+    var imgHTML = imgSrc
+      ? `<div style="text-align:center; background:#000; border-radius:8px; padding:6px; border:1px solid rgba(255,255,255,0.15); max-height:180px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+           <img src="${imgSrc}" style="max-height:170px; max-width:100%; object-fit:contain; border-radius:4px;" />
+         </div>`
+      : '';
+
+    var statsHTML = '';
+    if (isMonster) {
+      var atk = c.atk != null ? c.atk : (c[4] != null ? c[4] : 0);
+      var def = c.def != null ? c.def : (c[5] != null ? c[5] : 0);
+      var lvl = c.rank != null ? c.rank : (c.level != null ? c.level : (c[1] != null ? c[1] : 4));
+      var attr = c.attr || c[3] || 'LIGHT';
+      var type = c.type || c[2] || 'Warrior';
+      var lvlLabel = (c.kind === 'XYZ') ? ('★ RANGO ' + lvl) : ('★ NIVEL ' + lvl);
+
+      statsHTML = `
+        <div style="display:flex; justify-content:space-around; flex-wrap:wrap; gap:6px; background:#120e22; padding:8px 10px; border-radius:6px; border:1px solid #33274a; font-size:12px;">
+          <div><span style="color:#aaa;">Atributo:</span> <b style="color:#fff;">${attr}</b></div>
+          <div><span style="color:#aaa;">Tipo:</span> <b style="color:#fff;">${type}</b></div>
+          <div><b style="color:#ffd700;">${lvlLabel}</b></div>
+          <div><span style="color:#ffd700;">⚔ ATK:</span> <b>${atk}</b></div>
+          <div><span style="color:#4fc3f7;">🛡 DEF:</span> <b>${def}</b></div>
+        </div>
+      `;
+    }
+
+    body.innerHTML = `
+      ${imgHTML}
+      ${statsHTML}
+      <div style="background:#090914; border:1.5px solid ${themeBorder}; border-radius:8px; padding:12px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8);">
+        <div style="font-size:12px; font-weight:bold; color:${themeColor}; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px;">
+          【 DESCRIPCIÓN / EFECTO 】
+        </div>
+        <div style="font-size:13.5px; line-height:1.5; color:#f0f0f0; white-space:pre-wrap; word-break:break-word;">
+          ${effectText}
+        </div>
+      </div>
+    `;
+    box.appendChild(body);
+
+    // Footer with action buttons
+    var footer = document.createElement('div');
+    footer.style.cssText = 'padding:12px 18px; background:#070710; border-top:1px solid rgba(255,255,255,0.1); display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; align-items:center;';
+
+    if (zone === 'h' && typeof game !== 'undefined' && game && game.turn === 'player') {
+      if (isSpell) {
+        var actBtn = document.createElement('button');
+        actBtn.style.cssText = 'flex:1; min-width:120px; padding:8px 14px; background:linear-gradient(180deg, #1b5e20, #0e3813); color:#fff; font-weight:bold; border:1.5px solid #4caf50; border-radius:6px; font-size:12px; cursor:pointer; box-shadow:0 0 10px rgba(76,175,80,0.4);';
+        actBtn.textContent = '⚡ ACTIVAR MAGIA';
+        actBtn.onclick = function() {
+          closeModal();
+          if (typeof activateSTFromHand === 'function') activateSTFromHand(i);
+        };
+        footer.appendChild(actBtn);
+
+        var setBtn = document.createElement('button');
+        setBtn.style.cssText = 'flex:1; min-width:100px; padding:8px 12px; background:linear-gradient(180deg, #4e342e, #2d1e1a); color:#fff; font-weight:bold; border:1.5px solid #8d6e63; border-radius:6px; font-size:12px; cursor:pointer;';
+        setBtn.textContent = '📥 COLOCAR (SET)';
+        setBtn.onclick = function() {
+          closeModal();
+          if (typeof setST === 'function') setST(i);
+        };
+        footer.appendChild(setBtn);
+      } else if (isTrap) {
+        var setTrapBtn = document.createElement('button');
+        setTrapBtn.style.cssText = 'flex:1; min-width:130px; padding:8px 14px; background:linear-gradient(180deg, #ad1457, #6a0030); color:#fff; font-weight:bold; border:1.5px solid #ff4081; border-radius:6px; font-size:12px; cursor:pointer; box-shadow:0 0 12px rgba(255,64,129,0.4);';
+        setTrapBtn.textContent = '📥 COLOCAR TRAMPA (SET)';
+        setTrapBtn.onclick = function() {
+          closeModal();
+          if (typeof setST === 'function') setST(i);
+        };
+        footer.appendChild(setTrapBtn);
+      }
+    } else if (zone === 'b' && typeof game !== 'undefined' && game && game.turn === 'player') {
+      var isAuto = isTrap && (['MIRROR_FORCE','TRAP_HOLE','MAGIC_CYLINDER','NEGATE_ATTACK','SAKURETSU_ARMOR','TORRENTIAL'].includes(c.value) || ['Trap Hole','Sakuretsu Armor','Negate Attack','Mirror Force','Magic Cylinder','Torrential Tribute'].includes(name));
+      var isReady = !isTrap || (typeof window.isTrapReady === 'function' ? window.isTrapReady(c) : false);
+      if (c.set && isReady && !isAuto) {
+        var actSetBtn = document.createElement('button');
+        actSetBtn.style.cssText = 'flex:1; min-width:120px; padding:8px 14px; background:linear-gradient(180deg, #1b5e20, #0e3813); color:#fff; font-weight:bold; border:1.5px solid #4caf50; border-radius:6px; font-size:12px; cursor:pointer;';
+        actSetBtn.textContent = '⚡ ACTIVAR AHORA';
+        actSetBtn.onclick = function() {
+          closeModal();
+          if (typeof activateSetCard === 'function') activateSetCard(i);
+        };
+        footer.appendChild(actSetBtn);
+      }
+    }
+
+    var closeBtn = document.createElement('button');
+    closeBtn.style.cssText = 'padding:8px 16px; background:#241d33; color:#ccc; border:1px solid #4a3c66; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer;';
+    closeBtn.textContent = 'CERRAR';
+    closeBtn.onclick = closeModal;
+    footer.appendChild(closeBtn);
+
+    box.appendChild(footer);
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+
+    var closeX = document.getElementById('fmr-close-detail-x');
+    if (closeX) closeX.onclick = closeModal;
+  };
+
+  window.stHTML = function(c, zone, i) {
+    if (!c) return '<small>Zona libre</small>';
+    var sel = (typeof game !== 'undefined' && game && game.selected && game.selected.some(function(x) { return x[0] === zone && x[1] === i; }));
+    var cls = 'card ' + (c.kind === 'TRAP' ? 'trap' : 'spell') + (sel ? ' selected' : '');
+    var name = c.name || '';
+    var num = (window.CARD_MAPPINGS && window.CARD_MAPPINGS[name]) || 0;
+    var imgSrc = (num && window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) || '';
+    if (!imgSrc && window.CUSTOM_LOCAL_IMAGES) {
+      if (window.CUSTOM_LOCAL_IMAGES[name]) {
+        imgSrc = window.CUSTOM_LOCAL_IMAGES[name];
+      } else if (c.image) {
+        imgSrc = c.image;
+      } else if (c.id && window.CUSTOM_LOCAL_IMAGES[c.id]) {
+        imgSrc = window.CUSTOM_LOCAL_IMAGES[c.id];
+      } else {
+        var dict = typeof window.getGlobalCardDict === 'function' ? window.getGlobalCardDict() : (window.CARD_MAPPINGS || {});
+        var dNum = dict[name] && dict[name].num ? dict[name].num : dict[name];
+        if (dNum && window.CUSTOM_LOCAL_IMAGES[dNum]) {
+          imgSrc = window.CUSTOM_LOCAL_IMAGES[dNum];
+        }
+      }
+    }
+    var isEquip = (c.kind === 'EQUIP' || c.value === 'EQUIP');
+    var kindBadge = isEquip ? '⚡ EQUIPO' : (c.kind === 'TRAP' ? '🛡️ TRAMPA' : '🔮 MAGIA');
+    var badgeColor = isEquip ? '#ffd700' : (c.kind === 'TRAP' ? '#ff80ab' : '#80deea');
+
+    var imgTag = imgSrc ?
+      '<img src="' + imgSrc + '" style="max-width:100%;max-height:100%;object-fit:contain;background:#000;display:block;margin:auto;" />' :
+      '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:11px;">' + name + '</div>';
+
+    if (zone === 'h') {
+      var effFull = window.getCardEffectText ? window.getCardEffectText(c) : (c.desc || c.text || '');
+      var descText = effFull || (isEquip ? 'Mágica de Equipo' : (c.kind === 'TRAP' ? 'Carta de Trampa' : 'Carta Mágica'));
+
+      return '<div data-zone="' + zone + '" data-index="' + i + '" class="' + cls + '" onclick="select(\'' + zone + '\',' + i + '); if (window.showCardDetailModal) window.showCardDetailModal(game.hand ? game.hand[' + i + '] : null, \'' + zone + '\', ' + i + ');" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:5px;box-sizing:border-box;height:100%;cursor:pointer;">' +
+        '<div class="cardTop" style="display:flex;justify-content:space-between;align-items:center;gap:4px;margin-bottom:2px;flex-shrink:0;">' +
+          '<div class="name" style="font-size:11px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:1px 1px 2px #000;flex:1;" title="' + name + '">' + name + '</div>' +
+          '<span style="font-size:8px;font-weight:bold;color:' + badgeColor + ';background:rgba(0,0,0,0.7);padding:1px 4px;border-radius:3px;border:1px solid ' + badgeColor + ';flex-shrink:0;">' + kindBadge + '</span>' +
+        '</div>' +
+        '<div class="cardArt" style="padding:0;overflow:hidden;flex:1;min-height:68px;max-height:94px;width:100%;border-radius:4px;margin:2px 0;background:#000;border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;">' +
+          imgTag +
+          '<div style="position:absolute;bottom:2px;right:2px;background:rgba(2,10,30,0.85);color:#00e5ff;font-size:8px;font-weight:bold;padding:1px 4px;border-radius:3px;border:1px solid #00e5ff;">ℹ️ INFO</div>' +
+        '</div>' +
+        '<div class="cardMeta" style="font-size:8.5px;line-height:1.2;color:#dcdcdc;text-align:left;background:rgba(0,0,0,0.5);border-radius:3px;padding:2px 4px;margin:1px 0;max-height:26px;overflow:hidden;flex-shrink:0;" title="' + descText + '">' +
+          '<span style="color:' + badgeColor + ';font-weight:bold;">▶ </span>' + descText +
+        '</div>' +
+        '<div class="stActions" style="display:flex;gap:3px;margin-top:2px;flex-shrink:0;">' +
+          '<button type="button" style="flex:1.2;padding:4px 1px;font-size:9.5px;font-weight:bold;cursor:pointer;background:#0d233a;color:#64b5f6;border:1px solid #1976d2;border-radius:4px;" onclick="event.stopPropagation(); if (window.showCardDetailModal) window.showCardDetailModal(game.hand ? game.hand[' + i + '] : null, \'' + zone + '\', ' + i + ');" title="Ver descripción y efecto de la carta">ℹ️ DETALLES</button>' +
+          '<button type="button" style="flex:1;padding:4px 1px;font-size:9.5px;font-weight:bold;cursor:pointer;background:#392d20;color:#fff;border:1px solid #a48750;border-radius:4px;" onclick="event.stopPropagation();setST(' + i + ')">SET</button>' +
+          '<button type="button" style="flex:1;padding:4px 1px;font-size:9.5px;font-weight:bold;cursor:pointer;background:#1b5e20;color:#fff;border:1px solid #4caf50;border-radius:4px;" onclick="event.stopPropagation();activateSTFromHand(' + i + ')" ' + (c.kind === 'TRAP' ? 'disabled' : '') + '>ACTIVAR</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // Field backrow
+    var isTrapField = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado' || (c.value && String(c.value).includes('TRAP')));
+    var ready = !isTrapField || (typeof window.isTrapReady === 'function' ? window.isTrapReady(c) : false);
+    var statusText = c.set ? (isTrapField ? (ready ? 'LISTA' : 'ESPERA') : 'SET') : 'ACTIVA';
+    return '<div data-zone="' + zone + '" data-index="' + i + '" class="' + cls + '" onclick="select(\'' + zone + '\',' + i + '); if (window.showCardDetailModal) window.showCardDetailModal(null, \'' + zone + '\', ' + i + ');" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:4px;box-sizing:border-box;height:100%;cursor:pointer;">' +
+      '<div class="name" style="font-size:9px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;flex-shrink:0;" title="' + name + '">' + name + '</div>' +
+      '<div class="fieldArt" style="flex:1;min-height:48px;width:100%;overflow:hidden;border-radius:3px;background:#000;margin:2px 0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">' +
         imgTag +
       '</div>' +
-      '<div class="cardMeta" style="font-size:9px;color:#bbb;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px;flex-shrink:0;">' +
-        descText +
-      '</div>' +
-      '<div class="stActions" style="display:flex;gap:4px;margin-top:2px;flex-shrink:0;">' +
-        '<button style="flex:1;padding:4px 2px;font-size:10px;font-weight:bold;cursor:pointer;background:#392d20;color:#fff;border:1px solid #a48750;border-radius:4px;" onclick="event.stopPropagation();setST(' + i + ')">SET</button>' +
-        '<button style="flex:1;padding:4px 2px;font-size:10px;font-weight:bold;cursor:pointer;background:#1b5e20;color:#fff;border:1px solid #4caf50;border-radius:4px;" onclick="event.stopPropagation();activateSTFromHand(' + i + ')" ' + (c.kind === 'TRAP' ? 'disabled' : '') + '>ACTIVAR</button>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;font-size:8px;margin-top:2px;flex-shrink:0;">' +
+        '<span style="color:#ffd700;font-weight:bold;">' + statusText + '</span>' +
+        (c.set && ready ? '<button style="padding:2px 5px;font-size:8px;font-weight:bold;cursor:pointer;background:#1b5e20;color:#fff;border:1px solid #4caf50;border-radius:3px;" onclick="event.stopPropagation();activateSetCard(' + i + ')">ACTIVAR</button>' : '') +
       '</div>' +
     '</div>';
-  }
-
-  // Field backrow
-  var isTrapField = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado' || (c.value && String(c.value).includes('TRAP')));
-  var ready = !isTrapField || (typeof window.isTrapReady === 'function' ? window.isTrapReady(c) : false);
-  var statusText = c.set ? (isTrapField ? (ready ? 'LISTA' : 'ESPERA') : 'SET') : 'ACTIVA';
-  return '<div data-zone="' + zone + '" data-index="' + i + '" class="' + cls + '" onclick="select(\'' + zone + '\',' + i + ')" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:4px;box-sizing:border-box;height:100%;">' +
-    '<div class="name" style="font-size:9px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;flex-shrink:0;" title="' + name + '">' + name + '</div>' +
-    '<div class="fieldArt" style="flex:1;min-height:48px;width:100%;overflow:hidden;border-radius:3px;background:#000;margin:2px 0;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.15);">' +
-      imgTag +
-    '</div>' +
-    '<div style="display:flex;justify-content:space-between;align-items:center;font-size:8px;margin-top:2px;flex-shrink:0;">' +
-      '<span style="color:#ffd700;font-weight:bold;">' + statusText + '</span>' +
-      (c.set && ready ? '<button style="padding:2px 5px;font-size:8px;font-weight:bold;cursor:pointer;background:#1b5e20;color:#fff;border:1px solid #4caf50;border-radius:3px;" onclick="event.stopPropagation();activateSetCard(' + i + ')">ACTIVAR</button>' : '') +
-    '</div>' +
-  '</div>';
-};
-try { stHTML = window.stHTML; } catch(_) {}
+  };
+  try { stHTML = window.stHTML; } catch(_) {}
 
 
 
@@ -28430,45 +28748,116 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     try { cardHTML = window.cardHTML; } catch(_) {}
   }
 
-  // Hook window.updateCardInfo: show detailed info for concealed cards, Tuners, and Synchros
+  // Hook window.updateCardInfo: show detailed info for Spells, Traps, Hand cards, concealed cards, Tuners, and Synchros
   var prevUpdateCardInfoConceal = window.updateCardInfo;
   if (typeof prevUpdateCardInfoConceal === 'function') {
     window.updateCardInfo = function() {
       var r = prevUpdateCardInfoConceal.apply(this, arguments);
       try {
         if (typeof game === 'undefined' || !game) return r;
-        var pick = [...(game.selected || [])].reverse().find(function(x) { return x && ['f', 'e', 'l', 'el', 'h'].includes(x[0]); });
+        var pick = [...(game.selected || [])].reverse().find(function(x) { return x && ['f', 'e', 'l', 'el', 'h', 'b', 'eb'].includes(x[0]); });
         if (!pick) return r;
         var zone = pick[0], idx = Number(pick[1]);
-        var targetList = (zone === 'f') ? game.field : (zone === 'e' ? game.enemy : (zone === 'h' ? game.hand : null));
+        var targetList = (zone === 'f') ? game.field : (zone === 'e' ? game.enemy : (zone === 'h' ? game.hand : (zone === 'b' ? game.playerBack : (zone === 'eb' ? game.enemyBack : null))));
         var c = targetList ? targetList[idx] : null;
-        if (c) {
-          var body = document.getElementById('cardInfoBody');
-          var grid = body && body.querySelector('.infoGrid');
-          if (grid) {
-            if (c.faceDown || c.faceDownSet103) {
-              var s = document.createElement('span'); s.textContent = 'Posición';
-              var b = document.createElement('b'); b.className = 'infoSet103';
-              b.textContent = c._concealed ? 'DEFENSA BOCA ABAJO (Espadas de Luz Ocultadora)' : 'SET · DEFENSA BOCA ABAJO';
-              grid.append(s, b);
-            }
-            if (typeof window.isTunerMonster === 'function' && window.isTunerMonster(c)) {
-              var st = document.createElement('span'); st.textContent = 'Subtipo';
-              var bt = document.createElement('b'); bt.style.cssText = 'color:#00ff88; text-shadow:0 0 6px rgba(0,255,136,0.8); font-weight:bold;';
-              bt.textContent = '★ CANTANTE (TUNER)';
-              var sm = document.createElement('span'); sm.textContent = 'Sincronía';
-              var bm = document.createElement('b'); bm.style.cssText = 'color:#a3ffc7; font-size:11px;';
-              bm.textContent = 'Material Tuner para Extra Deck';
-              grid.append(st, bt, sm, bm);
-            } else if ((c.kind || '').toUpperCase() === 'SYNCHRO') {
-              var ss = document.createElement('span'); ss.textContent = 'Subtipo';
-              var bs = document.createElement('b'); bs.style.cssText = 'color:#ffffff; text-shadow:0 0 6px #fff; font-weight:bold;';
-              bs.textContent = '★ MONSTRUO SINCRONÍA';
-              var sr = document.createElement('span'); sr.textContent = 'Invocación';
-              var br = document.createElement('b'); br.style.cssText = 'color:#e0e0e0; font-size:11px;';
-              br.textContent = '1 Cantante + 1+ no-Cantantes';
-              grid.append(ss, bs, sr, br);
-            }
+        if (!c) return r;
+
+        var body = document.getElementById('cardInfoBody');
+        if (!body) return r;
+
+        var isSTCard = (typeof isST === 'function' ? isST(c) : (c.kind === 'SPELL' || c.kind === 'TRAP' || c.kind === 'EQUIP'));
+        
+        // Caso 1: Carta Mágica, de Trampa o de Equipo (en Mano o en Zona de Magia/Trampa)
+        if (isSTCard) {
+          var isTrap = (c.kind === 'TRAP' || (c.type && String(c.type).toUpperCase() === 'TRAP') || c.value === 'DUST_TORNADO' || c.name === 'Dust Tornado');
+          var isEquip = (c.kind === 'EQUIP' || c.value === 'EQUIP');
+          var kindBadge = isEquip ? '⚡ MÁGICA DE EQUIPO' : (isTrap ? '🛡️ CARTA DE TRAMPA' : '🔮 CARTA MÁGICA');
+          var kindColor = isEquip ? '#ffd700' : (isTrap ? '#ff4081' : '#00e5ff');
+          var effText = window.getCardEffectText ? window.getCardEffectText(c) : (c.text || c.desc || '');
+          if (!effText) effText = isTrap ? 'Carta de Trampa lista para colocar boca abajo o activar.' : 'Carta Mágica con efecto especial en el duelo.';
+
+          var statusNote = (zone === 'h') ? 'EN MANO' : (c.set ? 'COLOCADA (SET)' : 'ACTIVA EN CAMPO');
+
+          body.innerHTML = `
+            <div class="infoName" style="color:${kindColor}; font-weight:bold; font-size:12px; margin-bottom:2px;">${c.name || 'Carta'}</div>
+            <div style="font-size:9.5px; font-weight:bold; color:${kindColor}; margin-bottom:4px; display:flex; justify-content:space-between;">
+              <span>${kindBadge}</span>
+              <span style="color:#aaa; font-weight:normal;">${statusNote}</span>
+            </div>
+            <div style="font-size:10px; line-height:1.35; color:#f0f0f0; background:rgba(0,0,0,0.55); padding:6px; border-radius:5px; border:1px solid #3a3b5c; margin-bottom:6px; max-height:85px; overflow-y:auto; word-break:break-word;">
+              ${effText}
+            </div>
+            <button type="button" onclick="event.stopPropagation(); if (window.showCardDetailModal) window.showCardDetailModal(null, '${zone}', ${idx});" style="width:100%; padding:4px 6px; background:linear-gradient(180deg, #1a237e, #0d1642); border:1px solid #40c4ff; border-radius:4px; color:#fff; font-size:10px; font-weight:bold; cursor:pointer;">
+              👁️ VER DETALLES EN GRANDE
+            </button>
+          `;
+          return r;
+        }
+
+        // Caso 2: Monstruo seleccionado en la Mano
+        if (zone === 'h') {
+          var name = c.name || c[0] || 'Monstruo';
+          var level = c.level || c[1] || 4;
+          var atk = c.atk != null ? c.atk : (c[4] != null ? c[4] : 0);
+          var def = c.def != null ? c.def : (c[5] != null ? c[5] : 0);
+          var type = c.type || c[2] || 'Warrior';
+          var attr = c.attr || c[3] || 'EARTH';
+          var isXyz = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c)));
+          var lvlLabel = isXyz ? ('★ RANGO ' + level) : ('★ Nv ' + level);
+          var effText = window.getCardEffectText ? window.getCardEffectText(c) : (c.text || c.desc || '');
+
+          body.innerHTML = `
+            <div class="infoName">${name}</div>
+            <div class="infoStars" style="color:#ffd45c; font-size:9px;">${lvlLabel}</div>
+            <div class="infoGrid">
+              <span>Atributo</span><b>${attr}</b>
+              <span>Tipo</span><b>${type}</b>
+              <span>ATK</span><b class="infoAtk">${atk}</b>
+              <span>DEF</span><b class="infoDef">${def}</b>
+              <span>Ubicación</span><b>EN MANO</b>
+            </div>
+            ${effText ? `<div style="font-size:9.5px; line-height:1.3; color:#ccc; background:rgba(0,0,0,0.4); padding:4px; border-radius:4px; margin-top:4px; max-height:55px; overflow-y:auto;">${effText}</div>` : ''}
+            <button type="button" onclick="event.stopPropagation(); if (window.showCardDetailModal) window.showCardDetailModal(null, 'h', ${idx});" style="width:100%; margin-top:4px; padding:3px 6px; background:#1e1a2f; border:1px solid #7c4dff; border-radius:4px; color:#d1c4e9; font-size:9.5px; font-weight:bold; cursor:pointer;">
+              👁️ VER DETALLES
+            </button>
+          `;
+          return r;
+        }
+
+        // Caso 3: Monstruo en campo ('f', 'e', 'l', 'el')
+        var grid = body && body.querySelector('.infoGrid');
+        if (grid) {
+          if (c.faceDown || c.faceDownSet103) {
+            var s = document.createElement('span'); s.textContent = 'Posición';
+            var b = document.createElement('b'); b.className = 'infoSet103';
+            b.textContent = c._concealed ? 'DEFENSA BOCA ABAJO (Espadas de Luz Ocultadora)' : 'SET · DEFENSA BOCA ABAJO';
+            grid.append(s, b);
+          }
+          if (typeof window.isTunerMonster === 'function' && window.isTunerMonster(c)) {
+            var st = document.createElement('span'); st.textContent = 'Subtipo';
+            var bt = document.createElement('b'); bt.style.cssText = 'color:#00ff88; text-shadow:0 0 6px rgba(0,255,136,0.8); font-weight:bold;';
+            bt.textContent = '★ CANTANTE (TUNER)';
+            var sm = document.createElement('span'); sm.textContent = 'Sincronía';
+            var bm = document.createElement('b'); bm.style.cssText = 'color:#a3ffc7; font-size:11px;';
+            bm.textContent = 'Material Tuner para Extra Deck';
+            grid.append(st, bt, sm, bm);
+          } else if ((c.kind || '').toUpperCase() === 'SYNCHRO') {
+            var ss = document.createElement('span'); ss.textContent = 'Subtipo';
+            var bs = document.createElement('b'); bs.style.cssText = 'color:#ffffff; text-shadow:0 0 6px #fff; font-weight:bold;';
+            bs.textContent = '★ MONSTRUO SINCRONÍA';
+            var sr = document.createElement('span'); sr.textContent = 'Invocación';
+            var br = document.createElement('b'); br.style.cssText = 'color:#e0e0e0; font-size:11px;';
+            br.textContent = '1 Cantante + 1+ no-Cantantes';
+            grid.append(ss, bs, sr, br);
+          }
+          
+          var effMonText = window.getCardEffectText ? window.getCardEffectText(c) : (c.text || c.desc || '');
+          if (effMonText && !body.querySelector('.infoMonEffect')) {
+            var effDiv = document.createElement('div');
+            effDiv.className = 'infoMonEffect';
+            effDiv.style.cssText = 'font-size:9.5px; line-height:1.3; color:#ccc; background:rgba(0,0,0,0.45); padding:4px 6px; border-radius:4px; margin-top:5px; max-height:55px; overflow-y:auto; border:1px solid #33274a;';
+            effDiv.textContent = effMonText;
+            body.appendChild(effDiv);
           }
         }
       } catch(_) {}
