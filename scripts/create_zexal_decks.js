@@ -11,24 +11,29 @@ const zexalDecks = [
     cards: [
       "Tin Goldfish", "Tin Goldfish", "Tin Goldfish",
       "Goblindbergh", "Goblindbergh", "Goblindbergh",
+      "Kagetokage", "Kagetokage", "Kagetokage",
       "Zubaba Knight", "Zubaba Knight", "Zubaba Knight",
       "Gogogo Golem", "Gogogo Golem",
-      "Dododo Warrior", "Dododo Warrior",
-      "Crane Crane", "Crane Crane",
-      "Kagetokage", "Kagetokage",
-      "Double or Nothing!", "Double or Nothing!",
-      "Onomatopaira", "Onomatopaira",
+      "Gogogo Giant", "Gogogo Giant",
+      "Dododo Buster", "Dododo Buster",
       "Xyz Unit", "Xyz Unit",
-      "Dark Hole", "Raigeki", "Monster Reborn",
+      "Double or Nothing!", "Double or Nothing!",
+      "Generation Force", "Generation Force",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
       "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Mirror Force", "Sakuretsu Armor", "Sakuretsu Armor",
-      "Trap Hole", "Trap Hole", "Waboku", "Waboku",
-      "Xyz Block", "Xyz Block", "Xyz Reborn", "Xyz Reborn", "Magic Cylinder"
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Bottomless Trap Hole", "Torrential Tribute"
     ],
     extraDeck: [
-      "Grenosaurus", "Grenosaurus",
-      "Number 17: Leviathan Dragon",
-      "Gagaga Cowboy"
+      "Number 39: Utopia",
+      "Number C39: Utopia Ray",
+      "Gagaga Cowboy",
+      "Number 50: Blackship of Corn",
+      "Grenosaurus",
+      "Number 17: Leviathan Dragon"
     ]
   },
   {
@@ -36,27 +41,30 @@ const zexalDecks = [
     displayName: "Flip Turner",
     world: "Mundo4",
     cards: [
-      "Tour Guide From the Underworld", "Tour Guide From the Underworld",
+      "Tour Guide From the Underworld", "Tour Guide From the Underworld", "Tour Guide From the Underworld",
       "Crane Crane", "Crane Crane", "Crane Crane",
-      "Zubaba Knight", "Zubaba Knight",
       "Kagetokage", "Kagetokage", "Kagetokage",
-      "Gagaga Girl", "Gagaga Girl",
+      "Goblindbergh", "Goblindbergh", "Goblindbergh",
+      "Tin Goldfish", "Tin Goldfish",
       "Gagaga Magician", "Gagaga Magician",
-      "Goblindbergh", "Goblindbergh",
-      "Dododo Buster", "Dododo Buster",
-      "Onomatopaira", "Onomatopaira",
-      "Gagagarevenge", "Gagagarevenge",
+      "Gagaga Girl", "Gagaga Girl",
       "Xyz Unit", "Xyz Unit",
-      "Swords of Revealing Light", "Pot of Greed",
-      "Dark Hole", "Monster Reborn", "Mystical Space Typhoon",
-      "Mirror Force", "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Block", "Xyz Block", "Xyz Reborn", "Xyz Reborn",
-      "Trap Hole", "Waboku", "Magic Cylinder", "Compulsory Evacuation Device"
+      "Gagagarevenge", "Gagagarevenge",
+      "Onomatopaira", "Onomatopaira",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
+      "Mystical Space Typhoon", "Mystical Space Typhoon",
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Bottomless Trap Hole", "Torrential Tribute"
     ],
     extraDeck: [
       "Number 17: Leviathan Dragon",
+      "Number 17: Leviathan Dragon",
       "Grenosaurus",
       "Submersible Carrier Aero Shark",
+      "Number 39: Utopia",
       "Gagaga Cowboy"
     ]
   },
@@ -65,29 +73,32 @@ const zexalDecks = [
     displayName: "Reginald Kastle (Shark)",
     world: "Mundo4",
     cards: [
-      "Big Jaws", "Big Jaws", "Big Jaws",
-      "Skull Kraken", "Skull Kraken", "Skull Kraken",
-      "Spear Shark", "Spear Shark", "Spear Shark",
       "Doublefin Shark", "Doublefin Shark", "Doublefin Shark",
       "Silent Angler", "Silent Angler", "Silent Angler",
-      "Tin Goldfish", "Tin Goldfish",
-      "Monster Reborn", "Dark Hole", "Raigeki",
+      "Spear Shark", "Spear Shark", "Spear Shark",
+      "Tin Goldfish", "Tin Goldfish", "Tin Goldfish",
+      "Big Jaws", "Big Jaws", "Big Jaws",
+      "Skull Kraken", "Skull Kraken",
+      "Xyz Unit", "Xyz Unit",
+      "Generation Force", "Generation Force",
+      "Overlay Regen",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
       "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Pot of Greed", "Generation Force", "Generation Force",
-      "Xyz Unit", "Xyz Unit", "Overlay Regen",
-      "Mirror Force", "Torrential Tribute", "Torrential Tribute",
-      "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Reborn", "Xyz Reborn", "Xyz Block", "Xyz Block",
-      "Magic Cylinder", "Negate Attack", "Waboku"
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Torrential Tribute", "Torrential Tribute",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
-      "Submersible Carrier Aero Shark",
-      "Submersible Carrier Aero Shark",
-      "Black Ray Lancer",
-      "Black Ray Lancer",
       "Number 32: Shark Drake",
+      "Number 32: Shark Drake",
+      "Black Ray Lancer",
+      "Submersible Carrier Aero Shark",
+      "Number 17: Leviathan Dragon",
       "Number 30: Acid Golem of Destruction",
-      "Number 17: Leviathan Dragon"
+      "Number 50: Blackship of Corn"
     ]
   },
   {
@@ -98,21 +109,26 @@ const zexalDecks = [
       "Blizzard Thunderbird", "Blizzard Thunderbird", "Blizzard Thunderbird",
       "Aurora Wing", "Aurora Wing", "Aurora Wing",
       "Silent Angler", "Silent Angler", "Silent Angler",
-      "Doublefin Shark", "Doublefin Shark",
+      "Doublefin Shark", "Doublefin Shark", "Doublefin Shark",
       "Tin Goldfish", "Tin Goldfish", "Tin Goldfish",
       "Goblindbergh", "Goblindbergh",
-      "Monster Reborn", "Dark Hole", "Raigeki", "Pot of Greed",
-      "Mystical Space Typhoon", "Mystical Space Typhoon",
+      "Xyz Unit", "Xyz Unit",
       "Generation Force", "Generation Force",
-      "Xyz Unit", "Overlay Regen", "Overlay Regen",
-      "Mirror Force", "Torrential Tribute", "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Reborn", "Xyz Reborn", "Xyz Block", "Xyz Block",
-      "Waboku", "Waboku", "Magic Cylinder", "Negate Attack", "Compulsory Evacuation Device"
+      "Overlay Regen",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
+      "Mystical Space Typhoon", "Mystical Space Typhoon",
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Torrential Tribute", "Torrential Tribute",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
       "Ice Beast Zerofyne",
       "Ice Beast Zerofyne",
       "Number 32: Shark Drake",
+      "Submersible Carrier Aero Shark",
       "Number 50: Blackship of Corn",
       "Gagaga Cowboy"
     ]
@@ -129,20 +145,23 @@ const zexalDecks = [
       "Parsec, the Interstellar Dragon", "Parsec, the Interstellar Dragon",
       "Goblindbergh", "Goblindbergh",
       "Kagetokage", "Kagetokage",
-      "Monster Reborn", "Raigeki", "Dark Hole", "Pot of Greed",
-      "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Generation Force", "Generation Force", "Xyz Unit", "Xyz Unit",
-      "Overlay Regen", "Overlay Regen",
-      "Mirror Force", "Mirror Force", "Bottomless Trap Hole", "Bottomless Trap Hole",
+      "Xyz Unit", "Xyz Unit",
+      "Generation Force", "Generation Force",
       "Tachyon Transmigration", "Tachyon Transmigration",
-      "Xyz Reborn", "Xyz Block", "Magic Cylinder", "Negate Attack"
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
+      "Mystical Space Typhoon", "Mystical Space Typhoon",
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
-      "Starliege Paladynamo",
-      "Starliege Paladynamo",
       "Neo Galaxy-Eyes Photon Dragon",
-      "Number 10: Illumiknight",
+      "Starliege Paladynamo",
+      "Starliege Paladynamo",
       "Heroic Champion - Excalibur",
+      "Number 10: Illumiknight",
       "Number 39: Utopia"
     ]
   },
@@ -154,23 +173,27 @@ const zexalDecks = [
       "Chronomaly Crystal Skull", "Chronomaly Crystal Skull", "Chronomaly Crystal Skull",
       "Chronomaly Golden Jet", "Chronomaly Golden Jet", "Chronomaly Golden Jet",
       "Gogogo Golem", "Gogogo Golem", "Gogogo Golem",
-      "Gogogo Giant", "Gogogo Giant",
+      "Gogogo Giant", "Gogogo Giant", "Gogogo Giant",
       "Tin Goldfish", "Tin Goldfish",
       "Goblindbergh", "Goblindbergh",
-      "Monster Reborn", "Dark Hole", "Raigeki", "Pot of Greed",
-      "Mystical Space Typhoon", "Mystical Space Typhoon",
+      "Xyz Unit", "Xyz Unit",
       "Onomatopaira", "Onomatopaira",
-      "Generation Force", "Generation Force", "Xyz Unit", "Overlay Regen",
-      "Mirror Force", "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Block", "Xyz Block", "Xyz Reborn", "Xyz Reborn",
-      "Waboku", "Waboku", "Magic Cylinder", "Negate Attack", "Compulsory Evacuation Device", "Sakuretsu Armor"
+      "Generation Force", "Generation Force",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
+      "Mystical Space Typhoon", "Mystical Space Typhoon",
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Torrential Tribute", "Torrential Tribute",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
       "Number 33: Chronomaly Machu Mech",
       "Number 33: Chronomaly Machu Mech",
+      "Number 39: Utopia",
       "Number 50: Blackship of Corn",
-      "Gagaga Cowboy",
-      "Number 39: Utopia"
+      "Gagaga Cowboy"
     ]
   },
   {
@@ -181,17 +204,20 @@ const zexalDecks = [
       "Gimmick Puppet Dreary Doll", "Gimmick Puppet Dreary Doll", "Gimmick Puppet Dreary Doll",
       "Gimmick Puppet Magnet Doll", "Gimmick Puppet Magnet Doll", "Gimmick Puppet Magnet Doll",
       "Parsec, the Interstellar Dragon", "Parsec, the Interstellar Dragon",
-      "Dododo Warrior", "Dododo Warrior",
-      "Kagetokage", "Kagetokage",
-      "Goblindbergh", "Goblindbergh",
+      "Kagetokage", "Kagetokage", "Kagetokage",
+      "Goblindbergh", "Goblindbergh", "Goblindbergh",
       "Tin Goldfish", "Tin Goldfish",
+      "Xyz Unit", "Xyz Unit",
       "Rank-Up-Magic Barian's Force", "Rank-Up-Magic Barian's Force",
-      "Monster Reborn", "Dark Hole", "Raigeki", "Pot of Greed",
+      "Generation Force", "Generation Force",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
       "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Generation Force", "Generation Force", "Xyz Unit", "Overlay Regen",
-      "Mirror Force", "Torrential Tribute", "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Reborn", "Xyz Reborn", "Xyz Block", "Xyz Block",
-      "Magic Cylinder", "Negate Attack", "Waboku", "Fiendish Chain"
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Torrential Tribute", "Torrential Tribute",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
       "Number 15: Gimmick Puppet Giant Grinder",
@@ -208,26 +234,28 @@ const zexalDecks = [
     cards: [
       "Radius, the Half-Moon Dragon", "Radius, the Half-Moon Dragon", "Radius, the Half-Moon Dragon",
       "Parsec, the Interstellar Dragon", "Parsec, the Interstellar Dragon", "Parsec, the Interstellar Dragon",
-      "Galaxy-Eyes Photon Dragon", "Galaxy-Eyes Photon Dragon",
-      "Photon Thrasher", "Photon Thrasher",
+      "Galaxy-Eyes Photon Dragon", "Galaxy-Eyes Photon Dragon", "Galaxy-Eyes Photon Dragon",
+      "Photon Thrasher", "Photon Thrasher", "Photon Thrasher",
       "Photon Crusher", "Photon Crusher",
       "Goblindbergh", "Goblindbergh",
       "Kagetokage", "Kagetokage",
+      "Xyz Unit", "Xyz Unit",
+      "Tachyon Transmigration", "Tachyon Transmigration",
       "Rank-Up-Magic Barian's Force", "Rank-Up-Magic Barian's Force",
-      "Monster Reborn", "Dark Hole", "Raigeki", "Pot of Greed",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
       "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Generation Force", "Generation Force", "Xyz Unit", "Overlay Regen",
-      "Tachyon Transmigration", "Tachyon Transmigration", "Tachyon Transmigration",
-      "Mirror Force", "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Reborn", "Xyz Reborn", "Xyz Block", "Xyz Block",
-      "Magic Cylinder", "Negate Attack"
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
       "Number 107: Galaxy-Eyes Tachyon Dragon",
       "Number 107: Galaxy-Eyes Tachyon Dragon",
       "Neo Galaxy-Eyes Photon Dragon",
-      "Number 39: Utopia",
-      "Starliege Paladynamo"
+      "Starliege Paladynamo",
+      "Number 39: Utopia"
     ]
   },
   {
@@ -237,23 +265,28 @@ const zexalDecks = [
     cards: [
       "Umbral Horror Ghoul", "Umbral Horror Ghoul", "Umbral Horror Ghoul",
       "Umbral Horror Unform", "Umbral Horror Unform", "Umbral Horror Unform",
-      "Tour Guide From the Underworld", "Tour Guide From the Underworld",
+      "Tour Guide From the Underworld", "Tour Guide From the Underworld", "Tour Guide From the Underworld",
       "Kagetokage", "Kagetokage", "Kagetokage",
-      "Goblindbergh", "Goblindbergh",
+      "Goblindbergh", "Goblindbergh", "Goblindbergh",
+      "Tin Goldfish",
+      "Xyz Unit", "Xyz Unit",
       "Rank-Up-Magic Barian's Force", "Rank-Up-Magic Barian's Force",
-      "Monster Reborn", "Dark Hole", "Raigeki", "Pot of Greed",
+      "Generation Force", "Generation Force",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
       "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Generation Force", "Generation Force", "Xyz Unit", "Overlay Regen",
-      "Mirror Force", "Torrential Tribute", "Bottomless Trap Hole", "Bottomless Trap Hole",
-      "Xyz Block", "Xyz Block", "Xyz Reborn", "Xyz Reborn",
-      "Magic Cylinder", "Negate Attack", "Waboku", "Compulsory Evacuation Device", "Fiendish Chain", "Fiendish Chain"
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn",
+      "Torrential Tribute", "Torrential Tribute",
+      "Bottomless Trap Hole", "Bottomless Trap Hole"
     ],
     extraDeck: [
-      "Number 104: Masquerade",
-      "Number 104: Masquerade",
       "Number 66: Master Key Beetle",
       "Number 66: Master Key Beetle",
-      "Number 39: Utopia"
+      "Number 104: Masquerade",
+      "Number 39: Utopia",
+      "Number 50: Blackship of Corn"
     ]
   },
   {
@@ -263,32 +296,33 @@ const zexalDecks = [
     cards: [
       "Gagaga Magician", "Gagaga Magician", "Gagaga Magician",
       "Gagaga Girl", "Gagaga Girl",
-      "Gogogo Golem", "Gogogo Golem", "Gogogo Golem",
+      "Gogogo Golem", "Gogogo Golem",
       "Gogogo Giant", "Gogogo Giant",
-      "Zubaba Knight", "Zubaba Knight",
-      "Dododo Warrior", "Dododo Warrior",
-      "Dododo Buster", "Dododo Buster",
+      "Zubaba Knight",
+      "Dododo Buster",
       "Kagetokage", "Kagetokage",
-      "Goblindbergh", "Goblindbergh",
+      "Goblindbergh", "Goblindbergh", "Goblindbergh",
       "Tin Goldfish", "Tin Goldfish",
-      "Double or Nothing!", "Double or Nothing!", "Double or Nothing!",
+      "Double or Nothing!",
       "Onomatopaira", "Onomatopaira",
       "Gagagarevenge", "Gagagarevenge",
+      "Xyz Unit", "Xyz Unit",
       "Rank-Up-Magic Barian's Force",
-      "Monster Reborn", "Pot of Greed", "Raigeki", "Dark Hole",
+      "Raigeki", "Dark Hole", "Monster Reborn", "Pot of Greed",
       "Mystical Space Typhoon", "Mystical Space Typhoon",
-      "Mirror Force", "Bottomless Trap Hole",
-      "Xyz Reborn", "Xyz Reborn", "Xyz Block"
+      "Mirror Force", "Mirror Force",
+      "Magic Cylinder", "Magic Cylinder",
+      "Xyz Block", "Xyz Block",
+      "Xyz Reborn", "Xyz Reborn"
     ],
     extraDeck: [
       "Number 39: Utopia",
       "Number 39: Utopia",
       "Number C39: Utopia Ray",
-      "Number 17: Leviathan Dragon",
+      "Heroic Champion - Excalibur",
       "Gagaga Cowboy",
       "Number 50: Blackship of Corn",
-      "Heroic Champion - Excalibur",
-      "Grenosaurus"
+      "Number 17: Leviathan Dragon"
     ]
   }
 ];
@@ -296,5 +330,5 @@ const zexalDecks = [
 zexalDecks.forEach(d => {
   const p = path.join(DECKS_DIR, `${d.character}.json`);
   fs.writeFileSync(p, JSON.stringify(d, null, 2), 'utf8');
-  console.log(`Deck created: ${d.displayName} -> ${p}`);
+  console.log(`Deck created: ${d.displayName} -> ${p} (cards: ${d.cards.length}, extra: ${d.extraDeck.length})`);
 });

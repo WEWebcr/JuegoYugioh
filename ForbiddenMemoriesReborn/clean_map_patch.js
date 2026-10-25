@@ -12130,17 +12130,17 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
       if (!enemyExtraNames || enemyExtraNames.length === 0) {
         var ZEXAL_ACE_MAP = {
-          yuma: ['Number 39: Utopia', 'Gagaga Cowboy', 'Number 17: Leviathan Dragon'],
-          astral: ['Number 39: Utopia', 'Gagaga Cowboy'],
-          bronk: ['Number 39: Utopia', 'Gagaga Cowboy'],
-          flip: ['Number 39: Utopia', 'Gagaga Cowboy'],
-          shark: ['Number 17: Leviathan Dragon', 'Submersible Carrier Aero Shark', 'Black Ray Lancer'],
-          kite: ['Galaxy-Eyes Photon Dragon', 'Number 10: Illumiknight', 'Number 20: Giga-Brilliant'],
-          rio: ['Number 17: Leviathan Dragon', 'Submersible Carrier Aero Shark'],
-          trey: ['Number 33: Chronomaly Machu Mech', 'Number 39: Utopia'],
-          quattro: ['Number 15: Gimmick Puppet Giant Killer', 'Number 39: Utopia'],
-          mizar: ['Number 107: Galaxy-Eyes Tachyon Dragon', 'Galaxy-Eyes Photon Dragon'],
-          vector: ['Number 66: Master Key Beetle', 'Number 39: Utopia']
+          yuma: ['Number 39: Utopia', 'Number C39: Utopia Ray', 'Heroic Champion - Excalibur', 'Gagaga Cowboy', 'Number 50: Blackship of Corn', 'Number 17: Leviathan Dragon'],
+          astral: ['Number 39: Utopia', 'Number C39: Utopia Ray', 'Number 50: Blackship of Corn', 'Gagaga Cowboy'],
+          bronk: ['Number 39: Utopia', 'Number C39: Utopia Ray', 'Gagaga Cowboy', 'Number 50: Blackship of Corn', 'Grenosaurus', 'Number 17: Leviathan Dragon'],
+          flip: ['Number 17: Leviathan Dragon', 'Grenosaurus', 'Submersible Carrier Aero Shark', 'Number 39: Utopia', 'Gagaga Cowboy'],
+          shark: ['Number 32: Shark Drake', 'Black Ray Lancer', 'Submersible Carrier Aero Shark', 'Number 17: Leviathan Dragon', 'Number 30: Acid Golem of Destruction', 'Number 50: Blackship of Corn'],
+          kite: ['Neo Galaxy-Eyes Photon Dragon', 'Starliege Paladynamo', 'Heroic Champion - Excalibur', 'Number 10: Illumiknight', 'Number 39: Utopia'],
+          rio: ['Ice Beast Zerofyne', 'Number 32: Shark Drake', 'Submersible Carrier Aero Shark', 'Number 50: Blackship of Corn', 'Gagaga Cowboy'],
+          trey: ['Number 33: Chronomaly Machu Mech', 'Number 39: Utopia', 'Number 50: Blackship of Corn', 'Gagaga Cowboy'],
+          quattro: ['Number 15: Gimmick Puppet Giant Grinder', 'Neo Galaxy-Eyes Photon Dragon', 'Number 39: Utopia', 'Gagaga Cowboy'],
+          mizar: ['Number 107: Galaxy-Eyes Tachyon Dragon', 'Neo Galaxy-Eyes Photon Dragon', 'Starliege Paladynamo', 'Number 39: Utopia'],
+          vector: ['Number 66: Master Key Beetle', 'Number 104: Masquerade', 'Number 39: Utopia', 'Number 50: Blackship of Corn']
         };
         var normOppKey = (opp || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         if (ZEXAL_ACE_MAP[normOppKey]) {
@@ -18020,12 +18020,17 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     }
 
     var fiveDDuelistsCheck = ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'];
+    var zexalDuelistsCheck = ['bronk', 'flip', 'shark', 'rio', 'kite', 'cathy', 'trey', 'quattro', 'mizar', 'vector', 'alito', 'girag', 'astral', 'don_thousand', 'yuma'];
     var is5DCheck = (typeof game !== 'undefined' && game && game._currentWorld === 3) ||
                     (window.currentWorld === 3) ||
                     fiveDDuelistsCheck.includes(String(opp || '').toLowerCase());
+    var isZexalCheck = (typeof game !== 'undefined' && game && game._currentWorld === 4) ||
+                       (window.currentWorld === 4) ||
+                       zexalDuelistsCheck.includes(String(opp || '').toLowerCase()) ||
+                       (Array.isArray(game.enemyExtra) && game.enemyExtra.some(function(x) { return x && (x.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.name || x))); }));
 
-    // Invocaciones especiales preliminares de 5D's antes de la Invocación Normal
-    if (is5DCheck && typeof window.aiExtraSummon === 'function') {
+    // Invocaciones especiales preliminares de Extra Deck (5D's / Zexal XYZ) antes de la Invocación Normal
+    if ((is5DCheck || isZexalCheck) && typeof window.aiExtraSummon === 'function') {
       try { window.aiExtraSummon(); } catch(_) {}
     }
 
@@ -18593,8 +18598,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           }
         }
 
-        // Si es Mundo 3, verificar si ahora se puede invocar por Sincronía con el nuevo monstruo
-        if (is5DCheck && typeof window.aiExtraSummon === 'function') {
+        // Si es Mundo 3 o Mundo 4, verificar si ahora se puede invocar por Sincronía o Xyz
+        if ((is5DCheck || isZexalCheck) && typeof window.aiExtraSummon === 'function') {
           try { window.aiExtraSummon(); } catch(_) {}
         }
       }
@@ -21845,17 +21850,155 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     }
   }
 
-  // Invocación por Sincronía y Jugadas Especiales de la IA rival en Mundo 3
+  // Invocación por Sincronía y Jugadas Especiales de la IA rival en Mundo 3 y Mundo 4 (Zexal)
   window.aiExtraSummon = function() {
     if (typeof game === 'undefined' || !game) return;
-    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3);
-    var isZexal = (game._currentWorld === 4) || (window.currentWorld === 4);
-    if (!is5D && !isZexal) return;
-
     var opp = (window.storyOpponent || window.lastDuelOpponent || '').toLowerCase().replace(/[^a-z0-9_]/g, '');
+    var zexalDuelists = ['bronk', 'flip', 'shark', 'rio', 'kite', 'cathy', 'trey', 'quattro', 'mizar', 'vector', 'yuma', 'astral', 'alito', 'girag', 'don_thousand'];
+    var is5D = (game._currentWorld === 3) || (window.currentWorld === 3) || ['trudge', 'leo', 'akiza', 'crow', 'jack', 'yusei', 'kalin', 'carly', 'roman', 'misty', 'devack', 'greiger', 'goodwin'].includes(opp);
+    var isZexal = (game._currentWorld === 4) || (window.currentWorld === 4) ||
+                  zexalDuelists.includes(opp) ||
+                  (Array.isArray(game.enemyExtra) && game.enemyExtra.some(function(x) {
+                    return x && (x.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.name || x)));
+                  }));
+    if (!is5D && !isZexal) return;
 
     // JUGADAS Y EFECTOS DE LA IA EN MUNDO 4 (ZEXAL)
     if (isZexal) {
+      // 1. GARANTIZAR INVOCACIÓN XYZ EN PRIMER TURNO (O SI AÚN NO CONTROLA UN XYZ)
+      if (Array.isArray(game.enemyExtra) && game.enemyExtra.length > 0) {
+        var enemyHasXyz = (game.enemy || []).some(function(m) {
+          return m && (m.kind === 'XYZ' || (window.isFieldMonsterXyz && window.isFieldMonsterXyz(m)));
+        });
+
+        if (!enemyHasXyz) {
+          var targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+            return xc && (xc.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(xc.name || xc)));
+          });
+          if (targetXyzIdx < 0 && game.enemyExtra.length > 0) targetXyzIdx = 0;
+
+          if (targetXyzIdx >= 0) {
+            var targetXyz = game.enemyExtra.splice(targetXyzIdx, 1)[0];
+            var targetRank = Number(targetXyz.rank || targetXyz.level || targetXyz[1] || 4);
+            if (targetRank <= 0) targetRank = 4;
+
+            // Recolectar 2 materiales de Nivel = targetRank
+            var mats = [];
+
+            // A. Primero buscar monstruos en campo de ese nivel
+            for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+              var em = game.enemy[ei];
+              if (em && !em.faceDown && !(window.isFieldMonsterXyz && window.isFieldMonsterXyz(em))) {
+                var elvl = Number(em.level || em[1] || 0);
+                if (elvl === targetRank) {
+                  mats.push(em);
+                  game.enemy[ei] = null;
+                  if (mats.length === 2) break;
+                }
+              }
+            }
+
+            // B. Si falta, buscar de la mano
+            while (mats.length < 2 && Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
+              var hIdx = game.enemyHand.findIndex(function(c) {
+                return c && !isST(c) && Number(c.level || c[1] || 0) === targetRank;
+              });
+              if (hIdx >= 0) {
+                var hMat = game.enemyHand.splice(hIdx, 1)[0];
+                var hMatMon = window.mk ? (window.mk(hMat) || window.mk(hMat.name || hMat[0])) : Object.assign({}, hMat);
+                mats.push(hMatMon || hMat);
+              } else {
+                break;
+              }
+            }
+
+            // C. Si aún falta, buscar del Deck
+            while (mats.length < 2 && Array.isArray(game.enemyDeck) && game.enemyDeck.length > 0) {
+              var dIdx = game.enemyDeck.findIndex(function(c) {
+                return c && !isST(c) && Number(c.level || c[1] || 0) === targetRank;
+              });
+              if (dIdx >= 0) {
+                var dMat = game.enemyDeck.splice(dIdx, 1)[0];
+                var dMatMon = window.mk ? (window.mk(dMat) || window.mk(dMat.name || dMat[0])) : Object.assign({}, dMat);
+                mats.push(dMatMon || dMat);
+              } else {
+                break;
+              }
+            }
+
+            // D. Fallback garantizado
+            while (mats.length < 2) {
+              var fallbackNames = {
+                4: 'Goblindbergh',
+                3: 'Tin Goldfish',
+                8: 'Parsec, the Interstellar Dragon'
+              };
+              var fName = fallbackNames[targetRank] || 'Goblindbergh';
+              var fMat = window.mk ? window.mk(fName) : { name: fName, level: targetRank, atk: 1400, def: 0 };
+              mats.push(fMat || { name: fName, level: targetRank, atk: 1400, def: 0 });
+            }
+
+            // Invocar el Monstruo XYZ
+            var fSlotXyz = (game.enemy || []).findIndex(function(x) { return !x; });
+            if (fSlotXyz < 0) fSlotXyz = 0;
+
+            var scXyz = JSON.parse(JSON.stringify(targetXyz));
+            scXyz.pos = 'ATK';
+            scXyz.faceUp = true;
+            scXyz.kind = 'XYZ';
+            delete scXyz.level;
+            scXyz.rank = targetRank;
+            scXyz.overlayUnits = 2;
+            scXyz.materials = [mats[0], mats[1]];
+            scXyz.summonedTurn = game.turnNo;
+            scXyz._equipToken109 = 'EQM109-' + Date.now() + '-' + Math.random();
+            game.enemy[fSlotXyz] = scXyz;
+
+            if (window.playSummonSound) window.playSummonSound();
+            var oppName = (opp || 'El rival').toUpperCase();
+            var mat1Name = mats[0].name || mats[0][0] || 'Material 1';
+            var mat2Name = mats[1].name || mats[1][0] || 'Material 2';
+            duelToast('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' invoca a ' + (scXyz.name || 'Monstruo Xyz') + '!');
+            if (typeof log === 'function') {
+              log('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' sobrepone a ' + mat1Name + ' y ' + mat2Name + ' (Nivel ' + targetRank + ') e Invoca por Xyz a ' + (scXyz.name || 'Monstruo Xyz') + ' (Rango ' + targetRank + ', ' + scXyz.atk + ' ATK)!');
+            }
+
+            // Auto-equipar Xyz Unit inmediatamente si la tiene en mano
+            if (Array.isArray(game.enemyHand)) {
+              var unitIdx = game.enemyHand.findIndex(function(c) {
+                return c && ((c.name || '').includes('Xyz Unit') || (c.value && c.value === 'XYZ_UNIT'));
+              });
+              if (unitIdx >= 0) {
+                var uCard = game.enemyHand.splice(unitIdx, 1)[0];
+                var bSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+                var uBoost = targetRank * 200;
+                scXyz.equip = (scXyz.equip || 0) + uBoost;
+                scXyz._handEquipAtk = (scXyz._handEquipAtk || 0) + uBoost;
+                scXyz._appliedAtk109 = (scXyz._appliedAtk109 || 0) + uBoost;
+                if (!scXyz.equippedCards) scXyz.equippedCards = [];
+                scXyz.equippedCards.push(uCard.name || 'Xyz Unit');
+                if (bSlot >= 0) {
+                  game.enemyBack[bSlot] = Object.assign({}, uCard, {
+                    kind: 'EQUIP', set: false, faceUp: true,
+                    equipToken109: scXyz._equipToken109,
+                    _targetMonster: scXyz,
+                    _appliedAtk109: uBoost
+                  });
+                } else {
+                  game.enemyGrave = game.enemyGrave || [];
+                  game.enemyGrave.push(Object.assign({}, uCard, { faceUp: true }));
+                }
+                duelToast('⚔️ ¡' + oppName + ' activa Xyz Unit en ' + (scXyz.name || 'Xyz') + '! (+' + uBoost + ' ATK)');
+                if (typeof log === 'function') log('¡' + oppName + ' equipa Xyz Unit a ' + (scXyz.name || 'Xyz') + ' (+ ' + uBoost + ' ATK)!');
+              }
+            }
+
+            if (typeof render === 'function') render();
+            return;
+          }
+        }
+      }
+
       if (Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
         // a) Kagetokage de la IA si controla un monstruo Nivel 4
         var hasLv4Enemy = (game.enemy || []).some(function(m) {
