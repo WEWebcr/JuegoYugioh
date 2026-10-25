@@ -47,3 +47,6 @@ android/assets/
 android/*.keystore
 *.idsig
 *.apk
+
+scripts/upload_release_apk.js
+

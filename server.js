@@ -381,12 +381,15 @@ app.get('/', (req, res) => {
 
 // ── Descarga de APK Android ──────────────────────────────────────
 const APK_PATH = path.join(ROOT, 'YuGiOh-ForbiddenMemoriesReborn.apk');
+const GITHUB_APK_URL = 'https://github.com/WEWebcr/JuegoYugioh/releases/download/v4.1.0/YuGiOh-ForbiddenMemoriesReborn.apk';
+
 app.get(['/download/app.apk', '/app.apk', '/download/apk', '/public_downloads/app.apk'], (req, res) => {
   if (fs.existsSync(APK_PATH)) {
-    res.download(APK_PATH, 'YuGiOh-ForbiddenMemoriesReborn.apk');
-  } else {
-    res.status(404).send('APK no disponible. Debe generarse primero.');
+    return res.download(APK_PATH, 'YuGiOh-ForbiddenMemoriesReborn.apk');
   }
+  // En entornos en la nube como Render (donde el APK no se sube al repo git por pesar más de 100MB),
+  // redirigir transparentemente a la descarga directa oficial en GitHub Releases CDN
+  res.redirect(302, GITHUB_APK_URL);
 });
 
 // ════════════════════════════════════════════════════════════════
