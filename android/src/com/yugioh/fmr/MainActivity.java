@@ -162,6 +162,35 @@ public class MainActivity extends Activity {
                     bgmPlayer.setVolume(isMuted ? 0f : bgmVolume, isMuted ? 0f : bgmVolume);
                     bgmPlayer.prepare();
                     bgmPlayer.start();
+                } else {
+                    File cacheFile = new File(context.getCacheDir(), "bgm_" + cleanName);
+                    if (!cacheFile.exists() || cacheFile.length() == 0) {
+                        InputStream in = null;
+                        try {
+                            in = context.getAssets().open("musica/" + cleanName);
+                        } catch (Exception e2) {
+                            try { in = context.getAssets().open(cleanName); } catch (Exception ignored) {}
+                        }
+                        if (in != null) {
+                            FileOutputStream fos = new FileOutputStream(cacheFile);
+                            byte[] buf = new byte[16384];
+                            int read;
+                            while ((read = in.read(buf)) != -1) {
+                                fos.write(buf, 0, read);
+                            }
+                            fos.flush();
+                            fos.close();
+                            in.close();
+                        }
+                    }
+                    if (cacheFile.exists() && cacheFile.length() > 0) {
+                        bgmPlayer = new MediaPlayer();
+                        bgmPlayer.setDataSource(cacheFile.getAbsolutePath());
+                        bgmPlayer.setLooping(true);
+                        bgmPlayer.setVolume(isMuted ? 0f : bgmVolume, isMuted ? 0f : bgmVolume);
+                        bgmPlayer.prepare();
+                        bgmPlayer.start();
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -244,6 +273,36 @@ public class MainActivity extends Activity {
                     sfx.setOnCompletionListener(this);
                     sfx.prepare();
                     sfx.start();
+                } else {
+                    File cacheFile = new File(context.getCacheDir(), "sfx_" + cleanName);
+                    if (!cacheFile.exists() || cacheFile.length() == 0) {
+                        InputStream in = null;
+                        try {
+                            in = context.getAssets().open("musica/" + cleanName);
+                        } catch (Exception e2) {
+                            try { in = context.getAssets().open(cleanName); } catch (Exception ignored) {}
+                        }
+                        if (in != null) {
+                            FileOutputStream fos = new FileOutputStream(cacheFile);
+                            byte[] buf = new byte[8192];
+                            int read;
+                            while ((read = in.read(buf)) != -1) {
+                                fos.write(buf, 0, read);
+                            }
+                            fos.flush();
+                            fos.close();
+                            in.close();
+                        }
+                    }
+                    if (cacheFile.exists() && cacheFile.length() > 0) {
+                        MediaPlayer sfx = new MediaPlayer();
+                        sfx.setDataSource(cacheFile.getAbsolutePath());
+                        sfx.setLooping(false);
+                        sfx.setVolume(1.0f, 1.0f);
+                        sfx.setOnCompletionListener(this);
+                        sfx.prepare();
+                        sfx.start();
+                    }
                 }
             } catch (Exception ignored) {}
         }
@@ -255,32 +314,6 @@ public class MainActivity extends Activity {
                     mp.release();
                 }
             } catch (Exception ignored) {}
-        }
-    }
-
-    static class LimitedInputStream extends FilterInputStream {
-        private long remaining;
-
-        public LimitedInputStream(InputStream in, long limit) {
-            super(in);
-            this.remaining = limit;
-        }
-
-        @Override
-        public int read() throws IOException {
-            if (remaining <= 0) return -1;
-            int r = super.read();
-            if (r != -1) remaining--;
-            return r;
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            if (remaining <= 0) return -1;
-            if (len > remaining) len = (int) remaining;
-            int r = super.read(b, off, len);
-            if (r > 0) remaining -= r;
-            return r;
         }
     }
 
@@ -312,46 +345,53 @@ public class MainActivity extends Activity {
         }
 
         @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+            if (url == null) return null;
+            return handleIntercept(Uri.parse(url));
+        }
+
+        @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             if (request == null || request.getUrl() == null) {
                 return super.shouldInterceptRequest(view, request);
             }
-            Uri uri = request.getUrl();
+            return handleIntercept(request.getUrl());
+        }
+
+        private WebResourceResponse handleIntercept(Uri uri) {
+            if (uri == null) return null;
             String host = uri.getHost();
-            String scheme = uri.getScheme();
+            String path = uri.getPath();
+            if (path == null) path = "";
+            while (path.startsWith("/")) path = path.substring(1);
 
-            // 1. Interceptar peticiones locales bajo el dominio seguro virtual https://fmr.local/
+            // API calls must route to Render network, NOT local assets
+            if (path.startsWith("api/")) {
+                return null;
+            }
+
+            // 1. Virtual domain fmr.local or appassets.androidplatform.net
             if ("fmr.local".equalsIgnoreCase(host) || "appassets.androidplatform.net".equalsIgnoreCase(host)) {
-                String path = uri.getPath();
-                if (path != null && path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-                if (path == null || path.isEmpty()) {
-                    path = "YGOFMR2026-1.html";
-                }
-
-                // Las llamadas API (/api/...) NO son assets locales; deben ser manejadas por la red
-                if (path.startsWith("api/")) {
-                    return null;
-                }
-
-                return serveAsset(path, request);
+                if (path.isEmpty()) path = "YGOFMR2026-1.html";
+                return serveAsset(path);
             }
 
-            // 2. Interceptar también si se accede por file:///android_asset/
-            if ("file".equalsIgnoreCase(scheme)) {
-                String path = uri.getPath();
-                if (path != null) {
-                    if (path.startsWith("/android_asset/")) {
-                        path = path.substring("/android_asset/".length());
-                    } else if (path.startsWith("/")) {
-                        path = path.substring(1);
-                    }
-                    return serveAsset(path, request);
-                }
+            // 2. Intercept local asset paths regardless of domain (Render, local IP, etc.)
+            if (path.startsWith("imagenescartas/") || path.startsWith("ImagenesPersonajes/") ||
+                path.startsWith("musica/") || path.startsWith("assets/") || path.startsWith("data/") ||
+                path.equalsIgnoreCase("YGOFMR2026-1.html")) {
+                return serveAsset(path);
             }
 
-            return super.shouldInterceptRequest(view, request);
+            // 3. file:///android_asset/
+            if ("file".equalsIgnoreCase(uri.getScheme())) {
+                if (path.startsWith("android_asset/")) {
+                    path = path.substring("android_asset/".length());
+                }
+                return serveAsset(path);
+            }
+
+            return null;
         }
 
         private synchronized String resolveAssetCasing(String path) {
@@ -376,7 +416,7 @@ public class MainActivity extends Activity {
             } catch (Exception ignored) {}
         }
 
-        private WebResourceResponse serveAsset(String rawPath, WebResourceRequest request) {
+        private WebResourceResponse serveAsset(String rawPath) {
             if (rawPath == null || activity == null) return null;
             String path = rawPath;
             try {
@@ -386,6 +426,11 @@ public class MainActivity extends Activity {
             if (q != -1) path = path.substring(0, q);
             int h = path.indexOf('#');
             if (h != -1) path = path.substring(0, h);
+
+            path = path.replace('\\', '/');
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
 
             try {
                 InputStream is = null;
@@ -403,73 +448,15 @@ public class MainActivity extends Activity {
 
                 String mime = getMimeType(path);
                 boolean isText = mime.startsWith("text/") || mime.equals("application/javascript") || mime.equals("application/json");
-                // CRÍTICO: Para recursos binarios (imágenes, audio), encoding DEBE ser null
                 String encoding = isText ? "UTF-8" : null;
 
                 Map<String, String> headers = new HashMap<String, String>();
                 headers.put("Access-Control-Allow-Origin", "*");
                 headers.put("Access-Control-Allow-Methods", "GET, OPTIONS, HEAD");
-                headers.put("Accept-Ranges", "bytes");
-
-                long fileLength = -1;
-                try {
-                    AssetFileDescriptor afd = activity.getAssets().openFd(path);
-                    if (afd != null) {
-                        fileLength = afd.getLength();
-                        afd.close();
-                    }
-                } catch (Exception ignored) {
-                    try {
-                        fileLength = is.available();
-                    } catch (Exception ignored2) {}
-                }
-
-                String rangeHeader = null;
-                if (request != null && request.getRequestHeaders() != null) {
-                    rangeHeader = request.getRequestHeaders().get("Range");
-                    if (rangeHeader == null) rangeHeader = request.getRequestHeaders().get("range");
-                }
-
-                if (rangeHeader != null && rangeHeader.startsWith("bytes=") && fileLength > 0) {
-                    String rangeVal = rangeHeader.substring(6).trim();
-                    long start = 0;
-                    long end = fileLength - 1;
-                    int dash = rangeVal.indexOf('-');
-                    if (dash != -1) {
-                        String sStr = rangeVal.substring(0, dash).trim();
-                        String eStr = rangeVal.substring(dash + 1).trim();
-                        if (!sStr.isEmpty()) {
-                            try { start = Long.parseLong(sStr); } catch (Exception ignored) {}
-                        }
-                        if (!eStr.isEmpty()) {
-                            try { end = Long.parseLong(eStr); } catch (Exception ignored) {}
-                        }
-                    }
-                    if (end >= fileLength) end = fileLength - 1;
-                    if (start > end) start = 0;
-
-                    long contentLength = (end - start) + 1;
-                    headers.put("Content-Range", "bytes " + start + "-" + end + "/" + fileLength);
-                    headers.put("Content-Length", String.valueOf(contentLength));
-
-                    if (start > 0) {
-                        long skipped = 0;
-                        while (skipped < start) {
-                            long s = is.skip(start - skipped);
-                            if (s <= 0) break;
-                            skipped += s;
-                        }
-                    }
-
-                    return new WebResourceResponse(mime, encoding, 206, "Partial Content", headers, new LimitedInputStream(is, contentLength));
-                }
-
-                if (fileLength > 0) {
-                    headers.put("Content-Length", String.valueOf(fileLength));
-                }
+                headers.put("Cache-Control", "no-cache");
 
                 return new WebResourceResponse(mime, encoding, 200, "OK", headers, is);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 return null;
             }
         }

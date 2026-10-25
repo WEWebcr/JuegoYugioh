@@ -72,11 +72,11 @@ try {
     const compiledResZip = path.join(BUILD_DIR, 'compiled_res.zip');
     execSync(`"${AAPT2}" compile --dir "${path.join(ANDROID_DIR, 'res')}" -o "${compiledResZip}"`, { stdio: 'inherit' });
 
-    // 2. AAPT2 LINK CON ASSETS COMPLETOS (-A)
-    console.log('[2/7] Enlazando manifiesto, assets locales y generando R.java...');
+    // 2. AAPT2 LINK (Sin -A para evitar que aapt2 en Windows inserte barras invertidas \)
+    console.log('[2/7] Enlazando manifiesto, recursos y generando R.java...');
     const unalignedResApk = path.join(BUILD_DIR, 'unaligned_resources.apk');
     const manifestPath = path.join(ANDROID_DIR, 'AndroidManifest.xml');
-    execSync(`"${AAPT2}" link -I "${ANDROID_JAR}" --manifest "${manifestPath}" --min-sdk-version 24 --target-sdk-version 34 "${compiledResZip}" -A "${ASSETS_DIR}" --java "${GEN_DIR}" -o "${unalignedResApk}" --auto-add-overlay`, { stdio: 'inherit' });
+    execSync(`"${AAPT2}" link -I "${ANDROID_JAR}" --manifest "${manifestPath}" --min-sdk-version 24 --target-sdk-version 34 "${compiledResZip}" --java "${GEN_DIR}" -o "${unalignedResApk}" --auto-add-overlay`, { stdio: 'inherit' });
 
     // 3. JAVAC
     console.log('[3/7] Compilando código Java con OpenJDK 21...');
@@ -90,11 +90,15 @@ try {
     const classFiles = fs.readdirSync(fmrDir).filter(f => f.endsWith('.class')).map(f => path.join(fmrDir, f));
     execSync(`"${D8}" --min-api 24 --lib "${ANDROID_JAR}" --output "${DEX_DIR}" ${classFiles.map(c => `"${c}"`).join(' ')}`, { stdio: 'inherit' });
 
-    // 5. PACKAGING DEX INTO APK
-    console.log('[5/7] Empaquetando classes.dex dentro del APK...');
+    // 5. PACKAGING DEX INTO APK CON ASSETS Y RUTAS POSIX LIMPIAS (/)
+    console.log('[5/7] Empaquetando classes.dex y assets locales dentro del APK...');
     const apkWithDex = path.join(BUILD_DIR, 'app_with_dex.apk');
     fs.copyFileSync(unalignedResApk, apkWithDex);
     execSync(`"${JAR}" uf "${apkWithDex}" -C "${DEX_DIR}" classes.dex`, { stdio: 'inherit' });
+    // Empaquetar directorio assets/ con jar (garantiza barras / estándar y compatibles con Android Linux)
+    execSync(`"${JAR}" uf "${apkWithDex}" -C "${ANDROID_DIR}" assets`, { stdio: 'inherit' });
+    // Almacenar carpeta musica/ sin compresión (modo store -0) para acceso instantáneo con AssetFileDescriptor
+    execSync(`"${JAR}" -u -0 -f "${apkWithDex}" -C "${ANDROID_DIR}" assets/musica`, { stdio: 'inherit' });
 
     // 6. ZIPALIGN
     console.log('[6/7] Optimizando y alineando APK a 4 bytes (zipalign)...');
