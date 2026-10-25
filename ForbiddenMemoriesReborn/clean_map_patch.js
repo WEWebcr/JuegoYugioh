@@ -1037,14 +1037,14 @@ window.playCustomMusic = function(fileName) {
 };
 
 window.getMapBgm = function(world) {
-    if (world === 4) return 'mapa_zexal.mp3';
+    if (world === 4) return 'mapa_5d.mp3';
     if (world === 3) return 'mapa_5d.mp3';
     if (world === 2) return 'mapa_gx.mp3';
     return 'mapa.mp3';
 };
 
 window.getShopBgm = function(world) {
-    if (world === 4) return 'tienda_zexal.mp3';
+    if (world === 4) return 'tienda_5d.mp3';
     if (world === 3) return 'tienda_5d.mp3';
     if (world === 2) return 'tienda_gx.mp3';
     return 'tienda.mp3';
@@ -1058,10 +1058,7 @@ window.getDuelMusic = function(charId) {
     // ── MUNDO 4: HEARTLAND CITY (ZEXAL) ──
     var isZexalChar = ['bronk', 'flip', 'shark', 'rio', 'kite', 'cathy', 'trey', 'quattro', 'mizar', 'vector', 'yuma'].includes(charId);
     if (curWorld === 4 || isZexalChar) {
-        if (charId === 'yuma' || charId === 'kite' || charId === 'vector' || charId === 'mizar') {
-            return 'duelo_zexal.mp3';
-        }
-        return 'duelo_zexal.mp3';
+        return 'duelo_5d_boss.mp3';
     }
 
     // ── MUNDO 3: NEO DOMINO CITY (5D's) ──
