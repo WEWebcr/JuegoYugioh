@@ -24035,37 +24035,51 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     /* ============================================================== */
 
     /* --- 1. VISTA MANO (HAND VIEW) --- */
-    body.view-hand #hand {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      justify-content: center !important;
-      align-items: center !important;
-      gap: clamp(14px, 1.8vw, 26px) !important;
-      max-width: min(96vw, 1380px) !important;
-      margin: 16px auto 32px !important;
-      padding: 8px 14px !important;
+    body.view-hand .boardCenter {
+      width: 100% !important;
+      max-width: 100% !important;
       box-sizing: border-box !important;
     }
 
-    body.view-hand #hand .zone {
-      flex: 0 1 clamp(160px, 15vw, 215px) !important;
-      width: clamp(160px, 15vw, 215px) !important;
-      height: clamp(285px, 25vw, 325px) !important;
+    body.view-hand #hand,
+    body.view-hand .hand {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+      gap: 16px !important;
+      justify-content: center !important;
+      align-items: stretch !important;
+      width: 100% !important;
+      max-width: min(96vw, 1300px) !important;
+      margin: 14px auto 30px !important;
+      padding: 8px 12px !important;
+      box-sizing: border-box !important;
+    }
+
+    body.view-hand #hand .zone,
+    body.view-hand .hand .zone {
+      width: 100% !important;
+      height: auto !important;
       min-height: unset !important;
       max-height: unset !important;
+      aspect-ratio: 59 / 86 !important;
       border: 0 !important;
       background: transparent !important;
       display: flex !important;
       justify-content: center !important;
-      align-items: center !important;
+      align-items: stretch !important;
+      position: relative !important;
+      box-sizing: border-box !important;
+      overflow: visible !important;
     }
 
     body.view-hand #hand .card,
+    body.view-hand .hand .card,
     .hand .card {
       width: 100% !important;
       height: 100% !important;
       min-height: unset !important;
       max-height: unset !important;
+      aspect-ratio: 59 / 86 !important;
       display: flex !important;
       flex-direction: column !important;
       justify-content: space-between !important;
@@ -24150,9 +24164,9 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     body.view-hand #hand .card.spell .cardArt,
     body.view-hand #hand .card.trap .cardArt {
       width: 100% !important;
-      height: clamp(140px, 14vw, 175px) !important;
-      min-height: 120px !important;
-      max-height: 180px !important;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: unset !important;
       flex: 1 1 auto !important;
       margin: 2px 0 !important;
       border-radius: 7px !important;
@@ -24552,47 +24566,93 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     /* Responsive adjustments for mobile and portrait */
     @media (max-width: 768px), (orientation: portrait) {
-      body.view-hand #hand {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        padding: 4px 6px !important;
-        max-width: 100vw !important;
+      body.view-hand #hand,
+      body.view-hand .hand {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px 10px !important;
+        padding: 6px 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 8px auto 24px !important;
       }
-      body.view-hand #hand .zone {
-        flex: 0 1 calc(33.333% - 6px) !important;
-        width: calc(33.333% - 6px) !important;
-        height: 220px !important;
-        min-height: 220px !important;
-        max-height: 220px !important;
+      body.view-hand #hand .zone,
+      body.view-hand .hand .zone {
+        width: 100% !important;
+        height: auto !important;
+        min-height: unset !important;
+        max-height: unset !important;
+        aspect-ratio: 59 / 86 !important;
+        flex: none !important;
       }
       body.view-hand #hand .card,
+      body.view-hand .hand .card,
       .hand .card {
-        height: 220px !important;
-        min-height: 220px !important;
-        max-height: 220px !important;
-        padding: 4px !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: unset !important;
+        max-height: unset !important;
+        aspect-ratio: 59 / 86 !important;
+        padding: 5px !important;
       }
       body.view-hand #hand .card .cardArt,
       .hand .card .cardArt,
       body.view-hand #hand .card.spell .cardArt,
       body.view-hand #hand .card.trap .cardArt {
-        height: 118px !important;
-        min-height: 118px !important;
-        max-height: 118px !important;
-        flex: 0 0 118px !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: unset !important;
+        flex: 1 1 auto !important;
+      }
+      body.view-hand #hand .card .cardTop,
+      .hand .card .cardTop {
+        height: 22px !important;
+        min-height: 22px !important;
+        padding: 1px 5px !important;
       }
       body.view-hand #hand .card .cardTop .name,
       .hand .card .cardTop .name {
-        font-size: 9px !important;
+        font-size: 10px !important;
+      }
+      body.view-hand #hand .card .stats,
+      .hand .card .stats {
+        font-size: 9.5px !important;
+        height: 22px !important;
+        min-height: 22px !important;
+      }
+    }
+
+    @media (min-width: 520px) and (max-width: 768px) and (orientation: portrait) {
+      body.view-hand #hand,
+      body.view-hand .hand {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      body.view-hand #hand,
+      body.view-hand .hand {
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+        padding: 4px 6px !important;
+      }
+      body.view-hand #hand .card .cardTop,
+      .hand .card .cardTop {
+        height: 18px !important;
+        min-height: 18px !important;
+      }
+      body.view-hand #hand .card .cardTop .name,
+      .hand .card .cardTop .name {
+        font-size: 8.5px !important;
       }
       body.view-hand #hand .card .stats,
       .hand .card .stats {
         font-size: 8.5px !important;
-        height: 20px !important;
-        min-height: 20px !important;
+        height: 18px !important;
+        min-height: 18px !important;
       }
+    }
       .actionBtns {
         gap: 6px 8px !important;
         padding: 6px 8px !important;
