@@ -9010,14 +9010,53 @@ window.customShowDeckEditor = function() {
         return false;
     }
 
+    function getCardNum(name, fallback) {
+        if (!name) return fallback || 0;
+        if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+            let cd = window.CARDS_DATA.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === String(name).toLowerCase().trim())));
+            if (cd && cd.id) return cd.id;
+        }
+        if (window.getCardMetadata) {
+            let m = window.getCardMetadata(name);
+            if (m && m.num) return m.num;
+        }
+        if (window.CARD_MAPPINGS) {
+            let n = window.CARD_MAPPINGS[name] || (window.CARD_MAPPINGS_LOWER ? window.CARD_MAPPINGS_LOWER[String(name).toLowerCase().trim()] : null);
+            if (n) return typeof n === 'number' ? n : (parseInt(String(n).replace(/[^\d]/g, ''), 10) || fallback);
+        }
+        return fallback;
+    }
+
+    // 1. Prioridad Máxima: CARDS_DATA con sus IDs y datos oficiales
+    if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+        window.CARDS_DATA.forEach(cd => {
+            if (!cd || !cd.name) return;
+            let cdKind = String(cd.kind || '').toUpperCase();
+            let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
+            let isExtra = isExtraDeck(cd) || (window.isSynchroCard && window.isSynchroCard(cd.name));
+            cardDict[cd.name] = {
+                num: cd.id,
+                name: cd.name,
+                type: cd.type || (isST ? cdKind : 'Monstruo'),
+                attr: cd.attr || '-',
+                atk: (cd.atk !== undefined && cd.atk !== '-') ? cd.atk : (isST ? '-' : 0),
+                def: (cd.def !== undefined && cd.def !== '-') ? cd.def : (isST ? '-' : 0),
+                sign: (cd.sign1 || '-') + (cd.sign2 ? ' / ' + cd.sign2 : ''),
+                isMonster: !isST,
+                isExtra: isExtra,
+                image: cd.image || ''
+            };
+            if (cd.text || cd.desc) extraText[cd.name] = cd.text || cd.desc;
+        });
+    }
+
     if (window.FMR_CARD_META) {
         Object.values(window.FMR_CARD_META).forEach((c) => {
             if (isAdvanced(c)) return;
             let cdKind = String(c.kind || '').toUpperCase();
             if (cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD') return;
             if (!cardDict[c.name]) {
-                let rawNum = window.CARD_MAPPINGS ? (window.CARD_MAPPINGS[c.name] || globalNum++) : globalNum++;
-                let num = typeof rawNum === 'number' ? rawNum : (parseInt(String(rawNum || '').replace(/[^\d]/g, ''), 10) || 0);
+                let num = getCardNum(c.name, globalNum++);
                 cardDict[c.name] = { 
                     num: num, name: c.name, type: c.type, attr: c.attr, 
                     atk: c.atk, def: c.def, sign: (c.sign1 || '-') + (c.sign2 ? ' / ' + c.sign2 : ''), 
@@ -9030,8 +9069,7 @@ window.customShowDeckEditor = function() {
         window.FMR_ST_POOL_V1.forEach((c) => {
             if (isAdvanced(c)) return;
             if (!cardDict[c.name]) {
-                let rawNum = window.CARD_MAPPINGS ? (window.CARD_MAPPINGS[c.name] || globalNum++) : globalNum++;
-                let num = typeof rawNum === 'number' ? rawNum : (parseInt(String(rawNum || '').replace(/[^\d]/g, ''), 10) || 0);
+                let num = getCardNum(c.name, globalNum++);
                 cardDict[c.name] = { 
                     num: num, name: c.name, type: c.kind, attr: '-', 
                     atk: '-', def: '-', sign: '-', isMonster: false, isExtra: false 
@@ -9046,27 +9084,6 @@ window.customShowDeckEditor = function() {
             cardDict[name] = Object.assign({}, gDict[name], { isExtra: isExtraDeck(gDict[name]) || (window.isSynchroCard && window.isSynchroCard(name)) });
         }
     });
-
-    if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
-        window.CARDS_DATA.forEach(cd => {
-            if (!cd || !cd.name || cardDict[cd.name]) return;
-            let meta = window.getCardMetadata ? window.getCardMetadata(cd.name) : null;
-            if (meta) {
-                cardDict[cd.name] = {
-                    num: meta.num || 0,
-                    name: meta.name,
-                    type: meta.type || 'Monstruo',
-                    attr: meta.attr || '-',
-                    atk: meta.atk,
-                    def: meta.def,
-                    sign: '-',
-                    isMonster: meta.isMonster,
-                    isExtra: isExtraDeck(cd) || (window.isSynchroCard && window.isSynchroCard(cd.name))
-                };
-                if (meta.desc) extraText[cd.name] = meta.desc;
-            }
-        });
-    }
     
     s.extra = s.extra || [];
 
@@ -9108,10 +9125,10 @@ window.customShowDeckEditor = function() {
 
     // Fallback metadata for ANY card in ownedSet that isn't yet in cardDict
     ownedSet.forEach(name => {
+        let realNum = getCardNum(name, null);
         if (!cardDict[name]) {
             let meta = window.getCardMetadata ? window.getCardMetadata(name) : null;
-            let rawNum = (meta && meta.num) || (window.CARD_MAPPINGS ? (window.CARD_MAPPINGS[name] || 999) : 999);
-            let num = typeof rawNum === 'number' ? rawNum : (parseInt(String(rawNum || '').replace(/[^\d]/g, ''), 10) || 999);
+            let num = realNum || (meta && meta.num) || 999;
             cardDict[name] = {
                 num: num,
                 name: (meta && meta.name) || name,
@@ -9124,6 +9141,8 @@ window.customShowDeckEditor = function() {
                 isExtra: isExtraDeck(meta) || (window.isSynchroCard && window.isSynchroCard(name))
             };
             if (meta && meta.desc) extraText[name] = meta.desc;
+        } else if (realNum && cardDict[name].num !== realNum) {
+            cardDict[name].num = realNum;
         }
     });
 
@@ -9526,23 +9545,25 @@ window.customShowDeckEditor = function() {
     });
 
     function getCardImageUrl(name) {
-        if (cardDict[name]) {
-            let num = cardDict[name].num;
-            if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
-                return window.CUSTOM_LOCAL_IMAGES[num];
-            }
-            if (num >= 1100 && num <= 1199) {
-                return 'imagenescartas/Mundo4/' + num + '.jpg';
-            }
-        }
-        if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) return window.CUSTOM_LOCAL_IMAGES[name];
+        if (!name) return 'https://i.imgur.com/vHqR8Kq.png';
         if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
-            var cd = window.CARDS_DATA.find(function(x) { return x && x.name === name; });
+            var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase().trim() === String(name).toLowerCase().trim())); });
             if (cd) {
                 if (cd.image) return cd.image;
                 if (cd.id >= 1100 && cd.id <= 1199) return 'imagenescartas/Mundo4/' + cd.id + '.jpg';
+                if (cd.id >= 900 && cd.id <= 999) return 'imagenescartas/Mundo3/' + cd.id + '.jpg';
             }
         }
+        if (cardDict[name]) {
+            if (cardDict[name].image) return cardDict[name].image;
+            let num = cardDict[name].num;
+            if (num >= 1100 && num <= 1199) return 'imagenescartas/Mundo4/' + num + '.jpg';
+            if (num >= 900 && num <= 999) return 'imagenescartas/Mundo3/' + num + '.jpg';
+            if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[num]) {
+                return window.CUSTOM_LOCAL_IMAGES[num];
+            }
+        }
+        if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[name]) return window.CUSTOM_LOCAL_IMAGES[name];
         if (window.BANDAI_ART_FILES && window.BANDAI_ART_FILES[name]) return window.BANDAI_ART_FILES[name];
         if (window.CARD_FILES && window.CARD_FILES[name] && window.CARD_FILES[name].length > 0) {
             return 'https://yugioh.fandom.com/wiki/Special:Redirect/file/' + encodeURIComponent(window.CARD_FILES[name][0]);
@@ -11254,13 +11275,14 @@ window.getGlobalCardDict = function() {
         // Check CARDS_DATA first as authoritative source
         let cd = (window.CARDS_DATA || []).find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
         if (cd) {
+            let cardNum = cd.id || num;
             let cdKind = String(cd.kind || '').toUpperCase();
             let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
-            let isExtra = (cdKind === 'SYNCHRO' || cdKind === 'FUSION' || (window.isSynchroCard && window.isSynchroCard(cd.name)));
-            if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'SYNCHRO' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
-                cardEntry = { num, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: isExtra, kind: cdKind || (isExtra ? 'SYNCHRO' : 'MONSTER'), text: cd.text || cd.desc || '' };
+            let isExtra = (cdKind === 'XYZ' || cdKind === 'SYNCHRO' || cdKind === 'FUSION' || (window.isXyzCard && window.isXyzCard(cd.name)) || (window.isSynchroCard && window.isSynchroCard(cd.name)));
+            if (!isST && (cdKind === 'MONSTER' || cdKind === 'FUSION' || cdKind === 'SYNCHRO' || cdKind === 'XYZ' || cdKind === 'LINK' || (cd.atk !== undefined && cd.atk !== '-'))) {
+                cardEntry = { num: cardNum, name: cd.name, type: cd.type || 'Warrior', attr: cd.attr || 'EARTH', atk: cd.atk || 0, def: cd.def || 0, isMonster: true, isExtra: isExtra, kind: cdKind || (isExtra ? 'SYNCHRO' : 'MONSTER'), text: cd.text || cd.desc || '', image: cd.image || '' };
             } else {
-                cardEntry = { num, name: cd.name, type: cd.type || cd.kind || (cdKind === 'TRAP' ? 'TRAP' : 'SPELL'), isMonster: false, atk: '-', def: '-', text: cd.text || cd.desc || '', isExtra: false, kind: cdKind };
+                cardEntry = { num: cardNum, name: cd.name, type: cd.type || cd.kind || (cdKind === 'TRAP' ? 'TRAP' : 'SPELL'), isMonster: false, atk: '-', def: '-', text: cd.text || cd.desc || '', isExtra: false, kind: cdKind, image: cd.image || '' };
             }
         } else {
             let st = window.FMR_ST_POOL_V1 && window.FMR_ST_POOL_V1.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === normName)));
@@ -11284,6 +11306,34 @@ window.getGlobalCardDict = function() {
         dict[name] = cardEntry;
         dict[normName] = cardEntry;
     });
+
+    if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+        window.CARDS_DATA.forEach(cd => {
+            if (!cd || !cd.name) return;
+            let norm = cd.name.toLowerCase().trim();
+            if (!dict[cd.name] || dict[cd.name].num !== cd.id) {
+                let cdKind = String(cd.kind || '').toUpperCase();
+                let isST = cdKind === 'SPELL' || cdKind === 'TRAP' || cdKind === 'EQUIP' || cdKind === 'FIELD' || (cd.type && (String(cd.type).toLowerCase().includes('equip') || String(cd.type).toLowerCase().includes('field')));
+                let isExtra = (cdKind === 'XYZ' || cdKind === 'SYNCHRO' || cdKind === 'FUSION' || (window.isXyzCard && window.isXyzCard(cd.name)) || (window.isSynchroCard && window.isSynchroCard(cd.name)));
+                let entry = {
+                    num: cd.id,
+                    name: cd.name,
+                    type: cd.type || (isST ? cdKind : 'Warrior'),
+                    attr: cd.attr || '-',
+                    atk: (cd.atk !== undefined && cd.atk !== '-') ? cd.atk : (isST ? '-' : 0),
+                    def: (cd.def !== undefined && cd.def !== '-') ? cd.def : (isST ? '-' : 0),
+                    isMonster: !isST,
+                    isExtra: isExtra,
+                    kind: cdKind || (isExtra ? (cdKind === 'XYZ' ? 'XYZ' : 'SYNCHRO') : 'MONSTER'),
+                    text: cd.text || cd.desc || '',
+                    image: cd.image || ''
+                };
+                dict[cd.name] = entry;
+                dict[norm] = entry;
+            }
+        });
+    }
+
     window.globalCardDict = dict;
     return dict;
 };
@@ -11293,8 +11343,22 @@ function updatePreview(previewImg, infoBox, name, extraHtml) {
     let norm = name ? String(name).toLowerCase().trim() : '';
     let c = dict[name] || dict[norm];
     if (c) {
-        if (window.CUSTOM_LOCAL_IMAGES && window.CUSTOM_LOCAL_IMAGES[c.num]) {
-            previewImg.src = window.CUSTOM_LOCAL_IMAGES[c.num];
+        let imgSrc = '';
+        if (c.image) imgSrc = c.image;
+        else if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+            let cd = window.CARDS_DATA.find(x => x && (x.name === name || (x.name && x.name.toLowerCase().trim() === norm)));
+            if (cd && cd.image) imgSrc = cd.image;
+            else if (cd && cd.id >= 1100 && cd.id <= 1199) imgSrc = 'imagenescartas/Mundo4/' + cd.id + '.jpg';
+            else if (cd && cd.id >= 900 && cd.id <= 999) imgSrc = 'imagenescartas/Mundo3/' + cd.id + '.jpg';
+        }
+        if (!imgSrc && window.CUSTOM_LOCAL_IMAGES) {
+            if (window.CUSTOM_LOCAL_IMAGES[name]) imgSrc = window.CUSTOM_LOCAL_IMAGES[name];
+            else if (c.num >= 1100 && c.num <= 1199) imgSrc = 'imagenescartas/Mundo4/' + c.num + '.jpg';
+            else if (c.num >= 900 && c.num <= 999) imgSrc = 'imagenescartas/Mundo3/' + c.num + '.jpg';
+            else if (window.CUSTOM_LOCAL_IMAGES[c.num]) imgSrc = window.CUSTOM_LOCAL_IMAGES[c.num];
+        }
+        if (imgSrc) {
+            previewImg.src = imgSrc;
             previewImg.style.display = 'block';
         } else {
             previewImg.style.display = 'none';

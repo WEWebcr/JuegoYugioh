@@ -149,6 +149,15 @@ try {
     cardsData = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'cards.json'), 'utf8'));
 } catch(e) {}
 
+// Registrar todas las cartas de cardsData en mappings con su ID oficial
+if (Array.isArray(cardsData)) {
+    cardsData.forEach(c => {
+        if (c && c.name && c.id) {
+            mappings[c.name] = c.id;
+        }
+    });
+}
+
 // 4. Scan Images
 let customImages = {};
 try {
