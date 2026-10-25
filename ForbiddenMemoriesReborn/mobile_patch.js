@@ -962,7 +962,7 @@
     hud.id = 'fmr-mobile-floating-hud';
     hud.innerHTML = `
       <button class="m-hud-btn" id="m-hud-fs-btn" title="Pantalla Completa">⛶</button>
-      <a class="m-hud-btn m-hud-apk" id="m-hud-apk-btn" href="/download/app.apk" download title="Descargar APK Android">📲 APK</a>
+      <a class="m-hud-btn m-hud-apk" id="m-hud-apk-btn" href="/download/app.apk" download title="Descargar APK Android v4.0.0">📲 APK v4</a>
     `;
     document.body.appendChild(hud);
 

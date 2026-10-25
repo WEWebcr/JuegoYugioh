@@ -129,7 +129,7 @@ public class MainActivity extends Activity {
         settings.setDisplayZoomControls(false);
         settings.setTextZoom(100);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/3.3.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " YuGiOhFMR-AndroidApp/" + getAppVersionName());
 
         mWebView.setWebChromeClient(new CustomChromeClient(mProgressBar));
         mWebView.setWebViewClient(new CustomWebViewClient(this));
@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
     public void showConnectionErrorDialog() {
         final String currentUrl = mPrefs.getString(KEY_SERVER_URL, DEFAULT_URL);
         AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("⚠️ Error de Conexión");
+        b.setTitle("⚠️ Error de Conexión (APK v" + getAppVersionName() + ")");
         b.setMessage("No se pudo conectar al servidor:\n" + currentUrl + "\n\n¿Deseas reintentar o configurar un servidor / IP local?");
         b.setPositiveButton("Reintentar", new RetryClick(this));
         b.setNeutralButton("Cambiar Servidor", new ConfigClick(this));
@@ -235,12 +235,28 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("Yu-Gi-Oh! FMR");
-        b.setMessage("¿Deseas salir del juego o configurar el servidor?");
+        b.setTitle("Yu-Gi-Oh! FMR - APK v" + getAppVersionName());
+        b.setMessage("Versión instalada: v" + getAppVersionName() + " (Build " + getAppVersionCode() + ")\nServidor conectado:\n" + mPrefs.getString(KEY_SERVER_URL, DEFAULT_URL) + "\n\n¿Deseas salir del juego o configurar el servidor?");
         b.setPositiveButton("Salir", new ExitClick(this));
         b.setNeutralButton("Configurar Servidor", new ConfigClick(this));
         b.setNegativeButton("Continuar Duelo", null);
         b.show();
+    }
+
+    public String getAppVersionName() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            return "4.0.0";
+        }
+    }
+
+    public int getAppVersionCode() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (Exception e) {
+            return 6;
+        }
     }
 
     static class ExitClick implements DialogInterface.OnClickListener {

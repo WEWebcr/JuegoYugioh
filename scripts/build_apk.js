@@ -25,7 +25,14 @@ const ZIPALIGN = path.join(BUILD_TOOLS, 'zipalign.exe');
 const APKSIGNER = path.join(BUILD_TOOLS, 'apksigner.bat');
 const ANDROID_JAR = path.join(SDK_DIR, 'platforms', 'android-34', 'android.jar');
 
-console.log('=== COMPILADOR DE APK NATIVO YU-GI-OH! FMR ===');
+const manifestPath = path.join(ANDROID_DIR, 'AndroidManifest.xml');
+const manifestXml = fs.readFileSync(manifestPath, 'utf8');
+const vNameMatch = manifestXml.match(/android:versionName="([^"]+)"/);
+const vCodeMatch = manifestXml.match(/android:versionCode="([^"]+)"/);
+const appVersion = vNameMatch ? vNameMatch[1] : '4.0.0';
+const appBuild = vCodeMatch ? vCodeMatch[1] : '6';
+
+console.log(`=== COMPILADOR DE APK NATIVO YU-GI-OH! FMR v${appVersion} (Build ${appBuild}) ===`);
 
 // Prepare clean build dirs
 [BUILD_DIR, DEX_DIR, GEN_DIR, CLASSES_DIR].forEach(dir => {
@@ -86,7 +93,7 @@ try {
 
     const stats = fs.statSync(finalApkPath);
     console.log('\n======================================================');
-    console.log('  ¡APK GENERADO Y FIRMADO CON ÉXITO!');
+    console.log(`  ¡APK v${appVersion} (Build ${appBuild}) GENERADO Y FIRMADO CON ÉXITO!`);
     console.log('  Archivo: ' + finalApkPath);
     console.log('  Tamaño:  ' + (stats.size / 1024).toFixed(1) + ' KB (' + stats.size + ' bytes)');
     console.log('  Descarga directa: ' + path.join(pubDir, 'app.apk'));
