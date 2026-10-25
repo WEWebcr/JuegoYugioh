@@ -9213,7 +9213,11 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
       nameOrCard = nameOrCard.name || nameOrCard[0] || '';
     }
     var name = String(nameOrCard || '').trim();
-    if (!name) return null;
+    if (!name || name.length <= 1) return null;
+    var nameLower = name.toLowerCase();
+    if (nameLower === 'blizzard falcon') name = 'Blizzard Thunderbird';
+    if (nameLower === 'monster reborn') name = 'Renace al Monstruo';
+    if (nameLower === 'icarus attack') name = 'Torrential Tribute';
 
     var pool = window.FMR_ST_POOL_V1 || [];
     var st = pool.find(function(c) { return c && (c.name === name || (c.name && c.name.toLowerCase() === name.toLowerCase())); });
@@ -21572,7 +21576,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       bronk: ['Tin Goldfish', 'Gogogo Giant', 'Gogogo Golem', 'Double Summon'],
       flip: ['Kagetokage', 'Goblindbergh', 'Dark Hole', 'Baby Tiragon'],
       shark: ['Silent Angler', 'Hammer Shark', 'Big Jaws', 'Abyss Dweller'],
-      rio: ['Blizzard Falcon', 'Aurora Wing', 'Icarus Attack', 'Torrential Tribute'],
+      rio: ['Blizzard Thunderbird', 'Aurora Wing', 'Xyz Unit', 'Torrential Tribute', 'Mirror Force'],
       kite: ['Galaxy-Eyes Photon Dragon', 'Photon Thrasher', 'Photon Crusher', 'Photon Vanisher'],
       trey: ['Chronomaly Crystal Bones', 'Chronomaly Crystal Skull', 'Chronomaly Golden Jet', 'Chronomaly Nebra Disk'],
       quattro: ['Gimmick Puppet Dreary Doll', 'Gimmick Puppet Magnet Doll', 'Gimmick Puppet Scissor Arms', 'Junk Puppet'],
@@ -22220,6 +22224,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           if (isFieldZone || isExodia || (zone === 'h' && hasBonus)) {
             var effAtk = (zone === 'h') ? (Number(c.atk ?? c[4] ?? 0) + Number(c.tempBoost || 0) + Number(c.equip || 0) + Number(c._handEquipAtk || 0)) : ((typeof window.effectiveAtk === 'function') ? window.effectiveAtk(c) : (Number(c.atk || 0) + Number(c.equip || 0)));
             var effDef = (c.kind === 'LINK') ? null : (Number(c.def ?? c[5] ?? 0) + Number(c.tempDefense || 0) + Number(c.tempBoostDef || 0) + Number(c._handEquipDef || 0));
+            if (effAtk == null || isNaN(effAtk)) effAtk = Number((c && (c.atk !== undefined ? c.atk : c[4])) || 0);
+            if (isNaN(effAtk)) effAtk = 0;
+            if (effDef != null && isNaN(effDef)) effDef = Number((c && (c.def !== undefined ? c.def : c[5])) || 0);
+            if (effDef != null && isNaN(effDef)) effDef = 0;
             var clone = Array.isArray(c) ? c.slice() : Object.assign({}, c);
             clone.atk = effAtk;
             clone.def = effDef;
@@ -27691,13 +27699,17 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         var idx = game.enemyHand.indexOf(best);
         game.enemyHand.splice(idx, 1);
 
-        var summoned = (typeof window.mk === 'function' ? window.mk(best.name || best[0]) : null) || {
-          name: best.name || best[0],
-          atk: best.atk || best[4] || 0,
-          def: best.def || best[5] || 0,
-          pos: 'ATK',
-          faceUp: true
-        };
+        var resolvedBest = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(best) : null) ||
+                           (typeof window.mk === 'function' ? window.mk(typeof best === 'string' ? best : (best.name || '')) : null);
+        var summoned = resolvedBest ? Object.assign({}, resolvedBest) : (typeof best === 'object' && best ? Object.assign({}, best) : { name: String(best || 'Monstruo'), atk: 1500, def: 1200 });
+        if (!summoned.name || summoned.name.length <= 1) {
+          summoned.name = (resolvedBest && resolvedBest.name) || String(best && best.name ? best.name : (typeof best === 'string' ? best : 'Monstruo'));
+        }
+        var sStats = typeof getCardStats === 'function' ? getCardStats(summoned) : { atk: summoned.atk, def: summoned.def };
+        summoned.atk = Number(sStats.atk != null && !isNaN(Number(sStats.atk)) ? sStats.atk : (resolvedBest ? resolvedBest.atk : 1500));
+        summoned.def = Number(sStats.def != null && !isNaN(Number(sStats.def)) ? sStats.def : (resolvedBest ? resolvedBest.def : 1200));
+        if (isNaN(summoned.atk)) summoned.atk = 1500;
+        if (isNaN(summoned.def)) summoned.def = 1200;
 
         var bestStats = getCardStats(summoned);
         var sAtk = Number(bestStats.atk || 0);
@@ -31059,139 +31071,265 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
                   }));
     if (!is5D && !isZexal) return;
 
+    function safeDuelToast(msg) {
+      if (typeof duelToast === 'function') duelToast(msg);
+      else if (typeof window.duelToast === 'function') window.duelToast(msg);
+    }
+
     // JUGADAS Y EFECTOS DE LA IA EN MUNDO 4 (ZEXAL)
     if (isZexal) {
       // 1. GARANTIZAR INVOCACIÓN XYZ EN PRIMER TURNO (O SI AÚN NO CONTROLA UN XYZ)
-      if (Array.isArray(game.enemyExtra) && game.enemyExtra.length > 0) {
-        var enemyHasXyz = (game.enemy || []).some(function(m) {
-          return m && (m.kind === 'XYZ' || (window.isFieldMonsterXyz && window.isFieldMonsterXyz(m)));
-        });
+      // Especialmente reforzado para Rio Kastle y todos los duelistas de Zexal
+      var enemyHasXyz = (game.enemy || []).some(function(m) {
+        return m && (m.kind === 'XYZ' || (window.isFieldMonsterXyz && window.isFieldMonsterXyz(m)));
+      });
 
-        if (!enemyHasXyz) {
-          var targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
-            return xc && (xc.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(xc.name || xc)));
-          });
-          if (targetXyzIdx < 0 && game.enemyExtra.length > 0) targetXyzIdx = 0;
-
-          if (targetXyzIdx >= 0) {
-            var targetXyz = game.enemyExtra.splice(targetXyzIdx, 1)[0];
-            var targetRank = Number(targetXyz.rank || targetXyz.level || targetXyz[1] || 4);
-            if (targetRank <= 0) targetRank = 4;
-
-            // Recolectar 2 materiales de Nivel = targetRank
-            var mats = [];
-
-            // A. Primero buscar monstruos en campo de ese nivel
-            for (var ei = 0; ei < (game.enemy || []).length; ei++) {
-              var em = game.enemy[ei];
-              if (em && !em.faceDown && !(window.isFieldMonsterXyz && window.isFieldMonsterXyz(em))) {
-                var elvl = Number(em.level || em[1] || 0);
-                if (elvl === targetRank) {
-                  mats.push(em);
-                  game.enemy[ei] = null;
-                  if (mats.length === 2) break;
-                }
-              }
-            }
-
-            // B. Si falta, buscar de la mano
-            while (mats.length < 2 && Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
-              var hIdx = game.enemyHand.findIndex(function(c) {
-                return c && !isST(c) && Number(c.level || c[1] || 0) === targetRank;
-              });
-              if (hIdx >= 0) {
-                var hMat = game.enemyHand.splice(hIdx, 1)[0];
-                var hMatMon = window.mk ? (window.mk(hMat) || window.mk(hMat.name || hMat[0])) : Object.assign({}, hMat);
-                mats.push(hMatMon || hMat);
-              } else {
-                break;
-              }
-            }
-
-            // C. Si aún falta, buscar del Deck
-            while (mats.length < 2 && Array.isArray(game.enemyDeck) && game.enemyDeck.length > 0) {
-              var dIdx = game.enemyDeck.findIndex(function(c) {
-                return c && !isST(c) && Number(c.level || c[1] || 0) === targetRank;
-              });
-              if (dIdx >= 0) {
-                var dMat = game.enemyDeck.splice(dIdx, 1)[0];
-                var dMatMon = window.mk ? (window.mk(dMat) || window.mk(dMat.name || dMat[0])) : Object.assign({}, dMat);
-                mats.push(dMatMon || dMat);
-              } else {
-                break;
-              }
-            }
-
-            // D. Fallback garantizado
-            while (mats.length < 2) {
-              var fallbackNames = {
-                4: 'Goblindbergh',
-                3: 'Tin Goldfish',
-                8: 'Parsec, the Interstellar Dragon'
-              };
-              var fName = fallbackNames[targetRank] || 'Goblindbergh';
-              var fMat = window.mk ? window.mk(fName) : { name: fName, level: targetRank, atk: 1400, def: 0 };
-              mats.push(fMat || { name: fName, level: targetRank, atk: 1400, def: 0 });
-            }
-
-            // Invocar el Monstruo XYZ
-            var fSlotXyz = (game.enemy || []).findIndex(function(x) { return !x; });
-            if (fSlotXyz < 0) fSlotXyz = 0;
-
-            var scXyz = JSON.parse(JSON.stringify(targetXyz));
-            scXyz.pos = 'ATK';
-            scXyz.faceUp = true;
-            scXyz.kind = 'XYZ';
-            delete scXyz.level;
-            scXyz.rank = targetRank;
-            scXyz.overlayUnits = 2;
-            scXyz.materials = [mats[0], mats[1]];
-            scXyz.summonedTurn = game.turnNo;
-            scXyz._equipToken109 = 'EQM109-' + Date.now() + '-' + Math.random();
-            game.enemy[fSlotXyz] = scXyz;
-
-            if (window.playSummonSound) window.playSummonSound();
-            var oppName = (opp || 'El rival').toUpperCase();
-            var mat1Name = mats[0].name || mats[0][0] || 'Material 1';
-            var mat2Name = mats[1].name || mats[1][0] || 'Material 2';
-            duelToast('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' invoca a ' + (scXyz.name || 'Monstruo Xyz') + '!');
-            if (typeof log === 'function') {
-              log('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' sobrepone a ' + mat1Name + ' y ' + mat2Name + ' (Nivel ' + targetRank + ') e Invoca por Xyz a ' + (scXyz.name || 'Monstruo Xyz') + ' (Rango ' + targetRank + ', ' + scXyz.atk + ' ATK)!');
-            }
-
-            // Auto-equipar Xyz Unit inmediatamente si la tiene en mano
-            if (Array.isArray(game.enemyHand)) {
-              var unitIdx = game.enemyHand.findIndex(function(c) {
-                return c && ((c.name || '').includes('Xyz Unit') || (c.value && c.value === 'XYZ_UNIT'));
-              });
-              if (unitIdx >= 0) {
-                var uCard = game.enemyHand.splice(unitIdx, 1)[0];
-                var bSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
-                var uBoost = targetRank * 200;
-                scXyz.equip = (scXyz.equip || 0) + uBoost;
-                scXyz._handEquipAtk = (scXyz._handEquipAtk || 0) + uBoost;
-                scXyz._appliedAtk109 = (scXyz._appliedAtk109 || 0) + uBoost;
-                if (!scXyz.equippedCards) scXyz.equippedCards = [];
-                scXyz.equippedCards.push(uCard.name || 'Xyz Unit');
-                if (bSlot >= 0) {
-                  game.enemyBack[bSlot] = Object.assign({}, uCard, {
-                    kind: 'EQUIP', set: false, faceUp: true,
-                    equipToken109: scXyz._equipToken109,
-                    _targetMonster: scXyz,
-                    _appliedAtk109: uBoost
-                  });
-                } else {
-                  game.enemyGrave = game.enemyGrave || [];
-                  game.enemyGrave.push(Object.assign({}, uCard, { faceUp: true }));
-                }
-                duelToast('⚔️ ¡' + oppName + ' activa Xyz Unit en ' + (scXyz.name || 'Xyz') + '! (+' + uBoost + ' ATK)');
-                if (typeof log === 'function') log('¡' + oppName + ' equipa Xyz Unit a ' + (scXyz.name || 'Xyz') + ' (+ ' + uBoost + ' ATK)!');
-              }
-            }
-
-            if (typeof render === 'function') render();
-            return;
+      if (!enemyHasXyz) {
+        var targetXyzIdx = -1;
+        if (Array.isArray(game.enemyExtra) && game.enemyExtra.length > 0) {
+          if (opp === 'rio') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('zerofyne') || n.includes('ice beast');
+            });
+          } else if (opp === 'kite') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('galaxy') || n.includes('paladynamo');
+            });
+          } else if (opp === 'trey') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('machu') || n.includes('chronomaly');
+            });
+          } else if (opp === 'quattro') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('grinder') || n.includes('gimmick');
+            });
+          } else if (opp === 'mizar') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('tachyon') || n.includes('galaxy');
+            });
+          } else if (opp === 'vector') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('beetle') || n.includes('masquerade');
+            });
+          } else if (opp === 'yuma' || opp === 'astral') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('utopia');
+            });
+          } else if (opp === 'shark') {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              var n = (xc && (xc.name || xc[0] || '')).toLowerCase();
+              return n.includes('shark drake') || n.includes('black ray') || n.includes('aero shark');
+            });
           }
+
+          if (targetXyzIdx < 0) {
+            targetXyzIdx = game.enemyExtra.findIndex(function(xc) {
+              return xc && (xc.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(xc.name || xc)));
+            });
+          }
+          if (targetXyzIdx < 0 && game.enemyExtra.length > 0) targetXyzIdx = 0;
+        }
+
+        var targetXyz = null;
+        if (targetXyzIdx >= 0 && Array.isArray(game.enemyExtra)) {
+          targetXyz = game.enemyExtra.splice(targetXyzIdx, 1)[0];
+        } else {
+          var fallbackBoss = (opp === 'rio' ? 'Ice Beast Zerofyne' : (opp === 'kite' ? 'Galaxy-Eyes Photon Dragon' : 'Number 39: Utopia'));
+          targetXyz = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(fallbackBoss) : null) || { name: fallbackBoss, rank: 4, atk: 2000, def: 2200, kind: 'XYZ', frameType: 'xyz' };
+        }
+
+        if (targetXyz) {
+          var targetRank = Number(targetXyz.rank || targetXyz.level || targetXyz[1] || 4);
+          if (targetRank <= 0) targetRank = 4;
+
+          // Recolectar 2 materiales de Nivel = targetRank
+          var mats = [];
+
+          // A. Primero buscar monstruos en campo de ese nivel
+          for (var ei = 0; ei < (game.enemy || []).length; ei++) {
+            var em = game.enemy[ei];
+            if (em && !em.faceDown && !(window.isFieldMonsterXyz && window.isFieldMonsterXyz(em))) {
+              var elvl = Number(em.level || em[1] || 0);
+              if (elvl === targetRank) {
+                mats.push(em);
+                game.enemy[ei] = null;
+                if (mats.length === 2) break;
+              }
+            }
+          }
+
+          // B. Si falta, buscar de la mano
+          while (mats.length < 2 && Array.isArray(game.enemyHand) && game.enemyHand.length > 0) {
+            var hIdx = game.enemyHand.findIndex(function(c) {
+              if (!c || isST(c)) return false;
+              var lvl = Number(c.level || c[1] || 0);
+              if (lvl === 0 && typeof window.resolveGameCard === 'function') {
+                var rc = window.resolveGameCard(c);
+                if (rc) lvl = Number(rc.level || rc.rank || 0);
+              }
+              return lvl === targetRank;
+            });
+            if (hIdx >= 0) {
+              var hMat = game.enemyHand.splice(hIdx, 1)[0];
+              var hMatMon = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(hMat) : null) || Object.assign({}, hMat);
+              mats.push(hMatMon || hMat);
+            } else {
+              break;
+            }
+          }
+
+          // C. Si aún falta, buscar del Deck
+          while (mats.length < 2 && Array.isArray(game.enemyDeck) && game.enemyDeck.length > 0) {
+            var dIdx = game.enemyDeck.findIndex(function(c) {
+              if (!c || isST(c)) return false;
+              var lvl = Number(c.level || c[1] || 0);
+              if (lvl === 0 && typeof window.resolveGameCard === 'function') {
+                var rc = window.resolveGameCard(c);
+                if (rc) lvl = Number(rc.level || rc.rank || 0);
+              }
+              return lvl === targetRank;
+            });
+            if (dIdx >= 0) {
+              var dMat = game.enemyDeck.splice(dIdx, 1)[0];
+              var dMatMon = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(dMat) : null) || Object.assign({}, dMat);
+              mats.push(dMatMon || dMat);
+            } else {
+              break;
+            }
+          }
+
+          // D. Fallback temático garantizado
+          while (mats.length < 2) {
+            var fName = 'Goblindbergh';
+            if (opp === 'rio') {
+              fName = (mats.length === 0 ? 'Blizzard Thunderbird' : 'Aurora Wing');
+            } else if (targetRank === 8) {
+              fName = 'Parsec, the Interstellar Dragon';
+            } else if (targetRank === 3) {
+              fName = 'Tin Goldfish';
+            }
+            var fMat = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(fName) : null) || { name: fName, level: targetRank, atk: 1400, def: 1200 };
+            mats.push(fMat);
+          }
+
+          // Invocar el Monstruo XYZ al campo rival
+          var fSlotXyz = (game.enemy || []).findIndex(function(x) { return !x; });
+          if (fSlotXyz < 0) fSlotXyz = 0;
+
+          var scXyz = Object.assign({}, targetXyz);
+          scXyz.pos = 'ATK';
+          scXyz.faceUp = true;
+          scXyz.kind = 'XYZ';
+          scXyz.frameType = 'xyz';
+          delete scXyz.level;
+          scXyz.rank = targetRank;
+          scXyz.overlayUnits = 2;
+          scXyz.materials = [mats[0], mats[1]];
+          scXyz.summonedTurn = game.turnNo;
+          scXyz._equipToken109 = 'EQM109-' + Date.now() + '-' + Math.random();
+          game.enemy[fSlotXyz] = scXyz;
+
+          if (typeof window.playSummonSound === 'function') window.playSummonSound();
+          var oppName = (opp || 'El rival').toUpperCase();
+          var mat1Name = (mats[0] && (mats[0].name || mats[0][0])) || 'Material 1';
+          var mat2Name = (mats[1] && (mats[1].name || mats[1][0])) || 'Material 2';
+          safeDuelToast('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' invoca a ' + (scXyz.name || 'Monstruo Xyz') + '!');
+          if (typeof log === 'function') {
+            log('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' sobrepone a ' + mat1Name + ' y ' + mat2Name + ' (Nivel ' + targetRank + ') e Invoca por Xyz a ' + (scXyz.name || 'Monstruo Xyz') + ' (Rango ' + targetRank + ', ' + scXyz.atk + ' ATK)!');
+          }
+
+          // 1. AUTO-EQUIPAR CARTA DE EQUIPO PARA HACERLO FUERTE (Xyz Unit)
+          var equipCard = null;
+          if (Array.isArray(game.enemyHand)) {
+            var uHandIdx = game.enemyHand.findIndex(function(c) {
+              return c && ((c.name || '').includes('Xyz Unit') || (c.value && c.value === 'XYZ_UNIT') || c.kind === 'EQUIP');
+            });
+            if (uHandIdx >= 0) equipCard = game.enemyHand.splice(uHandIdx, 1)[0];
+          }
+          if (!equipCard && Array.isArray(game.enemyDeck)) {
+            var uDeckIdx = game.enemyDeck.findIndex(function(c) {
+              return c && ((c.name || '').includes('Xyz Unit') || (c.value && c.value === 'XYZ_UNIT') || c.kind === 'EQUIP');
+            });
+            if (uDeckIdx >= 0) equipCard = game.enemyDeck.splice(uDeckIdx, 1)[0];
+          }
+          if (!equipCard) {
+            equipCard = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard('Xyz Unit') : null) || { name: 'Xyz Unit', kind: 'EQUIP', value: 'XYZ_UNIT' };
+          }
+
+          if (equipCard) {
+            var resolvedEq = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(equipCard) : null) || equipCard;
+            var bSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+            var uBoost = targetRank * 200;
+            if (uBoost <= 0) uBoost = 800;
+            scXyz.equip = (scXyz.equip || 0) + uBoost;
+            scXyz._handEquipAtk = (scXyz._handEquipAtk || 0) + uBoost;
+            scXyz._appliedAtk109 = (scXyz._appliedAtk109 || 0) + uBoost;
+            if (!scXyz.equippedCards) scXyz.equippedCards = [];
+            scXyz.equippedCards.push(resolvedEq.name || 'Xyz Unit');
+            if (bSlot >= 0) {
+              game.enemyBack[bSlot] = Object.assign({}, resolvedEq, {
+                kind: 'EQUIP', set: false, faceUp: true,
+                equipToken109: scXyz._equipToken109,
+                _targetMonster: scXyz,
+                _appliedAtk109: uBoost
+              });
+            } else {
+              game.enemyGrave = game.enemyGrave || [];
+              game.enemyGrave.push(Object.assign({}, resolvedEq, { faceUp: true }));
+            }
+            safeDuelToast('⚔️ ¡' + oppName + ' activa ' + (resolvedEq.name || 'Xyz Unit') + ' en ' + (scXyz.name || 'Xyz') + '! (+' + uBoost + ' ATK)');
+            if (typeof log === 'function') log('¡' + oppName + ' equipa ' + (resolvedEq.name || 'Xyz Unit') + ' a ' + (scXyz.name || 'Xyz') + ' (+ ' + uBoost + ' ATK)!');
+          }
+
+          // 2. COLOCAR 1 TRAMPA DEFENSIVA EN EL CAMPO PARA PROTEGERSE
+          var trapSlot = (game.enemyBack || []).findIndex(function(x) { return !x; });
+          if (trapSlot >= 0) {
+            var defTrap = null;
+            var trapNames = ['Torrential Tribute', 'Mirror Force', 'Magic Cylinder', 'Xyz Block', 'Bottomless Trap Hole'];
+            if (Array.isArray(game.enemyHand)) {
+              var tHandIdx = game.enemyHand.findIndex(function(c) {
+                if (!c) return false;
+                var cn = c.name || c[0] || '';
+                return c.kind === 'TRAP' || trapNames.some(function(tn) { return cn.toLowerCase().includes(tn.toLowerCase()); });
+              });
+              if (tHandIdx >= 0) defTrap = game.enemyHand.splice(tHandIdx, 1)[0];
+            }
+            if (!defTrap && Array.isArray(game.enemyDeck)) {
+              var tDeckIdx = game.enemyDeck.findIndex(function(c) {
+                if (!c) return false;
+                var cn = c.name || c[0] || '';
+                return c.kind === 'TRAP' || trapNames.some(function(tn) { return cn.toLowerCase().includes(tn.toLowerCase()); });
+              });
+              if (tDeckIdx >= 0) defTrap = game.enemyDeck.splice(tDeckIdx, 1)[0];
+            }
+            if (!defTrap) {
+              var trapName = (opp === 'rio' ? 'Torrential Tribute' : 'Mirror Force');
+              defTrap = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(trapName) : null) || { name: trapName, kind: 'TRAP', value: trapName.toUpperCase().replace(/\s+/g, '_') };
+            }
+            if (defTrap) {
+              var resolvedTrap = (typeof window.resolveGameCard === 'function' ? window.resolveGameCard(defTrap) : null) || defTrap;
+              game.enemyBack[trapSlot] = Object.assign({}, resolvedTrap, {
+                kind: 'TRAP',
+                set: true,
+                faceUp: false,
+                setSide: 'enemy',
+                setTurn: game.turnNo || 1,
+                readyTurn: (game.turnNo || 1) + 1
+              });
+              safeDuelToast('🛡️ ' + oppName + ' coloca 1 carta trampa boca abajo para defenderse.');
+              if (typeof log === 'function') log('¡' + oppName + ' coloca una carta boca abajo en su zona de Magia y Trampa!');
+            }
+          }
+
+          if (typeof render === 'function') render();
+          return;
         }
       }
 
