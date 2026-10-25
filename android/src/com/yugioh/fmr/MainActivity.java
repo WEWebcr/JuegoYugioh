@@ -20,14 +20,19 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import android.net.Uri;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceResponse;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends Activity {
 
@@ -134,6 +139,85 @@ public class MainActivity extends Activity {
         public CustomWebViewClient(MainActivity act) {
             this.activity = act;
         }
+
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            if (request == null || request.getUrl() == null) {
+                return super.shouldInterceptRequest(view, request);
+            }
+            Uri uri = request.getUrl();
+            String host = uri.getHost();
+            String scheme = uri.getScheme();
+
+            // 1. Interceptar peticiones locales bajo el dominio seguro virtual https://fmr.local/
+            if ("fmr.local".equalsIgnoreCase(host) || "appassets.androidplatform.net".equalsIgnoreCase(host)) {
+                String path = uri.getPath();
+                if (path != null && path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                if (path == null || path.isEmpty()) {
+                    path = "YGOFMR2026-1.html";
+                }
+
+                // Las llamadas API (/api/...) deben salir a internet hacia Render
+                if (path.startsWith("api/")) {
+                    return null;
+                }
+
+                return serveAsset(path);
+            }
+
+            // 2. Interceptar también si se accede por file:///android_asset/
+            if ("file".equalsIgnoreCase(scheme)) {
+                String path = uri.getPath();
+                if (path != null) {
+                    if (path.startsWith("/android_asset/")) {
+                        path = path.substring("/android_asset/".length());
+                    } else if (path.startsWith("/")) {
+                        path = path.substring(1);
+                    }
+                    return serveAsset(path);
+                }
+            }
+
+            return super.shouldInterceptRequest(view, request);
+        }
+
+        private WebResourceResponse serveAsset(String path) {
+            if (path == null || activity == null) return null;
+            int q = path.indexOf('?');
+            if (q != -1) path = path.substring(0, q);
+            int h = path.indexOf('#');
+            if (h != -1) path = path.substring(0, h);
+
+            try {
+                InputStream is = activity.getAssets().open(path);
+                String mime = getMimeType(path);
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Access-Control-Allow-Origin", "*");
+                headers.put("Access-Control-Allow-Methods", "GET, OPTIONS");
+                headers.put("Accept-Ranges", "bytes");
+                return new WebResourceResponse(mime, "UTF-8", 200, "OK", headers, is);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        private static String getMimeType(String path) {
+            String p = path.toLowerCase();
+            if (p.endsWith(".html") || p.endsWith(".htm")) return "text/html";
+            if (p.endsWith(".js")) return "application/javascript";
+            if (p.endsWith(".css")) return "text/css";
+            if (p.endsWith(".json")) return "application/json";
+            if (p.endsWith(".jpg") || p.endsWith(".jpeg")) return "image/jpeg";
+            if (p.endsWith(".png")) return "image/png";
+            if (p.endsWith(".webp")) return "image/webp";
+            if (p.endsWith(".mp3")) return "audio/mpeg";
+            if (p.endsWith(".ogg")) return "audio/ogg";
+            if (p.endsWith(".wav")) return "audio/wav";
+            return "application/octet-stream";
+        }
+
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             if (request != null && request.isForMainFrame() && activity != null) {
@@ -231,7 +315,7 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) {}
 
         if (hasLocalAsset) {
-            mWebView.loadUrl("file:///android_asset/YGOFMR2026-1.html");
+            mWebView.loadUrl("https://fmr.local/YGOFMR2026-1.html");
             return;
         }
 

@@ -4,8 +4,10 @@
   var origFetch = window.fetch;
   if (typeof origFetch === 'function') {
     window.fetch = function(url, options) {
-      if (typeof url === 'string' && url.indexOf('/api/') === 0 && typeof location !== 'undefined' && location.protocol === 'file:') {
-        url = 'https://yugiohreborn.onrender.com' + url;
+      if (typeof url === 'string' && url.indexOf('/api/') === 0 && typeof location !== 'undefined') {
+        if (location.protocol === 'file:' || location.hostname === 'fmr.local' || location.hostname === 'appassets.androidplatform.net') {
+          url = 'https://yugiohreborn.onrender.com' + url;
+        }
       }
       return origFetch.call(this, url, options);
     };
