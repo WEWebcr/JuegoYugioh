@@ -29033,7 +29033,12 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     var faceUp = (game.field || [])
       .map(function(c, idx) { return { idx: idx, card: c }; })
-      .filter(function(x) { return x.card && !x.card.faceDown && !x.card.faceDownSet103; });
+      .filter(function(x) { 
+        if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
+        // Los monstruos Xyz poseen Rango en lugar de Nivel, no pueden usarse para Sincronía
+        if (window.isFieldMonsterXyz && window.isFieldMonsterXyz(x.card)) return false;
+        return true;
+      });
 
     var fTuners = faceUp.filter(function(x) { return window.isTunerMonster(x.card); });
     var fNonTuners = faceUp.filter(function(x) { return !window.isTunerMonster(x.card); });
@@ -29179,6 +29184,32 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     });
   };
 
+  // Detección de Monstruos Chaos Xyz / Number C
+  window.isChaosOrCMonster = function(c) {
+    if (!c) return false;
+    var name = (typeof c === 'string' ? c : (c.name || c[0] || '')).trim();
+    if (!name) return false;
+    return /^number\s+c/i.test(name) || /c39/i.test(name) || /chaos\s+xyz/i.test(name) || /^c\d+/i.test(name) || name.includes('Utopia Ray') || /cxyz/i.test(name);
+  };
+
+  // Comprobar si un monstruo en el campo es de tipo Xyz (posee Rango en lugar de Nivel)
+  window.isFieldMonsterXyz = function(c) {
+    if (!c) return false;
+    if (c.kind === 'XYZ') return true;
+    if (c.rank != null || c.overlayUnits != null) return true;
+    var type = String(c.type || c[2] || '').toLowerCase();
+    if (type.includes('xyz')) return true;
+    var name = (c.name || c[0] || '').trim();
+    if (typeof window.isXyzCard === 'function' && window.isXyzCard(name || c)) return true;
+    if (window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
+    if (/^number\s+\w+/i.test(name) || /cxyz/i.test(name) || /xyz\s+dragon/i.test(name)) return true;
+    if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
+      var cd = window.CARDS_DATA.find(function(x) { return x && x.name === name; });
+      if (cd && (cd.kind === 'XYZ' || (cd.type && String(cd.type).toLowerCase().includes('xyz')) || cd.rank != null)) return true;
+    }
+    return false;
+  };
+
   // Detección de Monstruos Chaos Xyz / Number C y su monstruo Xyz base
   window.getChaosChangeRequirements = function(c) {
     if (!c) return null;
@@ -29189,7 +29220,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (foundCd && (foundCd.rank || foundCd.level)) rank = Number(foundCd.rank || foundCd.level);
     }
 
-    var isChaos = /^number\s+c/i.test(name) || /c39/i.test(name) || /chaos\s+xyz/i.test(name) || /c\d+/i.test(name) || name.includes('Utopia Ray');
+    var isChaos = window.isChaosOrCMonster(name);
     if (!isChaos) return null;
 
     var baseName = 'Number 39: Utopia';
@@ -29235,11 +29266,14 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       var chaosIndices = [];
       (game.field || []).forEach(function(c, idx) {
         if (c && !c.faceDown && !c.faceDownSet103) {
+          // REGLA: Los monstruos C / Chaos ya en el campo NO pueden volver a usarse como material
+          if (window.isChaosOrCMonster(c)) return;
+
           var cName = (c.name || '').toLowerCase();
           var isBaseMatch = cName.includes(chaosReq.baseName.toLowerCase()) || 
-                            (chaosReq.baseName.toLowerCase().includes('utopia') && cName.includes('utopia'));
+                            (chaosReq.baseName.toLowerCase().includes('utopia') && cName.includes('utopia') && !window.isChaosOrCMonster(c));
           var cRank = Number(c.rank || c.level || 0);
-          var isXyzKind = (c.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(c)));
+          var isXyzKind = window.isFieldMonsterXyz(c);
           var isRankMatch = isXyzKind && (cRank === 4 || cRank === (chaosReq.targetRank - 1));
           if (isBaseMatch || isRankMatch) {
             chaosIndices.push(idx);
@@ -29253,9 +29287,14 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     }
 
     // 2. Invocación Xyz regular: 2 monstruos boca arriba de Nivel coincidente con el Rango
+    // REGLA FUNDAMENTAL: Los monstruos Xyz (Rango 4 o cualquier Xyz) tienen Rango, no Nivel.
+    // NINGÚN monstruo Xyz puede ser usado para una invocación Xyz regular (excepto C / Chaos).
     var matchingIndices = [];
     (game.field || []).forEach(function(c, idx) {
       if (c && !c.faceDown && !c.faceDownSet103) {
+        // Excluir cualquier monstruo Xyz (no tienen nivel)
+        if (window.isFieldMonsterXyz(c)) return;
+
         var lvl = Number(c.level || c[1] || 0);
         if (!lvl) {
           var fCd = (window.CARDS_DATA || []).find(function(x) { return x && x.name === c.name; });
@@ -29696,25 +29735,30 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     // Monstruos elegibles en el campo:
     var eligibleMonsters = [];
     if (isChaos) {
-      // Para Chaos Xyz: Monstruos boca arriba que sean el monstruo base o Xyz Rango 4 (o targetRank - 1)
+      // Para Chaos Xyz: Monstruos boca arriba que sean el monstruo base o Xyz Rango 4 (excluyendo monstruos C/Chaos)
       eligibleMonsters = (game.field || [])
         .map(function(c, idx) { return { idx: idx, card: c }; })
         .filter(function(x) {
           if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
+          // REGLA: Los monstruos C / Chaos ya no pueden ser usados como material
+          if (window.isChaosOrCMonster && window.isChaosOrCMonster(x.card)) return false;
           var cName = (x.card.name || '').toLowerCase();
           var isBaseMatch = cName.includes(chaosReq.baseName.toLowerCase()) || 
-                            (chaosReq.baseName.toLowerCase().includes('utopia') && cName.includes('utopia'));
+                            (chaosReq.baseName.toLowerCase().includes('utopia') && cName.includes('utopia') && !window.isChaosOrCMonster(x.card));
           var cRank = Number(x.card.rank || x.card.level || 0);
-          var isXyzKind = (x.card.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.card)));
+          var isXyzKind = window.isFieldMonsterXyz ? window.isFieldMonsterXyz(x.card) : (x.card.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(x.card)));
           var isRankMatch = isXyzKind && (cRank === 4 || cRank === (chaosReq.targetRank - 1));
           return isBaseMatch || isRankMatch;
         });
     } else {
-      // Para Xyz regular: Monstruos boca arriba cuyo nivel coincida con el rango
+      // Para Xyz regular: Monstruos boca arriba de Nivel coincidente.
+      // REGLA FUNDAMENTAL: Los monstruos Xyz (Rango 4 o cualquier Xyz) tienen Rango, no Nivel.
+      // NINGÚN monstruo Xyz puede ser usado para una invocación Xyz regular.
       eligibleMonsters = (game.field || [])
         .map(function(c, idx) { return { idx: idx, card: c }; })
         .filter(function(x) {
           if (!x.card || x.card.faceDown || x.card.faceDownSet103) return false;
+          if (window.isFieldMonsterXyz && window.isFieldMonsterXyz(x.card)) return false;
           var lvl = Number(x.card.level || x.card[1] || 0);
           if (!lvl) {
             var fCd = (window.CARDS_DATA || []).find(function(f) { return f && f.name === x.card.name; });
@@ -29781,12 +29825,15 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (eligibleMonsters.length === 0) {
         var currentMonsters = (game.field || []).filter(function(x) { return x && !x.faceDown && !x.faceDownSet103; });
         var currentSummary = currentMonsters.length > 0
-          ? currentMonsters.map(function(m) { return (m.name || 'Monstruo') + ' (' + (m.kind === 'XYZ' ? ('★ Rango ' + (m.rank || m.level || 4)) : ('★ Nv ' + (m.level || m[1] || '?'))) + ')'; }).join(', ')
+          ? currentMonsters.map(function(m) { 
+              var isXyz = (window.isFieldMonsterXyz ? window.isFieldMonsterXyz(m) : (m.kind === 'XYZ'));
+              return (m.name || 'Monstruo') + ' (' + (isXyz ? ('★ Rango ' + (m.rank || 4) + ' [Xyz]') : ('★ Nv ' + (m.level || m[1] || '?'))) + ')'; 
+            }).join(', ')
           : 'Tu campo está vacío actualmente';
 
         var noMatchMsg = isChaos
-          ? `Para sobreponer e invocar a <b style="color:#ff4081;">${xyzName}</b> necesitas tener a <b>${chaosReq.baseName}</b> (o cualquier Monstruo Xyz de Rango 4) en tu campo.<br><span style="color:#7cff7c; font-weight:bold;">¡Ventaja activa: No necesitas Magia de Subida de Rango!</span>`
-          : `Para sobreponer e invocar a <b style="color:#ffd700;">${xyzName}</b> necesitas <b>2 monstruos boca arriba de Nivel ${targetRank}</b> en tu campo.`;
+          ? `Para sobreponer e invocar a <b style="color:#ff4081;">${xyzName}</b> necesitas tener a <b>${chaosReq.baseName}</b> (o cualquier Monstruo Xyz de Rango 4) en tu campo.<br><span style="color:#7cff7c; font-weight:bold;">¡Ventaja activa: No necesitas Magia de Subida de Rango!</span><br><span style="color:#ff80ab; font-size:11px;">⚠️ Nota: Los monstruos C / Chaos ya en el campo no pueden usarse como material.</span>`
+          : `Para sobreponer e invocar a <b style="color:#ffd700;">${xyzName}</b> necesitas <b>2 monstruos boca arriba de Nivel ${targetRank}</b> en tu campo.<br><span style="color:#ffd54f; font-size:11px;">⚠️ Nota: Los monstruos Xyz (Rango 4 u otros) tienen Rango, no Nivel, y están restringidos para invocaciones Xyz estándar.</span>`;
 
         gridDiv.innerHTML = `
           <div style="grid-column:1/-1; background:#181228; border:1.5px dashed ${isChaos ? '#ff0055' : '#ffd700'}; border-radius:10px; padding:20px; text-align:center;">
@@ -30009,6 +30056,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         sc.pos = 'ATK';
         sc.faceUp = true;
         sc.kind = 'XYZ';
+        delete sc.level;
         sc.rank = targetRank;
         sc.materials = matCards;
         sc.overlayUnits = matCards.length;
@@ -30286,7 +30334,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (Array.isArray(game.enemyExtra) && game.enemyExtra.length > 0) {
         var eFieldMons = [];
         (game.enemy || []).forEach(function(c, idx) {
-          if (c && !c.faceDown && !c.faceDownSet103 && c.kind !== 'XYZ') {
+          if (c && !c.faceDown && !c.faceDownSet103 && !(window.isFieldMonsterXyz && window.isFieldMonsterXyz(c))) {
             var lvl = Number(c.level || c[1] || 0);
             if (lvl > 0) eFieldMons.push({ idx: idx, card: c, level: lvl });
           }
@@ -30325,6 +30373,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
             scXyz.pos = 'ATK';
             scXyz.faceUp = true;
             scXyz.kind = 'XYZ';
+            delete scXyz.level;
             scXyz.rank = targetRank;
             scXyz.overlayUnits = 2;
             scXyz.materials = [mat1, mat2];
@@ -31093,17 +31142,22 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (isChaos) {
         fieldCount = (game.field || []).filter(function(m) {
           if (!m || m.faceDown || m.faceDownSet103) return false;
+          // REGLA: Los monstruos C / Chaos ya no pueden ser usados como material
+          if (window.isChaosOrCMonster && window.isChaosOrCMonster(m)) return false;
           var mName = (m.name || '').toLowerCase();
           var isBaseMatch = mName.includes(chaosReq.baseName.toLowerCase()) || 
-                            (chaosReq.baseName.toLowerCase().includes('utopia') && mName.includes('utopia'));
+                            (chaosReq.baseName.toLowerCase().includes('utopia') && mName.includes('utopia') && !window.isChaosOrCMonster(m));
           var mRank = Number(m.rank || m.level || 0);
-          var isXyzKind = (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m)));
+          var isXyzKind = window.isFieldMonsterXyz ? window.isFieldMonsterXyz(m) : (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m)));
           return isBaseMatch || (isXyzKind && (mRank === 4 || mRank === (chaosReq.targetRank - 1)));
         }).length;
         isReady = (fieldCount >= 1);
       } else {
         fieldCount = (game.field || []).filter(function(m) {
           if (!m || m.faceDown || m.faceDownSet103) return false;
+          // REGLA FUNDAMENTAL: Los monstruos Xyz (Rango 4 o cualquier Xyz) tienen Rango, no Nivel.
+          // NINGÚN monstruo Xyz puede ser usado para una invocación Xyz regular.
+          if (window.isFieldMonsterXyz && window.isFieldMonsterXyz(m)) return false;
           var lvl = Number(m.level || m[1] || 0);
           if (!lvl) {
             var foundM = (window.CARDS_DATA || []).find(function(f) { return f && f.name === m.name; });
