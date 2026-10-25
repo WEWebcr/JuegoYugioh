@@ -424,7 +424,7 @@
     "image": "imagenescartas/Mundo1/058.jpeg"
   },
   {
-    "id": 59,
+    "id": 722,
     "name": "Mammoth Graveyard",
     "level": 3,
     "type": "Dinosaur",
@@ -433,7 +433,7 @@
     "def": 800,
     "kind": "MONSTER",
     "text": "Un mamut no muerto que vaga en las sombras con 1200 ATK y 800 DEF.",
-    "image": "imagenescartas/Mundo1/059.jpg",
+    "image": "imagenescartas/Mundo1/722.jpg",
     "sign1": "SATURNO",
     "sign2": "PLUTON"
   },

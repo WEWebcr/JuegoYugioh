@@ -11474,9 +11474,22 @@ function handleBackBtn(overlay) {
 
 // COLLECTION WITH TABLE VIEW
 window.customShowCollection = function() {
-    let s = JSON.parse(origGet('FMR_SAVE_' + window.activeAccount) || '{}');
-    if (!s.collection) return;
+    let curAccount = window.activeAccount || localStorage.getItem('FMR_ACTIVE_ACCOUNT') || '';
+    let sKey = curAccount ? ('FMR_SAVE_' + curAccount) : 'FMR_REBORN_STORY_V3000';
+    let sStr = origGet(sKey) || origGet('FMR_REBORN_STORY_V3000');
+    let s = {};
+    if (sStr) {
+        try { s = JSON.parse(sStr); } catch(_) {}
+    } else if (window.memorySave) {
+        s = window.memorySave;
+    }
+    if (!s.collection) s.collection = {};
+    if (!s.collectionMundo3) s.collectionMundo3 = {};
+    if (!s.collectionMundo4) s.collectionMundo4 = {};
     if (typeof window.cleanSaveCollection === 'function') window.cleanSaveCollection(s);
+    
+    let existingOverlay = document.getElementById('custom-collection-overlay');
+    if (existingOverlay) existingOverlay.remove();
     
     if (!document.getElementById('fmr-coll-fus-responsive-styles')) {
         let st = document.createElement('style');
