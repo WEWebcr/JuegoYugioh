@@ -7472,6 +7472,13 @@ body[data-phase106="EP"] #epBtn{
         return (isFus&&lvl<=6&&lvl>0)?{atk:1500,def:500}:{atk:0,def:0};
       }
       default: {
+        if(eq._appliedAtk109!=null||eq._appliedDef109!=null){
+          return {atk:Number(eq._appliedAtk109||0),def:Number(eq._appliedDef109||0)};
+        }
+        if(typeof window.getEquipStats==='function'){
+          var s=window.getEquipStats(eq,target);
+          if(s&&(s.atk||s.def))return s;
+        }
         if(eq.name==='Fusion Weapon'){
           const isFus=(typeof isFusionMonster==='function'?isFusionMonster(target):(target.isFusion||target._isFused||target.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(target.name||target[0]))));
           const lvl=Number(target.level??target[1]??(window.metaFor?window.metaFor(target.name||target[0])?.level:0)??0);

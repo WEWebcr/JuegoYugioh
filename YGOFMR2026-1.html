@@ -7473,6 +7473,13 @@ body[data-phase106="EP"] #epBtn{
         return (isFus&&lvl<=6&&lvl>0)?{atk:1500,def:500}:{atk:0,def:0};
       }
       default: {
+        if(eq._appliedAtk109!=null||eq._appliedDef109!=null){
+          return {atk:Number(eq._appliedAtk109||0),def:Number(eq._appliedDef109||0)};
+        }
+        if(typeof window.getEquipStats==='function'){
+          var s=window.getEquipStats(eq,target);
+          if(s&&(s.atk||s.def))return s;
+        }
         if(eq.name==='Fusion Weapon'){
           const isFus=(typeof isFusionMonster==='function'?isFusionMonster(target):(target.isFusion||target._isFused||target.kind==='FUSION'||(window.FUSION_MONSTER_NAMES&&window.FUSION_MONSTER_NAMES.has(target.name||target[0]))));
           const lvl=Number(target.level??target[1]??(window.metaFor?window.metaFor(target.name||target[0])?.level:0)??0);
@@ -22216,6 +22223,8 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
             var clone = Array.isArray(c) ? c.slice() : Object.assign({}, c);
             clone.atk = effAtk;
             clone.def = effDef;
+            clone[4] = effAtk;
+            clone[5] = effDef;
             if (Array.isArray(c)) {
               clone.name = c[0];
               clone.level = c[1];
@@ -22225,7 +22234,7 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
               clone[5] = effDef;
             }
             var rendered = origCardHTML.call(this, clone, zone, i);
-            if (isFieldZone && (c._handEquipAtk || c._handEquipDef)) {
+            if (isFieldZone) {
               rendered = rendered.replace(/<div class="fieldStats">[\s\S]*?<\/div>/, c.kind === 'LINK' ? '<div class="fieldStats"><span class="atk">⚔ ' + effAtk + '</span><span class="def">LINK</span></div>' : '<div class="fieldStats"><span class="atk">⚔ ' + effAtk + '</span><span class="def">🛡 ' + effDef + '</span></div>');
             }
             if (isFieldZone && (c.kind === 'XYZ' || c.overlayUnits != null || (window.isXyzCard && window.isXyzCard(c.name || c)))) {
@@ -23993,10 +24002,11 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       'Mage Power', 'Poder del Mago', 'Legendary Sword', 'Laser Cannon Armor',
       'Insect Armor with Laser Cannon', 'Horn of Light', 'Elegant Egotist',
       'Machine Conversion Factory', 'Raise Body Heat', 'Follow Wind', 'Power of Kaishin', 'Violet Crystal',
-      'Lightning Blade'
+      'Lightning Blade', 'Bright Castle', 'Castillo Brillante', 'Winged Trumpeter',
+      'Xyz Unit', 'Gagagarevenge', 'Gagaga Revenge'
     ];
     if (equipNames.includes(name)) return true;
-    if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER'].includes(val)) return true;
+    if (['AXE_DESPAIR', 'BLACK_PENDANT', 'HORN_UNICORN', 'DRAGON_TREASURE', 'EQUIP_DRAGON', 'UNITED_WE_STAND', 'FUSION_WEAPON', 'MAGE_POWER', 'XYZ_UNIT', 'GAGAGAREVENGE', 'BRIGHT_CASTLE', 'SALAMANDRA', 'WINGED_TRUMPETER', 'LIGHTNING_BLADE'].includes(val)) return true;
     var desc = (c.text || c.desc || '').toLowerCase();
     if ((desc.includes('equipa a') || desc.includes('monstruo equipado') || desc.includes('equipped with this card') || desc.includes('equip to')) && kind !== 'TRAP') return true;
     return false;
@@ -24008,7 +24018,29 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var val = (eqCard && eqCard.value) || '';
     var atk = 500;
     var def = 0;
-    if (name === 'Axe of Despair' || val === 'AXE_DESPAIR') {
+    if (name === 'Xyz Unit' || val === 'XYZ_UNIT') {
+      var rk = 4;
+      if (target) {
+        rk = Number(target.rank || target.level || target[1] || 4);
+      }
+      atk = rk * 200;
+      def = 0;
+    } else if (name === 'Gagagarevenge' || name === 'Gagaga Revenge' || val === 'GAGAGAREVENGE') {
+      atk = 300;
+      def = 0;
+    } else if (name === 'Bright Castle' || name === 'Castillo Brillante' || val === 'BRIGHT_CASTLE' || name === 'Shine Palace' || val === 'SHINE_PALACE') {
+      atk = 700;
+      def = 0;
+    } else if (name === 'Salamandra' || val === 'SALAMANDRA') {
+      atk = 700;
+      def = 0;
+    } else if (name === 'Winged Trumpeter' || val === 'WINGED_TRUMPETER') {
+      atk = 700;
+      def = 700;
+    } else if (name === 'Lightning Blade' || val === 'LIGHTNING_BLADE') {
+      atk = 800;
+      def = 0;
+    } else if (name === 'Axe of Despair' || val === 'AXE_DESPAIR') {
       atk = 1000; def = 0;
     } else if (name === 'Insect Armor with Laser Cannon' || val === 'EQUIP_INSECT_HEAVY') {
       atk = 700; def = 700;
@@ -24123,6 +24155,25 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     }
     if (eqVal === 'EQUIP_WINGED_BEAST' || eqName === 'Follow Wind') {
       return monType.includes('winged beast') || monType.includes('bestia alada');
+    }
+    if (eqVal === 'XYZ_UNIT' || eqName === 'Xyz Unit') {
+      return (typeof window.isFieldMonsterXyz === 'function' ? window.isFieldMonsterXyz(target) : (target.kind === 'XYZ' || (target.name && window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(target.name))));
+    }
+    if (eqVal === 'GAGAGAREVENGE' || eqName === 'Gagagarevenge' || eqName === 'Gagaga Revenge') {
+      var tNameG = (target.name || target[0] || '').toLowerCase();
+      return tNameG.includes('gagaga') || monType.includes('spellcaster') || monType.includes('mago') || monType.includes('warrior') || monType.includes('guerrero');
+    }
+    if (eqVal === 'LIGHTNING_BLADE' || eqName === 'Lightning Blade') {
+      return monType.includes('warrior') || monType.includes('guerrero');
+    }
+    if (eqVal === 'SALAMANDRA' || eqName === 'Salamandra') {
+      return monAttr === 'FIRE' || monType.includes('pyro') || monType.includes('fuego') || monType.includes('dragon') || monType.includes('dragón');
+    }
+    if (eqVal === 'WINGED_TRUMPETER' || eqName === 'Winged Trumpeter') {
+      return monType.includes('fairy') || monType.includes('hada') || monAttr === 'LIGHT';
+    }
+    if (eqVal === 'BRIGHT_CASTLE' || eqName === 'Bright Castle' || eqName === 'Castillo Brillante' || eqVal === 'SHINE_PALACE' || eqName === 'Shine Palace') {
+      return monAttr === 'LIGHT' || monType.includes('fairy') || monType.includes('spellcaster') || monType.includes('mago');
     }
     if (eqVal === 'FUSION_WEAPON' || eqName === 'Fusion Weapon') {
       return isFusionMonster(target) && (getMonsterLevel(target) <= 6) && (getMonsterLevel(target) > 0);
@@ -24269,8 +24320,12 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     var def = eqStats.def;
 
     tCard.equip = (tCard.equip || 0) + atk;
+    tCard._handEquipAtk = (tCard._handEquipAtk || 0) + atk;
+    tCard._appliedAtk109 = (tCard._appliedAtk109 || 0) + atk;
     if (def > 0) {
       tCard.tempBoostDef = (tCard.tempBoostDef || 0) + def;
+      tCard._handEquipDef = (tCard._handEquipDef || 0) + def;
+      tCard._appliedDef109 = (tCard._appliedDef109 || 0) + def;
     }
     if (!tCard.equippedCards) tCard.equippedCards = [];
     tCard.equippedCards.push(eqCard.name);
@@ -24805,8 +24860,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
         if (c._targetMonster) {
           var eqA = c._appliedAtk109 || (typeof getEquipStats === 'function' ? getEquipStats(c, c._targetMonster).atk : 0);
           var eqD = c._appliedDef109 || (typeof getEquipStats === 'function' ? getEquipStats(c, c._targetMonster).def : 0);
-          if (eqA) c._targetMonster.equip = Math.max(0, (c._targetMonster.equip || 0) - eqA);
-          if (eqD) c._targetMonster.tempBoostDef = Math.max(0, (c._targetMonster.tempBoostDef || 0) - eqD);
+          if (eqA) {
+            c._targetMonster.equip = Math.max(0, (c._targetMonster.equip || 0) - eqA);
+            if (c._targetMonster._handEquipAtk) c._targetMonster._handEquipAtk = Math.max(0, (c._targetMonster._handEquipAtk || 0) - eqA);
+            if (c._targetMonster._appliedAtk109) c._targetMonster._appliedAtk109 = Math.max(0, (c._targetMonster._appliedAtk109 || 0) - eqA);
+          }
+          if (eqD) {
+            c._targetMonster.tempBoostDef = Math.max(0, (c._targetMonster.tempBoostDef || 0) - eqD);
+            if (c._targetMonster._handEquipDef) c._targetMonster._handEquipDef = Math.max(0, (c._targetMonster._handEquipDef || 0) - eqD);
+            if (c._targetMonster._appliedDef109) c._targetMonster._appliedDef109 = Math.max(0, (c._targetMonster._appliedDef109 || 0) - eqD);
+          }
           if (Array.isArray(c._targetMonster.equippedCards)) {
             var eqIdx = c._targetMonster.equippedCards.indexOf(c.name || c[0]);
             if (eqIdx >= 0) c._targetMonster.equippedCards.splice(eqIdx, 1);
@@ -24817,8 +24880,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
           if (m && c.equipToken109 && m._equipToken109 === c.equipToken109) {
             var eqA2 = c._appliedAtk109 || (typeof getEquipStats === 'function' ? getEquipStats(c, m).atk : 0);
             var eqD2 = c._appliedDef109 || (typeof getEquipStats === 'function' ? getEquipStats(c, m).def : 0);
-            if (eqA2) m.equip = Math.max(0, (m.equip || 0) - eqA2);
-            if (eqD2) m.tempBoostDef = Math.max(0, (m.tempBoostDef || 0) - eqD2);
+            if (eqA2) {
+              m.equip = Math.max(0, (m.equip || 0) - eqA2);
+              if (m._handEquipAtk) m._handEquipAtk = Math.max(0, (m._handEquipAtk || 0) - eqA2);
+              if (m._appliedAtk109) m._appliedAtk109 = Math.max(0, (m._appliedAtk109 || 0) - eqA2);
+            }
+            if (eqD2) {
+              m.tempBoostDef = Math.max(0, (m.tempBoostDef || 0) - eqD2);
+              if (m._handEquipDef) m._handEquipDef = Math.max(0, (m._handEquipDef || 0) - eqD2);
+              if (m._appliedDef109) m._appliedDef109 = Math.max(0, (m._appliedDef109 || 0) - eqD2);
+            }
             if (Array.isArray(m.equippedCards)) {
               var mIdx = m.equippedCards.indexOf(c.name || c[0]);
               if (mIdx >= 0) m.equippedCards.splice(mIdx, 1);
@@ -25140,6 +25211,29 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     if (val === 'REBORN' || cName === 'Renace al Monstruo') {
       resolveMonsterReborn(null, i);
       return;
+    }
+    // Intercept Gagagarevenge graveyard revive
+    if (cName === 'Gagagarevenge' || cName === 'Gagaga Revenge' || val === 'GAGAGAREVENGE') {
+      var gagagasInGrave = (g.grave || []).filter(function(x) {
+        var n = ((x && x.name) || x?.[0] || '').toLowerCase();
+        return n.includes('gagaga') && (x.atk !== undefined || x.kind === 'MONSTER' || x.level);
+      });
+      var emptyFieldIdx = (g.field || []).findIndex(function(x) { return !x; });
+      if (gagagasInGrave.length > 0 && emptyFieldIdx >= 0) {
+        var revCard = gagagasInGrave[0];
+        for (var gi = 1; gi < gagagasInGrave.length; gi++) {
+          if ((gagagasInGrave[gi].atk || 0) > (revCard.atk || 0)) revCard = gagagasInGrave[gi];
+        }
+        var grIndex = g.grave.indexOf(revCard);
+        if (grIndex >= 0) g.grave.splice(grIndex, 1);
+        var revivedMon = window.mk ? (window.mk(revCard.name || revCard[0]) || Object.assign({}, revCard)) : Object.assign({}, revCard);
+        revivedMon.pos = 'ATK';
+        revivedMon.faceUp = true;
+        g.field[emptyFieldIdx] = revivedMon;
+        duelToast('¡Gagagarevenge revive a ' + (revivedMon.name || 'Gagaga') + ' del Cementerio y se equipa (+300 ATK)!');
+        window.promptEquipTarget(c, { type: 'hand', index: i });
+        return;
+      }
     }
     // Intercept EQUIP cards
     if (c.kind === 'EQUIP' || val === 'EQUIP' || isEquipSpell(c)) {
@@ -26012,6 +26106,167 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       if (typeof render === 'function') render();
       return;
     }
+
+    // OVERLAY REGEN
+    if (val === 'OVERLAY_REGEN' || cName === 'Overlay Regen' || nUpperHand === 'OVERLAY REGEN' || nUpperHand.includes('REGEN') || nUpperHand.includes('REGENERACI')) {
+      var xyzMonsters = [];
+      (g.field || []).forEach(function(m, idx) {
+        if (m && !m.faceDown && (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m.name || m)))) {
+          xyzMonsters.push({ card: m, index: idx });
+        }
+      });
+      (g.linkZones || []).forEach(function(m, idx) {
+        if (m && !m.faceDown && (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m.name || m)))) {
+          xyzMonsters.push({ card: m, index: idx, isLink: true });
+        }
+      });
+      if (!xyzMonsters.length) {
+        duelToast('Overlay Regen requiere al menos 1 Monstruo Xyz boca arriba en tu campo.');
+        if (typeof log === 'function') log('Overlay Regen: No controlas ningún Monstruo Xyz en el campo.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var chosenXyz = xyzMonsters[0].card;
+      chosenXyz.overlayUnits = (chosenXyz.overlayUnits != null ? chosenXyz.overlayUnits : 2) + 1;
+      var cXyzName = chosenXyz.name || chosenXyz[0] || 'Monstruo Xyz';
+      duelToast('🟡 ¡Overlay Regen acopló +1 Material Xyz a ' + cXyzName + '! (Total: ' + chosenXyz.overlayUnits + ')');
+      if (typeof log === 'function') log('Overlay Regen acopló +1 Unidad de Acoplamiento a ' + cXyzName + '. Total materiales: ' + chosenXyz.overlayUnits + '.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // DOUBLE OR NOTHING!
+    if (val === 'DOUBLE_OR_NOTHING' || cName === 'Double or Nothing!' || nUpperHand.includes('DOUBLE OR NOTHING') || nUpperHand.includes('DOBLE O NADA')) {
+      var myMonsters = (g.field || []).concat(g.linkZones || []).filter(function(m) {
+        return m && !m.faceDown;
+      });
+      if (!myMonsters.length) {
+        duelToast('Doble o Nada requiere al menos 1 monstruo boca arriba en tu campo.');
+        if (typeof log === 'function') log('Doble o Nada: No tienes monstruos boca arriba en el campo.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      myMonsters.sort(function(a, b) {
+        var atkA = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(a) : Number(a.atk || 0));
+        var atkB = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(b) : Number(b.atk || 0));
+        return atkB - atkA;
+      });
+      var targetMon = myMonsters[0];
+      var baseEff = (typeof window.effectiveAtk === 'function' ? window.effectiveAtk(targetMon) : Number(targetMon.atk || 0));
+      targetMon.tempBoost = (targetMon.tempBoost || 0) + baseEff;
+      var tMName = targetMon.name || targetMon[0] || 'Monstruo';
+      duelToast('💥 ¡Doble o Nada! ' + tMName + ' duplica su ATK (+' + baseEff + ' ATK).');
+      if (typeof log === 'function') log('¡Doble o Nada! ' + tMName + ' duplica su ataque este turno. +' + baseEff + ' ATK.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // GENERATION FORCE
+    if (val === 'GENERATION_FORCE' || cName === 'Generation Force' || nUpperHand.includes('GENERATION FORCE') || nUpperHand.includes('FUERZA DE GENERACI')) {
+      var hasXyz = (g.field || []).concat(g.linkZones || []).some(function(m) {
+        return m && !m.faceDown && (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m.name || m)));
+      });
+      if (!hasXyz) {
+        duelToast('Generation Force requiere que controles al menos 1 Monstruo Xyz boca arriba en el campo.');
+        if (typeof log === 'function') log('Generation Force: Requiere controlar un Monstruo Xyz en el campo.');
+        return;
+      }
+      var xyzCardIdx = (g.deck || []).findIndex(function(x) {
+        var xName = (x && x.name) || '';
+        return xName.toLowerCase().startsWith('xyz ') || xName.toLowerCase().includes(' xyz') || xName.toLowerCase() === 'xyz unit' || xName.toLowerCase() === 'xyz reborn' || xName.toLowerCase() === 'xyz block';
+      });
+      if (xyzCardIdx < 0) {
+        duelToast('No quedan cartas "Xyz" en tu Deck.');
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var foundXyzCard = g.deck.splice(xyzCardIdx, 1)[0];
+      g.hand.push(foundXyzCard);
+      duelToast('✨ ¡Generation Force! Añades ' + (foundXyzCard.name || 'carta Xyz') + ' de tu Deck a tu mano.');
+      if (typeof log === 'function') log('Generation Force añadió ' + (foundXyzCard.name || 'carta Xyz') + ' del Deck a la mano.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // ONOMATOPAIRA
+    if (val === 'ONOMATOPAIRA' || cName === 'Onomatopaira' || nUpperHand.includes('ONOMATOPAIRA') || nUpperHand.includes('ONOMATOPAREJA')) {
+      if (g.hand.length < 2) {
+        duelToast('Onomatopaira requiere descartar otra carta de tu mano al Cementerio.');
+        return;
+      }
+      var discardIdx = -1;
+      for (var hi = 0; hi < g.hand.length; hi++) {
+        if (hi !== i) { discardIdx = hi; break; }
+      }
+      var discarded = g.hand.splice(discardIdx, 1)[0];
+      g.grave.push(Object.assign({}, discarded, { faceUp: true }));
+      var curI = g.hand.indexOf(c);
+      if (curI >= 0) g.hand.splice(curI, 1);
+      else g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+
+      var archetypes = ['zubaba', 'gagaga', 'gogogo', 'dododo'];
+      var added = [];
+      for (var ai = 0; ai < 2; ai++) {
+        var dFoundIdx = (g.deck || []).findIndex(function(dk) {
+          var dkName = ((dk && dk.name) || dk?.[0] || '').toLowerCase();
+          return archetypes.some(function(arc) { return dkName.includes(arc); }) && !added.includes(dk);
+        });
+        if (dFoundIdx >= 0) {
+          var pulled = g.deck.splice(dFoundIdx, 1)[0];
+          g.hand.push(pulled);
+          added.push(pulled);
+        }
+      }
+      var addedNames = added.map(function(x) { return x.name || x[0]; }).join(' y ');
+      duelToast('⚡ ¡Onomatopaira! Descartaste ' + (discarded.name || 'carta') + ' y añadiste ' + (addedNames || 'monstruos') + ' a tu mano.');
+      if (typeof log === 'function') log('Onomatopaira: Descartaste ' + (discarded.name || 'carta') + ' y añadiste ' + (addedNames || 'monstruos') + ' del Deck a la mano.');
+      if (typeof render === 'function') render();
+      return;
+    }
+
+    // RANK-UP-MAGIC BARIAN'S FORCE
+    if (val === 'BARIANS_FORCE' || cName === "Rank-Up-Magic Barian's Force" || nUpperHand.includes('BARIAN') || nUpperHand.includes('RANK-UP')) {
+      var xyzTargets = [];
+      (g.field || []).forEach(function(m, idx) {
+        if (m && !m.faceDown && (m.kind === 'XYZ' || (window.isXyzCard && window.isXyzCard(m.name || m)))) {
+          xyzTargets.push({ card: m, index: idx });
+        }
+      });
+      if (!xyzTargets.length) {
+        duelToast("Rank-Up-Magic Barian's Force requiere al menos 1 Monstruo Xyz boca arriba en tu campo.");
+        return;
+      }
+      var chaosInExtraIdx = (g.extra || []).findIndex(function(ex) {
+        var exName = ((ex && ex.name) || ex?.[0] || '');
+        return exName.includes('Number C') || exName.includes('Chaos') || exName.includes('Neo Galaxy-Eyes');
+      });
+      if (chaosInExtraIdx < 0) {
+        duelToast("No tienes monstruos Chaos Xyz o 'Number C' en tu Extra Deck.");
+        return;
+      }
+      g.hand.splice(i, 1);
+      g.grave.push(Object.assign({}, c, { set: false, faceUp: true }));
+      var chaosCard = g.extra.splice(chaosInExtraIdx, 1)[0];
+      var baseMon = xyzTargets[0].card;
+      var fSlot = xyzTargets[0].index;
+      var prevUnits = (baseMon.overlayUnits != null ? baseMon.overlayUnits : 2);
+      g.grave.push(Object.assign({}, baseMon, { faceUp: true }));
+      var newChaosMon = window.mk ? (window.mk(chaosCard.name || chaosCard[0]) || Object.assign({}, chaosCard)) : Object.assign({}, chaosCard);
+      newChaosMon.kind = 'XYZ';
+      newChaosMon.pos = 'ATK';
+      newChaosMon.faceUp = true;
+      newChaosMon.overlayUnits = prevUnits + 1;
+      g.field[fSlot] = newChaosMon;
+      duelToast("⚡ ¡RANK-UP XYZ EVOLUTION! " + (baseMon.name || 'Xyz') + " evoluciona a " + (newChaosMon.name || 'Chaos Xyz') + "!");
+      if (typeof log === 'function') log("Rank-Up-Magic Barian's Force: " + (baseMon.name || 'Xyz') + " evolucionó a " + (newChaosMon.name || 'Chaos Xyz') + " con " + newChaosMon.overlayUnits + " materiales.");
+      if (typeof render === 'function') render();
+      return;
+    }
+
     var prevHandLen = g.hand.length;
     if (prevActivateHand) prevActivateHand.apply(this, arguments);
     if (g.hand && g.hand.length === prevHandLen && g.hand[i] === c && c.kind !== 'TRAP') {
