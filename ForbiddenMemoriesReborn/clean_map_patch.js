@@ -11948,28 +11948,68 @@ window.customShowFusions = function() {
 };
 
 
-window.surrenderDuel = function() { if(window.playCancelSound) window.playCancelSound();
-    if (confirm('¿Estás seguro de que quieres rendirte?')) {
-        let isStory = (typeof window.storyDuelActive !== 'undefined') ? window.storyDuelActive : false;
-        if (isStory) {
-            alert('¡Te has rendido! Fin del juego (Historia).');
-            location.reload();
+window.surrenderDuel = function() {
+    if (window.playCancelSound) window.playCancelSound();
+
+    var existing = document.getElementById('fmr-surrender-modal');
+    if (existing) existing.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'fmr-surrender-modal';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:9999999; display:flex; align-items:center; justify-content:center; padding:16px; font-family:"Segoe UI", Arial, sans-serif;';
+
+    var modal = document.createElement('div');
+    modal.style.cssText = 'width:min(92vw, 420px); background:linear-gradient(180deg, #1b140e 0%, #0c0805 100%); border:2px solid #d4af37; border-radius:16px; box-shadow:0 0 35px rgba(212, 175, 55, 0.4), 0 16px 40px rgba(0,0,0,0.9); padding:24px 20px; text-align:center; color:#fff; box-sizing:border-box; animation:popIn 0.22s ease-out;';
+
+    modal.innerHTML = `
+        <div style="font-size:38px; margin-bottom:8px;">⚔️</div>
+        <div style="font-family:VT323, monospace; font-size:28px; color:#ffd700; text-shadow:0 0 12px rgba(255,215,0,0.6); letter-spacing:1.5px; margin-bottom:6px;">
+            ¿RENDIRSE DEL DUELO?
+        </div>
+        <p style="color:#e0d0b0; font-size:13.5px; line-height:1.5; margin:0 0 20px;">
+            El duelo actual finalizará como derrota. ¿Deseas iniciar un <b>Nuevo Duelo</b> contra el mismo rival o volver al mapa?
+        </p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+            <button id="btnSurrenderRetry" style="background:linear-gradient(135deg, #c0392b 0%, #8e1b10 100%); border:1.5px solid #ff7979; color:#fff; font-weight:800; font-size:14px; padding:13px; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(192,57,43,0.5); text-transform:uppercase; letter-spacing:0.04em;">
+                🔄 Nuevo Duelo (Reintentar)
+            </button>
+            <button id="btnSurrenderMap" style="background:linear-gradient(135deg, #27ae60 0%, #1e824c 100%); border:1.5px solid #2ecc71; color:#fff; font-weight:800; font-size:14px; padding:13px; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(39,174,96,0.4); text-transform:uppercase; letter-spacing:0.04em;">
+                🗺️ Volver al Mapa
+            </button>
+            <button id="btnSurrenderCancel" style="background:transparent; border:1px solid #776039; color:#cbb482; font-size:13px; font-weight:600; padding:9px; border-radius:8px; cursor:pointer; margin-top:4px;">
+                Continuar Duelo
+            </button>
+        </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#btnSurrenderCancel').onclick = function() {
+        overlay.remove();
+    };
+
+    overlay.querySelector('#btnSurrenderRetry').onclick = function() {
+        overlay.remove();
+        var opp = window.storyOpponent || window.lastDuelOpponent || 'tristan';
+        if (typeof window.beginStoryDuel === 'function') {
+            window.beginStoryDuel(opp);
+        } else if (typeof window.newGame === 'function') {
+            window.newGame();
         } else {
-            alert('Te has rendido. Volviendo al mapa...');
-            // ISOLATION: Hide the duel board wrapper completely
-            if (window.hideDuelBoard) window.hideDuelBoard();
-            // Reset story state
-            if (window.storyDuelActive !== undefined) window.storyDuelActive = false;
-            if (typeof window.newGame === 'function') {
-                // Reset the game state so next duel starts fresh
-                window.newGame();
-                if (window.hideDuelBoard) window.hideDuelBoard(); // newGame calls showDuelBoard internally, hide it again
-            }
-            // Go to map
-            if(window.hideDuelBoard) window.hideDuelBoard(); if (window.customShowMap) window.customShowMap();
-            else if (window.showMain) window.showMain();
+            location.reload();
         }
-    }
+    };
+
+    overlay.querySelector('#btnSurrenderMap').onclick = function() {
+        overlay.remove();
+        if (window.cleanAllOverlays) window.cleanAllOverlays();
+        if (window.hideDuelBoard) window.hideDuelBoard();
+        if (window.storyDuelActive !== undefined) window.storyDuelActive = false;
+        if (typeof window.customShowMap === 'function') window.customShowMap();
+        else if (typeof window.showMap === 'function') window.showMap();
+        else if (typeof window.showMain === 'function') window.showMain();
+    };
 };
 
 // Efectos de sonido locales y optimizados para offline y Android nativo
@@ -23132,8 +23172,149 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     if (typeof updateSetButton103 === 'function') try { updateSetButton103(); } catch(_) {}
     if (typeof fixBadChars === 'function') try { fixBadChars(); } catch(_) {}
     if (typeof updateGuardianBattleHints === 'function') try { updateGuardianBattleHints(); } catch(_) {}
+    if (typeof window.updateActionButtonsState === 'function') {
+      try { window.updateActionButtonsState(); } catch(_) {}
+    }
   };
   try { render = window.render; } catch(_) {}
+
+  // Gestor inteligente de botones de acción: apagados por defecto y encendidos según la carta seleccionada
+  window.updateActionButtonsState = function() {
+    var g = (typeof game !== 'undefined' && game) ? game : window.game;
+    var actionBtns = document.querySelector('.btns.actionBtns');
+    if (!actionBtns) return;
+
+    // 1. Ocultar el botón "Nuevo duelo" durante el duelo activo (se abre en el modal de Rendirse)
+    var newGameBtn = actionBtns.querySelector('button[onclick*="newGame"]');
+    if (newGameBtn) {
+      newGameBtn.style.display = 'none';
+    }
+
+    if (!g) return;
+
+    var isPlayerTurn = (g.turn === 'player' && !g.duelOver);
+    var hasFreeMonsterSlot = Array.isArray(g.field) && g.field.some(function(x) { return !x; });
+    var hasFreeSpellSlot = Array.isArray(g.playerBack) && g.playerBack.some(function(x) { return !x; });
+    var canSummonOrSet = isPlayerTurn && !g.handSummoned && hasFreeMonsterSlot;
+
+    // Cartas seleccionadas
+    var sel = Array.isArray(g.selected) ? g.selected : [];
+    var hSel = sel.filter(function(x) { return x && x[0] === 'h'; });
+    var fSel = sel.filter(function(x) { return x && x[0] === 'f'; });
+    var pbSel = sel.filter(function(x) { return x && x[0] === 'pb'; });
+
+    // ¿Hay exactamente una carta en mano seleccionada?
+    var selectedHandCard = (hSel.length === 1 && Array.isArray(g.hand)) ? g.hand[hSel[0][1]] : null;
+    var isMonsterInHand = false;
+    var isSpellInHand = false;
+    var isTrapInHand = false;
+
+    if (selectedHandCard) {
+      if (typeof isST === 'function' && isST(selectedHandCard)) {
+        if (selectedHandCard.kind === 'TRAP') isTrapInHand = true;
+        else isSpellInHand = true;
+      } else {
+        isMonsterInHand = true;
+      }
+    }
+
+    // ¿Hay un monstruo en el campo seleccionado?
+    var selectedFieldMonster = (fSel.length === 1 && Array.isArray(g.field)) ? g.field[fSel[0][1]] : null;
+
+    // 1. INVOCAR (Normal Summon) - Solo se enciende si se selecciona un monstruo en la mano
+    var summonBtn = actionBtns.querySelector('#summonBtn103') ||
+                    actionBtns.querySelector('button[onclick*="normalSummon"]');
+    if (summonBtn) {
+      var canSummon = canSummonOrSet && isMonsterInHand;
+      summonBtn.disabled = !canSummon;
+      summonBtn.classList.toggle('disabled', !canSummon);
+      summonBtn.classList.toggle('ready', canSummon);
+    }
+
+    // 2. SET (Colocar Monstruo o Magia/Trampa)
+    var setBtn = document.getElementById('setMonsterBtn103');
+    if (setBtn) {
+      var canSetMonster = canSummonOrSet && isMonsterInHand;
+      if (canSetMonster && typeof isEgyptianGod === 'function' && isEgyptianGod(selectedHandCard.name || selectedHandCard[0])) {
+        canSetMonster = false; // Los Dioses Egipcios no pueden colocarse con SET
+      }
+      var canSetSpellTrap = isPlayerTurn && (isSpellInHand || isTrapInHand) && hasFreeSpellSlot;
+      var canSet = canSetMonster || canSetSpellTrap;
+
+      setBtn.disabled = !canSet;
+      setBtn.classList.toggle('disabled', !canSet);
+      setBtn.classList.toggle('setReady103', canSet);
+    }
+
+    // 3. INV. XYZ - Solo si hay opción real de invocación XYZ en el campo
+    var xyzBtn = document.getElementById('xyzSummonBtn');
+    if (xyzBtn) {
+      var canXyz = isPlayerTurn && (typeof window.canPlayerXyzSummonAny === 'function' && window.canPlayerXyzSummonAny());
+      xyzBtn.disabled = !canXyz;
+      xyzBtn.classList.toggle('disabled', !canXyz);
+      xyzBtn.classList.toggle('xyzReady', canXyz);
+    }
+
+    // 4. CAMBIAR POSICIÓN - Solo se enciende si hay un monstruo en campo que pueda cambiar de posición
+    var posBtn = actionBtns.querySelector('button[onclick*="changePosition"]');
+    if (posBtn) {
+      var canChangePos = isPlayerTurn && selectedFieldMonster &&
+        selectedFieldMonster.kind !== 'LINK' &&
+        selectedFieldMonster.summonedTurn !== g.turnNo &&
+        selectedFieldMonster.positionChangedTurn !== g.turnNo &&
+        selectedFieldMonster.attackedTurn !== g.turnNo;
+      posBtn.disabled = !canChangePos;
+      posBtn.classList.toggle('disabled', !canChangePos);
+      posBtn.classList.toggle('ready', canChangePos);
+    }
+
+    // 5. ACTIVAR (Magias en mano / Cartas seteadas en campo)
+    var actBtn = document.getElementById('activateSetBtn');
+    if (actBtn) {
+      var canActivate = false;
+      if (isPlayerTurn && pbSel.length === 1 && Array.isArray(g.playerBack)) {
+        var pbCard = g.playerBack[pbSel[0][1]];
+        if (pbCard && pbCard.set) {
+          var isReady = pbCard.kind !== 'TRAP' || g.turnNo >= (pbCard.readyTurn || 0);
+          if (isReady) canActivate = true;
+        }
+      }
+      if (isPlayerTurn && isSpellInHand) {
+        canActivate = true;
+      }
+      actBtn.disabled = !canActivate;
+      actBtn.classList.toggle('disabled', !canActivate);
+      actBtn.classList.toggle('ready59', canActivate);
+      actBtn.style.display = canActivate ? 'inline-flex' : 'none';
+    }
+
+    // 6. INV. ESPECIAL
+    var spBtn = document.getElementById('specialSummonBtn');
+    if (spBtn) {
+      var canSpecial = isPlayerTurn && (typeof window.canPlayerSpecialSummonAny === 'function' ? window.canPlayerSpecialSummonAny() : false);
+      spBtn.disabled = !canSpecial;
+      spBtn.classList.toggle('disabled', !canSpecial);
+      spBtn.classList.toggle('specialSummonReady', canSpecial);
+    }
+
+    // 7. FUSIÓN
+    var fusBtn = document.getElementById('fusionBtn');
+    if (fusBtn) {
+      var opts = (typeof fusionOptions === 'function') ? fusionOptions() : [];
+      var canFuse = isPlayerTurn && opts.length > 0;
+      fusBtn.disabled = !canFuse;
+      fusBtn.classList.toggle('disabled', !canFuse);
+      fusBtn.classList.toggle('fusionReady', canFuse);
+    }
+  };
+
+  document.addEventListener('click', function() {
+    setTimeout(function() {
+      if (typeof window.updateActionButtonsState === 'function') {
+        try { window.updateActionButtonsState(); } catch(_) {}
+      }
+    }, 25);
+  }, false);
 
   // Selector Visual e Interactivo del Extra Deck Xyz (Mundo Zexal)
   window.openXyzExtraDeckSelector = function() {
@@ -23683,9 +23864,16 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       color: #ffffff !important;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
     }
-    #summonBtn103:hover,
-    .actionBtns button[onclick*="normalSummon"]:hover {
-      box-shadow: 0 0 16px rgba(255, 121, 121, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    #summonBtn103:not(:disabled):not(.disabled),
+    .actionBtns button[onclick*="normalSummon"]:not(:disabled):not(.disabled) {
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 60%, #962d22 100%) !important;
+      border: 2px solid #ff7979 !important;
+      box-shadow: 0 0 16px rgba(255, 121, 121, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+      animation: summonPulse 1.3s infinite alternate !important;
+    }
+    @keyframes summonPulse {
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(255, 121, 121, 0.5); }
+      100% { transform: scale(1.04); box-shadow: 0 0 20px rgba(255, 121, 121, 1); }
     }
 
     /* 2. Botón SET (Colocar Monstruo en Defensa) */
@@ -23695,15 +23883,16 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       color: #e0f7fa !important;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
-    #setMonsterBtn103.setReady103 {
+    #setMonsterBtn103.setReady103,
+    #setMonsterBtn103:not(:disabled):not(.disabled) {
       border: 2px solid #00f2fe !important;
       box-shadow: 0 0 18px rgba(0, 242, 254, 0.9), inset 0 0 8px rgba(0, 242, 254, 0.45) !important;
       color: #ffffff !important;
       animation: setPulse 1.3s infinite alternate !important;
     }
     @keyframes setPulse {
-      0% { box-shadow: 0 0 8px rgba(0, 242, 254, 0.5); }
-      100% { box-shadow: 0 0 22px rgba(0, 242, 254, 1); }
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 242, 254, 0.5); }
+      100% { transform: scale(1.04); box-shadow: 0 0 22px rgba(0, 242, 254, 1); }
     }
 
     /* 3. Botón FUSIÓN */
@@ -23730,8 +23919,15 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       color: #ffffff !important;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
-    .actionBtns button[onclick*="changePosition"]:hover {
-      box-shadow: 0 0 16px rgba(46, 204, 113, 0.75) !important;
+    .actionBtns button[onclick*="changePosition"]:not(:disabled):not(.disabled) {
+      background: linear-gradient(135deg, #2ecc71 0%, #27ae60 60%, #1e8449 100%) !important;
+      border: 2px solid #58d68d !important;
+      box-shadow: 0 0 16px rgba(46, 204, 113, 0.85) !important;
+      animation: posPulse 1.2s infinite alternate !important;
+    }
+    @keyframes posPulse {
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(46, 204, 113, 0.5); }
+      100% { transform: scale(1.04); box-shadow: 0 0 20px rgba(88, 214, 141, 1); }
     }
 
     /* 5. Botón ACTIVAR (Magias / Trampas Colocadas) */
@@ -23747,16 +23943,9 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       100% { box-shadow: 0 0 22px rgba(253, 121, 168, 0.95); }
     }
 
-    /* 6. Botón NUEVO DUELO */
+    /* 6. Botón NUEVO DUELO (Oculto de la barra durante el duelo, activo desde el modal de Rendición) */
     .actionBtns button[onclick*="newGame"] {
-      background: linear-gradient(135deg, #3d3d3d 0%, #222222 100%) !important;
-      border: 1.5px solid #7f8c8d !important;
-      color: #dfe4ea !important;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.5) !important;
-    }
-    .actionBtns button[onclick*="newGame"]:hover {
-      border-color: #bdc3c7 !important;
-      color: #ffffff !important;
+      display: none !important;
     }
 
     /* 7. Botón RENDIRSE */
@@ -23772,30 +23961,40 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       box-shadow: 0 0 14px rgba(231, 76, 60, 0.8) !important;
     }
 
-    /* 8. Botones Deshabilitados */
+    /* 8. Botones Deshabilitados (APAGADOS por defecto) */
     .actionBtns .btn:disabled,
     .actionBtns .btn.disabled {
-      opacity: 0.32 !important;
-      filter: grayscale(0.85) !important;
+      opacity: 0.28 !important;
+      filter: grayscale(1) brightness(0.65) !important;
       pointer-events: none !important;
       box-shadow: none !important;
       animation: none !important;
-      border-color: #555555 !important;
+      border-color: #444444 !important;
+      color: #888888 !important;
       cursor: not-allowed !important;
+      transform: none !important;
     }
 
-    /* 9. Barra de Fases (Phase Bar: DP, BP, EP) */
-    .phaseBar {
+    /* 9. Barra de Fases (Phase Bar: DP, M1, BP, EP) - 100% CENTRADO */
+    .phaseBar,
+    .phaseBarAboveExtra,
+    body.view-field .phaseBar,
+    body.view-hand .phaseBar {
       background: rgba(16, 12, 8, 0.92) !important;
       border: 1.5px solid #9e814a !important;
       border-radius: 22px !important;
-      padding: 4px 8px !important;
-      display: inline-flex !important;
+      padding: 4px 10px !important;
+      display: flex !important;
+      width: fit-content !important;
+      max-width: max-content !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 6px !important;
+      gap: 8px !important;
       margin: 8px auto !important;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75), inset 0 0 8px rgba(0, 0, 0, 0.8) !important;
+      box-sizing: border-box !important;
+      position: relative !important;
+      z-index: 25 !important;
     }
     .phaseBtn {
       min-width: 52px !important;
@@ -23829,17 +24028,25 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       box-shadow: 0 0 16px rgba(243, 156, 18, 0.8) !important;
     }
 
-    /* 10. Navegación CAMPO / MANO (viewNav) */
-    .viewNav {
+    /* 10. Navegación CAMPO / MANO (viewNav) - 100% CENTRADO */
+    .viewNav,
+    body.view-field .viewNav,
+    body.view-hand .viewNav {
       background: rgba(14, 11, 8, 0.94) !important;
       border: 1.5px solid #9e814a !important;
       border-radius: 22px !important;
-      padding: 4px !important;
-      gap: 6px !important;
-      display: inline-flex !important;
+      padding: 4px 8px !important;
+      gap: 8px !important;
+      display: flex !important;
+      width: fit-content !important;
+      max-width: max-content !important;
+      margin: 8px auto 10px !important;
       align-items: center !important;
       justify-content: center !important;
       box-shadow: 0 4px 16px rgba(0,0,0,0.7) !important;
+      box-sizing: border-box !important;
+      position: relative !important;
+      z-index: 35 !important;
     }
     .viewBtn {
       min-width: 90px !important;
@@ -24080,21 +24287,21 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
 
     body.view-hand #hand,
     body.view-hand .hand {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
-      gap: 16px !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
       justify-content: center !important;
-      align-items: stretch !important;
+      align-items: center !important;
+      gap: 14px !important;
       width: 100% !important;
-      max-width: min(96vw, 1300px) !important;
-      margin: 14px auto 30px !important;
+      max-width: min(98vw, 1400px) !important;
+      margin: 10px auto 26px !important;
       padding: 8px 12px !important;
       box-sizing: border-box !important;
     }
 
     body.view-hand #hand .zone,
     body.view-hand .hand .zone {
-      width: 100% !important;
+      width: clamp(135px, 16vw, 185px) !important;
       height: auto !important;
       min-height: unset !important;
       max-height: unset !important;
@@ -24107,6 +24314,7 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       position: relative !important;
       box-sizing: border-box !important;
       overflow: visible !important;
+      flex: 0 0 auto !important;
     }
 
     body.view-hand #hand .card,
@@ -24670,24 +24878,49 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
     @media (orientation: landscape) and (max-height: 600px) {
       body.view-hand #hand,
       body.view-hand .hand {
-        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-        gap: 8px !important;
-        padding: 4px 6px !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 6px 10px !important;
+        margin: 6px auto 20px !important;
+      }
+      body.view-hand #hand .zone,
+      body.view-hand .hand .zone {
+        width: clamp(125px, 15vw, 175px) !important;
+        height: auto !important;
+        aspect-ratio: 59 / 86 !important;
+        flex: 0 0 auto !important;
+      }
+      body.view-hand #hand .card,
+      body.view-hand .hand .card,
+      .hand .card {
+        width: 100% !important;
+        height: 100% !important;
+        padding: 6px !important;
       }
       body.view-hand #hand .card .cardTop,
       .hand .card .cardTop {
-        height: 18px !important;
-        min-height: 18px !important;
+        height: 22px !important;
+        min-height: 22px !important;
+        padding: 1px 5px !important;
       }
       body.view-hand #hand .card .cardTop .name,
       .hand .card .cardTop .name {
-        font-size: 8.5px !important;
+        font-size: 11px !important;
+        font-weight: 800 !important;
+      }
+      body.view-hand #hand .card .cardMeta,
+      .hand .card .cardMeta {
+        font-size: 9px !important;
       }
       body.view-hand #hand .card .stats,
       .hand .card .stats {
-        font-size: 8.5px !important;
-        height: 18px !important;
-        min-height: 18px !important;
+        font-size: 10.5px !important;
+        font-weight: 800 !important;
+        height: 22px !important;
+        min-height: 22px !important;
       }
     }
       .actionBtns {
