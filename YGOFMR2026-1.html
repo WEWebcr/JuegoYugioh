@@ -9224,8 +9224,8 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
           return {
             id: cd.id,
             name: cd.name,
-            level: cd.level || cd.rank || 4,
-            rank: cd.rank || cd.level || 4,
+            level: isXyzCd ? undefined : (cd.level || 4),
+            rank: isXyzCd ? (cd.rank || cd.level || 4) : undefined,
             type: cd.type || 'Warrior',
             attr: cd.attr || 'EARTH',
             atk: cd.atk || 0,
@@ -9250,7 +9250,7 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
         var isXyzEx = ex[6] === 'XYZ' || (typeof window.isXyzCard === 'function' && window.isXyzCard(ex[0]));
         return {
           name: ex[0],
-          level: ex[1],
+          level: isXyzEx ? undefined : ex[1],
           rank: isXyzEx ? ex[1] : undefined,
           type: ex[2],
           attr: ex[3],
@@ -9271,7 +9271,7 @@ window.CHARACTER_DECKS = {"akiza":{"character":"akiza","displayName":"Akiza Izin
         var isXyzMeta = meta.kind === 'XYZ' || (typeof window.isXyzCard === 'function' && window.isXyzCard(name));
         return {
           name: meta.name || name,
-          level: meta.level || meta.rank || 4,
+          level: isXyzMeta ? undefined : (meta.level || 4),
           rank: isXyzMeta ? (meta.rank || meta.level || 4) : undefined,
           type: meta.type || 'Warrior',
           attr: meta.attr || 'LIGHT',
@@ -13181,7 +13181,7 @@ window.XYZ_CARD_NAMES = new Set([
 
 window.isXyzCard = function(cardOrName) {
   if (!cardOrName) return false;
-  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || cardOrName[1] || '')).trim();
+  var name = (typeof cardOrName === 'string' ? cardOrName : (cardOrName.name || cardOrName[0] || '')).trim();
   if (name && window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
   if (/^number\s+\w+/i.test(name) || /cxyz/i.test(name) || /xyz\s+dragon/i.test(name)) return true;
   var kind = String((cardOrName && cardOrName.kind) || (cardOrName && cardOrName[6]) || '').toUpperCase();
@@ -29584,18 +29584,30 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
   // Comprobar si un monstruo en el campo es de tipo Xyz (posee Rango en lugar de Nivel)
   window.isFieldMonsterXyz = function(c) {
     if (!c) return false;
-    if (c.kind === 'XYZ') return true;
-    if (c.rank != null || c.overlayUnits != null) return true;
+    var name = (typeof c === 'string' ? c : (c.name || c[0] || '')).trim();
+    if (window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
+    if (typeof window.isXyzCard === 'function' && window.isXyzCard(name || c)) return true;
+    if (/^number\s+\w+/i.test(name) || /cxyz/i.test(name) || /xyz\s+dragon/i.test(name)) return true;
+
+    var kind = String(c.kind || c[6] || '').toUpperCase();
+    if (kind === 'XYZ') return true;
+    if (c.overlayUnits != null || (Array.isArray(c.materials) && c.materials.length > 0)) return true;
+
     var type = String(c.type || c[2] || '').toLowerCase();
     if (type.includes('xyz')) return true;
-    var name = (c.name || c[0] || '').trim();
-    if (typeof window.isXyzCard === 'function' && window.isXyzCard(name || c)) return true;
-    if (window.XYZ_CARD_NAMES && window.XYZ_CARD_NAMES.has(name)) return true;
-    if (/^number\s+\w+/i.test(name) || /cxyz/i.test(name) || /xyz\s+dragon/i.test(name)) return true;
+
     if (window.CARDS_DATA && Array.isArray(window.CARDS_DATA)) {
-      var cd = window.CARDS_DATA.find(function(x) { return x && x.name === name; });
-      if (cd && (cd.kind === 'XYZ' || (cd.type && String(cd.type).toLowerCase().includes('xyz')) || cd.rank != null)) return true;
+      var cd = window.CARDS_DATA.find(function(x) { return x && (x.name === name || (x.name && x.name.toLowerCase() === name.toLowerCase())); });
+      if (cd && (cd.kind === 'XYZ' || (cd.type && String(cd.type).toLowerCase().includes('xyz')))) return true;
     }
+
+    if (typeof EXTRA !== 'undefined' && Array.isArray(EXTRA)) {
+      var ex = EXTRA.find(function(x) { return x && (x[0] === name || (x[0] && x[0].toLowerCase() === name.toLowerCase())); });
+      if (ex && ex[6] === 'XYZ') return true;
+    }
+
+    if (c.rank != null && c.level == null) return true;
+
     return false;
   };
 
