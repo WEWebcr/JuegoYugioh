@@ -515,7 +515,7 @@ function cardHTML(c,zone,i){
             return `<div class="${cls}"><div class="name">${c.name}</div><div>${c.kind==='EQUIP'?'EQUIPAMIENTO':c.kind}</div>${imgHTML}<div class="stActions"><button onclick="event.stopPropagation();setST(${i})">SET</button><button onclick="event.stopPropagation();activateSTFromHand(${i})" ${c.kind==='TRAP'?'disabled':''}>ACTIVAR</button></div></div>`;
         }
         let ready=c.kind!=='TRAP'||(window.isTrapReady ? window.isTrapReady(c) : ((c.setSide !== game.turn) || game.turnNo > (c.setTurn || 0)));
-        let isAuto=c.kind==='TRAP'&&(['MIRROR_FORCE','TRAP_HOLE','MAGIC_CYLINDER','NEGATE_ATTACK','SAKURETSU_ARMOR','TORRENTIAL'].includes(c.value)||['Trap Hole','Sakuretsu Armor','Negate Attack','Mirror Force','Magic Cylinder','Torrential Tribute'].includes(c.name));
+        let isAuto=c.kind==='TRAP'&&(['MIRROR_FORCE','TRAP_HOLE','MAGIC_CYLINDER','NEGATE_ATTACK','SAKURETSU_ARMOR','TORRENTIAL','BOTTOMLESS_TRAP_HOLE','BOTTOMLESS'].includes(c.value)||['Trap Hole','Sakuretsu Armor','Negate Attack','Mirror Force','Magic Cylinder','Torrential Tribute','Bottomless Trap Hole'].includes(c.name));
         let statusText=c.set?'SET · '+(c.kind==='TRAP'?(ready?'LISTA':'ESPERA'):'LISTA'):'';
         let actBtn=(c.set&&ready&&!isAuto)?`<button onclick="event.stopPropagation();activateSetCard(${i})">ACTIVAR</button>`:'';
         return `<div class="${cls}" onclick="select('${zone}',${i})"><div class="name">${c.name}</div><div>${c.kind==='EQUIP'?'EQUIPAMIENTO':c.kind}</div>${imgHTML}<div style="font-size:10px">${statusText}</div>${actBtn}</div>`;

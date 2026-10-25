@@ -11055,7 +11055,7 @@ window.cardHTML = function(c, z, i) {
         footer.appendChild(setTrapBtn);
       }
     } else if (zone === 'b' && typeof game !== 'undefined' && game && game.turn === 'player') {
-      var isAuto = isTrap && (['MIRROR_FORCE','TRAP_HOLE','MAGIC_CYLINDER','NEGATE_ATTACK','SAKURETSU_ARMOR','TORRENTIAL'].includes(c.value) || ['Trap Hole','Sakuretsu Armor','Negate Attack','Mirror Force','Magic Cylinder','Torrential Tribute'].includes(name));
+      var isAuto = isTrap && (['MIRROR_FORCE','TRAP_HOLE','MAGIC_CYLINDER','NEGATE_ATTACK','SAKURETSU_ARMOR','TORRENTIAL','BOTTOMLESS_TRAP_HOLE','BOTTOMLESS'].includes(c.value) || ['Trap Hole','Sakuretsu Armor','Negate Attack','Mirror Force','Magic Cylinder','Torrential Tribute','Bottomless Trap Hole'].includes(name));
       var isReady = !isTrap || (typeof window.isTrapReady === 'function' ? window.isTrapReady(c) : false);
       if (c.set && isReady && !isAuto) {
         var actSetBtn = document.createElement('button');
@@ -13666,6 +13666,16 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
       }
     }
 
+    // Verificación de Trampas de Invocación rival (Torrential Tribute, Bottomless Trap Hole, Trap Hole, etc.)
+    if (typeof window.checkSummonTraps === 'function') {
+      var trapFired = window.checkSummonTraps(monster, 'player', slot);
+      if (trapFired) {
+        if (typeof render === 'function') render();
+        if (typeof setDuelView === 'function') setDuelView('field');
+        return;
+      }
+    }
+
     if (typeof render === 'function') render();
     if (typeof setDuelView === 'function') setDuelView('field');
     if (isEgyptianGod(monster.name)) {
@@ -14418,6 +14428,10 @@ document.addEventListener('DOMContentLoaded', function _injectCustomCards() {
     fused.isFusion = true;
     fused.kind = 'FUSION';
     game.field[targetSlot] = fused;
+
+    if (typeof window.checkSummonTraps === 'function') {
+      window.checkSummonTraps(fused, 'player', targetSlot);
+    }
 
     if (typeof window.recordDiscoveredFusion === 'function') {
       try { window.recordDiscoveredFusion(resultName); } catch(_) {}
@@ -17480,8 +17494,8 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       }
 
       // Automatic response traps
-      if (['MIRROR_FORCE', 'TRAP_HOLE', 'MAGIC_CYLINDER', 'NEGATE_ATTACK', 'SAKURETSU_ARMOR', 'TORRENTIAL', 'WIDESPREAD_RUIN', 'EATGABOON', 'BEAR_TRAP', 'INVISIBLE_WIRE', 'ACID_TRAP_HOLE', 'GOBLIN_FAN', 'BAD_REACTION_TO_SIMOCHI', 'REVERSE_TRAP', 'FAKE_TRAP'].includes(val) ||
-          ['Trap Hole', 'Sakuretsu Armor', 'Negate Attack', 'Mirror Force', 'Torrential Tribute', 'Widespread Ruin', 'Eatgaboon', 'Bear Trap', 'Invisible Wire', 'Acid Trap Hole', 'Goblin Fan', 'Bad Reaction to Simochi', 'Reverse Trap', 'Fake Trap'].includes(cName)) {
+      if (['MIRROR_FORCE', 'TRAP_HOLE', 'MAGIC_CYLINDER', 'NEGATE_ATTACK', 'SAKURETSU_ARMOR', 'TORRENTIAL', 'WIDESPREAD_RUIN', 'EATGABOON', 'BEAR_TRAP', 'INVISIBLE_WIRE', 'ACID_TRAP_HOLE', 'GOBLIN_FAN', 'BAD_REACTION_TO_SIMOCHI', 'REVERSE_TRAP', 'FAKE_TRAP', 'BOTTOMLESS_TRAP_HOLE', 'BOTTOMLESS'].includes(val) ||
+          ['Trap Hole', 'Sakuretsu Armor', 'Negate Attack', 'Mirror Force', 'Torrential Tribute', 'Widespread Ruin', 'Eatgaboon', 'Bear Trap', 'Invisible Wire', 'Acid Trap Hole', 'Goblin Fan', 'Bad Reaction to Simochi', 'Reverse Trap', 'Fake Trap', 'Bottomless Trap Hole'].includes(cName)) {
         duelToast(cName + ' es una Trampa de respuesta automática. Se activará cuando el rival ataque o invoque.');
         return;
       }
@@ -17766,8 +17780,46 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       return true;
     }
 
-    // 2. Trap Hole (Monstruos invocados con ATK >= 1000)
-    var sAtk = Number(summonedCard.atk || summonedCard[4] || 0);
+    var sAtk = (typeof window.getCardStats === 'function' ? window.getCardStats(summonedCard).atk : null);
+    if (sAtk == null || isNaN(sAtk)) sAtk = Number(summonedCard.atk !== undefined ? summonedCard.atk : (summonedCard[4] || 0));
+
+    // 2. Bottomless Trap Hole (Monstruos invocados con ATK >= 1500: ¡Destruye y Destierra!)
+    var bthIdx = defBack.findIndex(function(c) {
+      if (!c || !c.set || !isTrapReady(c)) return false;
+      var cv = (c.value || '').toUpperCase();
+      var cn = (c.name || '').toLowerCase().trim();
+      return cv === 'BOTTOMLESS_TRAP_HOLE' || cv === 'BOTTOMLESS' || cn === 'bottomless trap hole';
+    });
+    if (bthIdx >= 0 && sAtk >= 1500) {
+      var sName = summonedCard.name || summonedCard[0] || 'Monstruo';
+      if (isEgyptianGod(sName)) {
+        if (typeof duelToast === 'function') duelToast('¡Bottomless Trap Hole falla! ¡Los Dioses Egipcios no caen en trampas!');
+        if (typeof log === 'function') log('¡Bottomless Trap Hole no puede atrapar al Dios Egipcio ' + sName + '!');
+        return false;
+      }
+      var trapBTH = defBack[bthIdx];
+      defBack[bthIdx] = null;
+      defGrave.push(Object.assign({}, trapBTH, { set: false, faceUp: true }));
+      if (slotIndex != null && sumField[slotIndex] === summonedCard) {
+        sumField[slotIndex] = null;
+      } else {
+        var fi = sumField.indexOf(summonedCard);
+        if (fi >= 0) sumField[fi] = null;
+        else if (slotIndex != null) sumField[slotIndex] = null;
+      }
+      var sumBanished = (summonedSide === 'enemy') ? (game.enemyBanished = game.enemyBanished || []) : (game.banished = game.banished || []);
+      sumBanished.push(summonedCard);
+      if (window.playDestroySound) window.playDestroySound();
+      var labelBTH = defendingSide === 'player' ? '¡Tu Bottomless Trap Hole activado!' : '¡El rival activa Bottomless Trap Hole!';
+      if (typeof duelToast === 'function') duelToast(labelBTH + ' ' + sName + ' (' + sAtk + ' ATK) cayó en el agujero trampa sin fondo: ¡DESTRUIDO Y DESTERRADO!');
+      if (typeof log === 'function') log(labelBTH + ' ' + sName + ' (' + sAtk + ' ATK) es destruido y desterrado del juego al ser invocado.');
+      if (document.getElementById('banishedCount')) document.getElementById('banishedCount').textContent = (game.banished || []).length;
+      if (document.getElementById('enemyBanishedCount')) document.getElementById('enemyBanishedCount').textContent = (game.enemyBanished || []).length;
+      if (typeof render === 'function') render();
+      return true;
+    }
+
+    // 3. Trap Hole (Monstruos invocados con ATK >= 1000)
     var thIdx = defBack.findIndex(function(c) {
       return c && c.set && isTrapReady(c) && (c.value === 'TRAP_HOLE' || c.name === 'Trap Hole');
     });
@@ -21720,6 +21772,10 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
         sc.summonedTurn = game.turnNo;
         game.field[slot] = sc;
 
+        if (typeof window.checkSummonTraps === 'function') {
+          window.checkSummonTraps(sc, 'player', slot);
+        }
+
         game.extraUsed = game.extraUsed || [];
         game.extraUsed.push(c.name);
         game.selected = [];
@@ -21774,6 +21830,10 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
       sc.kind = 'SYNCHRO';
       sc.summonedTurn = game.turnNo;
       game.field[slot] = sc;
+
+      if (typeof window.checkSummonTraps === 'function') {
+        window.checkSummonTraps(sc, 'player', slot);
+      }
 
       game.extraUsed = game.extraUsed || [];
       game.extraUsed.push(c.name);
@@ -22091,6 +22151,15 @@ window.showSynchroBlastWaveTargetModal = function(oppTargets, onSelected, onCanc
           safeDuelToast('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' invoca a ' + (scXyz.name || 'Monstruo Xyz') + '!');
           if (typeof log === 'function') {
             log('🌌 ¡INVOCACIÓN XYZ RIVAL! ' + oppName + ' sobrepone a ' + mat1Name + ' y ' + mat2Name + ' (Nivel ' + targetRank + ') e Invoca por Xyz a ' + (scXyz.name || 'Monstruo Xyz') + ' (Rango ' + targetRank + ', ' + scXyz.atk + ' ATK)!');
+          }
+
+          // Verificar si el jugador tiene una trampa ante invocación (Bottomless Trap Hole, Torrential Tribute, Trap Hole)
+          if (typeof window.checkSummonTraps === 'function') {
+            var bTrapFired = window.checkSummonTraps(scXyz, 'enemy', fSlotXyz);
+            if (bTrapFired) {
+              if (typeof render === 'function') render();
+              return;
+            }
           }
 
           // 1. AUTO-EQUIPAR CARTA DE EQUIPO PARA HACERLO FUERTE (Xyz Unit)
